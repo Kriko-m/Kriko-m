@@ -9,10 +9,41 @@
         "beschrijving": "Een eerste weekendje weg voor onze allerkleinsten: bosspelen, een spannende avondtocht en knus slapen in de lokalen.",
         "open_voor_inschrijving": true,
         "paklijst": [
-            { "categorie": "Kleding", "items": ["Stevige speelkleren", "Regenjas", "Warme trui", "Extra ondergoed", "Pyjama", "Pantoffels"] },
-            { "categorie": "Slapen", "items": ["Slaapzak", "Kussen", "Knuffel"] },
-            { "categorie": "Hygiëne", "items": ["Tandenborstel + tandpasta", "Washandje + handdoek", "Zeep"] },
-            { "categorie": "Andere", "items": ["Drinkbus", "Zaklamp", "Lievelingsboekje"] }
+            {
+                "categorie": "Kleding",
+                "items": [
+                    "Stevige speelkleren",
+                    "Regenjas",
+                    "Warme trui",
+                    "Extra ondergoed",
+                    "Pyjama",
+                    "Pantoffels"
+                ]
+            },
+            {
+                "categorie": "Slapen",
+                "items": [
+                    "Slaapzak",
+                    "Kussen",
+                    "Knuffel"
+                ]
+            },
+            {
+                "categorie": "Hygiëne",
+                "items": [
+                    "Tandenborstel + tandpasta",
+                    "Washandje + handdoek",
+                    "Zeep"
+                ]
+            },
+            {
+                "categorie": "Andere",
+                "items": [
+                    "Drinkbus",
+                    "Zaklamp",
+                    "Lievelingsboekje"
+                ]
+            }
         ]
     },
     {
@@ -25,11 +56,53 @@
         "beschrijving": "Tien dagen avontuur: tochten, een tweedaagse, sjorringen en elke avond kampvuur.",
         "open_voor_inschrijving": true,
         "paklijst": [
-            { "categorie": "Kleding", "items": ["Stevige wandelschoenen", "Laarzen", "Volledig uniform + das", "T-shirts (voldoende)", "Regenjas", "Warme trui", "Zwemkledij"] },
-            { "categorie": "Slapen", "items": ["Slaapzak", "Slaapmatje", "Kussensloop"] },
-            { "categorie": "Hygiëne", "items": ["Toiletzak", "2 handdoeken", "Zonnecrème", "Muggenmelk"] },
-            { "categorie": "Materiaal", "items": ["Grote rugzak", "Dagrugzak", "Zaklamp + batterijen", "Drinkbus (1L)", "Bestek + gamel + beker"] },
-            { "categorie": "Andere", "items": ["Postzegels + adressen", "Beperkt zakgeld", "Goed humeur"] }
+            {
+                "categorie": "Kleding",
+                "items": [
+                    "Stevige wandelschoenen",
+                    "Laarzen",
+                    "Volledig uniform + das",
+                    "T-shirts (voldoende)",
+                    "Regenjas",
+                    "Warme trui",
+                    "Zwemkledij"
+                ]
+            },
+            {
+                "categorie": "Slapen",
+                "items": [
+                    "Slaapzak",
+                    "Slaapmatje",
+                    "Kussensloop"
+                ]
+            },
+            {
+                "categorie": "Hygiëne",
+                "items": [
+                    "Toiletzak",
+                    "2 handdoeken",
+                    "Zonnecrème",
+                    "Muggenmelk"
+                ]
+            },
+            {
+                "categorie": "Materiaal",
+                "items": [
+                    "Grote rugzak",
+                    "Dagrugzak",
+                    "Zaklamp + batterijen",
+                    "Drinkbus (1L)",
+                    "Bestek + gamel + beker"
+                ]
+            },
+            {
+                "categorie": "Andere",
+                "items": [
+                    "Postzegels + adressen",
+                    "Beperkt zakgeld",
+                    "Goed humeur"
+                ]
+            }
         ]
     },
     {
@@ -42,10 +115,58 @@
         "beschrijving": "Tien dagen vol spel, sport en avontuur op kamp met de jonggivers.",
         "open_voor_inschrijving": true,
         "paklijst": [
-            { "categorie": "Kleding", "items": ["Wandelschoenen", "Laarzen", "Uniform + das", "T-shirts", "Regenjas", "Warme kleren", "Zwemkledij"] },
-            { "categorie": "Slapen", "items": ["Slaapzak", "Slaapmatje", "Kussen"] },
-            { "categorie": "Hygiëne", "items": ["Toiletzak", "Handdoeken", "Zonnecrème"] },
-            { "categorie": "Materiaal", "items": ["Rugzak", "Zaklamp", "Drinkbus", "Gamel + bestek"] }
+            {
+                "categorie": "Kleding",
+                "items": [
+                    "Wandelschoenen",
+                    "Laarzen",
+                    "Uniform + das",
+                    "T-shirts",
+                    "Regenjas",
+                    "Warme kleren",
+                    "Zwemkledij"
+                ]
+            },
+            {
+                "categorie": "Slapen",
+                "items": [
+                    "Slaapzak",
+                    "Slaapmatje",
+                    "Kussen"
+                ]
+            },
+            {
+                "categorie": "Hygiëne",
+                "items": [
+                    "Toiletzak",
+                    "Handdoeken",
+                    "Zonnecrème"
+                ]
+            },
+            {
+                "categorie": "Materiaal",
+                "items": [
+                    "Rugzak",
+                    "Zaklamp",
+                    "Drinkbus",
+                    "Gamel + bestek"
+                ]
+            }
         ]
+    },
+    {
+        "id": "kamp_5c2314b8659f",
+        "naam": "kamp",
+        "tak": "welpen",
+        "datum_van": "0040-02-10",
+        "datum_tot": "0043-04-30",
+        "locatie": "",
+        "beschrijving": "",
+        "open_voor_inschrijving": false,
+        "prijs": 0,
+        "paklijst": [],
+        "bestanden": [],
+        "aangemaakt_op": "2026-06-04 16:09:14",
+        "aangemaakt_door": "LEIDING-DEMO"
     }
 ]
