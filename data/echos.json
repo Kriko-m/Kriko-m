@@ -1,0 +1,42 @@
+[
+    {
+        "id": "echo_1",
+        "title": "Kriko Echo Oktober 2026",
+        "month": "10",
+        "year": "2026",
+        "tak": "kapoenen",
+        "file_name": "echo-oktober-kapoenen.pdf",
+        "uploaded_at": "2026-09-25 18:30:00",
+        "approved": true
+    },
+    {
+        "id": "echo_2",
+        "title": "Kriko Echo Oktober 2026",
+        "month": "10",
+        "year": "2026",
+        "tak": "welpen",
+        "file_name": "echo-oktober-welpen.pdf",
+        "uploaded_at": "2026-09-25 18:32:00",
+        "approved": true
+    },
+    {
+        "id": "echo_6a1c44410bfc3",
+        "title": "kriko echo test 3",
+        "month": "6",
+        "year": "2026",
+        "tak": "welpen",
+        "file_name": "echo-2026-6-welpen-6a1c44410bc3d.pdf",
+        "uploaded_at": "2026-05-31 14:22:57",
+        "approved": true
+    },
+    {
+        "id": "echo_6a1c670a36418",
+        "title": "kriko echo tester 3",
+        "month": "6",
+        "year": "2026",
+        "tak": "kapoenen",
+        "file_name": "echo-2026-6-kapoenen-6a1c670a35fba.pdf",
+        "uploaded_at": "2026-05-31 16:51:22",
+        "approved": true
+    }
+]

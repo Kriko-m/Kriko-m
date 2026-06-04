@@ -1,0 +1,51 @@
+[
+    {
+        "id": "kapoenen-weekend-2026",
+        "naam": "Kapoenenweekend 2026",
+        "tak": "kapoenen",
+        "datum_van": "2026-05-15",
+        "datum_tot": "2026-05-17",
+        "locatie": "De Hoge Rielen, Kasterlee",
+        "beschrijving": "Een eerste weekendje weg voor onze allerkleinsten: bosspelen, een spannende avondtocht en knus slapen in de lokalen.",
+        "open_voor_inschrijving": true,
+        "paklijst": [
+            { "categorie": "Kleding", "items": ["Stevige speelkleren", "Regenjas", "Warme trui", "Extra ondergoed", "Pyjama", "Pantoffels"] },
+            { "categorie": "Slapen", "items": ["Slaapzak", "Kussen", "Knuffel"] },
+            { "categorie": "Hygiëne", "items": ["Tandenborstel + tandpasta", "Washandje + handdoek", "Zeep"] },
+            { "categorie": "Andere", "items": ["Drinkbus", "Zaklamp", "Lievelingsboekje"] }
+        ]
+    },
+    {
+        "id": "zomerkamp-givers-2026",
+        "naam": "Zomerkamp Givers 2026",
+        "tak": "givers",
+        "datum_van": "2026-07-10",
+        "datum_tot": "2026-07-20",
+        "locatie": "Ardennen (exacte locatie volgt)",
+        "beschrijving": "Tien dagen avontuur: tochten, een tweedaagse, sjorringen en elke avond kampvuur.",
+        "open_voor_inschrijving": true,
+        "paklijst": [
+            { "categorie": "Kleding", "items": ["Stevige wandelschoenen", "Laarzen", "Volledig uniform + das", "T-shirts (voldoende)", "Regenjas", "Warme trui", "Zwemkledij"] },
+            { "categorie": "Slapen", "items": ["Slaapzak", "Slaapmatje", "Kussensloop"] },
+            { "categorie": "Hygiëne", "items": ["Toiletzak", "2 handdoeken", "Zonnecrème", "Muggenmelk"] },
+            { "categorie": "Materiaal", "items": ["Grote rugzak", "Dagrugzak", "Zaklamp + batterijen", "Drinkbus (1L)", "Bestek + gamel + beker"] },
+            { "categorie": "Andere", "items": ["Postzegels + adressen", "Beperkt zakgeld", "Goed humeur"] }
+        ]
+    },
+    {
+        "id": "jonggivers-kamp-2026",
+        "naam": "Zomerkamp Jonggivers 2026",
+        "tak": "jonggivers",
+        "datum_van": "2026-07-21",
+        "datum_tot": "2026-07-31",
+        "locatie": "Vlaamse Ardennen",
+        "beschrijving": "Tien dagen vol spel, sport en avontuur op kamp met de jonggivers.",
+        "open_voor_inschrijving": true,
+        "paklijst": [
+            { "categorie": "Kleding", "items": ["Wandelschoenen", "Laarzen", "Uniform + das", "T-shirts", "Regenjas", "Warme kleren", "Zwemkledij"] },
+            { "categorie": "Slapen", "items": ["Slaapzak", "Slaapmatje", "Kussen"] },
+            { "categorie": "Hygiëne", "items": ["Toiletzak", "Handdoeken", "Zonnecrème"] },
+            { "categorie": "Materiaal", "items": ["Rugzak", "Zaklamp", "Drinkbus", "Gamel + bestek"] }
+        ]
+    }
+]
