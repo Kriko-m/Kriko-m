@@ -87,28 +87,6 @@ function init_db_defaults($db_name) {
         case 'settings':
             $defaults = [
                 'scouts_year' => '2026-2027',
-                'accounts' => [
-                    'groepsleiding' => [
-                        'role_name' => 'Groepsleiding',
-                        'password_hash' => password_hash('KrikoGroep2026!', PASSWORD_DEFAULT)
-                    ],
-                    'kapoenen' => [
-                        'role_name' => 'Kapoenenleiding',
-                        'password_hash' => password_hash('KrikoKapoenen2026!', PASSWORD_DEFAULT)
-                    ],
-                    'welpen' => [
-                        'role_name' => 'Welpenleiding',
-                        'password_hash' => password_hash('KrikoWelpen2026!', PASSWORD_DEFAULT)
-                    ],
-                    'jonggivers' => [
-                        'role_name' => 'Jonggiverleiding',
-                        'password_hash' => password_hash('KrikoJonggivers2026!', PASSWORD_DEFAULT)
-                    ],
-                    'givers' => [
-                        'role_name' => 'Giverleiding',
-                        'password_hash' => password_hash('KrikoGivers2026!', PASSWORD_DEFAULT)
-                    ]
-                ],
                 'bank_iban' => 'BE76 1234 5678 9012',
                 'bank_bic' => 'KRIKOBE2B',
                 'bank_holder' => 'Scouts Kriko-M vzw',

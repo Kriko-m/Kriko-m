@@ -10,7 +10,6 @@ $contact_email   = isset($settings['contact_email'])   ? $settings['contact_emai
 $contact_phone   = isset($settings['contact_phone'])   ? $settings['contact_phone']   : '+32 3 776 00 00';
 $contact_address = isset($settings['contact_address']) ? $settings['contact_address'] : 'Industriepark-Noord 33, 9100 Sint-Niklaas';
 ?>
-    <?php if ($current_page !== 'admin.php'): ?>
     <footer class="site-footer">
         <div class="site-footer-inner">
 
@@ -76,10 +75,8 @@ $contact_address = isset($settings['contact_address']) ? $settings['contact_addr
 
         <div class="site-footer-bottom">
             <span>&copy; <?php echo date('Y'); ?> Scouts &amp; Gidsen Kriko-M Sint-Niklaas</span>
-            <a href="ouderportaal.php" class="dev-trigger" title="Portaal">⚙</a>
         </div>
     </footer>
-    <?php endif; ?>
 
     <!-- JavaScripts -->
     <script src="assets/js/main.js"></script>

@@ -345,11 +345,6 @@ if (!$ingelogd): ?>
     .alert-ok { width:100%; max-width:440px; padding:11px 14px; border-radius:11px; font-size:.85rem;
                 font-weight:600; text-align:center;
                 background:hsla(145,33%,36%,.12); border:1.5px solid #3F7D5A; color:#2C5A40; }
-    /* Wachtwoord-hint box voor admin */
-    .pw-hint { background:color-mix(in srgb,var(--gold) 10%,transparent);
-               border:1.5px solid var(--gold); border-radius:10px;
-               padding:9px 13px; margin-top:12px; font-size:.82rem; line-height:1.5; }
-    .pw-hint strong { color:#8a6020; }
     .divider { border:none; border-top:1px solid var(--border); margin:18px 0; }
     .back-link { display:inline-flex; align-items:center; gap:7px; font-size:.88rem;
                  font-weight:600; color:var(--muted); text-decoration:none; transition:color .15s; }
@@ -369,7 +364,7 @@ if (!$ingelogd): ?>
     <!-- Tabs -->
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('ouder',this)">👨‍👩‍👧 Ouder / Lid</button>
-      <button class="tab-btn"        onclick="switchTab('admin',this)">🛡️ Admin</button>
+      <button class="tab-btn"        onclick="switchTab('leiding',this)">🛡️ Leiding</button>
     </div>
 
     <!-- ── OUDER TAB ── -->
@@ -401,56 +396,29 @@ if (!$ingelogd): ?>
       <?php endif; ?>
     </div>
 
-    <!-- ── ADMIN TAB ── -->
-    <div id="pane-admin" class="tab-pane">
+    <!-- ── LEIDING TAB ── -->
+    <div id="pane-leiding" class="tab-pane">
       <p style="font-size:.85rem;color:var(--muted);margin-bottom:18px;line-height:1.5;">
-        Kies je rol en vul het wachtwoord in.</p>
-
-      <?php if (isset($_GET['admin_error'])): ?>
-        <div class="alert-err"><?php echo htmlspecialchars(urldecode($_GET['admin_error'])); ?></div>
-      <?php endif; ?>
-
-      <form method="POST" action="login.php" id="admin-form">
-        <label>Rol</label>
-        <select name="role" id="admin-role-sel" onchange="updateAdminHint()">
-          <option value="" disabled selected>Kies je rol...</option>
-          <optgroup label="Leiding">
-            <option value="kapoenen">Leiding — Kapoenen</option>
-            <option value="welpen">Leiding — Welpen</option>
-            <option value="jonggivers">Leiding — Jonggivers</option>
-            <option value="givers">Leiding — Givers</option>
-          </optgroup>
-          <optgroup label="Beheer">
-            <option value="groepsleiding" data-tab="orders">Groepsleiding</option>
-            <option value="groepsleiding" data-tab="settings">Website beheer</option>
-            <option value="groepsleiding" data-tab="orders">Webshop</option>
-          </optgroup>
-        </select>
-
-        <!-- Tijdelijk wachtwoord-hint -->
-        <div class="pw-hint" id="admin-pw-hint" style="display:none;">
-          <strong>Tijdelijk wachtwoord:</strong> <span id="hint-pw"></span>
-        </div>
-
-        <label>Wachtwoord</label>
-        <input type="password" name="password" required placeholder="••••••••">
-        <button type="submit" class="btn-login">Aanmelden →</button>
-      </form>
+        Leiding en groepsleiding loggen in met hun persoonlijk
+        <strong>Scouts &amp; Gidsen Vlaanderen</strong>-account. Je rol en takken
+        worden automatisch herkend.</p>
 
       <?php if (sgo_dev_mode()): ?>
-        <hr class="divider">
-        <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;flex-direction:column;gap:9px;">
           <a href="ouderportaal.php?demologin=leiding"
-             style="display:block;text-align:center;padding:10px;background:color-mix(in srgb,var(--green) 8%,transparent);
-                    border:1.5px solid var(--border);border-radius:10px;font-size:.82rem;font-weight:600;
-                    color:var(--green);text-decoration:none;">
+             style="display:block;text-align:center;padding:12px;background:var(--green);
+                    border-radius:11px;font-size:.9rem;font-weight:700;color:#fff;text-decoration:none;">
              Demo — Leiding (welpen)</a>
           <a href="ouderportaal.php?demologin=groepsleiding"
-             style="display:block;text-align:center;padding:10px;background:color-mix(in srgb,var(--green) 5%,transparent);
-                    border:1.5px solid var(--border);border-radius:10px;font-size:.82rem;font-weight:600;
-                    color:var(--green);text-decoration:none;opacity:.85;">
+             style="display:block;text-align:center;padding:12px;background:var(--green-mid);
+                    border-radius:11px;font-size:.9rem;font-weight:700;color:#fff;text-decoration:none;">
              Demo — Groepsleiding</a>
         </div>
+        <p style="font-size:.72rem;color:var(--muted);margin-top:12px;text-align:center;">
+            Echte S&amp;G-login actief zodra de API-key geconfigureerd is.</p>
+      <?php else: ?>
+        <a href="<?php echo htmlspecialchars(sgo_login_url()); ?>" class="btn-login" style="text-decoration:none;text-align:center;">
+            <i class="fa-solid fa-right-to-bracket"></i> Inloggen via Scouts &amp; Gidsen</a>
       <?php endif; ?>
     </div>
   </div>
@@ -466,30 +434,6 @@ if (!$ingelogd): ?>
       document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('pane-' + tab).classList.add('active');
-    }
-    <?php if (isset($_GET['admin_error'])): ?>
-    // Fout bij admin-login → open Admin-tab
-    switchTab('admin', document.querySelectorAll('.tab-btn')[1]);
-    <?php endif; ?>
-
-    var hints = {
-      'kapoenen':     'KrikoKapoenen2026!',
-      'welpen':       'KrikoWelpen2026!',
-      'jonggivers':   'KrikoJonggivers2026!',
-      'givers':       'KrikoGivers2026!',
-      'groepsleiding':'KrikoGroep2026!'
-    };
-    function updateAdminHint() {
-      var sel  = document.getElementById('admin-role-sel');
-      var hint = document.getElementById('admin-pw-hint');
-      var pw   = document.getElementById('hint-pw');
-      var val  = sel.value;
-      if (hints[val]) {
-        pw.textContent = hints[val];
-        hint.style.display = 'block';
-      } else {
-        hint.style.display = 'none';
-      }
     }
   </script>
 </body>

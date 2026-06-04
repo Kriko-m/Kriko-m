@@ -5,7 +5,7 @@
  */
 
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/auth.php';
+if (session_status() === PHP_SESSION_NONE) session_start();
 
 // Fetch site configuration settings
 $settings = read_db('settings');
@@ -43,20 +43,19 @@ function active_class($page, $current) {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <?php
-$portal_pages = ['admin.php', 'ouderportaal.php', 'shop.php', 'checkout.php', 'order-success.php'];
+$portal_pages = ['ouderportaal.php', 'shop.php', 'checkout.php', 'order-success.php'];
 $body_classes = [];
 if (in_array($current_page, $portal_pages)) $body_classes[] = 'portal-theme';
-if ($current_page === 'admin.php') $body_classes[] = 'no-nav';
 if ($current_page === 'ouderportaal.php') $body_classes[] = 'portaal';
 if (isset($body_class)) $body_classes[] = $body_class;
 ?>
 <body<?php if ($body_classes) echo ' class="' . implode(' ', $body_classes) . '"'; ?>>
 
 
-    <?php $is_portal_page = in_array($current_page, $portal_pages) && $current_page !== 'admin.php'; ?>
+    <?php $is_portal_page = in_array($current_page, $portal_pages); ?>
 
     <!-- Laadscherm — enkel op de publieke site, niet in portaal -->
-    <?php if (!$is_portal_page && $current_page !== 'admin.php'): ?>
+    <?php if (!$is_portal_page): ?>
     <div id="loading-screen" aria-hidden="true">
         <img src="assets/images/logo-finaal.png" alt="Kriko-M laden…">
         <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
@@ -75,7 +74,7 @@ if (isset($body_class)) $body_classes[] = $body_class;
     <?php endif; ?>
 
     <!-- 1. Top Announcement Banner (enkel publieke site) -->
-    <?php if ($alert_active && !empty($alert_message) && !$is_portal_page && $current_page !== 'admin.php'): ?>
+    <?php if ($alert_active && !empty($alert_message) && !$is_portal_page): ?>
         <div class="alert-banner">
             <div class="container alert-container">
                 <div class="alert-text">
@@ -89,16 +88,8 @@ if (isset($body_class)) $body_classes[] = $body_class;
         </div>
     <?php endif; ?>
 
-    <!-- 2. Navigatie: portaal-nav / admin-exit / hoofdnav -->
-    <?php if ($current_page === 'admin.php'): ?>
-        <!-- Admin: enkel een sluitknop linksboven -->
-        <div style="position: fixed; top: 24px; left: 24px; z-index: 9999;">
-            <a href="index.php" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background-color: var(--color-accent); color: var(--color-primary-dark); font-size: 1.8rem; font-weight: 700; text-decoration: none; box-shadow: 0 4px 15px rgba(0,0,0,0.25); transition: all 0.25s cubic-bezier(0.175,0.885,0.32,1.275); border: 2px solid var(--color-bg-white); line-height: 1;" onmouseover="this.style.transform='scale(1.08)';this.style.backgroundColor='var(--color-primary)';this.style.color='var(--color-bg-white)'" onmouseout="this.style.transform='scale(1)';this.style.backgroundColor='var(--color-accent)';this.style.color='var(--color-primary-dark)'" aria-label="Sluiten en terug naar site">
-                &times;
-            </a>
-        </div>
-
-    <?php elseif ($is_portal_page): ?>
+    <!-- 2. Navigatie: portaal-nav / hoofdnav -->
+    <?php if ($is_portal_page): ?>
         <!-- Portaal-nav: bosgroen, portaal-specifieke links -->
         <nav class="portaal-nav" id="portaal-nav">
             <a href="index.php" class="portaal-nav-brand">
@@ -118,11 +109,8 @@ if (isset($body_class)) $body_classes[] = $body_class;
 
             <div class="portaal-nav-links" id="portaal-nav-links">
                 <?php
-                $is_shop_page  = in_array($current_page, ['shop.php', 'checkout.php', 'order-success.php']);
-                $sgo_in        = !empty($_SESSION['sgo_logged_in']);
-                $ouder_in      = !empty($_SESSION['ouder_logged_in']);
-                $admin_in      = is_admin_logged_in();
-                $portaal_uit   = $sgo_in || $ouder_in; // beide auth-types
+                $is_shop_page = in_array($current_page, ['shop.php', 'checkout.php', 'order-success.php']);
+                $portaal_uit  = !empty($_SESSION['sgo_logged_in']) || !empty($_SESSION['ouder_logged_in']);
                 ?>
                 <?php if ($current_page === 'ouderportaal.php'): ?>
                     <a href="shop.php"><i class="fa-solid fa-bag-shopping"></i> Webshop</a>
@@ -134,8 +122,6 @@ if (isset($body_class)) $body_classes[] = $body_class;
                     <a href="ouderportaal.php"><i class="fa-solid fa-house"></i> Portaal</a>
                     <?php if ($portaal_uit): ?>
                         <a href="ouderportaal.php?uitloggen=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
-                    <?php elseif ($admin_in): ?>
-                        <a href="login.php?logout=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
                     <?php endif; ?>
                 <?php endif; ?>
                 <a href="index.php" class="uit"><i class="fa-solid fa-arrow-left"></i> Terug naar site</a>
@@ -175,13 +161,8 @@ if (isset($body_class)) $body_classes[] = $body_class;
                         </svg>
                         <span class="cart-count" style="display: none;">0</span>
                     </button>
-                    <?php if (is_admin_logged_in()): ?>
-                        <a href="admin.php" class="nav-cta">BEHEER</a>
-                        <a href="login.php?logout=1" class="nav-cta-secondary">LOG UIT</a>
-                    <?php else: ?>
-                        <a href="ouderportaal.php" class="nav-cta-secondary <?php echo ($current_page === 'ouderportaal.php') ? 'nav-active' : ''; ?>">PORTAAL</a>
-                        <a href="inschrijven.php" class="nav-cta">INSCHRIJVEN</a>
-                    <?php endif; ?>
+                    <a href="ouderportaal.php" class="nav-cta-secondary">PORTAAL</a>
+                    <a href="inschrijven.php" class="nav-cta">INSCHRIJVEN</a>
                     <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu openen" aria-expanded="false">
                         <span></span><span></span><span></span>
                     </button>
@@ -191,7 +172,7 @@ if (isset($body_class)) $body_classes[] = $body_class;
     <?php endif; ?>
 
     <!-- GDPR Cookiebanner (enkel publieke site) -->
-    <?php if (!$is_portal_page && $current_page !== 'admin.php'): ?>
+    <?php if (!$is_portal_page): ?>
     <div id="cookie-banner" class="cookie-hidden" role="dialog" aria-label="Cookie-melding">
         <span class="cookie-icon">🍪</span>
         <div class="cookie-text">
@@ -205,7 +186,7 @@ if (isset($body_class)) $body_classes[] = $body_class;
     <?php endif; ?>
 
     <!-- 3. Visual Sliding Cart Drawer (enkel publieke site) -->
-    <?php if (!$is_portal_page && $current_page !== 'admin.php'): ?>
+    <?php if (!$is_portal_page): ?>
     <div class="cart-backdrop"></div>
     <div class="cart-drawer">
         <div class="cart-drawer-header">

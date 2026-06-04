@@ -5,23 +5,37 @@
  */
 
 require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/ouder_auth.php';
 require_once __DIR__ . '/includes/mail.php';
+if (session_status() === PHP_SESSION_NONE) session_start();
 
-// Enkel toegankelijk na inloggen via Scouts & Gidsen.
-if (empty($_SESSION['sgo_logged_in'])) {
-    $_SESSION['portaal_flash_error'] = 'Je moet ingelogd zijn in het ouderportaal om een bestelling te plaatsen.';
+// Enkel toegankelijk na inloggen in het portaal (ouder-account of S&G-leiding).
+$_co_ouder = !empty($_SESSION['ouder_logged_in']);
+$_co_sgo   = !empty($_SESSION['sgo_logged_in']);
+if (!$_co_ouder && !$_co_sgo) {
+    $_SESSION['portaal_flash_error'] = 'Je moet ingelogd zijn in het portaal om een bestelling te plaatsen.';
     header('Location: ouderportaal.php');
     exit;
 }
-// "Ouder"-gegevens uit de S&G-sessie (geen lokale profielen meer).
-$current_parent = [
-    'id'         => $_SESSION['sgo_id'] ?? '',
-    'first_name' => $_SESSION['sgo_name'] ?? '',
-    'last_name'  => '',
-    'email'      => $_SESSION['sgo_email'] ?? '',
-    'phone'      => '',
-];
+// "Ouder"-gegevens uit de actieve sessie.
+if ($_co_ouder) {
+    $_co_acc = get_ouder_by_id($_SESSION['ouder_account_id'] ?? '');
+    $current_parent = [
+        'id'         => $_SESSION['ouder_account_id'] ?? '',
+        'first_name' => $_co_acc['naam'] ?? '',
+        'last_name'  => '',
+        'email'      => $_co_acc['email'] ?? '',
+        'phone'      => '',
+    ];
+} else {
+    $current_parent = [
+        'id'         => $_SESSION['sgo_id'] ?? '',
+        'first_name' => $_SESSION['sgo_name'] ?? '',
+        'last_name'  => '',
+        'email'      => $_SESSION['sgo_email'] ?? '',
+        'phone'      => '',
+    ];
+}
 
 
 // Helper function to generate a valid Belgian structured communication reference (Modulo 97)
