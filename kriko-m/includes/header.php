@@ -128,12 +128,6 @@ if (isset($body_class)) $body_classes[] = $body_class;
                 ?>
                 <?php if ($current_page === 'ouderportaal.php'): ?>
                     <a href="shop.php"><i class="fa-solid fa-bag-shopping"></i> Webshop</a>
-                    <a href="leiding-kampen.php"><i class="fa-solid fa-campground"></i> Kampen</a>
-                    <?php if ($portaal_uit): ?>
-                        <a href="ouderportaal.php?uitloggen=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
-                    <?php endif; ?>
-                <?php elseif ($current_page === 'leiding-kampen.php'): ?>
-                    <a href="leiding-kampen.php" class="accent"><i class="fa-solid fa-campground"></i> Kampen</a>
                     <?php if ($portaal_uit): ?>
                         <a href="ouderportaal.php?uitloggen=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
                     <?php endif; ?>

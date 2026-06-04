@@ -291,6 +291,203 @@ $calendar_events = ($portal_role === 'groepsleiding') ? (function() {
     return $ev;
 })() : [];
 
+/* ── Niet ingelogd → standalone login pagina (geen header/nav/footer) ── */
+if (!$ingelogd): ?>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Scouts Kriko-M</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="assets/images/logo-finaal.png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --green:#1A3D2A; --green-mid:#2A5C3F; --gold:#C9963A; --bg:#EEF5F1;
+            --border:#C2D9C9; --text:#1A1A1A; --muted:#6A8A75; --error:#B23A4D; --radius:14px; }
+    html,body { height:100%; font-family:'Outfit',sans-serif; background:var(--bg); color:var(--text); }
+    body { display:flex; flex-direction:column; align-items:center; justify-content:center;
+           min-height:100vh; padding:40px 20px; gap:24px; }
+    h1 { font-family:'Nunito',sans-serif; font-size:2rem; font-weight:900; color:var(--green);
+         letter-spacing:.06em; text-transform:uppercase; }
+    .card { width:100%; max-width:440px; background:#fff; border-radius:20px;
+            box-shadow:0 12px 40px rgba(26,61,42,.12); border:1px solid var(--border); overflow:hidden; }
+    /* Tabs */
+    .tabs { display:grid; grid-template-columns:1fr 1fr; border-bottom:2px solid var(--border); }
+    .tab-btn { padding:14px; background:none; border:none; font-family:'Outfit',sans-serif;
+               font-size:.92rem; font-weight:600; cursor:pointer; color:var(--muted);
+               transition:color .15s,background .15s; }
+    .tab-btn.active { color:var(--green); background:color-mix(in srgb,var(--green) 6%,transparent);
+                      border-bottom:2px solid var(--green); margin-bottom:-2px; }
+    /* Tab content */
+    .tab-pane { display:none; padding:28px 32px 32px; }
+    .tab-pane.active { display:block; }
+    label { display:block; font-size:.8rem; font-weight:600; color:var(--green); margin-bottom:5px; margin-top:14px; }
+    label:first-of-type { margin-top:0; }
+    input[type=email],input[type=password],select {
+      width:100%; padding:11px 13px; border:2px solid var(--border); border-radius:var(--radius);
+      font-family:inherit; font-size:.93rem; color:var(--text); background:#fff; outline:none;
+      transition:border-color .15s,box-shadow .15s; }
+    input:focus,select:focus { border-color:var(--green-mid); box-shadow:0 0 0 4px rgba(42,92,63,.1); }
+    .btn-login { display:block; width:100%; margin-top:18px; padding:13px;
+                 background:var(--green); color:#fff; border:none; border-radius:var(--radius);
+                 font-family:'Outfit',sans-serif; font-size:.97rem; font-weight:700;
+                 cursor:pointer; transition:background .15s; }
+    .btn-login:hover { background:var(--green-mid); }
+    .hint { font-size:.8rem; color:var(--muted); text-align:center; margin-top:12px; }
+    .hint a { color:var(--green); font-weight:700; text-decoration:none; }
+    .alert-err { padding:9px 12px; border-radius:9px; font-size:.83rem; font-weight:600;
+                 text-align:center; margin-bottom:14px;
+                 background:hsla(349,51%,47%,.1); border:1.5px solid var(--error); color:var(--error); }
+    /* Wachtwoord-hint box voor admin */
+    .pw-hint { background:color-mix(in srgb,var(--gold) 10%,transparent);
+               border:1.5px solid var(--gold); border-radius:10px;
+               padding:9px 13px; margin-top:12px; font-size:.82rem; line-height:1.5; }
+    .pw-hint strong { color:#8a6020; }
+    .divider { border:none; border-top:1px solid var(--border); margin:18px 0; }
+    .back-link { display:inline-flex; align-items:center; gap:7px; font-size:.88rem;
+                 font-weight:600; color:var(--muted); text-decoration:none; transition:color .15s; }
+    .back-link:hover { color:var(--green); }
+    .back-link svg { width:14px; height:14px; fill:currentColor; }
+    @media (max-width:480px) { .tab-pane { padding:22px 20px 26px; } }
+  </style>
+</head>
+<body>
+  <h1>Portaal</h1>
+
+  <div class="card">
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('ouder',this)">👨‍👩‍👧 Ouder / Lid</button>
+      <button class="tab-btn"        onclick="switchTab('admin',this)">🛡️ Admin</button>
+    </div>
+
+    <!-- ── OUDER TAB ── -->
+    <div id="pane-ouder" class="tab-pane active">
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:18px;line-height:1.5;">
+        Log in met je account op deze site. Nog geen account?
+        <a href="register.php" style="color:var(--green);font-weight:700;">Registreer hier</a>.</p>
+
+      <?php if ($login_error): ?>
+        <div class="alert-err"><?php echo htmlspecialchars($login_error); ?></div>
+      <?php endif; ?>
+      <?php if (isset($_GET['sgo_error'])): ?>
+        <div class="alert-err"><?php echo htmlspecialchars(urldecode($_GET['sgo_error'])); ?></div>
+      <?php endif; ?>
+
+      <form method="POST">
+        <input type="hidden" name="actie" value="ouder_login">
+        <label>E-mailadres</label>
+        <input type="email" name="email" required placeholder="naam@voorbeeld.be"
+               value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>" autofocus>
+        <label>Wachtwoord</label>
+        <input type="password" name="password" required placeholder="••••••••">
+        <button type="submit" class="btn-login">Inloggen →</button>
+      </form>
+      <?php if (sgo_dev_mode()): ?>
+        <hr class="divider">
+        <a href="ouderportaal.php?demologin=1" style="display:block;text-align:center;font-size:.78rem;color:var(--muted);text-decoration:underline;">
+          Demo ouder-account</a>
+      <?php endif; ?>
+    </div>
+
+    <!-- ── ADMIN TAB ── -->
+    <div id="pane-admin" class="tab-pane">
+      <p style="font-size:.85rem;color:var(--muted);margin-bottom:18px;line-height:1.5;">
+        Kies je rol en vul het wachtwoord in.</p>
+
+      <form method="POST" action="login.php" id="admin-form">
+        <label>Rol</label>
+        <select name="role" id="admin-role-sel" onchange="updateAdminHint()">
+          <option value="" disabled selected>Kies je rol...</option>
+          <optgroup label="Leiding">
+            <option value="kapoenen">Leiding — Kapoenen</option>
+            <option value="welpen">Leiding — Welpen</option>
+            <option value="jonggivers">Leiding — Jonggivers</option>
+            <option value="givers">Leiding — Givers</option>
+          </optgroup>
+          <optgroup label="Beheer">
+            <option value="groepsleiding" data-tab="orders">Groepsleiding</option>
+            <option value="groepsleiding" data-tab="settings">Website beheer</option>
+            <option value="groepsleiding" data-tab="orders">Webshop</option>
+          </optgroup>
+        </select>
+
+        <!-- Tijdelijk wachtwoord-hint -->
+        <div class="pw-hint" id="admin-pw-hint" style="display:none;">
+          <strong>Tijdelijk wachtwoord:</strong> <span id="hint-pw"></span>
+        </div>
+
+        <label>Wachtwoord</label>
+        <input type="password" name="password" required placeholder="••••••••">
+        <button type="submit" class="btn-login">Aanmelden →</button>
+      </form>
+
+      <?php if (sgo_dev_mode()): ?>
+        <hr class="divider">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a href="ouderportaal.php?demologin=leiding"
+             style="display:block;text-align:center;padding:10px;background:color-mix(in srgb,var(--green) 8%,transparent);
+                    border:1.5px solid var(--border);border-radius:10px;font-size:.82rem;font-weight:600;
+                    color:var(--green);text-decoration:none;">
+             Demo — Leiding (welpen)</a>
+          <a href="ouderportaal.php?demologin=groepsleiding"
+             style="display:block;text-align:center;padding:10px;background:color-mix(in srgb,var(--green) 5%,transparent);
+                    border:1.5px solid var(--border);border-radius:10px;font-size:.82rem;font-weight:600;
+                    color:var(--green);text-decoration:none;opacity:.85;">
+             Demo — Groepsleiding</a>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+
+  <a href="index.php" class="back-link">
+    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    Terug naar de website
+  </a>
+
+  <script>
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('pane-' + tab).classList.add('active');
+    }
+    <?php if ($login_error): ?>
+    // Fout bij ouder-login → toon ouder-tab
+    document.querySelector('.tab-btn').click();
+    <?php endif; ?>
+
+    var hints = {
+      'kapoenen':     'KrikoKapoenen2026!',
+      'welpen':       'KrikoWelpen2026!',
+      'jonggivers':   'KrikoJonggivers2026!',
+      'givers':       'KrikoGivers2026!',
+      'groepsleiding':'KrikoGroep2026!'
+    };
+    function updateAdminHint() {
+      var sel  = document.getElementById('admin-role-sel');
+      var hint = document.getElementById('admin-pw-hint');
+      var pw   = document.getElementById('hint-pw');
+      var val  = sel.value;
+      if (hints[val]) {
+        pw.textContent = hints[val];
+        hint.style.display = 'block';
+      } else {
+        hint.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
+<?php
+exit;
+endif;
+
+/* ── Ingelogd: gebruik normale header/footer ── */
 $page_title = match($portal_role) { 'leiding'=>'Leiding Portaal','groepsleiding'=>'Groepsleiding Portaal',default=>'Ouderportaal' };
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -307,81 +504,7 @@ require_once __DIR__ . '/includes/header.php';
   </div>
   <?php endif; ?>
 
-  <?php if (!$ingelogd): /* ══════════ NIET INGELOGD ══════════ */ ?>
-
-    <?php if (isset($_GET['sgo_error'])): ?>
-      <div style="max-width:480px;margin:0 auto 18px;background:hsla(4,75%,48%,.1);border:1.5px solid var(--color-error);
-          color:var(--color-error);padding:12px 16px;border-radius:10px;font-size:0.85rem;">
-          <?php echo htmlspecialchars(urldecode($_GET['sgo_error'])); ?>
-      </div>
-    <?php endif; ?>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:780px;margin:0 auto;">
-
-      <!-- Ouder login -->
-      <div style="background:#fff;border:1px solid var(--color-border);border-top:4px solid var(--color-accent);
-          border-radius:20px;padding:32px 28px;box-shadow:0 8px 24px rgba(26,61,42,.09);">
-        <div style="font-size:2rem;margin-bottom:10px;">👨‍👩‍👧</div>
-        <h3 style="font-size:1.2rem;margin-bottom:6px;color:var(--color-primary);">Ouder / Lid</h3>
-        <p style="font-size:.85rem;color:var(--color-text-muted);margin-bottom:20px;line-height:1.5;">
-            Log in met je account op deze site. Nog geen account?
-            <a href="register.php" style="color:var(--color-primary);font-weight:700;">Registreer hier</a>.</p>
-
-        <?php if ($login_error): ?>
-          <div style="background:hsla(349,51%,47%,.1);border:1.5px solid var(--color-error);color:var(--color-error);
-              padding:9px 12px;border-radius:9px;font-size:.83rem;font-weight:600;margin-bottom:14px;text-align:center;">
-              <?php echo htmlspecialchars($login_error); ?></div>
-        <?php endif; ?>
-
-        <form method="POST">
-          <input type="hidden" name="actie" value="ouder_login">
-          <label style="display:block;font-size:.78rem;font-weight:600;color:var(--color-primary);margin-bottom:5px;">E-mailadres</label>
-          <input type="email" name="email" required value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
-              placeholder="naam@voorbeeld.be"
-              style="width:100%;padding:10px 12px;border:2px solid var(--color-border);border-radius:10px;
-                     font-family:inherit;font-size:.9rem;margin-bottom:12px;outline:none;">
-          <label style="display:block;font-size:.78rem;font-weight:600;color:var(--color-primary);margin-bottom:5px;">Wachtwoord</label>
-          <input type="password" name="password" required placeholder="••••••••"
-              style="width:100%;padding:10px 12px;border:2px solid var(--color-border);border-radius:10px;
-                     font-family:inherit;font-size:.9rem;margin-bottom:16px;outline:none;">
-          <button type="submit" style="width:100%;padding:12px;background:var(--color-primary);color:#fff;border:none;
-              border-radius:11px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;">
-              Inloggen →</button>
-        </form>
-        <?php if (sgo_dev_mode()): ?>
-          <a href="ouderportaal.php?demologin=1" style="display:block;text-align:center;margin-top:12px;font-size:.78rem;
-              color:var(--color-text-muted);text-decoration:underline;">Demo ouder-account</a>
-        <?php endif; ?>
-      </div>
-
-      <!-- Leiding login -->
-      <div style="background:#fff;border:1px solid var(--color-border);border-top:4px solid var(--color-primary);
-          border-radius:20px;padding:32px 28px;box-shadow:0 8px 24px rgba(26,61,42,.09);">
-        <div style="font-size:2rem;margin-bottom:10px;">🛡️</div>
-        <h3 style="font-size:1.2rem;margin-bottom:6px;color:var(--color-primary);">Leiding</h3>
-        <p style="font-size:.85rem;color:var(--color-text-muted);margin-bottom:20px;line-height:1.5;">
-            Leiding en groepsleiding loggen in via Scouts &amp; Gidsen Vlaanderen
-            met hun persoonlijk S&amp;G-account.</p>
-        <?php if (sgo_dev_mode()): ?>
-          <div style="display:flex;flex-direction:column;gap:9px;">
-            <a href="ouderportaal.php?demologin=leiding" class="btn btn-secondary" style="width:100%;font-size:.88rem;padding:11px 16px;">
-                <i class="fa-solid fa-shield-halved"></i> Demo — Leiding (welpen)</a>
-            <a href="ouderportaal.php?demologin=groepsleiding" class="btn btn-secondary" style="width:100%;font-size:.88rem;padding:11px 16px;opacity:.85;">
-                <i class="fa-solid fa-star"></i> Demo — Groepsleiding</a>
-          </div>
-          <p style="font-size:.72rem;color:var(--color-text-muted);margin-top:12px;text-align:center;">
-              Echte S&amp;G-login actief zodra API-key geconfigureerd is.</p>
-        <?php else: ?>
-          <a href="<?php echo htmlspecialchars(sgo_login_url()); ?>" class="btn btn-secondary" style="width:100%;">
-              <i class="fa-solid fa-right-to-bracket"></i> Inloggen via S&amp;G</a>
-        <?php endif; ?>
-      </div>
-
-    </div>
-
-    @media (max-width: 600px) { .portaal-login-grid { grid-template-columns: 1fr !important; } }
-
-  <?php elseif ($portal_role === 'ouder'): /* ══════════ OUDER ══════════ */ ?>
+  <?php if ($portal_role === 'ouder'): /* ══════════ OUDER ══════════ */ ?>
 
     <!-- Intro popup -->
     <div id="portaal-intro-overlay" style="display:none;position:fixed;inset:0;z-index:2000;
@@ -454,6 +577,21 @@ require_once __DIR__ . '/includes/header.php';
             </span>
           </button>
           <?php endforeach; ?>
+          <?php if ($ouder_ingelogd): ?>
+          <a href="ouderportaal.php?actie=addkid"
+             style="display:flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;margin-top:6px;
+                    background:none;border:1.5px dashed var(--color-accent);border-radius:14px;
+                    cursor:pointer;text-decoration:none;transition:background .15s;"
+             title="Kind toevoegen via S&G">
+            <span style="width:42px;height:42px;border-radius:50%;background:color-mix(in srgb,var(--color-accent) 15%,transparent);
+                         color:var(--color-accent);display:flex;align-items:center;justify-content:center;
+                         font-size:1.2rem;font-weight:700;flex-shrink:0;">+</span>
+            <span style="display:flex;flex-direction:column;line-height:1.2;">
+              <span style="font-weight:700;font-size:.9rem;color:var(--color-accent);">Kind toevoegen</span>
+              <span style="font-size:.72rem;color:var(--color-text-muted);">via S&amp;G-account</span>
+            </span>
+          </a>
+          <?php endif; ?>
         </div>
       </aside>
       <?php endif; ?>
@@ -602,25 +740,29 @@ require_once __DIR__ . '/includes/header.php';
       </div><!-- /.kind-panel / direct -->
       <?php endforeach; ?>
 
-      <?php if ($ouder_ingelogd): ?>
-      <!-- Voeg kind toe -->
-      <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
-          padding:16px 20px;background:var(--color-bg-linen);border:1px dashed var(--color-border);border-radius:14px;">
-        <div>
-          <div style="font-weight:700;font-size:.92rem;color:var(--color-primary);">Voeg een kind toe</div>
-          <div style="font-size:.8rem;color:var(--color-text-muted);">Log in met het S&amp;G-account van je kind om het te koppelen.</div>
-        </div>
-        <a href="ouderportaal.php?actie=addkid" class="btn btn-secondary" style="padding:9px 18px;font-size:.88rem;">
-            <i class="fa-solid fa-plus"></i> Kind toevoegen via S&amp;G</a>
-      </div>
+      <?php if ($ouder_ingelogd && !$meerdere_kinderen): ?>
+      <!-- Voeg kind toe (enkel getoond als er maar 1 kind is — anders staat het in de chip-kolom links) -->
+      <a href="ouderportaal.php?actie=addkid"
+         style="display:flex;align-items:center;gap:12px;margin-top:14px;padding:13px 18px;
+                background:none;border:1.5px dashed var(--color-accent);border-radius:14px;
+                text-decoration:none;transition:background .15s;">
+        <span style="width:42px;height:42px;border-radius:50%;background:color-mix(in srgb,var(--color-accent) 15%,transparent);
+                     color:var(--color-accent);display:flex;align-items:center;justify-content:center;
+                     font-size:1.2rem;font-weight:700;flex-shrink:0;">+</span>
+        <span>
+          <span style="display:block;font-weight:700;font-size:.9rem;color:var(--color-accent);">Kind toevoegen</span>
+          <span style="font-size:.78rem;color:var(--color-text-muted);">Log in met het S&amp;G-account van je kind</span>
+        </span>
+      </a>
+      <?php endif; ?>
 
-      <!-- Verwijder account -->
+      <?php if ($ouder_ingelogd): ?>
       <div style="margin-top:10px;text-align:right;">
         <form method="post" style="display:inline;">
           <input type="hidden" name="actie" value="verwijder_account">
           <button type="submit" style="background:none;border:none;font-size:.78rem;color:var(--color-text-muted);
               cursor:pointer;text-decoration:underline;"
-              onclick="return confirm('Account en alle gekoppelde kinderen verwijderen? Dit kan niet ongedaan gemaakt worden.');">
+              onclick="return confirm('Account en alle gekoppelde kinderen verwijderen?');">
               Account verwijderen</button>
         </form>
       </div>
