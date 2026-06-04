@@ -484,10 +484,11 @@ require_once __DIR__ . '/includes/header.php';
             <form method="post" style="flex-shrink:0;">
               <input type="hidden" name="actie" value="ontkoppel_kind">
               <input type="hidden" name="ga_id" value="<?php echo htmlspecialchars($ga_id); ?>">
+              <?php $voornaam_confirm = htmlspecialchars($kind['voornaam'] ?? 'Dit kind', ENT_QUOTES); ?>
               <button type="submit" title="Kind ontkoppelen van account"
                   style="background:none;border:1.5px solid var(--color-border);color:var(--color-text-muted);
                          padding:4px 9px;border-radius:8px;font-size:.75rem;cursor:pointer;"
-                  onclick="return confirm('<?php echo htmlspecialchars($kind[\'voornaam\']??\'Dit kind\'); ?> ontkoppelen van jouw account?');">
+                  onclick="return confirm('<?php echo $voornaam_confirm; ?> ontkoppelen van jouw account?');">
                   <i class="fa-solid fa-link-slash"></i></button>
             </form>
             <?php endif; ?>

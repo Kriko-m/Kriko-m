@@ -1,1 +1,23 @@
-[]
+[
+    {
+        "id": "ouder_1478d0932bb22ecf",
+        "naam": "Demo Ouder",
+        "email": "demo.ouder@kriko-m.be",
+        "password_hash": "$2y$10$HioRNscnO2PiKbc2SX0vfOlwy3cnZzkjMexIN3YW8Iu3B.grHGaH2",
+        "kinderen": [
+            {
+                "ga_id": "GA-1001",
+                "voornaam": "Lotte",
+                "tak": "kapoenen",
+                "added_at": "2026-06-04 16:28:28"
+            },
+            {
+                "ga_id": "GA-1002",
+                "voornaam": "Mil",
+                "tak": "jonggivers",
+                "added_at": "2026-06-04 16:28:28"
+            }
+        ],
+        "created_at": "2026-06-04 16:28:28"
+    }
+]

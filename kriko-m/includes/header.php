@@ -120,25 +120,27 @@ if (isset($body_class)) $body_classes[] = $body_class;
 
             <div class="portaal-nav-links" id="portaal-nav-links">
                 <?php
-                $is_shop_page = in_array($current_page, ['shop.php', 'checkout.php', 'order-success.php']);
-                $sgo_in = !empty($_SESSION['sgo_logged_in']);
-                $admin_in = is_admin_logged_in();
+                $is_shop_page  = in_array($current_page, ['shop.php', 'checkout.php', 'order-success.php']);
+                $sgo_in        = !empty($_SESSION['sgo_logged_in']);
+                $ouder_in      = !empty($_SESSION['ouder_logged_in']);
+                $admin_in      = is_admin_logged_in();
+                $portaal_uit   = $sgo_in || $ouder_in; // beide auth-types
                 ?>
                 <?php if ($current_page === 'ouderportaal.php'): ?>
                     <a href="shop.php"><i class="fa-solid fa-bag-shopping"></i> Webshop</a>
                     <a href="leiding-kampen.php"><i class="fa-solid fa-campground"></i> Kampen</a>
-                    <?php if ($sgo_in): ?>
+                    <?php if ($portaal_uit): ?>
                         <a href="ouderportaal.php?uitloggen=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
                     <?php endif; ?>
                 <?php elseif ($current_page === 'leiding-kampen.php'): ?>
                     <a href="leiding-kampen.php" class="accent"><i class="fa-solid fa-campground"></i> Kampen</a>
-                    <?php if ($sgo_in): ?>
+                    <?php if ($portaal_uit): ?>
                         <a href="ouderportaal.php?uitloggen=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
                     <?php endif; ?>
                 <?php elseif ($is_shop_page): ?>
                     <a href="shop.php" <?php if ($current_page === 'shop.php') echo 'class="accent"'; ?>><i class="fa-solid fa-bag-shopping"></i> Webshop</a>
                     <a href="ouderportaal.php"><i class="fa-solid fa-house"></i> Portaal</a>
-                    <?php if ($sgo_in): ?>
+                    <?php if ($portaal_uit): ?>
                         <a href="ouderportaal.php?uitloggen=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
                     <?php elseif ($admin_in): ?>
                         <a href="login.php?logout=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
