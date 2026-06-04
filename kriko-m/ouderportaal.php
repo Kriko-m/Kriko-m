@@ -1,69 +1,108 @@
 <?php
 /**
- * Portaal — Ouders / Leiding / Groepsleiding
+ * Portaal — Ouders (lokale accounts) / Leiding / Groepsleiding (S&G OAuth)
  *
- * Rol bepaald door S&G OAuth2-login:
- *   ouder        → kind-inschrijvingen, paklijst, echo's, webshop
- *   leiding      → tak-beheer: kampen aanmaken/beheren, echo's, ledenlijst
- *   groepsleiding → alles van leiding + kalender
+ * Auth-systemen:
+ *   Ouders       → eigen account op deze site (email + wachtwoord)
+ *                  kinderen koppelen via S&G "voeg kind toe"-flow
+ *   Leiding      → S&G OAuth2 (tak-beheer, kampen, echo's, CSV)
+ *   Groepsleiding→ S&G OAuth2 (alles + kalender)
  */
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/sgo_config.php';
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/kamp_helpers.php';
+require_once __DIR__ . '/includes/ouder_auth.php';
 
-/* ── Demo-login ───────────────────────────────────────── */
+/* ── Demo-logins (enkel in dev-modus) ────────────────── */
 if (sgo_dev_mode() && isset($_GET['demologin'])) {
-    $_SESSION['sgo_logged_in']    = true;
-    $_SESSION['parent_logged_in'] = true;
-    $_SESSION['sgo_access_token'] = 'DEV-MOCK-TOKEN';
     $dl = $_GET['demologin'];
     if ($dl === 'leiding') {
+        $_SESSION['sgo_logged_in']      = true;
+        $_SESSION['sgo_access_token']   = 'DEV-MOCK-TOKEN';
         $_SESSION['sgo_id']             = 'LEIDING-DEMO';
         $_SESSION['sgo_name']           = 'Vic Verhaegen';
         $_SESSION['sgo_email']          = 'vic.verhaegen@scouts.be';
         $_SESSION['sgo_portal_role']    = 'leiding';
         $_SESSION['sgo_leiding_takken'] = ['welpen'];
-        $_SESSION['sgo_children']       = [];
     } elseif ($dl === 'groepsleiding') {
+        $_SESSION['sgo_logged_in']      = true;
+        $_SESSION['sgo_access_token']   = 'DEV-MOCK-TOKEN';
         $_SESSION['sgo_id']             = 'GL-DEMO';
         $_SESSION['sgo_name']           = 'Pieter Room';
         $_SESSION['sgo_email']          = 'pieter.room@scouts.be';
         $_SESSION['sgo_portal_role']    = 'groepsleiding';
         $_SESSION['sgo_leiding_takken'] = ['kapoenen','welpen','jonggivers','givers'];
-        $_SESSION['sgo_children']       = [];
     } else {
-        $_SESSION['sgo_id']             = 'OUDER-DEMO';
-        $_SESSION['sgo_name']           = 'Demo Ouder';
-        $_SESSION['sgo_email']          = 'demo.ouder@kriko-m.be';
-        $_SESSION['sgo_portal_role']    = 'ouder';
-        $_SESSION['sgo_leiding_takken'] = [];
-        $_SESSION['sgo_children']       = sgo_fetch_children('DEV-MOCK-TOKEN');
+        // Demo ouderaccount: maak aan als het nog niet bestaat
+        $demo_email = 'demo.ouder@kriko-m.be';
+        $demo_acc   = get_ouder_by_email($demo_email);
+        if (!$demo_acc) {
+            $demo_acc = create_ouder_account('Demo Ouder', $demo_email, 'demo1234');
+            // Voeg mock-kinderen toe
+            foreach (sgo_mock_children() as $kind) add_kind_to_account($demo_acc['id'], $kind);
+            $demo_acc = get_ouder_by_id($demo_acc['id']); // herlaad met kinderen
+        }
+        ouder_session_set($demo_acc);
     }
     header('Location: ouderportaal.php'); exit;
 }
 
 /* ── Uitloggen ────────────────────────────────────────── */
-if (isset($_GET['uitloggen']) || (isset($_GET['action']) && $_GET['action'] === 'logout')) {
+if (isset($_GET['uitloggen'])) {
     $_SESSION = []; session_destroy();
     header('Location: ouderportaal.php'); exit;
 }
 
-/* ── Base vars ────────────────────────────────────────── */
-$ingelogd    = !empty($_SESSION['sgo_logged_in']);
-$token       = $_SESSION['sgo_access_token'] ?? '';
-$ouder_naam  = $_SESSION['sgo_name'] ?? 'gebruiker';
-$ouder_email = strtolower($_SESSION['sgo_email'] ?? '');
-$ouder_ref   = $_SESSION['sgo_id'] ?? $ouder_email;
-$kinderen    = $_SESSION['sgo_children'] ?? [];
+/* ── Auth detectie ────────────────────────────────────── */
+$ouder_ingelogd = !empty($_SESSION['ouder_logged_in']);
+$sgo_ingelogd   = !empty($_SESSION['sgo_logged_in']);
+$ingelogd       = $ouder_ingelogd || $sgo_ingelogd;
 
-/* ── Rol ──────────────────────────────────────────────── */
-$portal_role    = $ingelogd ? sgo_get_portal_role($token) : 'ouder';
-$is_leiding     = in_array($portal_role, ['leiding','groepsleiding']);
-$leiding_takken = $is_leiding ? sgo_get_leiding_takken($token) : [];
+if ($ouder_ingelogd) {
+    $ouder_account = get_ouder_by_id($_SESSION['ouder_account_id'] ?? '');
+    $ouder_naam    = $ouder_account['naam']  ?? 'ouder';
+    $ouder_email   = $ouder_account['email'] ?? '';
+    $ouder_ref     = $_SESSION['ouder_account_id'] ?? '';
+    $kinderen      = $ouder_account['kinderen'] ?? [];
+    $token         = '';
+    $portal_role   = 'ouder';
+    $is_leiding    = false;
+    $leiding_takken= [];
+} elseif ($sgo_ingelogd) {
+    $token          = $_SESSION['sgo_access_token'] ?? '';
+    $ouder_naam     = $_SESSION['sgo_name']  ?? 'gebruiker';
+    $ouder_email    = strtolower($_SESSION['sgo_email'] ?? '');
+    $ouder_ref      = $_SESSION['sgo_id']   ?? $ouder_email;
+    $portal_role    = sgo_get_portal_role($token);
+    $is_leiding     = in_array($portal_role, ['leiding','groepsleiding']);
+    $leiding_takken = $is_leiding ? sgo_get_leiding_takken($token) : [];
+    $kinderen       = [];
+} else {
+    $ouder_naam = $ouder_email = $ouder_ref = $token = '';
+    $kinderen = $leiding_takken = [];
+    $portal_role = 'ouder'; $is_leiding = false;
+}
 
 /* ── Flash ────────────────────────────────────────────── */
-$flash = ''; $flash_type = 'success';
+$flash = ''; $flash_type = 'success'; $login_error = '';
+if (isset($_GET['kind_toegevoegd'])) $flash = 'Kind succesvol gelinkt aan jouw account! 🎉';
+if (isset($_GET['welkom']))          $flash = 'Account aangemaakt! Voeg hieronder je kind(eren) toe.';
+
+/* ── Lokale ouder-login (POST voor HTML output) ────────── */
+if (!$ingelogd && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['actie'] ?? '') === 'ouder_login') {
+    $account = verify_ouder_login($_POST['email'] ?? '', $_POST['password'] ?? '');
+    if ($account) {
+        ouder_session_set($account);
+        header('Location: ouderportaal.php'); exit;
+    }
+    $login_error = 'Ongeldig e-mailadres of wachtwoord.';
+}
+
+/* ── Kind toevoegen → redirect naar S&G ──────────────── */
+if ($ouder_ingelogd && isset($_GET['actie']) && $_GET['actie'] === 'addkid') {
+    header('Location: ' . sgo_addkid_url($_SESSION['ouder_account_id'])); exit;
+}
 
 /* ── Helpers ──────────────────────────────────────────── */
 function _eigen_lid(array $kinderen, string $ga_id): bool {
@@ -92,9 +131,25 @@ if ($ingelogd && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* ── OUDER ── */
     if ($portal_role === 'ouder') {
+
+        // Kind ontkoppelen van account
+        if ($actie === 'ontkoppel_kind' && $ouder_ingelogd) {
+            remove_kind_from_account($_SESSION['ouder_account_id'], $_POST['ga_id'] ?? '');
+            $kinderen = get_ouder_by_id($_SESSION['ouder_account_id'])['kinderen'] ?? [];
+            $flash = 'Kind ontkoppeld van jouw account.';
+        }
+        // Account verwijderen
+        elseif ($actie === 'verwijder_account' && $ouder_ingelogd) {
+            delete_ouder_account($_SESSION['ouder_account_id']);
+            $_SESSION = []; session_destroy();
+            header('Location: ouderportaal.php'); exit;
+        }
+
         $ga_id = $_POST['ga_id'] ?? '';
         if (!_eigen_lid($kinderen, $ga_id)) {
-            $flash = 'Je kan enkel je eigen leden inschrijven.'; $flash_type = 'error';
+            if (!in_array($actie, ['ontkoppel_kind','verwijder_account'])) {
+                $flash = 'Je kan enkel je eigen leden inschrijven.'; $flash_type = 'error';
+            }
         } elseif ($actie === 'inschrijven') {
             if (schrijf_kind_in($ga_id, $kamp_id, $_POST['opmerking'] ?? '', $ouder_ref))
                 $flash = 'Inschrijving geregistreerd!';
@@ -254,36 +309,77 @@ require_once __DIR__ . '/includes/header.php';
 
   <?php if (!$ingelogd): /* ══════════ NIET INGELOGD ══════════ */ ?>
 
-    <span class="portaal-eyebrow">Portaal</span>
     <?php if (isset($_GET['sgo_error'])): ?>
       <div style="max-width:480px;margin:0 auto 18px;background:hsla(4,75%,48%,.1);border:1.5px solid var(--color-error);
           color:var(--color-error);padding:12px 16px;border-radius:10px;font-size:0.85rem;">
           <?php echo htmlspecialchars(urldecode($_GET['sgo_error'])); ?>
       </div>
     <?php endif; ?>
-    <div style="max-width:480px;margin:0 auto;text-align:center;background:#fff;
-        border:1px solid var(--color-border);border-radius:20px;padding:44px 36px;box-shadow:0 12px 32px rgba(26,61,42,.1);">
-      <div style="font-size:2.6rem;margin-bottom:12px;">🔐</div>
-      <h3 style="font-size:1.4rem;margin-bottom:10px;color:var(--color-primary);">Log in met je Scouts-account</h3>
-      <p style="color:var(--color-text-muted);font-size:0.92rem;margin-bottom:28px;line-height:1.6;">
-          Je logt veilig in via <strong>Scouts &amp; Gidsen Vlaanderen</strong>. Wij bewaren géén wachtwoorden
-          of profielen — je leden komen rechtstreeks uit de groepsadministratie.</p>
-      <?php if (sgo_dev_mode()): ?>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <a href="ouderportaal.php?demologin=1" class="btn btn-secondary" style="width:100%;">
-              <i class="fa-solid fa-user"></i> Demo — Ouder/Lid</a>
-          <a href="ouderportaal.php?demologin=leiding" class="btn btn-secondary" style="width:100%;opacity:.85;">
-              <i class="fa-solid fa-shield-halved"></i> Demo — Leiding (welpen)</a>
-          <a href="ouderportaal.php?demologin=groepsleiding" class="btn btn-secondary" style="width:100%;opacity:.7;">
-              <i class="fa-solid fa-star"></i> Demo — Groepsleiding</a>
-        </div>
-        <p style="font-size:0.75rem;color:var(--color-text-muted);margin-top:14px;">
-            De echte S&amp;G-login werkt zodra de API-key in <code>sgo_config.php</code> staat.</p>
-      <?php else: ?>
-        <a href="<?php echo htmlspecialchars(sgo_login_url()); ?>" class="btn btn-secondary" style="width:100%;">
-            <i class="fa-solid fa-right-to-bracket"></i> Inloggen via Scouts &amp; Gidsen</a>
-      <?php endif; ?>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:780px;margin:0 auto;">
+
+      <!-- Ouder login -->
+      <div style="background:#fff;border:1px solid var(--color-border);border-top:4px solid var(--color-accent);
+          border-radius:20px;padding:32px 28px;box-shadow:0 8px 24px rgba(26,61,42,.09);">
+        <div style="font-size:2rem;margin-bottom:10px;">👨‍👩‍👧</div>
+        <h3 style="font-size:1.2rem;margin-bottom:6px;color:var(--color-primary);">Ouder / Lid</h3>
+        <p style="font-size:.85rem;color:var(--color-text-muted);margin-bottom:20px;line-height:1.5;">
+            Log in met je account op deze site. Nog geen account?
+            <a href="register.php" style="color:var(--color-primary);font-weight:700;">Registreer hier</a>.</p>
+
+        <?php if ($login_error): ?>
+          <div style="background:hsla(349,51%,47%,.1);border:1.5px solid var(--color-error);color:var(--color-error);
+              padding:9px 12px;border-radius:9px;font-size:.83rem;font-weight:600;margin-bottom:14px;text-align:center;">
+              <?php echo htmlspecialchars($login_error); ?></div>
+        <?php endif; ?>
+
+        <form method="POST">
+          <input type="hidden" name="actie" value="ouder_login">
+          <label style="display:block;font-size:.78rem;font-weight:600;color:var(--color-primary);margin-bottom:5px;">E-mailadres</label>
+          <input type="email" name="email" required value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>"
+              placeholder="naam@voorbeeld.be"
+              style="width:100%;padding:10px 12px;border:2px solid var(--color-border);border-radius:10px;
+                     font-family:inherit;font-size:.9rem;margin-bottom:12px;outline:none;">
+          <label style="display:block;font-size:.78rem;font-weight:600;color:var(--color-primary);margin-bottom:5px;">Wachtwoord</label>
+          <input type="password" name="password" required placeholder="••••••••"
+              style="width:100%;padding:10px 12px;border:2px solid var(--color-border);border-radius:10px;
+                     font-family:inherit;font-size:.9rem;margin-bottom:16px;outline:none;">
+          <button type="submit" style="width:100%;padding:12px;background:var(--color-primary);color:#fff;border:none;
+              border-radius:11px;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;">
+              Inloggen →</button>
+        </form>
+        <?php if (sgo_dev_mode()): ?>
+          <a href="ouderportaal.php?demologin=1" style="display:block;text-align:center;margin-top:12px;font-size:.78rem;
+              color:var(--color-text-muted);text-decoration:underline;">Demo ouder-account</a>
+        <?php endif; ?>
+      </div>
+
+      <!-- Leiding login -->
+      <div style="background:#fff;border:1px solid var(--color-border);border-top:4px solid var(--color-primary);
+          border-radius:20px;padding:32px 28px;box-shadow:0 8px 24px rgba(26,61,42,.09);">
+        <div style="font-size:2rem;margin-bottom:10px;">🛡️</div>
+        <h3 style="font-size:1.2rem;margin-bottom:6px;color:var(--color-primary);">Leiding</h3>
+        <p style="font-size:.85rem;color:var(--color-text-muted);margin-bottom:20px;line-height:1.5;">
+            Leiding en groepsleiding loggen in via Scouts &amp; Gidsen Vlaanderen
+            met hun persoonlijk S&amp;G-account.</p>
+        <?php if (sgo_dev_mode()): ?>
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <a href="ouderportaal.php?demologin=leiding" class="btn btn-secondary" style="width:100%;font-size:.88rem;padding:11px 16px;">
+                <i class="fa-solid fa-shield-halved"></i> Demo — Leiding (welpen)</a>
+            <a href="ouderportaal.php?demologin=groepsleiding" class="btn btn-secondary" style="width:100%;font-size:.88rem;padding:11px 16px;opacity:.85;">
+                <i class="fa-solid fa-star"></i> Demo — Groepsleiding</a>
+          </div>
+          <p style="font-size:.72rem;color:var(--color-text-muted);margin-top:12px;text-align:center;">
+              Echte S&amp;G-login actief zodra API-key geconfigureerd is.</p>
+        <?php else: ?>
+          <a href="<?php echo htmlspecialchars(sgo_login_url()); ?>" class="btn btn-secondary" style="width:100%;">
+              <i class="fa-solid fa-right-to-bracket"></i> Inloggen via S&amp;G</a>
+        <?php endif; ?>
+      </div>
+
     </div>
+
+    @media (max-width: 600px) { .portaal-login-grid { grid-template-columns: 1fr !important; } }
 
   <?php elseif ($portal_role === 'ouder'): /* ══════════ OUDER ══════════ */ ?>
 
@@ -380,10 +476,21 @@ require_once __DIR__ . '/includes/header.php';
         <div class="portaal-card">
           <div class="portaal-lid-head">
             <div class="portaal-lid-avatar"><?php echo strtoupper(substr($kind['voornaam']??'?',0,1)); ?></div>
-            <div>
+            <div style="flex:1;">
               <div class="portaal-lid-naam"><?php echo htmlspecialchars($naam); ?></div>
-              <div class="portaal-lid-meta"><?php echo htmlspecialchars($tak?:'onbekend'); ?> &middot; <?php echo htmlspecialchars($ga_id); ?></div>
+              <div class="portaal-lid-meta"><?php echo htmlspecialchars($tak?:'onbekend'); ?></div>
             </div>
+            <?php if ($ouder_ingelogd): ?>
+            <form method="post" style="flex-shrink:0;">
+              <input type="hidden" name="actie" value="ontkoppel_kind">
+              <input type="hidden" name="ga_id" value="<?php echo htmlspecialchars($ga_id); ?>">
+              <button type="submit" title="Kind ontkoppelen van account"
+                  style="background:none;border:1.5px solid var(--color-border);color:var(--color-text-muted);
+                         padding:4px 9px;border-radius:8px;font-size:.75rem;cursor:pointer;"
+                  onclick="return confirm('<?php echo htmlspecialchars($kind[\'voornaam\']??\'Dit kind\'); ?> ontkoppelen van jouw account?');">
+                  <i class="fa-solid fa-link-slash"></i></button>
+            </form>
+            <?php endif; ?>
           </div>
 
           <!-- Ingeschreven kampen -->
@@ -493,6 +600,31 @@ require_once __DIR__ . '/includes/header.php';
         </div><!-- /.portaal-card -->
       </div><!-- /.kind-panel / direct -->
       <?php endforeach; ?>
+
+      <?php if ($ouder_ingelogd): ?>
+      <!-- Voeg kind toe -->
+      <div style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+          padding:16px 20px;background:var(--color-bg-linen);border:1px dashed var(--color-border);border-radius:14px;">
+        <div>
+          <div style="font-weight:700;font-size:.92rem;color:var(--color-primary);">Voeg een kind toe</div>
+          <div style="font-size:.8rem;color:var(--color-text-muted);">Log in met het S&amp;G-account van je kind om het te koppelen.</div>
+        </div>
+        <a href="ouderportaal.php?actie=addkid" class="btn btn-secondary" style="padding:9px 18px;font-size:.88rem;">
+            <i class="fa-solid fa-plus"></i> Kind toevoegen via S&amp;G</a>
+      </div>
+
+      <!-- Verwijder account -->
+      <div style="margin-top:10px;text-align:right;">
+        <form method="post" style="display:inline;">
+          <input type="hidden" name="actie" value="verwijder_account">
+          <button type="submit" style="background:none;border:none;font-size:.78rem;color:var(--color-text-muted);
+              cursor:pointer;text-decoration:underline;"
+              onclick="return confirm('Account en alle gekoppelde kinderen verwijderen? Dit kan niet ongedaan gemaakt worden.');">
+              Account verwijderen</button>
+        </form>
+      </div>
+      <?php endif; ?>
+
       </div><!-- /.portaal-main -->
 
       <!-- Webshop + bestellingen -->

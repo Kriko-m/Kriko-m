@@ -212,17 +212,33 @@ function sgo_fetch_tak_leden(string $token, string $tak): array {
     return $result;
 }
 
-/** Genereer de login-URL voor S&G Keycloak */
+/** Genereer de login-URL voor S&G Keycloak (normale flow: leiding/groepsleiding) */
 function sgo_login_url(): string {
     $state = bin2hex(random_bytes(16));
     $_SESSION['sgo_state'] = $state;
-
     return SGO_AUTH_URL . '?' . http_build_query([
         'client_id'     => SGO_CLIENT_ID,
         'redirect_uri'  => SGO_REDIRECT_URI,
         'response_type' => 'code',
         'scope'         => 'openid profile email',
         'state'         => $state,
+    ]);
+}
+
+/**
+ * Genereer de S&G login-URL voor de "voeg kind toe" flow.
+ * State bevat het ouder-account-id zodat de callback weet aan welk account te koppelen.
+ */
+function sgo_addkid_url(string $account_id): string {
+    $state = 'addkid_' . $account_id . '_' . bin2hex(random_bytes(12));
+    $_SESSION['sgo_state'] = $state;
+    return SGO_AUTH_URL . '?' . http_build_query([
+        'client_id'     => SGO_CLIENT_ID,
+        'redirect_uri'  => SGO_REDIRECT_URI,
+        'response_type' => 'code',
+        'scope'         => 'openid profile email',
+        'state'         => $state,
+        'prompt'        => 'login', // forceer altijd inloggen (niet de ouder-sessie hergebruiken)
     ]);
 }
 
