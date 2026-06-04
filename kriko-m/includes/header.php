@@ -43,7 +43,7 @@ function active_class($page, $current) {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <?php
-$portal_pages = ['login.php', 'admin.php', 'ouderportaal.php', 'leiding-kampen.php', 'shop.php', 'checkout.php', 'order-success.php', 'register.php'];
+$portal_pages = ['admin.php', 'ouderportaal.php', 'shop.php', 'checkout.php', 'order-success.php'];
 $body_classes = [];
 if (in_array($current_page, $portal_pages)) $body_classes[] = 'portal-theme';
 if ($current_page === 'admin.php') $body_classes[] = 'no-nav';
@@ -106,10 +106,8 @@ if (isset($body_class)) $body_classes[] = $body_class;
                 <div class="portaal-nav-brand-text">
                     KRIKO-M
                     <small><?php
-                        if ($current_page === 'login.php')              echo 'LEIDING LOGIN';
-                        elseif ($current_page === 'leiding-kampen.php') echo 'LEIDING';
-                        elseif (in_array($current_page, ['shop.php', 'checkout.php', 'order-success.php'])) echo 'WEBSHOP';
-                        else                                             echo 'OUDER PORTAAL';
+                        echo in_array($current_page, ['shop.php', 'checkout.php', 'order-success.php'])
+                            ? 'WEBSHOP' : 'PORTAAL';
                     ?></small>
                 </div>
             </a>

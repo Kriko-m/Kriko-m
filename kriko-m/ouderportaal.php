@@ -342,6 +342,9 @@ if (!$ingelogd): ?>
     .alert-err { padding:9px 12px; border-radius:9px; font-size:.83rem; font-weight:600;
                  text-align:center; margin-bottom:14px;
                  background:hsla(349,51%,47%,.1); border:1.5px solid var(--error); color:var(--error); }
+    .alert-ok { width:100%; max-width:440px; padding:11px 14px; border-radius:11px; font-size:.85rem;
+                font-weight:600; text-align:center;
+                background:hsla(145,33%,36%,.12); border:1.5px solid #3F7D5A; color:#2C5A40; }
     /* Wachtwoord-hint box voor admin */
     .pw-hint { background:color-mix(in srgb,var(--gold) 10%,transparent);
                border:1.5px solid var(--gold); border-radius:10px;
@@ -357,6 +360,10 @@ if (!$ingelogd): ?>
 </head>
 <body>
   <h1>Portaal</h1>
+
+  <?php if (isset($_GET['uitgelogd'])): ?>
+    <div class="alert-ok">Je bent uitgelogd.</div>
+  <?php endif; ?>
 
   <div class="card">
     <!-- Tabs -->
@@ -398,6 +405,10 @@ if (!$ingelogd): ?>
     <div id="pane-admin" class="tab-pane">
       <p style="font-size:.85rem;color:var(--muted);margin-bottom:18px;line-height:1.5;">
         Kies je rol en vul het wachtwoord in.</p>
+
+      <?php if (isset($_GET['admin_error'])): ?>
+        <div class="alert-err"><?php echo htmlspecialchars(urldecode($_GET['admin_error'])); ?></div>
+      <?php endif; ?>
 
       <form method="POST" action="login.php" id="admin-form">
         <label>Rol</label>
@@ -456,9 +467,9 @@ if (!$ingelogd): ?>
       btn.classList.add('active');
       document.getElementById('pane-' + tab).classList.add('active');
     }
-    <?php if ($login_error): ?>
-    // Fout bij ouder-login → toon ouder-tab
-    document.querySelector('.tab-btn').click();
+    <?php if (isset($_GET['admin_error'])): ?>
+    // Fout bij admin-login → open Admin-tab
+    switchTab('admin', document.querySelectorAll('.tab-btn')[1]);
     <?php endif; ?>
 
     var hints = {

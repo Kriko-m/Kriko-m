@@ -43,7 +43,7 @@ function can_edit_tak($tak) {
  */
 function check_admin_auth() {
     if (!is_admin_logged_in()) {
-        header('Location: login.php');
+        header('Location: ouderportaal.php');
         exit;
     }
 }

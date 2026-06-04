@@ -76,7 +76,7 @@ $contact_address = isset($settings['contact_address']) ? $settings['contact_addr
 
         <div class="site-footer-bottom">
             <span>&copy; <?php echo date('Y'); ?> Scouts &amp; Gidsen Kriko-M Sint-Niklaas</span>
-            <a href="login.php" class="dev-trigger" title="Leiding Portaal">⚙</a>
+            <a href="ouderportaal.php" class="dev-trigger" title="Portaal">⚙</a>
         </div>
     </footer>
     <?php endif; ?>
