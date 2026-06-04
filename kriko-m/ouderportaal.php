@@ -16,6 +16,10 @@ require_once __DIR__ . '/includes/ouder_auth.php';
 
 /* ── Demo-logins (enkel in dev-modus) ────────────────── */
 if (sgo_dev_mode() && isset($_GET['demologin'])) {
+    // Eerst alle bestaande auth-state wissen (voorkomt conflict ouder ↔ sgo)
+    foreach (['ouder_logged_in','ouder_account_id','ouder_naam','ouder_email',
+              'sgo_logged_in','sgo_access_token','sgo_id','sgo_name','sgo_email',
+              'sgo_portal_role','sgo_leiding_takken'] as $k) unset($_SESSION[$k]);
     $dl = $_GET['demologin'];
     if ($dl === 'leiding') {
         $_SESSION['sgo_logged_in']      = true;
@@ -229,6 +233,47 @@ if ($ingelogd && $_SERVER['REQUEST_METHOD'] === 'POST') {
             write_db('calendar', $events);
             $flash = 'Evenement verwijderd.';
         }
+
+        /* ── Webshop-bestellingen ── */
+        elseif ($actie === 'order_status') {
+            $oid = $_POST['order_id'] ?? '';
+            $new = $_POST['status'] ?? '';
+            if (in_array($new, ['pending','waiting_approval','paid','completed','cancelled'])) {
+                $orders = read_db('orders') ?: [];
+                foreach ($orders as &$o) { if (($o['id'] ?? '') === $oid) { $o['status'] = $new; break; } }
+                unset($o); write_db('orders', $orders);
+                $flash = 'Bestelling bijgewerkt.';
+            }
+        } elseif ($actie === 'order_delete') {
+            $oid = $_POST['order_id'] ?? '';
+            write_db('orders', array_values(array_filter(read_db('orders') ?: [], fn($o) => ($o['id'] ?? '') !== $oid)));
+            $flash = 'Bestelling verwijderd.';
+        }
+
+        /* ── Contactberichten ── */
+        elseif ($actie === 'message_read') {
+            $mid = $_POST['message_id'] ?? '';
+            $msgs = read_db('messages') ?: [];
+            foreach ($msgs as &$m) { if (($m['id'] ?? '') === $mid) { $m['read'] = true; break; } }
+            unset($m); write_db('messages', $msgs);
+            $flash = 'Bericht gemarkeerd als gelezen.';
+        } elseif ($actie === 'message_delete') {
+            $mid = $_POST['message_id'] ?? '';
+            write_db('messages', array_values(array_filter(read_db('messages') ?: [], fn($m) => ($m['id'] ?? '') !== $mid)));
+            $flash = 'Bericht verwijderd.';
+        }
+
+        /* ── Website-instellingen ── */
+        elseif ($actie === 'save_settings') {
+            $s = read_db('settings') ?: [];
+            foreach (['scouts_year','bank_iban','bank_bic','bank_holder',
+                      'contact_email','contact_phone','contact_address','alert_message'] as $f) {
+                if (isset($_POST[$f])) $s[$f] = substr(trim($_POST[$f]), 0, 500);
+            }
+            $s['alert_active'] = !empty($_POST['alert_active']);
+            write_db('settings', $s);
+            $flash = 'Website-instellingen opgeslagen.';
+        }
     }
 }
 
@@ -290,6 +335,18 @@ $calendar_events = ($portal_role === 'groepsleiding') ? (function() {
     usort($ev, fn($a,$b) => strcmp($a['date']??'', $b['date']??''));
     return $ev;
 })() : [];
+
+/* ── Groepsleiding beheer-data ── */
+$gl_orders = $gl_messages = []; $gl_settings = [];
+$gl_msg_unread = 0;
+if ($portal_role === 'groepsleiding') {
+    $gl_orders = read_db('orders') ?: [];
+    usort($gl_orders, fn($a,$b) => strcmp($b['date']??'', $a['date']??''));
+    $gl_messages = read_db('messages') ?: [];
+    usort($gl_messages, fn($a,$b) => strcmp($b['date']??'', $a['date']??''));
+    foreach ($gl_messages as $m) if (empty($m['read'])) $gl_msg_unread++;
+    $gl_settings = read_db('settings') ?: [];
+}
 
 /* ── Niet ingelogd → standalone login pagina (geen header/nav/footer) ── */
 if (!$ingelogd): ?>
@@ -1033,6 +1090,174 @@ require_once __DIR__ . '/includes/header.php';
         </div>
       </aside>
     </div><!-- /.portaal-grid -->
+
+    <?php if ($portal_role === 'groepsleiding'): ?>
+    <!-- ════════ GROEPSLEIDING — WEBSITEBEHEER ════════ -->
+    <div style="margin-top:36px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+        <span style="font-family:'Outfit',sans-serif;font-weight:700;font-size:1.25rem;color:var(--color-primary);">⚙️ Websitebeheer</span>
+        <span style="flex:1;height:1px;background:var(--color-border);"></span>
+      </div>
+
+      <!-- Sub-tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+        <button class="gl-tab-btn active" data-gltab="orders" onclick="glTab('orders',this)">
+          🛍️ Bestellingen <?php if ($gl_orders): ?><span style="background:var(--color-accent);color:#fff;border-radius:20px;padding:1px 7px;font-size:.7rem;margin-left:3px;"><?php echo count($gl_orders); ?></span><?php endif; ?>
+        </button>
+        <button class="gl-tab-btn" data-gltab="messages" onclick="glTab('messages',this)">
+          ✉️ Berichten <?php if ($gl_msg_unread): ?><span style="background:var(--color-error);color:#fff;border-radius:20px;padding:1px 7px;font-size:.7rem;margin-left:3px;"><?php echo $gl_msg_unread; ?></span><?php endif; ?>
+        </button>
+        <button class="gl-tab-btn" data-gltab="settings" onclick="glTab('settings',this)">🌐 Instellingen</button>
+      </div>
+
+      <style>
+        .gl-tab-btn { padding:9px 16px; border:1.5px solid var(--color-border); background:#fff;
+          border-radius:10px; font-family:'Outfit',sans-serif; font-weight:600; font-size:.88rem;
+          color:var(--color-text-muted); cursor:pointer; transition:all .15s; }
+        .gl-tab-btn.active { background:var(--color-primary); color:#fff; border-color:var(--color-primary); }
+        .gl-pane { display:none; }
+        .gl-pane.active { display:block; }
+      </style>
+
+      <!-- ─── BESTELLINGEN ─── -->
+      <div id="gl-orders" class="gl-pane active">
+        <div class="portaal-card" style="border-top-color:var(--color-accent);">
+          <?php if (empty($gl_orders)): ?>
+            <div class="portaal-empty">Nog geen bestellingen.</div>
+          <?php else: ?>
+          <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:.85rem;">
+            <thead><tr style="text-align:left;border-bottom:2px solid var(--color-border);">
+              <th style="padding:8px;">Datum</th><th style="padding:8px;">Klant</th>
+              <th style="padding:8px;">Items</th><th style="padding:8px;">Totaal</th>
+              <th style="padding:8px;">Status</th><th style="padding:8px;">Actie</th>
+            </tr></thead>
+            <tbody>
+            <?php foreach ($gl_orders as $o):
+              $st = $o['status'] ?? 'pending';
+              [$stl,$stk] = $status_labels[$st] ?? [ucfirst($st),'#888'];
+              $items = implode(', ', array_map(fn($it)=>($it['quantity']??1).'× '.($it['name']??''), $o['items']??[])); ?>
+            <tr style="border-bottom:1px solid var(--color-border);">
+              <td style="padding:8px;white-space:nowrap;"><?php echo date('j/n/y',strtotime($o['date']??'now')); ?></td>
+              <td style="padding:8px;"><?php echo htmlspecialchars($o['customer_name'] ?? $o['child_name'] ?? '—'); ?><br>
+                  <span style="font-size:.75rem;color:var(--color-text-muted);"><?php echo htmlspecialchars($o['email']??''); ?></span></td>
+              <td style="padding:8px;max-width:200px;"><?php echo htmlspecialchars($items); ?></td>
+              <td style="padding:8px;white-space:nowrap;">€<?php echo number_format((float)($o['total']??0),2,',','.'); ?></td>
+              <td style="padding:8px;"><span style="background:<?php echo $stk; ?>;color:#fff;padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap;"><?php echo htmlspecialchars($stl); ?></span></td>
+              <td style="padding:8px;">
+                <div style="display:flex;gap:4px;align-items:center;">
+                  <form method="post" style="margin:0;">
+                    <input type="hidden" name="actie" value="order_status">
+                    <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($o['id']??''); ?>">
+                    <select name="status" onchange="this.form.submit()" style="font-size:.75rem;padding:3px 6px;border:1px solid var(--color-border);border-radius:6px;">
+                      <?php foreach (['pending'=>'Wachtend','waiting_approval'=>'Gemeld','paid'=>'Betaald','completed'=>'Geleverd','cancelled'=>'Geannuleerd'] as $sv=>$sl): ?>
+                        <option value="<?php echo $sv; ?>"<?php echo $st===$sv?' selected':''; ?>><?php echo $sl; ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  </form>
+                  <form method="post" style="margin:0;">
+                    <input type="hidden" name="actie" value="order_delete">
+                    <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($o['id']??''); ?>">
+                    <button type="submit" style="background:none;border:none;color:var(--color-error);cursor:pointer;font-size:.9rem;"
+                        onclick="return confirm('Bestelling verwijderen?');">✕</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <?php endforeach; ?>
+            </tbody>
+          </table>
+          </div>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <!-- ─── BERICHTEN ─── -->
+      <div id="gl-messages" class="gl-pane">
+        <div class="portaal-card" style="border-top-color:var(--color-accent);">
+          <?php if (empty($gl_messages)): ?>
+            <div class="portaal-empty">Nog geen berichten.</div>
+          <?php else: foreach ($gl_messages as $m): ?>
+          <div style="padding:14px;border:1px solid var(--color-border);border-radius:12px;margin-bottom:10px;
+              <?php echo empty($m['read'])?'background:color-mix(in srgb,var(--color-accent) 5%,transparent);border-left:4px solid var(--color-accent);':'background:#fff;'; ?>">
+            <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+              <div>
+                <strong style="color:var(--color-primary);"><?php echo htmlspecialchars($m['name']??$m['subject']??'Bericht'); ?></strong>
+                <?php if (empty($m['read'])): ?><span style="background:var(--color-accent);color:#fff;font-size:.65rem;padding:1px 7px;border-radius:20px;margin-left:6px;">NIEUW</span><?php endif; ?>
+                <div style="font-size:.78rem;color:var(--color-text-muted);">
+                  <a href="mailto:<?php echo htmlspecialchars($m['email']??''); ?>" style="color:var(--color-accent);"><?php echo htmlspecialchars($m['email']??''); ?></a>
+                  · <?php echo date('j/n/Y',strtotime($m['date']??'now')); ?>
+                  <?php if($m['subject']??''): ?> · <?php echo htmlspecialchars($m['subject']); ?><?php endif; ?>
+                </div>
+              </div>
+              <div style="display:flex;gap:5px;flex-shrink:0;">
+                <?php if (empty($m['read'])): ?>
+                <form method="post" style="margin:0;">
+                  <input type="hidden" name="actie" value="message_read">
+                  <input type="hidden" name="message_id" value="<?php echo htmlspecialchars($m['id']??''); ?>">
+                  <button type="submit" style="background:none;border:1.5px solid var(--color-success);color:var(--color-success);padding:3px 9px;border-radius:7px;font-size:.72rem;cursor:pointer;">✓ Gelezen</button>
+                </form>
+                <?php endif; ?>
+                <form method="post" style="margin:0;">
+                  <input type="hidden" name="actie" value="message_delete">
+                  <input type="hidden" name="message_id" value="<?php echo htmlspecialchars($m['id']??''); ?>">
+                  <button type="submit" style="background:none;border:1.5px solid var(--color-error);color:var(--color-error);padding:3px 9px;border-radius:7px;font-size:.72rem;cursor:pointer;"
+                      onclick="return confirm('Bericht verwijderen?');">✕</button>
+                </form>
+              </div>
+            </div>
+            <p style="font-size:.88rem;margin-top:8px;line-height:1.5;color:var(--color-text-dark);"><?php echo nl2br(htmlspecialchars($m['message']??'')); ?></p>
+          </div>
+          <?php endforeach; endif; ?>
+        </div>
+      </div>
+
+      <!-- ─── INSTELLINGEN ─── -->
+      <div id="gl-settings" class="gl-pane">
+        <div class="portaal-card" style="border-top-color:var(--color-accent);">
+          <form method="post" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <input type="hidden" name="actie" value="save_settings">
+
+            <div style="grid-column:1/-1;font-weight:700;color:var(--color-primary);font-size:.95rem;">Algemeen</div>
+            <div><label class="form-label" style="font-size:.78rem;">Scoutsjaar</label>
+              <input type="text" name="scouts_year" class="form-control" style="font-size:.88rem;padding:8px 11px;" value="<?php echo htmlspecialchars($gl_settings['scouts_year']??''); ?>"></div>
+            <div><label class="form-label" style="font-size:.78rem;">Contact e-mail</label>
+              <input type="email" name="contact_email" class="form-control" style="font-size:.88rem;padding:8px 11px;" value="<?php echo htmlspecialchars($gl_settings['contact_email']??''); ?>"></div>
+            <div><label class="form-label" style="font-size:.78rem;">Telefoon</label>
+              <input type="text" name="contact_phone" class="form-control" style="font-size:.88rem;padding:8px 11px;" value="<?php echo htmlspecialchars($gl_settings['contact_phone']??''); ?>"></div>
+            <div><label class="form-label" style="font-size:.78rem;">Adres</label>
+              <input type="text" name="contact_address" class="form-control" style="font-size:.88rem;padding:8px 11px;" value="<?php echo htmlspecialchars($gl_settings['contact_address']??''); ?>"></div>
+
+            <div style="grid-column:1/-1;font-weight:700;color:var(--color-primary);font-size:.95rem;margin-top:8px;">Bankgegevens</div>
+            <div><label class="form-label" style="font-size:.78rem;">IBAN</label>
+              <input type="text" name="bank_iban" class="form-control" style="font-size:.88rem;padding:8px 11px;" value="<?php echo htmlspecialchars($gl_settings['bank_iban']??''); ?>"></div>
+            <div><label class="form-label" style="font-size:.78rem;">BIC</label>
+              <input type="text" name="bank_bic" class="form-control" style="font-size:.88rem;padding:8px 11px;" value="<?php echo htmlspecialchars($gl_settings['bank_bic']??''); ?>"></div>
+            <div style="grid-column:1/-1"><label class="form-label" style="font-size:.78rem;">Rekeninghouder</label>
+              <input type="text" name="bank_holder" class="form-control" style="font-size:.88rem;padding:8px 11px;" value="<?php echo htmlspecialchars($gl_settings['bank_holder']??''); ?>"></div>
+
+            <div style="grid-column:1/-1;font-weight:700;color:var(--color-primary);font-size:.95rem;margin-top:8px;">Aankondigingsbalk</div>
+            <div style="grid-column:1/-1"><label class="form-label" style="font-size:.78rem;">Bericht</label>
+              <textarea name="alert_message" rows="2" class="form-control" style="font-size:.88rem;padding:8px 11px;"><?php echo htmlspecialchars($gl_settings['alert_message']??''); ?></textarea></div>
+            <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+              <label style="display:flex;align-items:center;gap:8px;font-size:.88rem;">
+                <input type="checkbox" name="alert_active" value="1"<?php echo !empty($gl_settings['alert_active'])?' checked':''; ?>> Balk tonen op de site</label>
+              <button type="submit" class="btn btn-secondary" style="padding:10px 24px;font-size:.9rem;">Opslaan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function glTab(tab, btn) {
+        document.querySelectorAll('.gl-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.gl-pane').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('gl-' + tab).classList.add('active');
+      }
+    </script>
+    <?php endif; /* /groepsleiding beheer */ ?>
 
   <?php endif; /* /role switch */ ?>
   </div><!-- /.portaal-wrap -->
