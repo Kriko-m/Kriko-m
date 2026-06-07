@@ -144,12 +144,9 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               >
                 <i className="fas fa-copy"></i> {tak.email}
               </CopyButton>
-              <a href={`mailto:${tak.email}`} className="btn btn-secondary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <i className="fas fa-envelope"></i> Stuur e-mail
-              </a>
               {tak.whatsapp_url && (
                 <a href={tak.whatsapp_url} target="_blank" rel="noopener"
-                   className="btn" style={{ marginTop: 8, width: '100%', background: 'transparent', color: '#25D366', border: '1.5px solid #25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                   className="btn" style={{ marginTop: 4, width: '100%', background: 'transparent', color: '#25D366', border: '1.5px solid #25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                   <i className="fab fa-whatsapp" style={{ fontSize: '1.1rem' }}></i> Doe mee op WhatsApp
                 </a>
               )}
