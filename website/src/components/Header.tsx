@@ -15,11 +15,16 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [takkenOpen, setTakkenOpen] = useState(false)
-  const [alertDismissed, setAlertDismissed] = useState(false)
+  const [alertDismissed, setAlertDismissed] = useState(true) // start verborgen, toon pas na check
 
   useEffect(() => {
     setMenuOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem('kriko_alert_dismissed')
+    if (!dismissed) setAlertDismissed(false)
+  }, [])
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
@@ -37,7 +42,7 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
               </svg>
               <span>{alertMessage}</span>
             </div>
-            <button className="alert-close" onClick={() => setAlertDismissed(true)} aria-label="Melding sluiten">&times;</button>
+            <button className="alert-close" onClick={() => { localStorage.setItem('kriko_alert_dismissed', '1'); setAlertDismissed(true) }} aria-label="Melding sluiten">&times;</button>
           </div>
         </div>
       )}
