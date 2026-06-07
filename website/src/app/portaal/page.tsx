@@ -96,7 +96,7 @@ export default function PortaalPage() {
               key={t}
               onClick={() => { setTab(t); setError(''); setInfo('') }}
               style={{
-                padding: '18px 16px', background: 'none', border: 'none',
+                padding: '18px 16px', border: 'none',
                 fontFamily: 'inherit', fontSize: '1rem', fontWeight: 600, cursor: 'pointer',
                 color: tab === t ? '#1A3D2A' : '#6A8A75',
                 background: tab === t ? 'color-mix(in srgb, #1A3D2A 6%, transparent)' : 'none',
