@@ -89,6 +89,7 @@ export default function AdminTabs({ orders: initialOrders, messages: initialMess
           💬 Berichten {onreadMessages > 0 && <span style={{ marginLeft: 4, background: '#B23A4D', color: '#fff', borderRadius: 20, padding: '1px 8px', fontSize: '.72rem' }}>{onreadMessages}</span>}
         </button>
         <button style={tabStyle('instellingen')} onClick={() => setTab('instellingen')}>⚙️ Instellingen</button>
+        <a href="/portaal/admin/kampen" style={{ padding: '10px 18px', borderRadius: 8, background: '#EEF5F1', color: '#3A5A42', fontFamily: 'inherit', fontSize: '.9rem', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>🏕️ Kampen</a>
       </div>
 
       {/* ── BESTELLINGEN ── */}

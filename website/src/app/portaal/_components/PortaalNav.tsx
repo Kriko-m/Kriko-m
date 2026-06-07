@@ -23,24 +23,27 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
 
   const links = [
     { href: '/portaal/dashboard', label: '🏠 Dashboard' },
+    { href: '/portaal/kinderen', label: '👧 Leden' },
+    { href: '/portaal/kampen', label: '🏕️ Kampen' },
+    { href: '/portaal/echos', label: '📰 Echo\'s' },
     { href: '/portaal/bestellingen', label: '🛍️ Bestellingen' },
     ...(isAdmin ? [{ href: '/portaal/admin', label: '⚙️ Beheer' }] : []),
   ]
 
   return (
     <header style={{ background: '#1A3D2A', color: '#fff', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 2px 12px rgba(0,0,0,.15)' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', gap: 20, height: 64 }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', gap: 16, height: 64 }}>
         <Link href="/portaal/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
           <Image src="/images/logo-finaal.png" alt="Kriko-M" width={36} height={36} style={{ objectFit: 'contain' }} />
           <span style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '1.1rem', color: '#fff', letterSpacing: '.04em' }}>Portaal</span>
         </Link>
 
-        <nav style={{ display: 'flex', gap: 4, flex: 1, flexWrap: 'wrap' }}>
+        <nav style={{ display: 'flex', gap: 2, flex: 1, flexWrap: 'wrap' }}>
           {links.map(l => (
             <Link key={l.href} href={l.href}
               style={{
-                padding: '6px 14px', borderRadius: 8, fontSize: '.88rem', fontWeight: 600, textDecoration: 'none',
-                color: pathname.startsWith(l.href) ? '#C9963A' : 'rgba(255,255,255,.8)',
+                padding: '6px 12px', borderRadius: 8, fontSize: '.82rem', fontWeight: 600, textDecoration: 'none',
+                color: pathname.startsWith(l.href) ? '#C9963A' : 'rgba(255,255,255,.75)',
                 background: pathname.startsWith(l.href) ? 'rgba(201,150,58,.12)' : 'none',
               }}>
               {l.label}
@@ -48,10 +51,10 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
           ))}
         </nav>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-          <span style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.7)', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{naam}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          <span style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.6)', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{naam}</span>
           <button onClick={handleLogout}
-            style={{ padding: '6px 14px', borderRadius: 8, border: '1.5px solid rgba(255,255,255,.3)', background: 'none', color: 'rgba(255,255,255,.8)', fontSize: '.82rem', fontWeight: 600, cursor: 'pointer' }}>
+            style={{ padding: '5px 12px', borderRadius: 8, border: '1.5px solid rgba(255,255,255,.3)', background: 'none', color: 'rgba(255,255,255,.8)', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer' }}>
             Uitloggen
           </button>
         </div>
