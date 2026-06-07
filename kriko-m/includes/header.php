@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/csrf.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 // Fetch site configuration settings
@@ -15,15 +16,13 @@ $scouts_year = isset($settings['scouts_year']) ? $settings['scouts_year'] : '202
 
 // Determine active page helper
 $current_page = basename($_SERVER['PHP_SELF']);
-function active_class($page, $current) {
-    return ($page === $current) ? 'active' : '';
-}
 ?>
 <!DOCTYPE html>
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars(csrf_token()); ?>">
     <title><?php echo isset($page_title) ? $page_title . " | Scouts Kriko-M" : "Scouts Kriko-M Sint-Niklaas"; ?></title>
     <meta name="description" content="Welkom bij Scouts Kriko-M uit Sint-Niklaas. Ontdek onze takken, maandelijkse Kriko Echo's planningen, webshop, en hoe lid te worden!">
     
@@ -43,7 +42,8 @@ function active_class($page, $current) {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <?php
-$portal_pages = ['ouderportaal.php', 'shop.php', 'checkout.php', 'order-success.php'];
+$portal_pages = ['ouderportaal.php', 'shop.php', 'checkout.php', 'order-success.php', 'verslagen.php'];
+$shop_pages   = ['shop.php', 'checkout.php', 'order-success.php'];
 $body_classes = [];
 if (in_array($current_page, $portal_pages)) $body_classes[] = 'portal-theme';
 if ($current_page === 'ouderportaal.php') $body_classes[] = 'portaal';
@@ -52,7 +52,11 @@ if (isset($body_class)) $body_classes[] = $body_class;
 <body<?php if ($body_classes) echo ' class="' . implode(' ', $body_classes) . '"'; ?>>
 
 
-    <?php $is_portal_page = in_array($current_page, $portal_pages); ?>
+
+    <?php
+    $is_portal_page = in_array($current_page, $portal_pages);
+    $is_shop_page   = in_array($current_page, $shop_pages);
+    ?>
 
     <!-- Laadscherm — enkel op de publieke site, niet in portaal -->
     <?php if (!$is_portal_page): ?>
@@ -96,10 +100,7 @@ if (isset($body_class)) $body_classes[] = $body_class;
                 <img src="assets/images/logo-finaal.png" alt="Kriko-M">
                 <div class="portaal-nav-brand-text">
                     KRIKO-M
-                    <small><?php
-                        echo in_array($current_page, ['shop.php', 'checkout.php', 'order-success.php'])
-                            ? 'WEBSHOP' : 'PORTAAL';
-                    ?></small>
+                    <small><?php echo $is_shop_page ? 'WEBSHOP' : ($current_page === 'verslagen.php' ? 'VERSLAGEN' : 'PORTAAL'); ?></small>
                 </div>
             </a>
 
@@ -109,16 +110,25 @@ if (isset($body_class)) $body_classes[] = $body_class;
 
             <div class="portaal-nav-links" id="portaal-nav-links">
                 <?php
-                $is_shop_page = in_array($current_page, ['shop.php', 'checkout.php', 'order-success.php']);
-                $portaal_uit  = !empty($_SESSION['sgo_logged_in']) || !empty($_SESSION['ouder_logged_in']);
+                $portaal_uit = !empty($_SESSION['sgo_logged_in']) || !empty($_SESSION['ouder_logged_in']);
+                $nav_leiding = !empty($_SESSION['sgo_logged_in']) && in_array($_SESSION['sgo_portal_role'] ?? '', ['leiding','groepsleiding']);
                 ?>
                 <?php if ($current_page === 'ouderportaal.php'): ?>
                     <a href="shop.php"><i class="fa-solid fa-bag-shopping"></i> Webshop</a>
+                    <?php if ($nav_leiding): ?>
+                        <a href="verslagen.php"><i class="fa-solid fa-file-lines"></i> Verslagen</a>
+                    <?php endif; ?>
                     <?php if ($portaal_uit): ?>
                         <a href="ouderportaal.php?uitloggen=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
                     <?php endif; ?>
                 <?php elseif ($is_shop_page): ?>
                     <a href="shop.php" <?php if ($current_page === 'shop.php') echo 'class="accent"'; ?>><i class="fa-solid fa-bag-shopping"></i> Webshop</a>
+                    <a href="ouderportaal.php"><i class="fa-solid fa-house"></i> Portaal</a>
+                    <?php if ($portaal_uit): ?>
+                        <a href="ouderportaal.php?uitloggen=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
+                    <?php endif; ?>
+                <?php elseif ($current_page === 'verslagen.php'): ?>
+                    <a href="verslagen.php" class="accent"><i class="fa-solid fa-file-lines"></i> Verslagen</a>
                     <a href="ouderportaal.php"><i class="fa-solid fa-house"></i> Portaal</a>
                     <?php if ($portaal_uit): ?>
                         <a href="ouderportaal.php?uitloggen=1" class="uit"><i class="fa-solid fa-right-from-bracket"></i> Uitloggen</a>
@@ -155,13 +165,7 @@ if (isset($body_class)) $body_classes[] = $body_class;
                         <li><a href="evenementen.php" class="<?php echo ($current_page === 'evenementen.php') ? 'nav-active' : ''; ?>">KALENDER</a></li>
                         <li><a href="verhuur.php" class="<?php echo ($current_page === 'verhuur.php') ? 'nav-active' : ''; ?>">VERHUUR</a></li>
                     </ul>
-                    <button class="cart-trigger-btn nav-cart-btn" aria-label="Winkelwagen bekijken" style="display: none;">
-                        <svg style="width: 20px; height: 20px; fill: none; stroke: currentColor;" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                        <span class="cart-count" style="display: none;">0</span>
-                    </button>
-                    <a href="ouderportaal.php" class="nav-cta-secondary">PORTAAL</a>
+                    <a href="ouderportaal.php" class="nav-cta-secondary">LOGIN</a>
                     <a href="inschrijven.php" class="nav-cta">INSCHRIJVEN</a>
                     <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu openen" aria-expanded="false">
                         <span></span><span></span><span></span>
@@ -176,7 +180,7 @@ if (isset($body_class)) $body_classes[] = $body_class;
     <div id="cookie-banner" class="cookie-hidden" role="dialog" aria-label="Cookie-melding">
         <span class="cookie-icon">🍪</span>
         <div class="cookie-text">
-            <p>Scouts Kriko-M gebruikt <strong>functionele cookies</strong> om je winkelmandje, voorkeuren en instellingen te onthouden. We volgen je niet en delen geen gegevens met derden.</p>
+            <p>Scouts Kriko-M gebruikt <strong>functionele cookies</strong> om je winkelmandje, voorkeuren en instellingen te onthouden. We volgen je niet en delen geen gegevens met derden. Meer in onze <a href="privacy.php" style="color:inherit;text-decoration:underline;">privacyverklaring</a>.</p>
             <div class="cookie-actions">
                 <button class="cookie-btn-accept">Begrepen, akkoord!</button>
                 <button class="cookie-btn-decline">Enkel essentieel</button>
@@ -185,24 +189,4 @@ if (isset($body_class)) $body_classes[] = $body_class;
     </div>
     <?php endif; ?>
 
-    <!-- 3. Visual Sliding Cart Drawer (enkel publieke site) -->
-    <?php if (!$is_portal_page): ?>
-    <div class="cart-backdrop"></div>
-    <div class="cart-drawer">
-        <div class="cart-drawer-header">
-            <h3 style="color: var(--color-bg-white); font-size: 1.25rem;">Winkelmandje</h3>
-            <button class="cart-drawer-close">&times;</button>
-        </div>
-        <div class="cart-drawer-body">
-            <!-- Dynamically populated via JS -->
-        </div>
-        <div class="cart-drawer-footer">
-            <div class="cart-subtotal">
-                <span>Subtotaal:</span>
-                <span class="cart-subtotal-value">€0,00</span>
-            </div>
-            <p style="font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 16px; line-height: 1.3;">Bestellingen worden betaald via overschrijving. Instructies worden getoond tijdens de checkout.</p>
-            <a href="checkout.php" class="btn btn-secondary btn-cart-checkout" style="width: 100%;">Naar afrekenen</a>
-        </div>
-    </div>
-    <?php endif; ?>
+    <!-- Het winkelmandje zit nu als inklapbare kolom ín de webshop (shop.php), niet meer als drawer. -->

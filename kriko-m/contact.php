@@ -5,6 +5,7 @@
  */
 
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/csrf.php';
 $settings = read_db('settings');
 
 $contact_email = isset($settings['contact_email']) ? $settings['contact_email'] : 'groepsleiding@kriko-m.be';
@@ -20,7 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_SPECIAL_CHARS);
     $message_text = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_SPECIAL_CHARS);
     
-    if (empty($name) || empty($email) || empty($subject) || empty($message_text)) {
+    if (!csrf_verify()) {
+        $error_message = 'Beveiligingscontrole mislukt. Herlaad de pagina en probeer opnieuw.';
+    } elseif (empty($name) || empty($email) || empty($subject) || empty($message_text)) {
         $error_message = 'Vul alstublieft alle formuliervelden in.';
     } else {
         // Geen lokale opslag: we sturen het bericht meteen door naar de leiding.
@@ -42,11 +45,11 @@ require_once __DIR__ . '/includes/header.php';
 ?>
 
 <!-- 1. Page Header -->
-<section class="tak-hero algemeen">
+<section class="tak-hero primair hero-contact">
     <div class="container">
         <span class="hero-eyebrow">Vragen of opmerkingen?</span>
-        <h2 class="tak-hero-title">Neem contact op</h2>
-        <p style="font-size: 1.2rem; color: hsla(0, 0%, 100%, 0.9); margin-top: 8px;">We staan altijd klaar om je te helpen!</p>
+        <h1 class="tak-hero-title">Neem contact op</h1>
+        <p style="color:rgba(255,255,255,.85);margin-top:8px;font-size:1.1rem;">We staan altijd klaar om je te helpen!</p>
     </div>
 </section>
 
@@ -71,6 +74,7 @@ require_once __DIR__ . '/includes/header.php';
             <h3 style="font-size: 1.6rem; border-bottom: 2px solid var(--color-bg-linen); padding-bottom: 12px; margin-bottom: 24px; color: var(--color-primary-dark);">Stuur een bericht</h3>
             
             <form action="contact.php" method="POST">
+                <?php echo csrf_field(); ?>
                 <!-- Name -->
                 <div class="form-group">
                     <label class="form-label" for="name">Jouw Naam:</label>

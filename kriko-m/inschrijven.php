@@ -17,11 +17,11 @@ $contact_email = isset($settings['contact_email']) ? $settings['contact_email'] 
 ?>
 
 <!-- 1. Page Header -->
-<section class="tak-hero kapoenen">
+<section class="tak-hero primair hero-inschrijven">
     <div class="container">
         <span class="hero-eyebrow">Word lid</span>
-        <h2 class="tak-hero-title">Inschrijven & Lidgeld</h2>
-        <p style="font-size: 1.2rem; color: hsla(0, 0%, 100%, 0.9); margin-top: 8px;">Sluit je aan bij de tofste scoutsgroep van Sint-Niklaas voor het scoutsjaar <?php echo htmlspecialchars($scouts_year); ?>!</p>
+        <h1 class="tak-hero-title">Inschrijven & Lidgeld</h1>
+        <p style="color:rgba(255,255,255,.85);margin-top:8px;font-size:1.1rem;">Sluit je aan bij de tofste scoutsgroep van Sint-Niklaas voor het scoutsjaar <?php echo htmlspecialchars($scouts_year); ?>!</p>
     </div>
 </section>
 

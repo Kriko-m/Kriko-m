@@ -7,26 +7,32 @@
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/ouder_auth.php';
 require_once __DIR__ . '/includes/mail.php';
+require_once __DIR__ . '/includes/csrf.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 // Enkel toegankelijk na inloggen in het portaal (ouder-account of S&G-leiding).
+vereis_portaal_login('webshop');
 $_co_ouder = !empty($_SESSION['ouder_logged_in']);
 $_co_sgo   = !empty($_SESSION['sgo_logged_in']);
-if (!$_co_ouder && !$_co_sgo) {
-    $_SESSION['portaal_flash_error'] = 'Je moet ingelogd zijn in het portaal om een bestelling te plaatsen.';
-    header('Location: ouderportaal.php');
-    exit;
-}
-// "Ouder"-gegevens uit de actieve sessie.
+// "Ouder"-gegevens uit de actieve sessie. Deze worden voor-ingevuld op het
+// formulier, maar blijven aanpasbaar (de ouder mag op naam van wie dan ook bestellen).
+$linked_kids = []; // gekoppelde kinderen van het ouder-account (voor snelinvulling)
 if ($_co_ouder) {
     $_co_acc = get_ouder_by_id($_SESSION['ouder_account_id'] ?? '');
     $current_parent = [
         'id'         => $_SESSION['ouder_account_id'] ?? '',
-        'first_name' => $_co_acc['naam'] ?? '',
+        'first_name' => $_co_acc['naam'] ?? ($_SESSION['ouder_naam'] ?? ''),
         'last_name'  => '',
-        'email'      => $_co_acc['email'] ?? '',
+        'email'      => $_co_acc['email'] ?? ($_SESSION['ouder_email'] ?? ''),
         'phone'      => '',
     ];
+    // Net als in het ouderportaal: kinderen uit het account, met terugval op de sessie.
+    foreach (($_co_acc['kinderen'] ?? ($_SESSION['ouder_kinderen'] ?? [])) as $k) {
+        $linked_kids[] = [
+            'naam' => trim($k['voornaam'] ?? ''),
+            'tak'  => strtolower($k['tak'] ?? ''),
+        ];
+    }
 } else {
     $current_parent = [
         'id'         => $_SESSION['sgo_id'] ?? '',
@@ -38,52 +44,106 @@ if ($_co_ouder) {
 }
 
 
-// Helper function to generate a valid Belgian structured communication reference (Modulo 97)
-function generate_structured_communication() {
-    // Generate a random 10-digit number
-    $first_ten = rand(1000000000, 9999999999);
-    // Modulo 97 check digit calculation
-    $modulo = $first_ten % 97;
+// Bouw een geldige Belgische gestructureerde mededeling (Modulo 97) uit het
+// oplopende bestelnummer. Door het bestelnummer als basis te gebruiken (i.p.v.
+// een willekeurig getal) is de mededeling gegarandeerd uniek per bestelling.
+// Let op: een gestructureerde mededeling is per definitie zuiver numeriek
+// (12 cijfers) — er kan dus geen tekst zoals "Webbestelling" in. Daarvoor
+// gebruiken we apart een leesbare referentie (order_ref, bv. "WEB-0001").
+function generate_structured_communication(int $order_number) {
+    // Eerste 10 cijfers = zero-padded bestelnummer (ruim voldoende capaciteit).
+    $first_ten = str_pad((string) ($order_number % 10000000000), 10, '0', STR_PAD_LEFT);
+    // Modulo 97 controlegetal.
+    $modulo = ((int) $first_ten) % 97;
     $check = ($modulo === 0) ? 97 : $modulo;
-    $check_str = str_pad($check, 2, '0', STR_PAD_LEFT);
-    $full_twelve = str_pad($first_ten . $check_str, 12, '0', STR_PAD_LEFT);
-    
+    $check_str = str_pad((string) $check, 2, '0', STR_PAD_LEFT);
+    $full_twelve = $first_ten . $check_str;
+
     $part1 = substr($full_twelve, 0, 3);
     $part2 = substr($full_twelve, 3, 4);
     $part3 = substr($full_twelve, 7, 5);
-    
+
     return "+++{$part1}/{$part2}/{$part3}+++";
 }
 
 $error = '';
 
+// Toegelaten takken (server-side validatie i.p.v. vertrouwen op de <select>).
+$geldige_takken = ['kapoenen', 'welpen', 'jonggivers', 'givers'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Sanitize inputs
-    $customer_name = filter_input(INPUT_POST, 'customer_name', FILTER_SANITIZE_SPECIAL_CHARS);
-    $child_name = filter_input(INPUT_POST, 'child_name', FILTER_SANITIZE_SPECIAL_CHARS);
-    $child_tak = filter_input(INPUT_POST, 'child_tak', FILTER_SANITIZE_SPECIAL_CHARS);
-    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    // Ruwe (niet voor-gecodeerde) waarden; we coderen pas bij het uitvoeren
+    // met htmlspecialchars, zo vermijden we dubbele encoding (bv. "O'Brien").
+    $customer_name = trim($_POST['customer_name'] ?? '');
+    $child_name    = trim($_POST['child_name'] ?? '');
+    $child_tak     = strtolower(trim($_POST['child_tak'] ?? ''));
+    $email         = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
     $cart_data_json = isset($_POST['cart_data']) ? $_POST['cart_data'] : '';
 
     $cart = json_decode($cart_data_json, true);
 
-    if (empty($customer_name) || empty($child_name) || empty($child_tak) || empty($email)) {
+    if (!csrf_verify()) {
+        $error = 'Beveiligingscontrole mislukt. Herlaad de pagina en probeer opnieuw.';
+    } elseif ($customer_name === '' || $child_name === '' || $child_tak === '' || empty($email)) {
         $error = 'Vul alstublieft alle contact- en bestelgegevens in.';
-    } elseif (!$cart || count($cart) === 0) {
+    } elseif (!in_array($child_tak, $geldige_takken, true)) {
+        $error = 'Selecteer een geldige tak voor het lid.';
+    } elseif (!is_array($cart) || count($cart) === 0) {
         $error = 'Je winkelwagen is leeg. Ga terug naar de shop.';
     } else {
-        // Calculate dynamic total
+        // BELANGRIJK — prijzen en namen NOOIT uit het client-mandje vertrouwen.
+        // Het mandje leeft in localStorage en is volledig manipuleerbaar; een
+        // gebruiker zou anders elke prijs (bv. €0) kunnen opgeven. We hervalideren
+        // elk artikel tegen de server-side catalogus aan de hand van het item-id.
+        $catalogue = [];
+        foreach (read_db('shop') as $si) {
+            if (!empty($si['active']) && isset($si['id'])) $catalogue[$si['id']] = $si;
+        }
+
+        $validated_cart = [];
         $total = 0;
         foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
+            $id   = is_array($item) ? ($item['id'] ?? '') : '';
+            $qty  = (int) (is_array($item) ? ($item['quantity'] ?? 0) : 0);
+            $size = trim((string) (is_array($item) ? ($item['size'] ?? '') : ''));
+
+            if ($id === '' || !isset($catalogue[$id]) || $qty < 1) continue; // onbekend/ongeldig → overslaan
+            $prod  = $catalogue[$id];
+            $sizes = $prod['sizes'] ?? [];
+            // Maat valideren; valt terug op de eerste geldige maat indien gemanipuleerd.
+            if (!empty($sizes) && !in_array($size, $sizes, true)) $size = $sizes[0];
+            $qty   = min($qty, 50); // redelijke bovengrens
+            $price = (float) ($prod['price'] ?? 0); // VERTROUWDE prijs uit de catalogus
+
+            $validated_cart[] = [
+                'id'       => $id,
+                'name'     => $prod['name'] ?? 'Artikel',
+                'size'     => $size,
+                'price'    => $price,
+                'quantity' => $qty,
+            ];
+            $total += $price * $qty;
         }
-        
-        $comm = generate_structured_communication();
-        $order_id = 'ord_' . uniqid();
-        
+
+        if (empty($validated_cart)) {
+            $error = 'Je winkelwagen bevat geen geldige artikelen meer. Ga terug naar de shop.';
+        }
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($error)) {
+        // Vanaf hier werken we enkel met de gevalideerde mandje-inhoud.
+        $cart = $validated_cart;
+
+        $order_number = next_order_number();                        // 1, 2, 3, …
+        $order_ref    = 'WEB-' . str_pad((string) $order_number, 4, '0', STR_PAD_LEFT); // leesbaar, bv. WEB-0001
+        $comm         = generate_structured_communication($order_number); // uniek per bestelling
+        $order_id     = 'ord_' . uniqid();
+
         // Construct order object
         $order = [
             'id' => $order_id,
+            'order_number' => $order_number,
+            'order_ref' => $order_ref,
             'date' => date('Y-m-d H:i:s'),
             'status' => 'pending', // pending, paid, completed
             'customer_name' => $customer_name,
@@ -119,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $email_body = "<h2>Beste " . htmlspecialchars($customer_name) . ",</h2>
-        <p>Bedankt voor uw bestelling bij de Scouts Kriko-M Webshop! We hebben uw bestelling succesvol ontvangen onder bestellingsnummer: <strong>{$order_id}</strong>.</p>
+        <p>Bedankt voor uw bestelling bij de Scouts Kriko-M Webshop! We hebben uw bestelling succesvol ontvangen onder bestellingsnummer: <strong>{$order_ref}</strong>.</p>
         
         <p>Gelieve de betaling van <strong>€" . number_format($total, 2, ',', '.') . "</strong> handmatig via overschrijving te voldoen met de onderstaande details:</p>
         
@@ -155,7 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>U kunt de actuele status van uw bestelling ook te allen tijde opvolgen via het <a href='" . (isset($_SERVER['HTTPS']) ? 'https' : 'http') . "://{$_SERVER['HTTP_HOST']}" . dirname($_SERVER['PHP_SELF']) . "/ouderportaal.php'>Ouderportaal</a>.</p>";
         
         // Trigger email sending
-        scouts_send_mail($email, "Bestelbevestiging #{$order_id} - Scouts Kriko-M Webshop", $email_body);
+        scouts_send_mail($email, "Bestelbevestiging {$order_ref} - Scouts Kriko-M Webshop", $email_body);
         
         // Save to session to display on success page
         if (session_status() === PHP_SESSION_NONE) {
@@ -173,8 +233,8 @@ $page_title = "Afrekenen";
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!-- 1. Page Header -->
-<section class="tak-hero givers">
+<!-- 1. Page Header — zelfde groene portaal-banner als de webshop/portaalzone -->
+<section class="tak-hero primair hero-checkout">
     <div class="container">
         <span class="hero-eyebrow">Bijna klaar</span>
         <h2 class="tak-hero-title">Bestelling afronden</h2>
@@ -197,44 +257,68 @@ require_once __DIR__ . '/includes/header.php';
             <h3 style="font-size: 1.6rem; border-bottom: 2px solid var(--color-bg-linen); padding-bottom: 12px; margin-bottom: 24px; color: var(--color-primary-dark);">Contact & Bestelgegevens</h3>
             
             <form action="checkout.php" method="POST" id="checkout-form">
+                <?php echo csrf_field(); ?>
                 <!-- Hidden input containing dynamic JSON string of cart items -->
                 <input type="hidden" name="cart_data" id="cart-data-input">
                 
+                <?php
+                // Voor-ingevulde waarden: bewaar een ingediende waarde (bij een fout),
+                // val anders terug op de accountgegevens uit de sessie.
+                $val_naam  = $_POST['customer_name'] ?? ($current_parent['first_name'] . ' ' . $current_parent['last_name']);
+                $val_kind  = $_POST['child_name'] ?? '';
+                $val_tak   = strtolower($_POST['child_tak'] ?? '');
+                $val_email = $_POST['email'] ?? ($current_parent['email'] ?? '');
+                ?>
                 <!-- Billing Name -->
                 <div class="form-group">
                     <label class="form-label" for="customer_name">Naam Ouder / Voogd:</label>
-                    <input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="Voornaam + Achternaam" value="<?php echo $current_parent ? htmlspecialchars($current_parent['first_name'] . ' ' . $current_parent['last_name']) : ''; ?>" required>
+                    <input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="Voornaam + Achternaam" value="<?php echo htmlspecialchars(trim($val_naam)); ?>" required>
                 </div>
-                
+
+                <?php if (!empty($linked_kids)): ?>
+                <!-- Snelinvulling: gekoppelde kinderen van dit account -->
+                <div class="form-group">
+                    <label class="form-label" for="kind-picker">Snel invullen — gekoppeld lid:</label>
+                    <select id="kind-picker" class="form-control">
+                        <option value="">— Kies een gekoppeld lid (of vul hieronder zelf in) —</option>
+                        <?php foreach ($linked_kids as $i => $k): ?>
+                            <option value="<?php echo $i; ?>" data-naam="<?php echo htmlspecialchars($k['naam']); ?>" data-tak="<?php echo htmlspecialchars($k['tak']); ?>">
+                                <?php echo htmlspecialchars($k['naam'] . ($k['tak'] ? ' (' . ucfirst($k['tak']) . ')' : '')); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php endif; ?>
+
                 <!-- Child Info Rows -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" for="child_name">Naam Lid (Kind):</label>
-                        <input type="text" id="child_name" name="child_name" class="form-control" placeholder="Voornaam + Achternaam" required>
+                        <input type="text" id="child_name" name="child_name" class="form-control" placeholder="Voornaam + Achternaam" value="<?php echo htmlspecialchars(trim($val_kind)); ?>" required>
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label" for="child_tak">Tak van Lid:</label>
                         <select id="child_tak" name="child_tak" class="form-control" required>
-                            <option value="" disabled selected>Selecteer Tak</option>
-                            <option value="kapoenen">Kapoenen (6-8j)</option>
-                            <option value="welpen">Welpen (8-11j)</option>
-                            <option value="jonggivers">Jonggivers (11-14j)</option>
-                            <option value="givers">Givers (14-17j)</option>
+                            <option value="" disabled <?php echo $val_tak === '' ? 'selected' : ''; ?>>Selecteer Tak</option>
+                            <option value="kapoenen"   <?php echo $val_tak === 'kapoenen'   ? 'selected' : ''; ?>>Kapoenen (6-8j)</option>
+                            <option value="welpen"     <?php echo $val_tak === 'welpen'     ? 'selected' : ''; ?>>Welpen (8-11j)</option>
+                            <option value="jonggivers" <?php echo $val_tak === 'jonggivers' ? 'selected' : ''; ?>>Jonggivers (11-14j)</option>
+                            <option value="givers"     <?php echo $val_tak === 'givers'     ? 'selected' : ''; ?>>Givers (14-17j)</option>
                         </select>
                     </div>
                 </div>
-                
+
                 <!-- Contact -->
                 <div class="form-group">
                     <label class="form-label" for="email">E-mailadres:</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="ouder@domein.be" value="<?php echo $current_parent ? htmlspecialchars($current_parent['email']) : ''; ?>" required>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="ouder@domein.be" value="<?php echo htmlspecialchars(trim($val_email)); ?>" required>
                 </div>
 
                 <div style="background-color: var(--color-bg-linen); border-radius: var(--border-radius-md); padding: 20px; border: 1px solid var(--color-border); margin: 24px 0 30px;">
                     <strong style="display: block; color: var(--color-primary-dark); margin-bottom: 6px;">Betalingsinformatie</strong>
                     <span style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.4; display: block;">
-                        Door op 'Bestelling plaatsen' te klikken, stem je in met de betalingsvoorwaarden van Scouts Kriko-M. Je ontvangt onmiddellijk de bankgegevens en een unieke gestructureerde mededeling op het volgende scherm. Zodra we je overschrijving ontvangen, wordt je bestelling verwerkt!
+                        Door op 'Bestelling plaatsen' te klikken, stem je in met de <a href="voorwaarden.php" target="_blank" style="color: var(--color-secondary); font-weight: 600;">verkoopsvoorwaarden</a> en de <a href="privacy.php" target="_blank" style="color: var(--color-secondary); font-weight: 600;">privacyverklaring</a> van Scouts Kriko-M. Je ontvangt onmiddellijk de bankgegevens en een unieke gestructureerde mededeling op het volgende scherm. Zodra we je overschrijving ontvangen, wordt je bestelling verwerkt!
                     </span>
                 </div>
                 
@@ -267,6 +351,24 @@ require_once __DIR__ . '/includes/header.php';
         
     </div>
 </section>
+
+<!-- Snelinvulling: zet naam + tak van het gekozen gekoppelde lid (blijft aanpasbaar) -->
+<script>
+    (function () {
+        var picker = document.getElementById('kind-picker');
+        if (!picker) return;
+        picker.addEventListener('change', function () {
+            var opt = picker.options[picker.selectedIndex];
+            if (!opt || !opt.value) return;
+            var naam = opt.getAttribute('data-naam') || '';
+            var tak = opt.getAttribute('data-tak') || '';
+            var naamInput = document.getElementById('child_name');
+            var takSelect = document.getElementById('child_tak');
+            if (naamInput && naam) naamInput.value = naam;
+            if (takSelect && tak) takSelect.value = tak;
+        });
+    })();
+</script>
 
 <!-- Cart is safely cleared in order-success.php upon page load to prevent race conditions -->
 

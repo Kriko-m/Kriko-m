@@ -49,11 +49,13 @@ $webcal_url = preg_replace('#^https?://#', 'webcal://', $ics_url);
 ?>
 
 
-<div class="page-header">
-    <div class="page-header-line"></div>
-    <h2 class="page-header-title">Kalender</h2>
-    <p class="page-header-sub">Alle groepsactiviteiten van Scouts Kriko-M op een rijtje — en in één klik in jouw eigen agenda.</p>
-</div>
+<section class="tak-hero primair hero-kalender">
+    <div class="container">
+        <span class="hero-eyebrow">Activiteiten &amp; evenementen</span>
+        <h1 class="tak-hero-title">Kalender</h1>
+        <p style="color:rgba(255,255,255,.85);margin-top:8px;font-size:1.1rem;">Alle groepsactiviteiten van Scouts Kriko-M — in één klik in jouw agenda.</p>
+    </div>
+</section>
 
 <section class="section container section--no-top">
 

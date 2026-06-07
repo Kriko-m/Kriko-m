@@ -1,10 +1,21 @@
 <?php
 /**
- * Verslagen & notulen (PDF downloads)
+ * Verslagen & notulen (PDF downloads) — enkel voor leiding/groepsleiding.
+ * De groepsleiding beheert (uploadt) de verslagen; ouders en publiek hebben geen toegang.
  */
+require_once __DIR__ . '/sgo_config.php';
+require_once __DIR__ . '/includes/db.php';
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+// Leiding-only: niet-leiding wordt naar de login gestuurd.
+$_vs_role = !empty($_SESSION['sgo_logged_in']) ? sgo_get_portal_role($_SESSION['sgo_access_token'] ?? '') : '';
+if (!in_array($_vs_role, ['leiding', 'groepsleiding'], true)) {
+    header('Location: ouderportaal.php?login_vereist=verslagen');
+    exit;
+}
+
 $page_title = "Verslagen";
 require_once __DIR__ . '/includes/header.php';
-require_once __DIR__ . '/includes/db.php';
 
 $verslagen = read_db('verslagen');
 if (!is_array($verslagen)) $verslagen = [];
@@ -19,18 +30,21 @@ foreach ($verslagen as $v) {
 krsort($per_jaar);
 ?>
 
-<section class="section container">
-    <div class="page-header" style="padding:32px 0 28px;">
-        <div class="page-header-line"></div>
-        <h1 class="page-header-title">📄 Verslagen</h1>
-        <p class="page-header-sub">Notulen van leidingsvergaderingen en groepsbijeenkomsten.</p>
+<section class="tak-hero primair hero-verslagen">
+    <div class="container">
+        <span class="hero-eyebrow">Leiding</span>
+        <h1 class="tak-hero-title">Verslagen</h1>
+        <p style="color:rgba(255,255,255,.85);margin-top:8px;font-size:1.1rem;">Notulen van leidingsvergaderingen en groepsbijeenkomsten.</p>
     </div>
+</section>
+
+<section class="section container">
 
     <div style="background:var(--color-bg-linen);border:1px solid var(--color-border);border-radius:var(--border-radius-md);padding:16px 20px;margin-bottom:32px;display:flex;gap:12px;align-items:flex-start;">
         <i class="fa-solid fa-circle-info" style="color:var(--color-accent);margin-top:2px;flex-shrink:0;"></i>
         <p style="font-size:0.88rem;color:var(--color-text-muted);margin:0;line-height:1.5;">
-            Verslagen zijn beschikbaar als PDF-download. Enkel voor leden en ouders. Heb je een verslag nodig dat hier niet staat?
-            <a href="contact.php" style="color:var(--color-accent);">Neem contact op</a> met de groepsleiding.
+            Notulen van leidings- en groepsvergaderingen, beheerd door de groepsleiding. Enkel zichtbaar voor leiding.
+            Mis je een verslag? <a href="contact.php" style="color:var(--color-accent);">Neem contact op</a> met de groepsleiding.
         </p>
     </div>
 

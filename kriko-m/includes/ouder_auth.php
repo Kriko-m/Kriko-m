@@ -100,18 +100,26 @@ function is_ouder_logged_in(): bool {
     return !empty($_SESSION['ouder_logged_in']);
 }
 
+/** Is er iemand ingelogd in het portaal (ouder-account óf S&G-leiding)? */
+function portaal_ingelogd(): bool {
+    return !empty($_SESSION['ouder_logged_in']) || !empty($_SESSION['sgo_logged_in']);
+}
+
+/**
+ * Bescherm een "groene" portaal-/webshop-pagina: niet-ingelogde bezoekers
+ * worden naar de login-pagina gestuurd. Moet aangeroepen worden vóór elke uitvoer.
+ */
+function vereis_portaal_login(string $reden = ''): void {
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    if (portaal_ingelogd()) return;
+    $q = $reden !== '' ? '?login_vereist=' . rawurlencode($reden) : '?login_vereist=1';
+    header('Location: ouderportaal.php' . $q);
+    exit;
+}
+
 function ouder_session_set(array $account): void {
     $_SESSION['ouder_logged_in']  = true;
     $_SESSION['ouder_account_id'] = $account['id'];
     $_SESSION['ouder_naam']       = $account['naam'];
     $_SESSION['ouder_email']      = $account['email'];
-}
-
-function ouder_logout(): void {
-    unset(
-        $_SESSION['ouder_logged_in'],
-        $_SESSION['ouder_account_id'],
-        $_SESSION['ouder_naam'],
-        $_SESSION['ouder_email']
-    );
 }

@@ -45,14 +45,26 @@ $tak_ages = [
     'jonggivers' => '11 – 14 jaar',
     'givers'     => '14 – 17 jaar',
 ];
+
+// Ouders zien enkel de KE van de lopende maand en de volgende maand
+$ke_cur_m = (int)date('n');
+$ke_cur_y = (int)date('Y');
+$ke_nxt_m = $ke_cur_m === 12 ? 1 : $ke_cur_m + 1;
+$ke_nxt_y = $ke_cur_m === 12 ? $ke_cur_y + 1 : $ke_cur_y;
+function ke_zichtbaar(array $e, int $cm, int $cy, int $nm, int $ny): bool {
+    $em = (int)($e['month'] ?? 0); $ey = (int)($e['year'] ?? 0);
+    return ($em === $cm && $ey === $cy) || ($em === $nm && $ey === $ny);
+}
 ?>
 
-<div class="echo-page-wrap">
-
-    <div class="page-header">
-        <div class="page-header-line"></div>
-        <h1 class="page-header-title">Kriko Echo</h1>
+<section class="tak-hero primair hero-echos">
+    <div class="container">
+        <span class="hero-eyebrow">Maandelijks bulletin</span>
+        <h1 class="tak-hero-title">Kriko Echo</h1>
     </div>
+</section>
+
+<div class="echo-page-wrap">
 
     <div class="echo-grid-wrap">
         <div class="echo-grid">
@@ -60,7 +72,8 @@ $tak_ages = [
                 $tak      = isset($takken_data[$tak_key]) ? $takken_data[$tak_key] : [];
                 $naam     = isset($tak['name']) ? $tak['name'] : ucfirst($tak_key);
                 $leeftijd = $tak_ages[$tak_key];
-                $pdfs     = array_slice($echos_by_tak[$tak_key], 0, 2);
+                $pdfs     = array_values(array_filter($echos_by_tak[$tak_key],
+                                fn($e) => ke_zichtbaar($e, $ke_cur_m, $ke_cur_y, $ke_nxt_m, $ke_nxt_y)));
             ?>
             <div class="echo-card echo-card-<?php echo $tak_key; ?>">
                 <div class="echo-card-inner">

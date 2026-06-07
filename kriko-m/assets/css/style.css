@@ -3,6 +3,7 @@
  * Custom Vanilla CSS Design System with Scouts Aesthetics
  */
 
+
 /* ==========================================================================
    1. Design System Tokens & Base Setup
    ========================================================================== */
@@ -14,7 +15,7 @@
     --color-primary: #650B19;
     --color-primary-light: #650B19;
     /* Bordeaux donker — footer · hover nav · paginatitels · sectiekoppen */
-    --color-primary-dark: #4A0A1C;
+    --color-primary-dark: #3a0710;
     --color-primary-hover: #650B19;
 
     /* Goud — inschrijven-knop · subtitels · decoratieve lijn */
@@ -45,7 +46,6 @@
     --color-welpen: #2E8B3A;     /* donkergroen · 8–11 jaar */
     --color-jonggivers: #E07B1A; /* oranje · 11–14 jaar */
     --color-givers: #1A3FB5;     /* kobaltblauw · 14–17 jaar */
-    --color-leiding: var(--color-primary);
 
     /* Layout Tokens */
     --border-radius-sm: 8px;
@@ -97,11 +97,6 @@ body {
     flex-direction: column;
     min-height: 100vh;
     padding-top: 70px;
-}
-
-/* Portaal/admin pages have no nav, so remove padding */
-body.no-nav {
-    padding-top: 0;
 }
 
 /* Typography */
@@ -211,21 +206,6 @@ a {
 .btn-outline:hover {
     background-color: var(--color-primary);
     color: var(--color-bg-white);
-}
-
-.btn-danger {
-    background-color: var(--color-error);
-    color: var(--color-bg-white);
-}
-
-.btn-danger:hover {
-    background-color: hsl(4, 75%, 40%);
-    transform: translateY(-2px);
-}
-
-.btn-icon {
-    padding: 10px;
-    border-radius: var(--border-radius-sm);
 }
 
 /* ==========================================================================
@@ -660,27 +640,6 @@ a {
     font-size: 0.75rem;
 }
 
-/* Section Title Styling */
-.section-header {
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto 50px;
-}
-
-.section-header p {
-    color: var(--color-text-muted);
-    font-size: 1.1rem;
-    margin-top: 8px;
-}
-
-.title-line {
-    width: 60px;
-    height: 4px;
-    background-color: var(--color-secondary);
-    margin: 12px auto 0;
-    border-radius: 2px;
-}
-
 /* ==========================================================================
    4. Takken — Vic-stijl portretkaarten (homepage & overzicht)
    ========================================================================== */
@@ -691,49 +650,6 @@ a {
     max-width: 1200px;
     margin: 0 auto;
     box-sizing: border-box;
-}
-
-.vic-takken-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-    padding: 32px 40px 24px 180px;
-    margin-bottom: 24px;
-}
-
-.vic-takken-header-right {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.vic-takken-sub {
-    font-size: 0.95rem;
-    color: var(--color-text-muted);
-    font-weight: 500;
-    max-width: 420px;
-    margin: 0;
-    line-height: 1.5;
-}
-
-.vic-takken-line {
-    width: 56px;
-    height: 4px;
-    background-color: var(--color-accent);
-    border-radius: 2px;
-}
-
-.vic-takken-title {
-    text-align: left;
-    font-family: 'Nunito', Arial, sans-serif;
-    font-size: clamp(1.6rem, 3vw, 2.4rem);
-    font-weight: 900;
-    white-space: nowrap;
-    color: var(--color-primary);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-bottom: 0;
 }
 
 .vic-takken-section--full .vic-tak-card {
@@ -810,83 +726,7 @@ a {
     text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
-/* ── Tak-kaart stijlen voor detailpagina's (behouden) ── */
-.tak-card {
-    background-color: var(--color-bg-white);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    transition: var(--transition-normal);
-    position: relative;
-    border: 1px solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-}
-
-.tak-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-}
-
-.tak-card-header {
-    height: 12px;
-}
-
-.tak-card-header.kapoenen { background-color: var(--color-kapoenen); }
-.tak-card-header.welpen { background-color: var(--color-welpen); }
-.tak-card-header.jonggivers { background-color: var(--color-jonggivers); }
-.tak-card-header.givers { background-color: var(--color-givers); }
-.tak-card-header.leiding { background-color: var(--color-leiding); }
-
-.tak-card-body {
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.tak-card-tag {
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-}
-
-.tak-card h3 {
-    margin-bottom: 8px;
-    font-size: 1.5rem;
-}
-
-.tak-card-age {
-    background-color: var(--color-bg-linen);
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 30px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--color-primary-light);
-    margin-bottom: 16px;
-    align-self: flex-start;
-}
-
-.tak-card-desc {
-    color: var(--color-text-muted);
-    font-size: 0.95rem;
-    margin-bottom: 24px;
-    flex-grow: 1;
-}
-
-.tak-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid var(--color-border);
-    padding-top: 16px;
-    margin-top: auto;
-}
-
+/* ── "Bestel onze groepsdas"-link op de tak-detailpagina ── */
 .tak-card-link {
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
@@ -1045,6 +885,43 @@ a {
 .tak-hero.jonggivers { --tak-color: var(--color-jonggivers); }
 .tak-hero.givers     { --tak-color: var(--color-givers); }
 .tak-hero.algemeen   { --tak-color: var(--color-accent-light); } /* algemene paginakop (niet tak-specifiek) */
+.tak-hero.primair    { --tak-color: var(--color-accent-light); } /* bordeaux paginakop — niet tak-specifiek */
+
+.tak-hero.primair {
+    /* Thema-bewust: bordeaux op de publieke site, groen in de portaal-/webshopzone */
+    background: linear-gradient(160deg, var(--color-primary-dark) 0%, var(--color-primary) 55%);
+    padding: 44px 0;
+    margin-bottom: 40px;
+}
+/* Groene variant met wat meer diepte in de portaal-/webshopzone */
+body.portal-theme .tak-hero.primair {
+    background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+}
+.tak-hero.primair::after {
+    content: '⚜';  /* fallback */
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%) translateY(-0.07em);
+    font-size: 9rem;
+    line-height: 1;
+    opacity: 0.09;
+    pointer-events: none;
+    user-select: none;
+}
+.tak-hero.primair .container {
+    padding-left: 8px;
+}
+.tak-hero.hero-takken::after    { content: '⚜'; }
+.tak-hero.hero-kalender::after  { content: '📅'; }
+.tak-hero.hero-echos::after     { content: '📰'; }
+.tak-hero.hero-archief::after   { content: '🗂️'; }
+.tak-hero.hero-verslagen::after { content: '📋'; }
+.tak-hero.hero-webshop::after   { content: '🛍️'; }
+.tak-hero.hero-inschrijven::after { content: '✏️'; }
+.tak-hero.hero-contact::after   { content: '✉️'; }
+.tak-hero.hero-checkout::after  { content: '🛒'; }
+.tak-hero.hero-bestelling::after { content: '✅'; }
 
 .tak-hero.kapoenen   { background: linear-gradient(color-mix(in srgb, var(--color-kapoenen) 42%, transparent), color-mix(in srgb, var(--color-kapoenen) 42%, transparent)), url('../images/banner_kapoenen.png') center/cover; }
 .tak-hero.welpen     { background: linear-gradient(color-mix(in srgb, var(--color-welpen) 42%, transparent), color-mix(in srgb, var(--color-welpen) 42%, transparent)), url('../images/banner_welpen.png') center/cover; }
@@ -1382,6 +1259,111 @@ a {
     visibility: visible;
 }
 
+/* ── Webshop: producten op volle breedte ──────────────────────────── */
+.shop-products { min-width: 0; }
+.shop-cat { margin-bottom: 56px; }
+.shop-cat:last-child { margin-bottom: 0; }
+.shop-cat-title {
+    font-size: 1.75rem;
+    border-bottom: 2px solid var(--color-bg-linen);
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+    color: var(--color-primary-dark);
+}
+
+/* ── Winkelmandje: schuift in/uit langs de rechterrand ────────────────
+   De verticale tab is het handvat én de toggle (geen aparte knop).      */
+.shop-cart-dock {
+    --cart-w: 340px;
+    position: fixed;
+    top: 96px;
+    right: 0;
+    z-index: 130;
+    display: flex;
+    align-items: center;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.shop-cart-dock.collapsed { transform: translateX(var(--cart-w)); }
+
+/* Verticaal tab-handvat dat altijd aan de rand zichtbaar blijft */
+.shop-cart-tab {
+    flex-shrink: 0;
+    align-self: center;
+    width: 46px;
+    background: var(--color-primary-dark);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 14px 0 0 14px;
+    padding: 18px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    box-shadow: -5px 6px 18px rgba(0, 0, 0, 0.20);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    transition: background 0.15s;
+}
+.shop-cart-tab:hover { background: var(--color-primary); }
+.shop-cart-tab i { font-size: 1.15rem; }
+.shop-cart-tab-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+}
+.shop-cart-tab .cart-count {
+    position: static;
+    inset: auto;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 0.72rem;
+}
+
+/* Het schuifpaneel met de mandje-inhoud */
+.shop-cart-panel {
+    width: var(--cart-w);
+    max-height: calc(100vh - 120px);
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-right: none;
+    box-shadow: -8px 10px 30px rgba(0, 0, 0, 0.18);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.shop-cart-panel .cart-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px;
+}
+.shop-cart-empty {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: 28px 12px;
+    font-size: 0.9rem;
+}
+.shop-cart-foot {
+    padding: 16px 18px;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg-linen);
+}
+.shop-cart-note {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    margin: 0 0 12px;
+    line-height: 1.35;
+}
+
+@media (max-width: 600px) {
+    .shop-cart-dock { --cart-w: calc(100vw - 46px); }
+}
+
 /* Checkout Page Columns */
 .checkout-layout {
     display: grid;
@@ -1514,165 +1496,6 @@ a {
 
 .step-body h4 {
     margin-bottom: 6px;
-}
-
-/* ==========================================================================
-   9. Leaders Login & Admin Dashboard
-   ========================================================================== */
-
-.login-card {
-    max-width: 440px;
-    margin: 60px auto;
-    background-color: var(--color-bg-white);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-lg);
-    padding: 40px;
-    border: 1px solid var(--color-border);
-}
-
-.login-card h2 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-/* Admin Dashboard Design */
-.admin-layout {
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 40px;
-}
-
-.admin-sidebar {
-    background-color: var(--color-bg-white);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
-    padding: 24px 16px;
-    border: 1px solid var(--color-border);
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    align-self: flex-start;
-}
-
-.admin-menu {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.admin-menu-btn {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: var(--border-radius-md);
-    border: none;
-    background: none;
-    font-family: 'Outfit', sans-serif;
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-align: left;
-    cursor: pointer;
-    transition: var(--transition-fast);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--color-text-muted);
-}
-
-.admin-menu-btn:hover {
-    background-color: var(--color-bg-linen);
-    color: var(--color-primary);
-}
-
-.admin-menu-btn.active {
-    background-color: var(--color-primary);
-    color: var(--color-bg-white);
-}
-
-/* Dashboard Tab Panels */
-.admin-panel {
-    display: none;
-    background-color: var(--color-bg-white);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
-    padding: 30px;
-    border: 1px solid var(--color-border);
-}
-
-.admin-panel.active {
-    display: block;
-}
-
-.admin-panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid var(--color-bg-linen);
-    padding-bottom: 16px;
-    margin-bottom: 24px;
-}
-
-/* Custom gorgeous tables */
-.table-responsive {
-    width: 100%;
-    overflow-x: auto;
-}
-
-.admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 12px;
-    font-size: 0.95rem;
-}
-
-.admin-table th {
-    background-color: var(--color-bg-linen);
-    color: var(--color-primary-dark);
-    font-family: 'Outfit', sans-serif;
-    font-weight: 700;
-    text-align: left;
-    padding: 12px 16px;
-    border-bottom: 2px solid var(--color-border);
-}
-
-.admin-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--color-border);
-    color: var(--color-text-dark);
-}
-
-.admin-table tr:hover {
-    background-color: color-mix(in srgb, var(--color-bg-linen) 40%, transparent);
-}
-
-/* Badge orders statuses */
-.status-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 30px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.status-badge.paid {
-    background-color: color-mix(in srgb, var(--color-success) 15%, transparent);
-    color: var(--color-success);
-}
-
-.status-badge.waiting_approval {
-    background-color: color-mix(in srgb, var(--color-warning) 15%, transparent);
-    color: var(--color-warning);
-}
-
-.status-badge.pending {
-    background-color: color-mix(in srgb, var(--color-error) 15%, transparent);
-    color: var(--color-error);
-}
-
-.status-badge.completed {
-    background-color: color-mix(in srgb, var(--color-primary) 15%, transparent);
-    color: var(--color-primary);
 }
 
 /* ==========================================================================
@@ -1875,16 +1698,22 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
 }
-
-.dev-trigger {
-    color: #bbb;
-    font-size: 0.9rem;
+.footer-legal-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.footer-legal-links a {
+    color: rgba(255,255,255,0.55);
     text-decoration: none;
-    transition: color 0.15s;
 }
-
-.dev-trigger:hover { color: #fff; }
+.footer-legal-links a:hover {
+    color: rgba(255,255,255,0.9);
+    text-decoration: underline;
+}
 
 @media (max-width: 1024px) {
     .site-footer-inner {
@@ -1996,35 +1825,9 @@ a {
     .vic-takken-section {
         padding: 16px 20px 24px;
     }
-    .vic-takken-header {
-        padding: 12px 20px 16px 80px;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-    .cal-hero-inner {
-        padding: 8px 20px 16px 80px !important;
-        flex-wrap: wrap;
-        gap: 16px;
-    }
-
-    .home-grid, .checkout-layout, .register-layout, .tak-layout, .admin-layout {
+    .home-grid, .checkout-layout, .register-layout, .tak-layout {
         grid-template-columns: 1fr;
         gap: 30px;
-    }
-    
-    .admin-sidebar {
-        flex-direction: row;
-        overflow-x: auto;
-        width: 100%;
-    }
-    
-    .admin-menu {
-        flex-direction: row;
-        gap: 10px;
-    }
-    
-    .admin-menu-btn {
-        white-space: nowrap;
     }
 }
 
@@ -2034,11 +1837,6 @@ a {
 
     .vic-takken-section { padding: 60px 16px; }
     .vic-takken-grid    { gap: 14px; }
-
-    .footer-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
 
     .form-row {
         grid-template-columns: 1fr;
@@ -2051,7 +1849,6 @@ a {
     .hero-sub   { font-size: 0.95rem; letter-spacing: 0.1em; }
 
     .vic-takken-grid { gap: 10px; }
-    .vic-takken-title { font-size: 1.2rem; margin-bottom: 0; }
 }
 
 /* ==========================================================================
@@ -2063,48 +1860,6 @@ a {
     flex-direction: column;
     /* Vult de beschikbare hoogte zodat kaarten het scherm vullen */
     min-height: calc(100vh - 70px);
-}
-
-.echo-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-    padding: 32px 40px 24px 180px;
-    flex-shrink: 0;
-}
-
-.echo-header-title {
-    font-family: 'Nunito', Arial, sans-serif;
-    font-size: clamp(1.6rem, 3vw, 2.4rem);
-    font-weight: 900;
-    color: var(--color-primary);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin: 0;
-    white-space: nowrap;
-}
-
-.echo-header-right {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.echo-header-sub {
-    font-size: 0.95rem;
-    color: var(--color-text-muted);
-    font-weight: 500;
-    max-width: 420px;
-    margin: 0;
-    line-height: 1.5;
-}
-
-.echo-header-line {
-    width: 56px;
-    height: 4px;
-    background-color: var(--color-accent);
-    border-radius: 2px;
 }
 
 .echo-grid-wrap {
@@ -2272,7 +2027,6 @@ a {
 }
 
 @media (max-width: 540px) {
-    .echo-header    { padding: 16px 16px 16px 80px; flex-wrap: wrap; gap: 16px; }
     .echo-grid-wrap { padding: 0 12px 16px; }
     .echo-grid      { gap: 12px; }
     .echo-card      { height: calc((100vh - 240px) / 2); }
@@ -2311,57 +2065,6 @@ a {
         transform: none !important;
         margin: 20px auto 0;
         max-width: 500px;
-    }
-}
-
-/* Division Directory Cards on takken.php */
-.tak-directory-card {
-    background-color: var(--color-bg-white);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--color-border);
-    overflow: hidden;
-    display: flex;
-    flex-direction: row;
-    transition: var(--transition-normal);
-}
-
-.tak-directory-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
-}
-
-.tak-directory-card-header {
-    width: 15px;
-    flex-shrink: 0;
-}
-
-.tak-directory-card-body {
-    padding: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-
-@media (max-width: 768px) {
-    .tak-directory-card {
-        flex-direction: column;
-    }
-    .tak-directory-card-header {
-        width: 100%;
-        height: 15px;
-    }
-    .tak-directory-card-body {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 24px;
-        gap: 16px;
-    }
-    .tak-directory-card-body .btn {
-        width: 100%;
     }
 }
 
@@ -2811,42 +2514,6 @@ a {
     border-bottom: none;
 }
 
-.cal-hero-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
-    padding: 16px 40px 20px 180px !important;
-}
-
-.cal-hero-left {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.cal-hero-right {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.cal-hero-sub {
-    font-size: 0.95rem;
-    color: var(--color-text-muted);
-    font-weight: 500;
-    max-width: 420px;
-    margin: 0;
-    line-height: 1.5;
-}
-
-.cal-hero-line {
-    width: 56px;
-    height: 4px;
-    background-color: var(--color-accent);
-    border-radius: 2px;
-}
-
 /* Eyebrow-label: koper tekst zonder donkere pil */
 .tak-hero.algemeen .hero-eyebrow {
     background-color: transparent;
@@ -2871,14 +2538,6 @@ a {
 /* Subtitel-paragraaf (inline wit) overschrijven naar gedempt grijs */
 .tak-hero.algemeen .container > p {
     color: var(--color-text-muted) !important;
-}
-
-/* Koper-divider onder de kop */
-
-/* Optioneel kop-icoon (enkel waar in de markup aanwezig, bv. de kalender) */
-.tak-hero-icon {
-    color: var(--color-accent);
-    margin-right: 12px;
 }
 
 /* ==========================================================================
@@ -2968,14 +2627,6 @@ a {
     gap: 10px;
 }
 
-.page-header-line {
-    width: 40px;
-    height: 3px;
-    background: var(--color-accent);
-    border-radius: 2px;
-    margin-bottom: 4px;
-}
-
 .page-header-title {
     font-family: 'Nunito', Arial, sans-serif;
     font-size: clamp(2rem, 4vw, 3rem);
@@ -2985,15 +2636,6 @@ a {
     text-transform: uppercase;
     margin: 0;
     line-height: 1;
-}
-
-.page-header-sub {
-    font-size: 1rem;
-    color: var(--color-text-muted);
-    font-weight: 500;
-    max-width: 480px;
-    margin: 0;
-    line-height: 1.6;
 }
 
 /* ==========================================================================
@@ -3207,29 +2849,6 @@ a {
     text-decoration: line-through;
     color: var(--color-text-muted);
 }
-.paklijst-progress-bar-wrap {
-    flex: 1;
-    height: 10px;
-    background: var(--color-bg-linen);
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid var(--color-border);
-}
-.paklijst-progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-accent), var(--color-accent-hover));
-    border-radius: 10px;
-    transition: width 0.45s cubic-bezier(0.4,0,0.2,1);
-    width: 0%;
-}
-.paklijst-progress-text {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    white-space: nowrap;
-    min-width: 110px;
-    text-align: right;
-}
 
 /* ── Verslagen / Notulen pagina ───────────────────────── */
 .verslag-item {
@@ -3316,7 +2935,7 @@ a {
    Z. Verhuur — foto-hero, fotogalerij & locatiekaart
    ========================================================================== */
 .verhuur-hero {
-    height: 340px;
+    height: 480px;
     background-size: cover;
     background-position: center 42%;
     border-bottom: 4px solid var(--color-accent);
@@ -3378,21 +2997,6 @@ a {
     transform: scale(1.06);
 }
 
-.verhuur-gallery-empty {
-    text-align: center;
-    padding: 48px 24px;
-    background-color: var(--color-bg-white);
-    border: 2px dashed var(--color-border);
-    border-radius: var(--border-radius-lg);
-    color: var(--color-text-muted);
-}
-
-.verhuur-gallery-empty i {
-    font-size: 2rem;
-    color: var(--color-border);
-    margin-bottom: 12px;
-}
-
 /* Galerij responsive: 3 → 2 → 1 kolommen */
 @media (max-width: 800px) {
     .verhuur-gallery { grid-template-columns: repeat(2, 1fr); }
@@ -3445,14 +3049,6 @@ a {
     margin-bottom: 28px;
 }
 
-/* Feature highlight cards */
-.vh-features {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-bottom: 64px;
-}
-
 .vh-feature {
     background-color: var(--color-bg-white);
     border: 1px solid var(--color-border);
@@ -3492,165 +3088,6 @@ a {
     color: var(--color-text-muted);
 }
 
-/* Ideaal voor — chips */
-.vh-usecases { margin-bottom: 64px; }
-
-.vh-chips {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 14px;
-}
-
-.vh-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background-color: var(--color-bg-white);
-    border: 1px solid var(--color-border);
-    border-radius: 50px;
-    padding: 12px 22px;
-    font-family: 'Nunito', Arial, sans-serif;
-    font-weight: 700;
-    font-size: 0.98rem;
-    color: var(--color-primary-dark);
-    box-shadow: var(--shadow-sm);
-}
-
-.vh-chip i { color: var(--color-accent); }
-
-/* Locatie + kaart */
-.vh-locate {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: 24px;
-    align-items: stretch;
-}
-
-.vh-locate .verhuur-map {
-    height: 100%;
-    min-height: 320px;
-}
-
-.vh-locate-info {
-    background-color: var(--color-bg-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-sm);
-    padding: 28px;
-    display: flex;
-    flex-direction: column;
-}
-
-.vh-locate-address {
-    font-family: 'Nunito', Arial, sans-serif;
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--color-primary-dark);
-}
-
-.vh-locate-sub {
-    color: var(--color-text-muted);
-    font-size: 0.9rem;
-    margin-bottom: 20px;
-}
-
-.vh-locate-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 13px;
-    font-size: 0.92rem;
-    color: var(--color-text-dark);
-    margin-bottom: 24px;
-}
-
-.vh-locate-list i {
-    color: var(--color-accent);
-    width: 20px;
-    text-align: center;
-    margin-right: 8px;
-}
-
-.vh-locate-info .btn { margin-top: auto; align-self: flex-start; }
-
-/* Goed om te weten */
-.vh-notes {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px 28px;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.vh-note {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    font-size: 0.95rem;
-    color: var(--color-text-dark);
-}
-
-.vh-note i { margin-top: 4px; flex-shrink: 0; }
-.vh-note i.ok { color: var(--color-success); }
-.vh-note i.no { color: var(--color-error); }
-
-/* CTA */
-.vh-cta {
-    text-align: center;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-    border-radius: var(--border-radius-lg);
-    padding: 56px 24px;
-    box-shadow: var(--shadow-md);
-}
-
-.vh-cta-price {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--color-accent-light);
-    background-color: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 6px 16px;
-    border-radius: 50px;
-    margin-bottom: 18px;
-}
-
-.vh-cta-title {
-    font-family: 'Nunito', Arial, sans-serif;
-    font-size: 2rem;
-    font-weight: 900;
-    color: #fff;
-    margin-bottom: 12px;
-}
-
-.vh-cta-text {
-    font-size: 1.05rem;
-    color: rgba(255, 255, 255, 0.78);
-    line-height: 1.6;
-    max-width: 520px;
-    margin: 0 auto 30px;
-}
-
-.vh-cta-actions {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.vh-cta-btn { padding: 14px 30px; }
-
-.vh-cta-btn-ghost {
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
-}
-
-.vh-cta-btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
-
 /* Specs — 2×2 kaartjes (hergebruikt .vh-feature voor de kaart) */
 .vh-specs {
     display: grid;
@@ -3678,88 +3115,14 @@ a {
     font-size: 0.95rem;
 }
 
-/* FAQ */
-.vh-faq-block { margin-bottom: 0; }
-
-.vh-faq {
-    max-width: 760px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.vh-faq-item {
-    background-color: var(--color-bg-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-sm);
-    padding: 4px 24px;
-}
-
-.vh-faq-item summary {
-    cursor: pointer;
-    list-style: none;
-    font-family: 'Nunito', Arial, sans-serif;
-    font-weight: 800;
-    font-size: 1.08rem;
-    color: var(--color-primary-dark);
-    padding: 18px 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-}
-
-.vh-faq-item summary::-webkit-details-marker { display: none; }
-
-.vh-faq-item summary::after {
-    content: '\f078'; /* chevron-down */
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    font-size: 0.85rem;
-    color: var(--color-accent);
-    transition: transform 0.2s;
-}
-
-.vh-faq-item[open] summary::after { transform: rotate(180deg); }
-
-.vh-faq-item p {
-    margin: 0;
-    padding: 0 0 20px;
-    font-size: 0.98rem;
-    line-height: 1.65;
-    color: var(--color-text-dark);
-}
-
-.vh-faq-item a { color: var(--color-accent); font-weight: 700; }
-.vh-faq-item a:hover { text-decoration: underline; }
-
 @media (max-width: 860px) {
-    .vh-features { grid-template-columns: 1fr; }
     .vh-specs { grid-template-columns: 1fr; }
-    .vh-locate { grid-template-columns: 1fr; }
-    .vh-notes { grid-template-columns: 1fr; }
     .vh-intro-title { font-size: 2rem; }
 }
 
 /* ==========================================================================
    Ouderportaal — kind-selector & panelen (huisstijl)
    ========================================================================== */
-
-.portaal-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-bottom: 28px;
-    padding-bottom: 18px;
-    border-bottom: 1px solid var(--color-border);
-}
-.portaal-top h3 { font-size: 1.4rem; color: var(--color-primary-dark); margin: 0; }
-.portaal-top-sub { font-size: 0.85rem; color: var(--color-text-muted); }
-.portaal-top-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 /* Webshop-link bovenaan — opvallend in koper */
 .portaal-shop-btn {
@@ -3822,6 +3185,148 @@ a {
 .kind-chip-info { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
 .kind-chip-naam { font-weight: 700; color: var(--color-primary-dark); font-size: 0.98rem; }
 .kind-chip-tak { font-size: 0.76rem; color: var(--color-text-muted); text-transform: capitalize; }
+
+/* ── Ouderportaal: startmenu (hero + boxes) ──────────── */
+.portaal-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--border-radius-lg);
+    padding: 40px 42px;
+    margin-bottom: 34px;
+    background: linear-gradient(120deg, #1A3D2A 0%, #2A5C3F 55%, #3F7D5A 105%);
+    box-shadow: 0 18px 40px color-mix(in srgb, #1A3D2A 32%, transparent);
+    color: #fff;
+}
+.portaal-hero::after {
+    content: '';
+    position: absolute;
+    right: -70px; top: -70px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 55%, transparent), transparent 70%);
+    pointer-events: none;
+}
+.portaal-hero-deco {
+    position: absolute; right: 30px; bottom: -22px;
+    font-size: 8rem; line-height: 1; opacity: 0.15; pointer-events: none; z-index: 0;
+}
+.portaal-hero-content { position: relative; z-index: 1; }
+.portaal-hero-kicker {
+    display: inline-block;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--color-accent-light);
+    margin-bottom: 10px;
+}
+.portaal-hero h1 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 2rem; margin: 0 0 6px; line-height: 1.1; }
+.portaal-hero-content p { color: rgba(255,255,255,0.84); font-size: 1rem; margin: 0 0 22px; max-width: 540px; }
+.portaal-hero-stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.portaal-hero-stats span {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 7px 15px; border-radius: 50px;
+    font-size: 0.82rem; color: rgba(255,255,255,0.9);
+}
+.portaal-hero-stats strong { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.02rem; color: #fff; }
+
+.portaal-menu-label {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.05rem;
+    color: var(--color-primary-dark); margin: 0 0 18px;
+}
+.portaal-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+    gap: 20px;
+}
+.portaal-menu-card {
+    --kleur: var(--color-accent);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 24px 20px;
+    background: var(--color-bg-white);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s, border-color 0.22s;
+    overflow: hidden;
+}
+.portaal-menu-card::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 0; height: 4px;
+    background: var(--kleur);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.25s;
+}
+.portaal-menu-card:hover {
+    transform: translateY(-5px);
+    border-color: color-mix(in srgb, var(--kleur) 50%, var(--color-border));
+    box-shadow: 0 16px 34px color-mix(in srgb, var(--kleur) 26%, transparent);
+}
+.portaal-menu-card:hover::before { transform: scaleX(1); }
+.portaal-menu-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem;
+    background: color-mix(in srgb, var(--kleur) 16%, #fff);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--kleur) 32%, transparent);
+    transition: transform 0.22s;
+}
+.portaal-menu-card:hover .portaal-menu-icon { transform: scale(1.06) rotate(-4deg); }
+.portaal-menu-body { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.portaal-menu-titel { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--color-primary-dark); }
+.portaal-menu-desc { font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.5; }
+.portaal-menu-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
+.portaal-menu-stat {
+    padding: 5px 13px;
+    background: color-mix(in srgb, var(--kleur) 15%, transparent);
+    color: color-mix(in srgb, var(--kleur) 52%, var(--color-primary-dark));
+    border-radius: 50px;
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+.portaal-menu-arrow {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--kleur) 14%, transparent);
+    color: var(--kleur); font-size: 0.85rem; flex-shrink: 0;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.portaal-menu-card:hover .portaal-menu-arrow { background: var(--kleur); color: #fff; transform: translateX(3px); }
+
+@media (max-width: 560px) {
+    .portaal-hero { padding: 28px 24px; }
+    .portaal-hero h1 { font-size: 1.6rem; }
+    .portaal-hero-deco { font-size: 6rem; right: 10px; }
+    .portaal-menu { grid-template-columns: 1fr; }
+}
+
+/* Sectie-pagina (na keuze in het startmenu) */
+.portaal-sectie-head {
+    --kleur: var(--color-accent);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--color-border);
+}
+.portaal-back {
+    width: 42px; height: 42px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--kleur) 16%, #fff);
+    color: color-mix(in srgb, var(--kleur) 58%, var(--color-primary-dark));
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.18s, color 0.18s, transform 0.18s;
+}
+.portaal-back:hover { background: var(--kleur); color: #fff; transform: translateX(-3px); }
+.portaal-sectie-titel { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.6rem; color: var(--color-primary-dark); margin: 0; }
+.portaal-sectie-wrap { max-width: 560px; }
 
 /* Panelen */
 .kind-panel { display: none; animation: kindfade 0.35s ease; }
@@ -3896,7 +3401,6 @@ a {
 @media (max-width: 560px) {
     .kind-chips { gap: 10px; }
     .kind-chip { padding: 6px 16px 6px 6px; }
-    .portaal-top { flex-direction: column; align-items: flex-start; }
 }
 
 /* ==========================================================================
@@ -4037,49 +3541,6 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
 
 .portaal-wrap { max-width: 860px; margin: 0 auto; }
 
-/* Gradient hero-banner */
-.portaal-hero {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(120deg, var(--color-primary-dark) 0%, var(--color-primary) 52%, var(--color-accent) 135%);
-    color: #fff;
-    border-radius: 22px;
-    padding: 30px 34px;
-    margin-bottom: 24px;
-    box-shadow: 0 16px 34px color-mix(in srgb, var(--color-primary) 28%, transparent);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-.portaal-hero-text { position: relative; z-index: 1; }
-.portaal-hero-eyebrow {
-    font-family: 'Nunito', sans-serif;
-    font-weight: 800;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-accent-light);
-}
-.portaal-hero h2 { color: #fff; font-size: 1.7rem; margin: 5px 0 7px; }
-.portaal-hero p { color: rgba(255,255,255,0.82); font-size: 0.92rem; max-width: 430px; margin: 0; line-height: 1.5; }
-.portaal-hero-shop {
-    position: relative; z-index: 1;
-    display: inline-flex; align-items: center; gap: 9px;
-    background: #fff; color: var(--color-primary-dark);
-    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.92rem;
-    padding: 12px 22px; border-radius: 14px;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.15s, box-shadow 0.15s;
-}
-.portaal-hero-shop:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); color: var(--color-primary-dark); }
-.portaal-hero-deco {
-    position: absolute; right: 6px; bottom: -34px;
-    font-size: 8.5rem; line-height: 1; opacity: 0.13;
-    pointer-events: none; user-select: none; transform: rotate(-8deg);
-}
-
 /* Witte kaart met het geselecteerde lid */
 .portaal-card {
     background: #fff;
@@ -4087,7 +3548,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
     border-top: 5px solid var(--kleur, var(--color-accent));
     border-radius: 20px;
     box-shadow: var(--shadow-md);
-    padding: 22px 26px 26px;
+    padding: 28px 32px 32px;
 }
 .portaal-lid-head {
     display: flex;
@@ -4120,17 +3581,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
 /* Eerste subkop hoeft geen grote bovenmarge in de kaart */
 .portaal-card .portaal-subhead:first-of-type { margin-top: 18px; }
 
-/* Login-/titelkop voor uitgelogde staat */
-.portaal-eyebrow {
-    display: block; text-align: center;
-    font-family: 'Nunito', sans-serif; font-weight: 800;
-    font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--color-accent); margin-bottom: 18px;
-}
-
 @media (max-width: 560px) {
-    .portaal-hero { padding: 24px 22px; }
-    .portaal-hero h2 { font-size: 1.4rem; }
     .portaal-card { padding: 18px 18px 22px; }
 }
 

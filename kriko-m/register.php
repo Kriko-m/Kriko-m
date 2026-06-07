@@ -4,6 +4,7 @@
  */
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once __DIR__ . '/includes/ouder_auth.php';
+require_once __DIR__ . '/includes/csrf.php';
 
 // Al ingelogd → meteen door
 if (is_ouder_logged_in()) { header('Location: ouderportaal.php'); exit; }
@@ -17,7 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pw       = $_POST['password']      ?? '';
     $pw2      = $_POST['password2']     ?? '';
 
-    if (empty($naam) || empty($email) || empty($pw)) {
+    if (!csrf_verify()) {
+        $error = 'Beveiligingscontrole mislukt. Herlaad de pagina en probeer opnieuw.';
+    } elseif (empty($naam) || empty($email) || empty($pw)) {
         $error = 'Vul alle velden in.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Ongeldig e-mailadres.';
@@ -95,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST">
+            <?php echo csrf_field(); ?>
             <label for="naam">Naam</label>
             <input type="text" id="naam" name="naam" value="<?php echo htmlspecialchars($_POST['naam'] ?? ''); ?>" placeholder="Volledige naam" required autofocus>
 
@@ -111,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <p class="hint">Al een account? <a href="ouderportaal.php">Inloggen</a></p>
+        <p class="hint">Door een account aan te maken ga je akkoord met onze <a href="privacy.php">privacyverklaring</a>.</p>
     </div>
 
     <a href="index.php" class="back-link">

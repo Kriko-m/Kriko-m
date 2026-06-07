@@ -205,12 +205,14 @@ $months_nl = [
 
 
 <?php else: ?>
-    <!-- 3. Tak-overzicht (Vic-stijl portretkaarten) -->
-    <div class="page-header">
-        <div class="page-header-line"></div>
-        <h2 class="page-header-title">Onze Takken</h2>
-        <p class="page-header-sub">Klik op een tak voor alle info, de leiding en de laatste Kriko Echo.</p>
-    </div>
+    <!-- 3. Tak-overzicht -->
+    <section class="tak-hero primair hero-takken">
+        <div class="container">
+            <span class="hero-eyebrow">Scouts Kriko-M</span>
+            <h1 class="tak-hero-title">Onze Takken</h1>
+            <p style="color:rgba(255,255,255,.85);margin-top:8px;font-size:1.1rem;">Klik op een tak voor alle info, de leiding en de laatste Kriko Echo.</p>
+        </div>
+    </section>
 
     <section class="vic-takken-section vic-takken-section--full">
         <div class="vic-takken-grid">

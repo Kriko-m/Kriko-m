@@ -77,6 +77,20 @@ function write_db($db_name, $data) {
 }
 
 /**
+ * Geef het volgende oplopende webbestelnummer terug (1, 2, 3, …).
+ * Wordt bewaard in counters.json zodat nummers uniek én monotoon blijven,
+ * ook als oude bestellingen verwijderd worden. Op deze schaal is de kleine
+ * race-kans verwaarloosbaar.
+ */
+function next_order_number(): int {
+    $counters = read_db('counters');
+    $n = (int) ($counters['order_number'] ?? 0) + 1;
+    $counters['order_number'] = $n;
+    write_db('counters', $counters);
+    return $n;
+}
+
+/**
  * Initialize default data for databases if they do not exist yet.
  */
 function init_db_defaults($db_name) {
@@ -341,22 +355,7 @@ function init_db_defaults($db_name) {
             // Empty list of shop orders
             $defaults = [];
             break;
-            
-        case 'registrations':
-            // Empty list of event registrations
-            $defaults = [];
-            break;
-            
-        case 'parents':
-            // Empty list of parent accounts
-            $defaults = [];
-            break;
-            
-        case 'password_resets':
-            // Empty list of active password reset tokens
-            $defaults = [];
-            break;
-            
+
         case 'calendar':
             // Default upcoming activities on the home page
             $defaults = [

@@ -36,7 +36,6 @@ $contact_address = isset($settings['contact_address']) ? $settings['contact_addr
                     <li><a href="verhuur.php">Verhuur lokaal</a></li>
                     <li><a href="shop.php">Webshop</a></li>
                     <li><a href="inschrijven.php">Inschrijven</a></li>
-                    <li><a href="verslagen.php">Verslagen</a></li>
                     <li><a href="archief.php">Archief</a></li>
                     <li><a href="ouderportaal.php">Ouderportaal</a></li>
                 </ul>
@@ -75,10 +74,16 @@ $contact_address = isset($settings['contact_address']) ? $settings['contact_addr
 
         <div class="site-footer-bottom">
             <span>&copy; <?php echo date('Y'); ?> Scouts &amp; Gidsen Kriko-M Sint-Niklaas</span>
+            <span class="footer-legal-links">
+                <a href="privacy.php">Privacyverklaring</a>
+                <span aria-hidden="true">&middot;</span>
+                <a href="voorwaarden.php">Verkoopsvoorwaarden</a>
+            </span>
         </div>
     </footer>
 
     <!-- JavaScripts -->
+    <script src="assets/js/csrf.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/cart.js"></script>
     <script src="assets/js/lightbox.js"></script>

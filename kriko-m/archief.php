@@ -7,12 +7,11 @@ require_once __DIR__ . '/includes/header.php';
 require_once __DIR__ . '/includes/db.php';
 
 $echos      = read_db('echos');
-$verslagen  = read_db('verslagen');
 
 if (!is_array($echos))    $echos    = [];
-if (!is_array($verslagen))$verslagen= [];
 
-// Combineer alles met type-label
+// Combineer alles met type-label.
+// (Verslagen zitten hier bewust niet bij: die zijn leiding-only, niet publiek.)
 $all = [];
 foreach ($echos as $e) {
     if (isset($e['approved']) && !$e['approved']) continue;
@@ -25,16 +24,6 @@ foreach ($echos as $e) {
         'date'  => $jaar.'-'.$maand.'-01',
         'link'  => isset($e['file_name']) && $e['file_name'] ? 'uploads/echos/'.urlencode($e['file_name']) : '#',
         'icon'  => '📰',
-    ];
-}
-foreach ($verslagen as $v) {
-    $all[] = [
-        'type'  => 'verslag',
-        'label' => 'Verslag',
-        'title' => $v['title'] ?? 'Verslag',
-        'date'  => $v['date'] ?? '2024-01-01',
-        'link'  => 'verslagen.php',
-        'icon'  => '📄',
     ];
 }
 
@@ -50,12 +39,15 @@ foreach ($all as $item) {
 krsort($per_jaar);
 ?>
 
-<section class="section container">
-    <div class="page-header" style="padding:32px 0 28px;">
-        <div class="page-header-line"></div>
-        <h1 class="page-header-title">🗂️ Archief</h1>
-        <p class="page-header-sub">Alle echos, kampverhalen en verslagen op chronologische volgorde.</p>
+<section class="tak-hero primair hero-archief">
+    <div class="container">
+        <span class="hero-eyebrow">Scouts Kriko-M</span>
+        <h1 class="tak-hero-title">Archief</h1>
+        <p style="color:rgba(255,255,255,.85);margin-top:8px;font-size:1.1rem;">Alle Kriko Echo's op chronologische volgorde.</p>
     </div>
+</section>
+
+<section class="section container">
 
     <?php if (empty($all)): ?>
         <div style="text-align:center;padding:60px 24px;color:var(--color-text-muted);">

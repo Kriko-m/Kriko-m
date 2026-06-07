@@ -8,6 +8,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+require_once __DIR__ . '/includes/ouder_auth.php';
+
+// Groene zone: enkel voor ingelogde bezoekers.
+vereis_portaal_login('webshop');
+
 // Redirect to shop if no session order is active
 if (!isset($_SESSION['last_order'])) {
     header('Location: ouderportaal.php');
@@ -27,18 +32,15 @@ $page_title = "Bestelling Geslaagd";
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<!-- 1. Celebrating banner -->
-<section class="section container" style="text-align: center; max-width: 700px;">
-    <div style="width: 80px; height: 80px; background-color: hsla(145, 63%, 35%, 0.1); color: var(--color-success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; border: 3px solid var(--color-success);">
-        <svg style="width: 48px; height: 48px;" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-        </svg>
+<!-- 1. Page Header — zelfde groene portaal-banner als de webshop/portaalzone -->
+<section class="tak-hero primair hero-bestelling">
+    <div class="container">
+        <span class="hero-eyebrow">Bestelling bevestigd</span>
+        <h2 class="tak-hero-title">Bedankt voor je bestelling!</h2>
+        <p style="font-size: 1.2rem; color: hsla(0, 0%, 100%, 0.9); margin-top: 8px;">
+            We hebben je bestelling goed ontvangen onder nummer <strong><?php echo htmlspecialchars($order['order_ref'] ?? $order['id']); ?></strong>. Volg de onderstaande stappen om de betaling via overschrijving te voldoen.
+        </p>
     </div>
-    
-    <h2 style="font-size: 2.25rem; color: var(--color-primary-dark); margin-bottom: 8px;">Bedankt voor je bestelling!</h2>
-    <p style="color: var(--color-text-muted); font-size: 1.1rem; line-height: 1.5;">
-        We hebben je bestelling goed ontvangen onder nummer <strong><?php echo htmlspecialchars($order['id']); ?></strong>. Volg de onderstaande stappen om de betaling via overschrijving te voldoen.
-    </p>
 </section>
 
 <!-- 2. Detailed Receipt & Payment Box -->
@@ -102,9 +104,8 @@ require_once __DIR__ . '/includes/header.php';
             
             <div style="font-family: inherit; font-size: 0.85rem; margin-bottom: 20px; line-height: 1.6;">
                 <div><strong>Koper:</strong> <?php echo htmlspecialchars($order['customer_name']); ?></div>
-                <div><strong>Lid:</strong> <?php echo htmlspecialchars($order['child_name']); ?> (<?php echo ucfirst($order['child_tak']); ?>)</div>
+                <div><strong>Lid:</strong> <?php echo htmlspecialchars($order['child_name']); ?> (<?php echo htmlspecialchars(ucfirst($order['child_tak'])); ?>)</div>
                 <div><strong>E-mail:</strong> <?php echo htmlspecialchars($order['email']); ?></div>
-                <div><strong>Tel:</strong> <?php echo htmlspecialchars($order['phone']); ?></div>
             </div>
             
             <div style="border-top: 1px dashed var(--color-border); padding-top: 16px; margin-top: 16px; font-family: inherit;">

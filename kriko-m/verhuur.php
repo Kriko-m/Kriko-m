@@ -42,7 +42,7 @@ require_once __DIR__ . '/includes/header.php';
 ?>
 
 <!-- 1. Page Header — foto van het lokaal -->
-<section class="verhuur-hero" style="background-image: linear-gradient(rgba(102, 12, 25, 0.55), rgba(102, 12, 25, 0.55)), url('assets/images/verhuur/lokaal-04.jpg');">
+<section class="verhuur-hero" style="background-image: url('assets/images/verhuur/lokaal-04.jpg');">
     <div class="container verhuur-hero-inner">
         <h1 class="verhuur-hero-title">Ons lokaal</h1>
         <a href="<?php echo htmlspecialchars($kampas_url); ?>" target="_blank" rel="noopener" class="btn btn-primary verhuur-hero-btn">

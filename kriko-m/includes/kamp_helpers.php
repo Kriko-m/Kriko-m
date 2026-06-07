@@ -120,6 +120,7 @@ function create_kamp(array $data): array {
         'beschrijving'           => substr(trim($data['beschrijving'] ?? ''), 0, 2000),
         'open_voor_inschrijving' => !empty($data['open_voor_inschrijving']),
         'prijs'                  => max(0, (float)($data['prijs'] ?? 0)),
+        'foto'                   => '',
         'paklijst'               => [],
         'bestanden'              => [],
         'aangemaakt_op'          => date('Y-m-d H:i:s'),
@@ -150,13 +151,45 @@ function update_kamp(string $kamp_id, array $data): bool {
     return $changed && save_kampen($kampen);
 }
 
-/** Verwijder kamp + al zijn inschrijvingen + al zijn bestanden. */
+/** Sla een coverfoto op voor een kamp en verwijder de oude. */
+function set_kamp_foto(string $kamp_id, string $file_name): bool {
+    $kampen = read_kampen();
+    foreach ($kampen as &$kamp) {
+        if (($kamp['id'] ?? '') !== $kamp_id) continue;
+        if (!empty($kamp['foto'])) {
+            $old = __DIR__ . '/../uploads/kamp-fotos/' . $kamp['foto'];
+            if (file_exists($old)) @unlink($old);
+        }
+        $kamp['foto'] = $file_name;
+        return save_kampen($kampen);
+    }
+    return false;
+}
+
+/** Upload een foto voor een kamp en sla het op. Geeft bestandsnaam terug of null bij fout. */
+function _upload_kamp_foto(array $file, string $kamp_id): ?string {
+    if ($file['error'] !== UPLOAD_ERR_OK) return null;
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ['jpg','jpeg','png','webp'])) return null;
+    if ($file['size'] > 10 * 1024 * 1024) return null;
+    $dir = __DIR__ . '/../uploads/kamp-fotos/';
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    $fn = 'foto-' . $kamp_id . '-' . uniqid() . '.' . $ext;
+    if (move_uploaded_file($file['tmp_name'], $dir . $fn)) return $fn;
+    return null;
+}
+
+/** Verwijder kamp + al zijn inschrijvingen + al zijn bestanden + foto. */
 function delete_kamp(string $kamp_id): bool {
     $kamp = get_kamp($kamp_id);
     if ($kamp) {
         $dir = __DIR__ . '/../uploads/kamp-bestanden/';
         foreach ($kamp['bestanden'] ?? [] as $b) {
             $p = $dir . ($b['file_name'] ?? '');
+            if (file_exists($p)) @unlink($p);
+        }
+        if (!empty($kamp['foto'])) {
+            $p = __DIR__ . '/../uploads/kamp-fotos/' . $kamp['foto'];
             if (file_exists($p)) @unlink($p);
         }
     }

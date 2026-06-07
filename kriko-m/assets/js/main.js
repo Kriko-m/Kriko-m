@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initPortaalNav();
 });
 
+
 /* ── Ouderportaal: mobiele nav toggle ─────────────────── */
 function initPortaalNav() {
     const toggle = document.getElementById('portaal-nav-toggle');
@@ -245,49 +246,22 @@ function initCookieBanner() {
     });
 }
 
-/* ── Paklijst interactiviteit (ondersteunt meerdere lijsten) ── */
+/* ── Paklijst interactiviteit (per kamp/lid in het ouderportaal) ── */
 function initPaklijst() {
-    const forms = document.querySelectorAll('.paklijst-form, #paklijst-form');
-    forms.forEach(form => setupPaklijst(form));
+    document.querySelectorAll('.paklijst-form').forEach(setupPaklijst);
 }
 
 function setupPaklijst(form) {
-    // Unieke opslagsleutel per lijst (per kamp/lid). Valt terug op een vaste sleutel.
+    // Unieke opslagsleutel per lijst (per kamp/lid).
     const KEY = form.dataset.key || 'kriko_paklijst_v1';
     const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
-    const checkboxes = form.querySelectorAll('input[type="checkbox"]');
 
-    // Voortgangsbalk: binnen de form, anders globaal (standalone paklijst-pagina).
-    const bar = form.querySelector('.paklijst-progress-bar') || document.querySelector('.paklijst-progress-bar');
-    const txt = form.querySelector('.paklijst-progress-text') || document.querySelector('.paklijst-progress-text');
-    const scopedBar = form.contains(bar) ? bar : (form.id === 'paklijst-form' ? bar : null);
-    const scopedTxt = form.contains(txt) ? txt : (form.id === 'paklijst-form' ? txt : null);
-
-    checkboxes.forEach(cb => {
+    form.querySelectorAll('input[type="checkbox"]').forEach(cb => {
         if (saved[cb.id]) { cb.checked = true; cb.closest('.paklijst-item').classList.add('checked'); }
         cb.addEventListener('change', () => {
             cb.closest('.paklijst-item').classList.toggle('checked', cb.checked);
             saved[cb.id] = cb.checked;
             localStorage.setItem(KEY, JSON.stringify(saved));
-            updateProgress();
         });
     });
-
-    function updateProgress() {
-        const done = [...checkboxes].filter(c => c.checked).length;
-        const pct = checkboxes.length ? Math.round((done / checkboxes.length) * 100) : 0;
-        if (scopedBar) scopedBar.style.width = pct + '%';
-        if (scopedTxt) scopedTxt.textContent = done + ' / ' + checkboxes.length + ' ingepakt (' + pct + '%)';
-    }
-    updateProgress();
-
-    // Reset-knop hoort bij de standalone pagina.
-    if (form.id === 'paklijst-form') {
-        const resetBtn = document.getElementById('paklijst-reset');
-        if (resetBtn) resetBtn.addEventListener('click', () => {
-            checkboxes.forEach(cb => { cb.checked = false; cb.closest('.paklijst-item').classList.remove('checked'); });
-            localStorage.removeItem(KEY);
-            updateProgress();
-        });
-    }
 }

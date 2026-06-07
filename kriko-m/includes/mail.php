@@ -93,33 +93,45 @@ function scouts_send_mail($to, $subject, $body_html, $from = 'no-reply@kriko-m.b
  * Wraps dynamic body HTML inside a gorgeous Scouts Kriko-M brand template
  */
 function render_email_template($title, $body_html) {
-    return '<!DOCTYPE html>
+    /* ── Mail-huisstijl — pas deze kleuren aan om de hele template te restylen ── */
+    $brand       = '#7a1b2e'; // bordeaux: koppen, tabelkoppen, links
+    $brand_light = '#a22c42'; // lichtere bordeaux: header-gradient
+    $accent      = '#d97706'; // koper: knoppen, accentlijnen
+    $border      = '#e2e8f0'; // randen/lijnen
+    $text        = '#2d3748'; // bodytekst
+    $page_bg     = '#f7f5f0'; // achtergrond rond de mail
+
+    $safe_title = htmlspecialchars($title);
+    $year       = date('Y');
+
+    return <<<HTML
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>' . htmlspecialchars($title) . '</title>
+    <title>{$safe_title}</title>
     <style>
-        body { font-family: "Outfit", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background-color: #f7f5f0; color: #2d3748; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-        .wrapper { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04); }
-        .header { background: linear-gradient(135deg, #7a1b2e 0%, #a22c42 100%); padding: 35px 30px; text-align: center; color: #ffffff; border-bottom: 3px solid #d97706; }
+        body { font-family: "Outfit", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background-color: {$page_bg}; color: {$text}; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+        .wrapper { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; border: 1px solid {$border}; overflow: hidden; box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04); }
+        .header { background: linear-gradient(135deg, {$brand} 0%, {$brand_light} 100%); padding: 35px 30px; text-align: center; color: #ffffff; border-bottom: 3px solid {$accent}; }
         .header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; font-family: "Outfit", sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
         .content { padding: 40px 35px; line-height: 1.6; font-size: 15px; background-color: #ffffff; font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif; }
-        .content h2 { color: #7a1b2e; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 20px; font-family: "Outfit", sans-serif; }
+        .content h2 { color: {$brand}; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 20px; font-family: "Outfit", sans-serif; }
         .button-container { text-align: center; margin: 30px 0; }
-        .button { background-color: #d97706; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 30px; font-weight: 700; display: inline-block; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35); transition: all 0.2s ease; font-family: "Outfit", sans-serif; font-size: 15px; }
-        .receipt-table { width: 100%; border-collapse: collapse; margin: 24px 0; background-color: #faf9f6; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; }
-        .receipt-table th { background-color: #7a1b2e; color: #ffffff; padding: 12px 16px; font-size: 0.85rem; font-weight: 700; text-align: left; text-transform: uppercase; }
-        .receipt-table td { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
-        .receipt-total { background-color: #7a1b2e; color: #ffffff; font-weight: bold; }
-        .payment-box { background-color: #fffbeb; border: 2px dashed #d97706; border-radius: 12px; padding: 24px; margin: 24px 0; }
-        .payment-box h4 { margin: 0 0 10px 0; color: #7a1b2e; font-size: 1.1rem; font-weight: 700; }
+        .button { background-color: {$accent}; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 30px; font-weight: 700; display: inline-block; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35); transition: all 0.2s ease; font-family: "Outfit", sans-serif; font-size: 15px; }
+        .receipt-table { width: 100%; border-collapse: collapse; margin: 24px 0; background-color: #faf9f6; border-radius: 10px; overflow: hidden; border: 1px solid {$border}; }
+        .receipt-table th { background-color: {$brand}; color: #ffffff; padding: 12px 16px; font-size: 0.85rem; font-weight: 700; text-align: left; text-transform: uppercase; }
+        .receipt-table td { padding: 14px 16px; border-bottom: 1px solid {$border}; font-size: 0.9rem; }
+        .receipt-total { background-color: {$brand}; color: #ffffff; font-weight: bold; }
+        .payment-box { background-color: #fffbeb; border: 2px dashed {$accent}; border-radius: 12px; padding: 24px; margin: 24px 0; }
+        .payment-box h4 { margin: 0 0 10px 0; color: {$brand}; font-size: 1.1rem; font-weight: 700; }
         .payment-details { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 0.9rem; margin-bottom: 15px; }
         .payment-details strong { color: #4a5568; }
-        .payment-details code { font-family: monospace; font-size: 1rem; color: #7a1b2e; background-color: #ffffff; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; }
+        .payment-details code { font-family: monospace; font-size: 1rem; color: {$brand}; background-color: #ffffff; padding: 2px 6px; border-radius: 4px; border: 1px solid {$border}; }
         .warning-text { color: #c53030; font-size: 0.82rem; font-weight: 600; margin: 0; line-height: 1.4; }
-        .footer { background-color: #f8fafc; padding: 30px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 13px; color: #64748b; }
-        .footer a { color: #7a1b2e; text-decoration: underline; font-weight: 600; }
+        .footer { background-color: #f8fafc; padding: 30px; border-top: 1px solid {$border}; text-align: center; font-size: 13px; color: #64748b; }
+        .footer a { color: {$brand}; text-decoration: underline; font-weight: 600; }
         .footer p { margin: 6px 0; }
     </style>
 </head>
@@ -129,13 +141,14 @@ function render_email_template($title, $body_html) {
             <h1>Scouts Kriko-M</h1>
         </div>
         <div class="content">
-            ' . $body_html . '
+            {$body_html}
         </div>
         <div class="footer">
-            <p>&copy; ' . date('Y') . ' Scouts Kriko-M Sint-Niklaas. Alle rechten voorbehouden.</p>
+            <p>&copy; {$year} Scouts Kriko-M Sint-Niklaas. Alle rechten voorbehouden.</p>
             <p>Aangesloten bij Scouts en Gidsen Vlaanderen. Vragen? Mail naar <a href="mailto:groepsleiding@kriko-m.be">groepsleiding@kriko-m.be</a></p>
         </div>
     </div>
 </body>
-</html>';
+</html>
+HTML;
 }
