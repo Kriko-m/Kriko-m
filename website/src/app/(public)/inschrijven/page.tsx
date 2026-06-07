@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getSettings } from '@/lib/db'
+import CopyButton from '@/components/CopyButton'
 
 export const metadata: Metadata = { title: 'Inschrijven | Scouts Kriko-M' }
 
@@ -104,9 +105,9 @@ export default async function InschrijvenPage() {
               <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginTop: 8, marginBottom: 16 }}>
                 Aarzel niet om ons te contacteren!
               </p>
-              <a href={`mailto:${email}`} className="btn btn-secondary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                <i className="fas fa-envelope"></i> {email}
-              </a>
+              <CopyButton text={email} className="btn btn-secondary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <i className="fas fa-copy"></i> {email}
+              </CopyButton>
             </div>
           </div>
 
