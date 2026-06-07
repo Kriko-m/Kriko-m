@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getSettings, getEchos } from '@/lib/db'
 import type { Metadata } from 'next'
+import CopyButton from '@/components/CopyButton'
 
 const TAK_DARK: Record<string, string> = {
   kapoenen:   '#d4780a',
@@ -136,10 +137,22 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
             <div className="side-card">
               <h3>Contact</h3>
               <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginBottom: 8 }}>Vragen aan de leiding?</p>
-              <a href={`mailto:${tak.email}`} className="btn btn-outline" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
-                <i className="fas fa-envelope"></i>
-                <span>{tak.email}</span>
+              <CopyButton
+                text={tak.email}
+                className="btn btn-outline"
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}
+              >
+                <i className="fas fa-copy"></i> {tak.email}
+              </CopyButton>
+              <a href={`mailto:${tak.email}`} className="btn btn-secondary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <i className="fas fa-envelope"></i> Stuur e-mail
               </a>
+              {tak.whatsapp_url && (
+                <a href={tak.whatsapp_url} target="_blank" rel="noopener"
+                   className="btn" style={{ marginTop: 8, width: '100%', background: 'transparent', color: '#25D366', border: '1.5px solid #25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <i className="fab fa-whatsapp" style={{ fontSize: '1.1rem' }}></i> Doe mee op WhatsApp
+                </a>
+              )}
             </div>
 
             {/* Uniform kaart */}

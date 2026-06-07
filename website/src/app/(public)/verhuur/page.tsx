@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getSettings } from '@/lib/db'
+import PhotoGallery from '@/components/PhotoGallery'
 
 export const metadata: Metadata = { title: 'Verhuur lokaal | Scouts Kriko-M' }
 
@@ -38,13 +39,7 @@ export default async function VerhuurPage() {
 
         <div className="vh-block">
           <h3 className="vh-block-title">In beeld</h3>
-          <div className="verhuur-gallery">
-            {PHOTOS.map((src, i) => (
-              <a key={src} href={src} className="verhuur-photo" data-lightbox="verhuur" aria-label={`Foto ${i+1} van het lokaal`}>
-                <img src={src} alt={`Lokaal Scouts Kriko-M — foto ${i+1}`} loading="lazy" />
-              </a>
-            ))}
-          </div>
+          <PhotoGallery photos={PHOTOS} />
         </div>
 
         <div className="vh-block">

@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
+import LoadingScreen from './LoadingScreen'
 
 interface HeaderProps {
   alertActive?: boolean
@@ -24,11 +25,7 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
 
   return (
     <>
-      {/* Laadscherm */}
-      <div id="loading-screen" aria-hidden="true">
-        <img src="/images/logo-finaal.png" alt="Kriko-M laden…" />
-        <div className="loading-bar-wrap"><div className="loading-bar"></div></div>
-      </div>
+      <LoadingScreen />
 
       {/* Aankondigingsbanner */}
       {alertActive && alertMessage && !alertDismissed && (

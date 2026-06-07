@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { getCalendarEvents } from '@/lib/db'
+import HeroCTA from '@/components/HeroCTA'
 
 const MONTHS_NL: Record<number, string> = {
   1: 'Jan', 2: 'Feb', 3: 'Mrt', 4: 'Apr', 5: 'Mei', 6: 'Jun',
@@ -26,17 +27,9 @@ export default async function HomePage() {
           <div className="hero-text">
             <span className="hero-title">Kriko-M</span>
             <span className="hero-sub">Scouts &amp; Gidsen</span>
-            <button className="hero-cta" id="hero-cta">
-              Leer meer <i className="fa-solid fa-chevron-down"></i>
-            </button>
+            <HeroCTA />
           </div>
         </div>
-        <script dangerouslySetInnerHTML={{ __html: `
-          document.getElementById('hero-cta')?.addEventListener('click', function() {
-            var welkom = document.getElementById('welkom');
-            if (welkom) welkom.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          });
-        `}} />
       </section>
 
       <hr className="section-divider" />

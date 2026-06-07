@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import CopyButton from './CopyButton'
 
 interface FooterProps {
   contactEmail?: string
@@ -68,10 +69,13 @@ export default function Footer({
           </Link>
           <ul className="footer-links">
             <li>
-              <a href={`mailto:${contactEmail}`}>
-                <i className="far fa-envelope" style={{ marginRight: 6, opacity: 0.7 }}></i>
-                {contactEmail}
-              </a>
+              <CopyButton
+                text={contactEmail ?? ''}
+                className="footer-copy-mail"
+              >
+                <i className="far fa-copy"></i>
+                <span className="footer-copy-mail-text">{contactEmail}</span>
+              </CopyButton>
             </li>
             <li>
               <a href={`tel:${contactPhone.replace(/\s+/g, '')}`}>{contactPhone}</a>
