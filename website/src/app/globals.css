@@ -1,0 +1,3714 @@
+/*
+ * Scouts Kriko-M Web Platform - Stylesheet
+ * Custom Vanilla CSS Design System with Scouts Aesthetics
+ */
+
+
+/* ==========================================================================
+   1. Design System Tokens & Base Setup
+   ========================================================================== */
+
+:root {
+    /* ── Kleurenpallet Kriko-M v3 ───────────────────────────────────────────── */
+
+    /* Bordeaux — navigatiebalk · knoppen · accenten */
+    --color-primary: #650B19;
+    --color-primary-light: #650B19;
+    /* Bordeaux donker — footer · hover nav · paginatitels · sectiekoppen */
+    --color-primary-dark: #3a0710;
+    --color-primary-hover: #650B19;
+
+    /* Goud — inschrijven-knop · subtitels · decoratieve lijn */
+    --color-accent: #C9963A;
+    --color-accent-hover: #B8862F;
+    --color-accent-light: #E2C58D;
+
+    /* Secondary = alias van het accent (backwards-compat met bestaande klassen) */
+    --color-secondary: var(--color-accent);
+    --color-secondary-hover: var(--color-accent-hover);
+
+    /* Crème — pagina-achtergrond · sectie-achtergrond */
+    --color-bg-linen: #F0ECE4;
+    /* Wit — kaartachtergrond · modals · formulieren */
+    --color-bg-white: #FFFFFF;
+    /* Tekst — bodytekst · labels · navigatie-items */
+    --color-text-dark: #1A1A1A;
+    --color-text-muted: hsl(345, 10%, 45%);
+    --color-border: hsl(345, 15%, 85%);
+
+    /* Feedback */
+    --color-success: hsl(145, 63%, 35%);
+    --color-warning: hsl(38, 92%, 50%);
+    --color-error: hsl(4, 75%, 48%);
+
+    /* Takken kleuren */
+    --color-kapoenen: #CABD30;   /* geel-groen · 6–8 jaar */
+    --color-welpen: #2E8B3A;     /* donkergroen · 8–11 jaar */
+    --color-jonggivers: #E07B1A; /* oranje · 11–14 jaar */
+    --color-givers: #1A3FB5;     /* kobaltblauw · 14–17 jaar */
+
+    /* Layout Tokens */
+    --border-radius-sm: 8px;
+    --border-radius-md: 14px;
+    --border-radius-lg: 24px;
+    --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 10px 20px color-mix(in srgb, var(--color-primary) 8%, transparent);
+    --shadow-lg: 0 20px 40px color-mix(in srgb, var(--color-primary) 15%, transparent);
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --max-width: 1240px;
+}
+
+/* Reset and Base Styles */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Hide scrollbars globally */
+html { scrollbar-width: none; }
+::-webkit-scrollbar { display: none; }
+
+/* Focus-ring alleen tonen bij toetsenbordnavigatie, niet bij muisklikken */
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+    background-color: var(--color-bg-linen);
+    color: var(--color-text-dark);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: 70px;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    line-height: 1.25;
+}
+
+h1 { font-size: 2.75rem; }
+h2 { font-size: 2.25rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.25rem; }
+
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: var(--color-bg-linen);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--color-primary-light);
+    border: 2px solid var(--color-bg-linen);
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+}
+
+/* Generic Layout Wrapper */
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+}
+
+.section {
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.section--no-top {
+    padding-top: 0;
+}
+
+.section-bg {
+    background-color: var(--color-bg-white);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: var(--border-radius-md);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+    background-color: var(--color-accent);
+    color: var(--color-bg-white);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+.btn-secondary {
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    box-shadow: none;
+}
+
+.btn-outline:hover {
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
+}
+
+/* ==========================================================================
+   2. Navigatie (Vic-stijl)
+   ========================================================================== */
+
+.site-header {
+    position: relative;
+}
+
+.mainnav {
+    background-color: var(--color-primary);
+    height: 70px;
+    overflow: visible;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    border-bottom: 4px solid var(--color-accent);
+}
+
+.mainnav-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    padding-left: 170px;
+    padding-right: 0;
+}
+
+/* Logo (hangt onder nav) */
+.nav-logo {
+    position: absolute;
+    left: 16px;
+    top: 10px;
+    transition: transform 0.25s ease;
+    text-decoration: none;
+    height: 140px;
+    z-index: 101;
+}
+
+.nav-logo img {
+    height: 100%;
+    width: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.nav-logo:hover {
+    transform: scale(1.08);
+}
+
+/* Nav links */
+.nav-links {
+    list-style: none;
+    display: flex;
+    align-items: stretch;
+    height: 70px;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.nav-links > li {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+}
+
+.nav-links > li > a {
+    color: #fff;
+    text-decoration: none;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    transition: background 0.15s;
+}
+
+.nav-links > li > a:hover,
+.nav-links > li:hover > a {
+    background-color: rgba(0, 0, 0, 0.22);
+}
+
+.nav-links > li > a.nav-active {
+    background-color: transparent;
+    box-shadow: inset 0 -3px 0 var(--color-accent);
+}
+
+.nav-links > li + li::before {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.18);
+    align-self: center;
+    flex-shrink: 0;
+}
+
+.arrow {
+    font-size: 0.55rem;
+    margin-left: 5px;
+    opacity: 0.8;
+}
+
+/* Dropdown */
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    background-color: var(--color-primary);
+    list-style: none;
+    min-width: 210px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    z-index: 200;
+    border-radius: 0 0 14px 14px;
+    overflow: hidden;
+}
+
+.dropdown li a {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 11px 18px;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: background 0.12s;
+}
+
+.dropdown li a:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.has-dropdown:hover .dropdown {
+    display: block;
+}
+
+/* CTA knop (inschrijven) */
+.nav-cta {
+    background-color: var(--color-accent);
+    color: var(--color-bg-white) !important;
+    text-decoration: none;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 9px 20px;
+    margin: auto 8px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 50px;
+    transition: background 0.15s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    white-space: nowrap;
+}
+
+.nav-cta:hover {
+    background-color: var(--color-accent-hover);
+    transform: scale(1.05);
+}
+
+/* Secundaire knop (portaal/log uit) */
+.nav-cta-secondary {
+    background-color: transparent;
+    color: rgba(255,255,255,0.8) !important;
+    text-decoration: none;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 9px 16px;
+    margin: auto 4px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 50px;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.nav-cta-secondary:hover {
+    background-color: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.6);
+    color: #fff !important;
+}
+
+/* Cart knop in nav */
+.nav-cart-btn {
+    position: relative;
+    background-color: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    width: 38px;
+    height: 38px;
+    margin: auto 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+.nav-cart-btn:hover {
+    background-color: var(--color-accent);
+}
+
+.cart-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: var(--color-accent);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-primary-dark);
+}
+
+/* Hamburger */
+.nav-hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 16px;
+    margin-left: auto;
+    height: 70px;
+    z-index: 102;
+    flex-shrink: 0;
+}
+
+.nav-hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--color-bg-white);
+    border-radius: 2px;
+    pointer-events: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.mainnav.nav-open .nav-hamburger span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.mainnav.nav-open .nav-hamburger span:nth-child(2) {
+    opacity: 0;
+}
+
+.mainnav.nav-open .nav-hamburger span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Scroll-naar-boven knop */
+.scroll-top-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--color-primary-dark);
+    color: var(--color-bg-white);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    z-index: 200;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s;
+    pointer-events: none;
+}
+
+.scroll-top-btn.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.scroll-top-btn:hover {
+    background-color: var(--color-accent);
+}
+
+/* Aankondigingsbanner */
+.alert-banner {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: #fff;
+    border-bottom: 2px solid var(--color-accent);
+    padding: 10px 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.alert-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.alert-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-close {
+    background: none;
+    border: none;
+    color: #fff;
+    opacity: 0.7;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: opacity 0.15s;
+}
+
+.alert-close:hover {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   3. Hero (Vic-stijl, volledig scherm)
+   ========================================================================== */
+
+.hero {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 70px);
+    overflow: hidden;
+    margin-bottom: 0;
+    border-bottom: 4px solid var(--color-accent-light);
+}
+
+.hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 160px;
+}
+
+.hero-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.hero-title {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 7rem;
+    font-weight: 900;
+    color: var(--color-bg-white);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-shadow: 0 4px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
+    line-height: 1;
+    margin: 0;
+}
+
+.hero-sub {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--color-accent-light); /* tussentint goud op donkere achtergrond */
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.7), 0 0 14px rgba(0,0,0,0.45);
+}
+
+.hero-cta {
+    margin-top: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    border: 2px solid rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(4px);
+}
+
+.hero-cta:hover {
+    background: rgba(255,255,255,0.18);
+    border-color: #fff;
+    transform: scale(1.05);
+}
+
+.hero-cta i {
+    font-size: 0.75rem;
+}
+
+/* ==========================================================================
+   4. Takken — Vic-stijl portretkaarten (homepage & overzicht)
+   ========================================================================== */
+
+.vic-takken-section {
+    padding: 0 24px 72px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.vic-takken-section--full .vic-tak-card {
+    min-height: 560px;
+}
+
+.vic-takken-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 56px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.vic-tak-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 0;
+    aspect-ratio: 44 / 88;
+    border-radius: 16px;
+    border: 5px solid transparent;
+    text-decoration: none;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow 0.2s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.vic-tak-card.tak-kapoenen   { border-color: var(--color-kapoenen); }
+.vic-tak-card.tak-welpen     { border-color: var(--color-welpen); }
+.vic-tak-card.tak-jonggivers { border-color: var(--color-jonggivers); }
+.vic-tak-card.tak-givers     { border-color: var(--color-givers); }
+
+.vic-tak-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+    transition: background 0.2s;
+}
+
+.vic-tak-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.3); transform: translateY(-4px); }
+.vic-tak-card.tak-kapoenen:hover   { box-shadow: 0 6px 24px color-mix(in srgb, var(--color-kapoenen) 50%, transparent); }
+.vic-tak-card.tak-welpen:hover     { box-shadow: 0 6px 24px color-mix(in srgb, var(--color-welpen) 45%, transparent); }
+.vic-tak-card.tak-jonggivers:hover { box-shadow: 0 6px 24px color-mix(in srgb, var(--color-jonggivers) 50%, transparent); }
+.vic-tak-card.tak-givers:hover     { box-shadow: 0 6px 24px color-mix(in srgb, var(--color-givers) 45%, transparent); }
+
+.vic-tak-name,
+.vic-tak-age { position: relative; z-index: 1; }
+
+.vic-tak-name {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+}
+
+.vic-tak-age {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-accent-light);
+    letter-spacing: 0.08em;
+    margin-bottom: 16px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+/* ── "Bestel onze groepsdas"-link op de tak-detailpagina ── */
+.tak-card-link {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-primary);
+}
+
+.tak-card-link:hover {
+    color: var(--color-secondary);
+}
+
+/* ==========================================================================
+   5. Calendar & News Block
+   ========================================================================== */
+
+.home-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+
+/* Calendar Card */
+.calendar-card {
+    background-color: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 30px;
+    border: 1px solid var(--color-border);
+}
+
+.calendar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.calendar-item {
+    display: flex;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed var(--color-border);
+}
+
+.calendar-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.calendar-date-block {
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
+    border-radius: var(--border-radius-md);
+    width: 65px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.calendar-day {
+    font-size: 1.6rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.calendar-month {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.calendar-details {
+    flex-grow: 1;
+}
+
+.calendar-time {
+    font-size: 0.85rem;
+    color: var(--color-secondary);
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.calendar-details h4 {
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+}
+
+.calendar-desc {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+}
+
+/* Info Banner Block */
+.info-banner {
+    background-color: var(--color-primary-dark);
+    color: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background-image: linear-gradient(color-mix(in srgb, var(--color-primary) 90%, transparent), color-mix(in srgb, var(--color-primary) 90%, transparent)), url('../images/banner-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    justify-content: center;
+}
+
+.info-banner h3 {
+    color: var(--color-accent-light);
+}
+
+.info-banner p {
+    color: hsla(0, 0%, 100%, 0.85);
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   6. Takken Detail Pages
+   ========================================================================== */
+
+.tak-hero {
+    color: var(--color-bg-white);
+    padding: 80px 0;
+    border-bottom: 4px solid var(--color-accent-light);
+    position: relative;
+}
+
+/* Hero "eyebrow" label — accentlabel boven hero-titels */
+.hero-eyebrow {
+    display: inline-block;
+    color: var(--tak-color, var(--color-accent-light));
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background-color: rgba(0, 0, 0, 0.35);
+    padding: 2px 10px;
+    border-radius: 50px;
+    backdrop-filter: blur(4px);
+}
+
+/* Tak-specifieke accentkleur via CSS-variabele */
+.tak-hero.kapoenen   { --tak-color: var(--color-kapoenen); }
+.tak-hero.welpen     { --tak-color: var(--color-welpen); }
+.tak-hero.jonggivers { --tak-color: var(--color-jonggivers); }
+.tak-hero.givers     { --tak-color: var(--color-givers); }
+.tak-hero.algemeen   { --tak-color: var(--color-accent-light); } /* algemene paginakop (niet tak-specifiek) */
+.tak-hero.primair    { --tak-color: var(--color-accent-light); } /* bordeaux paginakop — niet tak-specifiek */
+
+.tak-hero.primair {
+    /* Thema-bewust: bordeaux op de publieke site, groen in de portaal-/webshopzone */
+    background: linear-gradient(160deg, var(--color-primary-dark) 0%, var(--color-primary) 55%);
+    padding: 44px 0;
+    margin-bottom: 40px;
+}
+/* Groene variant met wat meer diepte in de portaal-/webshopzone */
+body.portal-theme .tak-hero.primair {
+    background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+}
+.tak-hero.primair::after {
+    content: '⚜';  /* fallback */
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%) translateY(-0.07em);
+    font-size: 9rem;
+    line-height: 1;
+    opacity: 0.09;
+    pointer-events: none;
+    user-select: none;
+}
+.tak-hero.primair .container {
+    padding-left: 8px;
+}
+.tak-hero.hero-takken::after    { content: '⚜'; }
+.tak-hero.hero-kalender::after  { content: '📅'; }
+.tak-hero.hero-echos::after     { content: '📰'; }
+.tak-hero.hero-archief::after   { content: '🗂️'; }
+.tak-hero.hero-verslagen::after { content: '📋'; }
+.tak-hero.hero-webshop::after   { content: '🛍️'; }
+.tak-hero.hero-inschrijven::after { content: '✏️'; }
+.tak-hero.hero-contact::after   { content: '✉️'; }
+.tak-hero.hero-checkout::after  { content: '🛒'; }
+.tak-hero.hero-bestelling::after { content: '✅'; }
+
+.tak-hero.kapoenen   { background: linear-gradient(color-mix(in srgb, var(--color-kapoenen) 42%, transparent), color-mix(in srgb, var(--color-kapoenen) 42%, transparent)), url('../images/banner_kapoenen.png') center/cover; }
+.tak-hero.welpen     { background: linear-gradient(color-mix(in srgb, var(--color-welpen) 42%, transparent), color-mix(in srgb, var(--color-welpen) 42%, transparent)), url('../images/banner_welpen.png') center/cover; }
+.tak-hero.jonggivers { background: linear-gradient(color-mix(in srgb, var(--color-jonggivers) 40%, transparent), color-mix(in srgb, var(--color-jonggivers) 40%, transparent)), url('../images/banner_jonggivers.png') center/cover; }
+.tak-hero.givers     { background: linear-gradient(color-mix(in srgb, var(--color-givers) 42%, transparent), color-mix(in srgb, var(--color-givers) 42%, transparent)), url('../images/banner_givers.png') center/cover; }
+
+.tak-hero-title {
+    font-size: 3rem;
+    color: var(--color-bg-white);
+}
+
+.tak-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+
+/* Leader contact card */
+.leaders-section {
+    background-color: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 30px;
+    border: 1px solid var(--color-border);
+}
+
+.leaders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.leader-card {
+    background-color: var(--color-bg-linen);
+    border-radius: var(--border-radius-md);
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--color-border);
+}
+
+.leader-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--tak-color, var(--color-primary-light));
+    color: var(--color-bg-white);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+}
+
+.leader-card h4 {
+    font-size: 1.05rem;
+    margin-bottom: 2px;
+}
+
+.leader-card p {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.leader-totem {
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--color-primary-dark);
+    margin: 4px 0;
+    line-height: 1.2;
+}
+
+.leader-phone {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.leader-phone:hover {
+    color: var(--color-secondary);
+}
+
+/* Side Info Cards */
+.side-card {
+    background-color: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 24px;
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+}
+
+.side-card h3 {
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--color-bg-linen);
+    padding-bottom: 8px;
+}
+
+.side-card ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.side-card li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   6b. Tak Foto's
+   ========================================================================== */
+
+
+/* ==========================================================================
+   7. Webshop & Checkout (Shopping Cart)
+   ========================================================================== */
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.shop-card {
+    background-color: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: var(--transition-normal);
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.shop-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.shop-card-image {
+    height: 240px;
+    position: relative;
+    background-color: var(--color-bg-linen);
+    overflow: hidden;
+}
+
+.shop-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-normal);
+}
+
+.shop-card:hover .shop-card-image img {
+    transform: scale(1.08);
+}
+
+.shop-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background-color: var(--color-secondary);
+    color: var(--color-bg-white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 30px;
+    text-transform: uppercase;
+}
+
+.shop-card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.shop-card-title {
+    font-size: 1.25rem;
+    margin-bottom: 6px;
+}
+
+.shop-card-price {
+    font-size: 1.4rem;
+    font-family: 'Outfit', sans-serif;
+    color: var(--color-secondary);
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.shop-card-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 18px;
+    flex-grow: 1;
+}
+
+.shop-size-select {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+    margin-bottom: 16px;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+
+/* Cart Overlay Drawer */
+.cart-drawer {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 100%;
+    max-width: 420px;
+    height: 100%;
+    background-color: var(--color-bg-white);
+    box-shadow: var(--shadow-lg);
+    z-index: 150;
+    transition: var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid var(--color-primary);
+    visibility: hidden; /* Prevent focus and overflow when closed */
+}
+
+.cart-drawer.open {
+    right: 0;
+    visibility: visible;
+}
+
+.cart-drawer-header {
+    padding: 20px;
+    background-color: var(--color-primary-dark);
+    color: var(--color-bg-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-drawer-close {
+    background: none;
+    border: none;
+    color: var(--color-bg-white);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.cart-drawer-body {
+    padding: 20px;
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cart-item {
+    display: flex;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-border);
+    align-items: center;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.cart-item-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.cart-item-meta {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.cart-item-price {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-secondary);
+}
+
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: var(--color-error);
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.cart-drawer-footer {
+    padding: 20px;
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg-linen);
+}
+
+.cart-subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--color-primary-dark);
+}
+
+.cart-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 140;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition-fast);
+    backdrop-filter: blur(4px);
+}
+
+.cart-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ── Webshop: producten op volle breedte ──────────────────────────── */
+.shop-products { min-width: 0; }
+.shop-cat { margin-bottom: 56px; }
+.shop-cat:last-child { margin-bottom: 0; }
+.shop-cat-title {
+    font-size: 1.75rem;
+    border-bottom: 2px solid var(--color-bg-linen);
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+    color: var(--color-primary-dark);
+}
+
+/* ── Winkelmandje: schuift in/uit langs de rechterrand ────────────────
+   De verticale tab is het handvat én de toggle (geen aparte knop).      */
+.shop-cart-dock {
+    --cart-w: 340px;
+    position: fixed;
+    top: 96px;
+    right: 0;
+    z-index: 130;
+    display: flex;
+    align-items: center;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.shop-cart-dock.collapsed { transform: translateX(var(--cart-w)); }
+
+/* Verticaal tab-handvat dat altijd aan de rand zichtbaar blijft */
+.shop-cart-tab {
+    flex-shrink: 0;
+    align-self: center;
+    width: 46px;
+    background: var(--color-primary-dark);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 14px 0 0 14px;
+    padding: 18px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    box-shadow: -5px 6px 18px rgba(0, 0, 0, 0.20);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    transition: background 0.15s;
+}
+.shop-cart-tab:hover { background: var(--color-primary); }
+.shop-cart-tab i { font-size: 1.15rem; }
+.shop-cart-tab-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.78rem;
+}
+.shop-cart-tab .cart-count {
+    position: static;
+    inset: auto;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 0.72rem;
+}
+
+/* Het schuifpaneel met de mandje-inhoud */
+.shop-cart-panel {
+    width: var(--cart-w);
+    max-height: calc(100vh - 120px);
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-right: none;
+    box-shadow: -8px 10px 30px rgba(0, 0, 0, 0.18);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.shop-cart-panel .cart-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 18px;
+}
+.shop-cart-empty {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: 28px 12px;
+    font-size: 0.9rem;
+}
+.shop-cart-foot {
+    padding: 16px 18px;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg-linen);
+}
+.shop-cart-note {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    margin: 0 0 12px;
+    line-height: 1.35;
+}
+
+@media (max-width: 600px) {
+    .shop-cart-dock { --cart-w: calc(100vw - 46px); }
+}
+
+/* Checkout Page Columns */
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 40px;
+}
+
+.checkout-card {
+    background-color: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 30px;
+    border: 1px solid var(--color-border);
+}
+
+/* Styled checkout forms */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-primary-dark);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: var(--border-radius-md);
+    border: 2px solid var(--color-border);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: var(--transition-fast);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-accent) 15%, transparent);
+}
+
+/* Invoice block receipt style */
+.invoice-receipt {
+    background-color: var(--color-bg-linen);
+    border: 2px dashed var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 24px;
+    margin: 20px 0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.invoice-header {
+    text-align: center;
+    border-bottom: 1px dashed var(--color-border);
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+}
+
+.invoice-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.invoice-total {
+    border-top: 1px dashed var(--color-border);
+    padding-top: 12px;
+    margin-top: 16px;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.structured-communication {
+    background-color: var(--color-primary-dark);
+    color: var(--color-bg-white);
+    text-align: center;
+    padding: 10px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-radius: var(--border-radius-sm);
+    margin: 12px 0;
+    letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   8. Inschrijven (Registration) Page
+   ========================================================================== */
+
+.register-layout {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 40px;
+}
+
+.step-card {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+    background-color: var(--color-bg-white);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+}
+
+.step-number {
+    width: 45px;
+    height: 45px;
+    background-color: var(--color-secondary);
+    color: var(--color-bg-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.step-body h4 {
+    margin-bottom: 6px;
+}
+
+/* ==========================================================================
+   10. Footer (Vic-stijl)
+   ========================================================================== */
+
+.site-footer {
+    background-color: var(--color-primary-dark);
+    color: #ccc;
+    padding: 48px 24px 0;
+    margin-top: auto;
+}
+
+.site-footer-inner {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.footer-col-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-brand-name {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.footer-brand-sub {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.footer-brand-divider {
+    width: 40px;
+    height: 3px;
+    background-color: var(--color-accent);
+    border-radius: 2px;
+    margin: 4px 0;
+}
+
+.footer-brand-desc {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.45);
+    line-height: 1.55;
+    max-width: 220px;
+    margin-bottom: 4px;
+}
+
+.footer-social {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.footer-social a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #bbb;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.footer-social a:hover {
+    background-color: var(--color-accent);
+    color: var(--color-primary-dark);
+}
+
+.footer-col-title {
+    display: block;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 16px;
+}
+
+.footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-links a {
+    color: #bbb;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: color 0.15s;
+}
+
+.footer-links a:hover { color: #fff; }
+
+/* E-mail kopieer-knop in footer (ziet eruit als een gewone footer-link) */
+.footer-copy-mail {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #bbb;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: left;
+    transition: color 0.15s;
+}
+
+.footer-copy-mail:hover { color: #fff; }
+.footer-copy-mail i { font-size: 0.8rem; opacity: 0.7; }
+.footer-copy-mail.copied { color: var(--color-accent); }
+.footer-copy-mail.copied i { opacity: 1; }
+
+/* "Volg ons" label boven de social-iconen */
+.footer-social-label {
+    display: block;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-top: 8px;
+}
+
+/* "Bekijk alle activiteiten" link onder de activiteitenlijst */
+.calendar-view-all {
+    display: inline-block;
+    margin-top: 24px;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--color-secondary);
+    text-decoration: none;
+    transition: color 0.15s, transform 0.15s;
+}
+
+.calendar-view-all:hover {
+    color: var(--color-primary-dark);
+    transform: translateX(3px);
+}
+
+
+.footer-contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--color-accent);
+    color: var(--color-primary-dark);
+    font-family: 'Nunito', Arial, sans-serif;
+    font-weight: 800;
+    font-size: 0.9rem;
+    text-decoration: none;
+    padding: 11px 20px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    transition: transform 0.15s, background-color 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.footer-contact-btn:hover {
+    background-color: var(--color-accent-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+}
+
+.site-footer-bottom {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 16px 0;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.footer-legal-links {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.footer-legal-links a {
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+}
+.footer-legal-links a:hover {
+    color: rgba(255,255,255,0.9);
+    text-decoration: underline;
+}
+
+@media (max-width: 1024px) {
+    .site-footer-inner {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+    }
+}
+
+@media (max-width: 600px) {
+    .site-footer-inner {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+    .site-footer {
+        padding: 40px 20px 0;
+    }
+}
+
+/* ==========================================================================
+   11. Responsive Layout Overrides
+   ========================================================================== */
+
+@media (max-width: 992px) {
+    h1 { font-size: 2.25rem; }
+    h2 { font-size: 1.85rem; }
+
+    /* Nav responsive */
+    .nav-logo {
+        height: 44px;
+        top: 13px;
+    }
+
+    .nav-hamburger {
+        display: flex;
+    }
+
+    .nav-links {
+        display: none;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        right: 0;
+        background: var(--color-primary);
+        flex-direction: column;
+        height: auto;
+        z-index: 99;
+        padding: 8px 0 16px;
+        border-bottom: 4px solid var(--color-accent);
+        max-height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+
+    .mainnav.nav-open .nav-links {
+        display: flex;
+    }
+
+    .nav-links > li {
+        flex-direction: column;
+        height: auto;
+        align-items: stretch;
+    }
+
+    .nav-links > li + li::before {
+        display: none;
+    }
+
+    .nav-links > li > a {
+        padding: 12px 24px;
+        height: auto;
+        width: 100%;
+    }
+
+    .nav-cta, .nav-cta-secondary {
+        display: none;
+    }
+
+    .mainnav-inner {
+        padding-left: 70px;
+    }
+
+    .has-dropdown:hover .dropdown {
+        display: none;
+    }
+
+    .has-dropdown.open .dropdown {
+        display: block;
+        position: static;
+        box-shadow: none;
+        background: rgba(0,0,0,0.25);
+        min-width: unset;
+        width: 100%;
+        border-radius: 0;
+    }
+
+    .has-dropdown.open .dropdown li a {
+        padding-left: 36px;
+    }
+
+    /* Hero responsive */
+    .hero-title { font-size: 5rem; }
+    .hero-sub   { font-size: 1.3rem; letter-spacing: 0.16em; }
+
+    /* Tak grid */
+    .vic-takken-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .vic-takken-section {
+        padding: 16px 20px 24px;
+    }
+    .home-grid, .checkout-layout, .register-layout, .tak-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title { font-size: 3.6rem; }
+    .hero-sub   { font-size: 1.1rem; letter-spacing: 0.12em; }
+
+    .vic-takken-section { padding: 60px 16px; }
+    .vic-takken-grid    { gap: 14px; }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title { font-size: 2.8rem; letter-spacing: 0.05em; }
+    .hero-sub   { font-size: 0.95rem; letter-spacing: 0.1em; }
+
+    .vic-takken-grid { gap: 10px; }
+}
+
+/* ==========================================================================
+   11b. Kriko Echo pagina (Vic-stijl)
+   ========================================================================== */
+
+.echo-page-wrap {
+    display: flex;
+    flex-direction: column;
+    /* Vult de beschikbare hoogte zodat kaarten het scherm vullen */
+    min-height: calc(100vh - 70px);
+}
+
+.echo-grid-wrap {
+    padding: 0 40px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    flex: 1;
+}
+
+.echo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    height: 100%;
+}
+
+/* Kaart — hoogte vult helft van resterende viewport */
+.echo-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: calc((100vh - 248px) / 2);
+    min-height: 180px;
+    max-height: 520px;
+    border-radius: 16px;
+    border: 5px solid transparent;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow 0.2s, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.echo-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.70) 0%, rgba(0,0,0,0.12) 55%, transparent 100%);
+    z-index: 0;
+}
+
+/* Achtergrondafbeelding + gekleurde rand per tak */
+.echo-card-kapoenen   { background-image: url('../images/tak_kapoenen.jpg');   background-color: #9A9020; border-color: var(--color-kapoenen); }
+.echo-card-welpen     { background-image: url('../images/tak_welpen.jpg');     background-color: #2E8B3A; border-color: var(--color-welpen); }
+.echo-card-jonggivers { background-image: url('../images/tak_jonggivers.jpg'); background-color: #C05A00; border-color: var(--color-jonggivers); }
+.echo-card-givers     { background-image: url('../images/tak_givers.jpg');     background-color: #1A3FB5; border-color: var(--color-givers); }
+
+.echo-card:hover { transform: translateY(-3px); }
+.echo-card-kapoenen:hover   { box-shadow: 0 6px 24px color-mix(in srgb, var(--color-kapoenen) 45%, transparent); }
+.echo-card-welpen:hover     { box-shadow: 0 6px 24px color-mix(in srgb, var(--color-welpen) 45%, transparent); }
+.echo-card-jonggivers:hover { box-shadow: 0 6px 24px color-mix(in srgb, var(--color-jonggivers) 45%, transparent); }
+.echo-card-givers:hover     { box-shadow: 0 6px 24px color-mix(in srgb, var(--color-givers) 45%, transparent); }
+
+.echo-card-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 0 20px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.echo-card-naam {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    line-height: 1.1;
+}
+
+.echo-card-leeftijd {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-accent-light);
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+}
+
+.echo-card-pdfs {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.echo-card-pdf-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 14px;
+    background: rgba(255,255,255,0.16);
+    border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 9px;
+    text-decoration: none;
+    backdrop-filter: blur(4px);
+    transition: background 0.15s, border-color 0.15s;
+    width: 100%;
+}
+
+.echo-card-pdf-btn:hover {
+    background: rgba(255,255,255,0.28);
+    border-color: rgba(255,255,255,0.55);
+}
+
+.echo-pdf-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.echo-pdf-left i {
+    color: rgba(255,255,255,0.85);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.echo-pdf-maand {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: capitalize;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.echo-pdf-open {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.echo-pdf-open i { font-size: 0.6rem; }
+
+.echo-card-empty {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.45);
+    margin: 4px 0 0;
+}
+
+@media (max-width: 768px) {
+    .echo-grid-wrap { padding: 0 20px 20px; }
+    .echo-grid      { gap: 16px; }
+    .echo-card      { height: calc((100vh - 258px) / 2); }
+}
+
+@media (max-width: 540px) {
+    .echo-grid-wrap { padding: 0 12px 16px; }
+    .echo-grid      { gap: 12px; }
+    .echo-card      { height: calc((100vh - 240px) / 2); }
+    .echo-card-inner { padding: 0 12px 14px; }
+}
+
+/* Dunne accentlijn als scheiding tussen secties */
+.section-divider {
+    width: 72%;
+    height: 1px;
+    background-color: var(--color-accent);
+    opacity: 0.35;
+    margin: 0 auto;
+    border: none;
+}
+
+/* ==========================================================================
+   12. Layout Helper Utilities & Responsive Structures
+   ========================================================================== */
+
+/* Welcome block responsive grid on homepage */
+.welcome-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+@media (max-width: 992px) {
+    .welcome-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    .welcome-grid div[style*="rotate"] {
+        transform: none !important;
+        margin: 20px auto 0;
+        max-width: 500px;
+    }
+}
+
+/* Contact Page Sidebar lists */
+.contact-sidebar-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.9rem;
+}
+
+.contact-sidebar-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed var(--color-border);
+    padding-bottom: 8px;
+    gap: 12px;
+}
+
+.contact-sidebar-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .contact-sidebar-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}
+
+/* ==========================================================================
+   X. Kalender (publieke agenda)
+   ========================================================================== */
+
+/* Action bar */
+.cal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.cal-actions-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.cal-actions-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cal-actions-hint {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 36px;
+}
+
+.cal-actions-hint i { color: var(--color-accent); }
+
+.cal-empty {
+    background-color: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: 50px 30px;
+    text-align: center;
+    color: var(--color-text-muted);
+}
+
+/* Two-column layout */
+.cal-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+}
+
+/* ---- Month grid (left) ---- */
+.cal-calendar {
+    background-color: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-border);
+    padding: 24px;
+    position: sticky;
+    top: 90px;
+}
+
+.cal-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.cal-cal-title {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+}
+
+.cal-cal-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cal-today-btn {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-linen);
+    color: var(--color-primary-dark);
+    font-family: 'Nunito', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s, transform 0.15s;
+}
+
+.cal-today-btn:hover:not(:disabled) {
+    background-color: var(--color-primary-dark);
+    color: var(--color-bg-white);
+    transform: translateY(-1px);
+}
+
+.cal-today-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.cal-nav-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-linen);
+    color: var(--color-primary-dark);
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s, color 0.15s, transform 0.15s;
+}
+
+.cal-nav-btn:hover {
+    background-color: var(--color-primary-dark);
+    color: var(--color-bg-white);
+    transform: translateY(-1px);
+}
+
+.cal-weekdays,
+.cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+}
+
+.cal-weekdays {
+    margin-bottom: 8px;
+}
+
+.cal-weekdays span {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding: 4px 0;
+}
+
+.cal-day {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-text-dark);
+}
+
+.cal-day.empty {
+    background: transparent;
+    pointer-events: none;
+}
+
+.cal-day.today {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+    font-weight: 700;
+}
+
+.cal-day.has-event {
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s, background-color 0.15s;
+}
+
+.cal-day.has-event:hover {
+    background-color: var(--color-primary-dark);
+    transform: translateY(-2px);
+}
+
+.cal-day.has-event.today {
+    outline-color: var(--color-accent);
+}
+
+.cal-day.selected {
+    box-shadow: 0 0 0 3px var(--color-accent);
+    transform: translateY(-2px);
+}
+
+.cal-day-dot {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--color-accent-light);
+}
+
+.cal-legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--color-border);
+}
+
+.cal-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.cal-legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 5px;
+}
+
+.cal-legend-today {
+    background-color: var(--color-bg-linen);
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+}
+
+.cal-legend-event {
+    background-color: var(--color-primary);
+}
+
+/* ---- Upcoming list (right) ---- */
+.cal-upcoming-title {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    margin-bottom: 20px;
+}
+
+.cal-upcoming-empty {
+    color: var(--color-text-muted);
+}
+
+.cal-event {
+    display: flex;
+    gap: 18px;
+    background-color: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 20px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.cal-event:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-md);
+}
+
+.cal-event.highlight {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 25%, transparent), var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.cal-event-date {
+    flex-shrink: 0;
+    width: 64px;
+    height: 70px;
+    background-color: var(--color-primary);
+    color: var(--color-bg-white);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.cal-event-day {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.cal-event-month {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.cal-event-body {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.cal-countdown {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-accent);
+    background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+    padding: 2px 10px;
+    border-radius: 30px;
+    margin-bottom: 8px;
+}
+
+.cal-event-title {
+    font-size: 1.2rem;
+    color: var(--color-primary-dark);
+    margin-bottom: 8px;
+}
+
+.cal-event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+}
+
+.cal-event-meta i { color: var(--color-secondary); margin-right: 2px; }
+
+.cal-event-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-dark);
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.cal-event-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.cal-add-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.cal-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    background-color: var(--color-bg-linen);
+    border: 1px solid var(--color-border);
+    border-radius: 30px;
+    padding: 5px 12px;
+    text-decoration: none;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.cal-add-btn:hover {
+    background-color: var(--color-primary-dark);
+    color: var(--color-bg-white);
+    border-color: var(--color-primary-dark);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .cal-layout {
+        grid-template-columns: 1fr;
+    }
+    .cal-calendar {
+        position: static;
+    }
+    .cal-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .cal-actions-group {
+        flex-direction: column;
+    }
+    .cal-actions-btn {
+        justify-content: center;
+    }
+}
+
+/* ==========================================================================
+   Y. Compacte lichte paginakop — algemene (niet tak-specifieke) header
+   (raakt: kalender, contact, registration-success, admin)
+   ========================================================================== */
+.tak-hero.algemeen {
+    background: var(--color-bg-white);
+    color: var(--color-text-dark);
+    padding: 20px 0 0;
+    border-bottom: none;
+}
+
+/* Eyebrow-label: koper tekst zonder donkere pil */
+.tak-hero.algemeen .hero-eyebrow {
+    background-color: transparent;
+    backdrop-filter: none;
+    padding: 0;
+    color: var(--color-accent);
+    letter-spacing: 2px;
+}
+
+/* Titel in merk-bordeaux i.p.v. wit */
+.tak-hero.algemeen .tak-hero-title {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 900;
+    color: var(--color-primary);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin: 0;
+}
+
+/* Subtitel-paragraaf (inline wit) overschrijven naar gedempt grijs */
+.tak-hero.algemeen .container > p {
+    color: var(--color-text-muted) !important;
+}
+
+/* ==========================================================================
+   Z0. Lightbox
+   ========================================================================== */
+
+.lightbox-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-overlay.active {
+    display: flex;
+}
+
+.lightbox-img {
+    max-width: 90vw;
+    max-height: 88vh;
+    border-radius: 8px;
+    object-fit: contain;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    user-select: none;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2.2rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.15s;
+}
+.lightbox-close:hover { opacity: 1; }
+
+.lightbox-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+.lightbox-arrow:hover { background: rgba(255,255,255,0.25); }
+.lightbox-arrow.prev { left: 20px; }
+.lightbox-arrow.next { right: 20px; }
+
+.lightbox-counter {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    font-family: 'Nunito', sans-serif;
+}
+
+/* ==========================================================================
+   Z0. Gedeelde paginakop (takken / echo / kalender)
+   ========================================================================== */
+
+
+.page-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 44px 40px 36px;
+    gap: 10px;
+}
+
+.page-header-title {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    color: var(--color-primary);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1;
+}
+
+/* ==========================================================================
+   UITBREIDINGSPAKKET — Visueel & Animaties / UX / Inhoud
+   ========================================================================== */
+
+/* ── Scroll Reveal — bredere klassenset ───────────────── */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.65s cubic-bezier(0.4,0,0.2,1), transform 0.65s cubic-bezier(0.4,0,0.2,1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition: opacity 0.65s cubic-bezier(0.4,0,0.2,1), transform 0.65s cubic-bezier(0.4,0,0.2,1);
+}
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+.reveal-right {
+    opacity: 0;
+    transform: translateX(32px);
+    transition: opacity 0.65s cubic-bezier(0.4,0,0.2,1), transform 0.65s cubic-bezier(0.4,0,0.2,1);
+}
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+/* ── Laadscherm ───────────────────────────────────────── */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--color-primary-dark);
+    z-index: 9997;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+#loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+#loading-screen img {
+    width: 110px;
+    height: auto;
+    animation: ls-pulse 1.4s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px color-mix(in srgb, var(--color-accent) 40%, transparent));
+}
+.loading-bar-wrap {
+    width: 160px;
+    height: 3px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 3px;
+    overflow: hidden;
+}
+.loading-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light));
+    border-radius: 3px;
+    animation: ls-fill 1.1s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes ls-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50% { transform: scale(1.07); opacity: 1; }
+}
+@keyframes ls-fill {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+/* ── GDPR Cookiebanner ────────────────────────────────── */
+#cookie-banner {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    width: calc(100% - 48px);
+    max-width: 660px;
+    background: var(--color-primary-dark);
+    border: 2px solid var(--color-accent);
+    border-radius: var(--border-radius-lg);
+    padding: 20px 24px;
+    z-index: 9000;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+}
+#cookie-banner.cookie-hidden {
+    transform: translateX(-50%) translateY(140%);
+    opacity: 0;
+    pointer-events: none;
+}
+.cookie-icon { font-size: 1.5rem; flex-shrink: 0; line-height: 1.2; }
+.cookie-text { flex: 1; }
+.cookie-text p {
+    color: rgba(255,255,255,0.82);
+    font-size: 0.87rem;
+    line-height: 1.55;
+    margin: 0 0 12px;
+}
+.cookie-text p strong { color: var(--color-accent-light); }
+.cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.cookie-btn-accept {
+    padding: 8px 20px;
+    background: var(--color-accent);
+    color: var(--color-primary-dark);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.cookie-btn-accept:hover { background: var(--color-accent-hover); }
+.cookie-btn-decline {
+    padding: 8px 16px;
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: var(--border-radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+}
+.cookie-btn-decline:hover { color: #fff; border-color: rgba(255,255,255,0.38); }
+@media (max-width: 520px) {
+    #cookie-banner { flex-direction: column; gap: 10px; }
+}
+
+/* ── 404 pagina ───────────────────────────────────────── */
+.error-404 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px 80px;
+    min-height: 65vh;
+}
+.error-404-number {
+    font-family: 'Nunito', sans-serif;
+    font-size: clamp(5rem, 18vw, 9rem);
+    font-weight: 900;
+    color: var(--color-primary-dark);
+    line-height: 1;
+    opacity: 0.12;
+    margin-bottom: -20px;
+    user-select: none;
+}
+.error-404-emoji { font-size: 3.5rem; line-height: 1; margin-bottom: 12px; }
+.error-404-title { font-size: 1.7rem; margin-bottom: 10px; color: var(--color-primary); }
+.error-404-text {
+    max-width: 400px;
+    color: var(--color-text-muted);
+    margin-bottom: 28px;
+    line-height: 1.65;
+    font-size: 0.95rem;
+}
+
+/* ── Paklijst pagina ──────────────────────────────────── */
+.paklijst-section {
+    background: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    padding: 24px 28px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+    margin-bottom: 20px;
+}
+.paklijst-section-title {
+    font-size: 1.05rem;
+    color: var(--color-primary);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+}
+.paklijst-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 6px;
+    transition: background 0.1s;
+}
+.paklijst-item:last-child { border-bottom: none; }
+.paklijst-item:hover { background: var(--color-bg-linen); }
+.paklijst-item input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.paklijst-item label {
+    cursor: pointer;
+    font-size: 0.93rem;
+    flex: 1;
+    user-select: none;
+    transition: color 0.15s;
+}
+.paklijst-item.checked label {
+    text-decoration: line-through;
+    color: var(--color-text-muted);
+}
+
+/* ── Verslagen / Notulen pagina ───────────────────────── */
+.verslag-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: var(--color-bg-white);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s, transform 0.2s;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 10px;
+}
+.verslag-item:hover { box-shadow: var(--shadow-md); transform: translateX(4px); }
+.verslag-icon {
+    width: 44px;
+    height: 44px;
+    background: #d32f2f;
+    color: white;
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.verslag-info { flex: 1; min-width: 0; }
+.verslag-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 3px; }
+.verslag-meta { font-size: 0.79rem; color: var(--color-text-muted); }
+.verslag-download {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--color-accent);
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Archief pagina ───────────────────────────────────── */
+.archief-year { margin-bottom: 44px; }
+.archief-year-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--color-primary);
+    border-left: 4px solid var(--color-accent);
+    padding-left: 14px;
+    margin-bottom: 18px;
+}
+.archief-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 14px;
+}
+.archief-card {
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s, transform 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.archief-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.archief-card-type {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 800;
+    color: var(--color-accent);
+    margin-bottom: 5px;
+}
+.archief-card-title { font-size: 0.95rem; margin-bottom: 4px; font-weight: 600; }
+.archief-card-date { font-size: 0.8rem; color: var(--color-text-muted); }
+
+/* ==========================================================================
+   Z. Verhuur — foto-hero, fotogalerij & locatiekaart
+   ========================================================================== */
+.verhuur-hero {
+    height: 480px;
+    background-size: cover;
+    background-position: center 42%;
+    border-bottom: 4px solid var(--color-accent);
+    display: flex;
+    align-items: center;
+}
+
+.verhuur-hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.verhuur-hero-title {
+    margin: 0;
+    color: #fff;
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+.verhuur-hero-btn {
+    padding: 12px 26px;
+}
+
+@media (max-width: 600px) {
+    .verhuur-hero-title { font-size: 2.2rem; }
+}
+
+.verhuur-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.verhuur-photo {
+    display: block;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-linen);
+}
+
+.verhuur-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.verhuur-photo:hover img {
+    transform: scale(1.06);
+}
+
+/* Galerij responsive: 3 → 2 → 1 kolommen */
+@media (max-width: 800px) {
+    .verhuur-gallery { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+    .verhuur-gallery { grid-template-columns: 1fr; }
+}
+
+/* ---- Wervende content ---- */
+.vh-intro {
+    max-width: 760px;
+    margin: 0 auto 56px;
+    text-align: center;
+}
+
+.vh-eyebrow {
+    display: inline-block;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+    margin-bottom: 12px;
+}
+
+.vh-intro-title {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    line-height: 1.12;
+    color: var(--color-primary-dark);
+    margin-bottom: 16px;
+}
+
+.vh-lead {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--color-text-dark);
+}
+
+.vh-block { margin-bottom: 64px; }
+
+.vh-block-title {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.vh-feature {
+    background-color: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 32px 28px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.vh-feature:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.vh-feature-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--color-accent);
+    background-color: color-mix(in srgb, var(--color-accent) 12%, transparent);
+    margin-bottom: 20px;
+}
+
+.vh-feature h3 {
+    font-size: 1.3rem;
+    color: var(--color-primary-dark);
+    margin-bottom: 10px;
+}
+
+.vh-feature p {
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+}
+
+/* Specs — 2×2 kaartjes (hergebruikt .vh-feature voor de kaart) */
+.vh-specs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Galerij placeholders (getoond zolang er nog geen foto's zijn) */
+.verhuur-photo-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--color-text-muted);
+}
+
+.verhuur-photo-placeholder i { font-size: 2rem; color: var(--color-accent); }
+
+.verhuur-photo-placeholder span {
+    font-family: 'Nunito', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 860px) {
+    .vh-specs { grid-template-columns: 1fr; }
+    .vh-intro-title { font-size: 2rem; }
+}
+
+/* ==========================================================================
+   Ouderportaal — kind-selector & panelen (huisstijl)
+   ========================================================================== */
+
+/* Webshop-link bovenaan — opvallend in koper */
+.portaal-shop-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 22px;
+    border-radius: var(--border-radius-md);
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+.portaal-shop-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px color-mix(in srgb, var(--color-accent) 35%, transparent); color: #fff; }
+
+/* Kind-chips */
+.kind-chips {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+.kind-chip {
+    --kleur: var(--color-accent);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--color-bg-white);
+    border: 2px solid var(--color-border);
+    border-radius: 50px;
+    padding: 8px 20px 8px 8px;
+    cursor: pointer;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s, border-color 0.18s;
+    box-shadow: var(--shadow-sm);
+    font-family: inherit;
+}
+.kind-chip:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.kind-chip.active {
+    border-color: var(--kleur);
+    box-shadow: 0 6px 18px color-mix(in srgb, var(--kleur) 35%, transparent);
+}
+.kind-chip-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--kleur);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+    font-family: 'Outfit', sans-serif;
+}
+.kind-chip-info { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
+.kind-chip-naam { font-weight: 700; color: var(--color-primary-dark); font-size: 0.98rem; }
+.kind-chip-tak { font-size: 0.76rem; color: var(--color-text-muted); text-transform: capitalize; }
+
+/* ── Ouderportaal: startmenu (hero + boxes) ──────────── */
+.portaal-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--border-radius-lg);
+    padding: 40px 42px;
+    margin-bottom: 34px;
+    background: linear-gradient(120deg, #1A3D2A 0%, #2A5C3F 55%, #3F7D5A 105%);
+    box-shadow: 0 18px 40px color-mix(in srgb, #1A3D2A 32%, transparent);
+    color: #fff;
+}
+.portaal-hero::after {
+    content: '';
+    position: absolute;
+    right: -70px; top: -70px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 55%, transparent), transparent 70%);
+    pointer-events: none;
+}
+.portaal-hero-deco {
+    position: absolute; right: 30px; bottom: -22px;
+    font-size: 8rem; line-height: 1; opacity: 0.15; pointer-events: none; z-index: 0;
+}
+.portaal-hero-content { position: relative; z-index: 1; }
+.portaal-hero-kicker {
+    display: inline-block;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.72rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--color-accent-light);
+    margin-bottom: 10px;
+}
+.portaal-hero h1 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 2rem; margin: 0 0 6px; line-height: 1.1; }
+.portaal-hero-content p { color: rgba(255,255,255,0.84); font-size: 1rem; margin: 0 0 22px; max-width: 540px; }
+.portaal-hero-stats { display: flex; flex-wrap: wrap; gap: 10px; }
+.portaal-hero-stats span {
+    display: inline-flex; align-items: baseline; gap: 6px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 7px 15px; border-radius: 50px;
+    font-size: 0.82rem; color: rgba(255,255,255,0.9);
+}
+.portaal-hero-stats strong { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.02rem; color: #fff; }
+
+.portaal-menu-label {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.05rem;
+    color: var(--color-primary-dark); margin: 0 0 18px;
+}
+.portaal-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+    gap: 20px;
+}
+.portaal-menu-card {
+    --kleur: var(--color-accent);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 24px 20px;
+    background: var(--color-bg-white);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.22s, border-color 0.22s;
+    overflow: hidden;
+}
+.portaal-menu-card::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 0; height: 4px;
+    background: var(--kleur);
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.25s;
+}
+.portaal-menu-card:hover {
+    transform: translateY(-5px);
+    border-color: color-mix(in srgb, var(--kleur) 50%, var(--color-border));
+    box-shadow: 0 16px 34px color-mix(in srgb, var(--kleur) 26%, transparent);
+}
+.portaal-menu-card:hover::before { transform: scaleX(1); }
+.portaal-menu-icon {
+    width: 56px; height: 56px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem;
+    background: color-mix(in srgb, var(--kleur) 16%, #fff);
+    box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--kleur) 32%, transparent);
+    transition: transform 0.22s;
+}
+.portaal-menu-card:hover .portaal-menu-icon { transform: scale(1.06) rotate(-4deg); }
+.portaal-menu-body { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.portaal-menu-titel { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--color-primary-dark); }
+.portaal-menu-desc { font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.5; }
+.portaal-menu-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
+.portaal-menu-stat {
+    padding: 5px 13px;
+    background: color-mix(in srgb, var(--kleur) 15%, transparent);
+    color: color-mix(in srgb, var(--kleur) 52%, var(--color-primary-dark));
+    border-radius: 50px;
+    font-size: 0.76rem;
+    font-weight: 800;
+}
+.portaal-menu-arrow {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--kleur) 14%, transparent);
+    color: var(--kleur); font-size: 0.85rem; flex-shrink: 0;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.portaal-menu-card:hover .portaal-menu-arrow { background: var(--kleur); color: #fff; transform: translateX(3px); }
+
+@media (max-width: 560px) {
+    .portaal-hero { padding: 28px 24px; }
+    .portaal-hero h1 { font-size: 1.6rem; }
+    .portaal-hero-deco { font-size: 6rem; right: 10px; }
+    .portaal-menu { grid-template-columns: 1fr; }
+}
+
+/* Sectie-pagina (na keuze in het startmenu) */
+.portaal-sectie-head {
+    --kleur: var(--color-accent);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--color-border);
+}
+.portaal-back {
+    width: 42px; height: 42px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--kleur) 16%, #fff);
+    color: color-mix(in srgb, var(--kleur) 58%, var(--color-primary-dark));
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.18s, color 0.18s, transform 0.18s;
+}
+.portaal-back:hover { background: var(--kleur); color: #fff; transform: translateX(-3px); }
+.portaal-sectie-titel { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.6rem; color: var(--color-primary-dark); margin: 0; }
+.portaal-sectie-wrap { max-width: 560px; }
+
+/* Panelen */
+.kind-panel { display: none; animation: kindfade 0.35s ease; }
+.kind-panel.active { display: block; }
+@keyframes kindfade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Subkop met accentlijn in de tak-kleur */
+.portaal-subhead {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0 16px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--color-primary-dark);
+}
+.portaal-subhead::before {
+    content: '';
+    width: 28px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--kleur, var(--color-accent));
+    flex-shrink: 0;
+}
+
+/* Kampkaart in het portaal */
+.portaal-kamp {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    background: var(--color-bg-white);
+    box-shadow: var(--shadow-sm);
+    border-left: 6px solid var(--kleur, var(--color-accent));
+}
+.portaal-kamp.is-in { background: color-mix(in srgb, var(--color-success) 5%, transparent); }
+.portaal-kamp-naam { font-weight: 700; font-size: 1.05rem; color: var(--color-primary-dark); }
+.portaal-kamp-meta { font-size: 0.82rem; color: var(--color-text-muted); margin-top: 2px; }
+.portaal-kamp-desc { font-size: 0.88rem; color: var(--color-text-dark); margin-top: 8px; }
+
+.portaal-empty {
+    text-align: center;
+    padding: 26px 20px;
+    color: var(--color-text-muted);
+    background: var(--color-bg-white);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--border-radius-md);
+    font-size: 0.9rem;
+}
+
+/* Echo-downloadknop in het portaal (hergebruik look van echo-pagina) */
+.portaal-echo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.portaal-echo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--border-radius-md);
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    color: var(--color-primary-dark);
+}
+.portaal-echo-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--kleur, var(--color-accent)); }
+.portaal-echo-btn .fa-file-pdf { color: #d32f2f; margin-right: 8px; }
+.portaal-echo-maand { font-weight: 700; font-size: 0.9rem; text-transform: capitalize; }
+.portaal-echo-open { font-size: 0.78rem; color: var(--color-accent); font-weight: 700; white-space: nowrap; }
+
+@media (max-width: 560px) {
+    .kind-chips { gap: 10px; }
+    .kind-chip { padding: 6px 16px 6px 6px; }
+}
+
+/* ==========================================================================
+   Ouderportaal — eigen nav & kleurthema (koper-gedomineerd, zelfde palet)
+   ========================================================================== */
+
+/* Warm, licht koper-getint canvas i.p.v. het neutrale linnen van de site */
+/* ── Bosgroen portaalthema — gedeeld door login · admin · ouderportaal · leiding
+   Alleen actief als body.portal-theme aanwezig is; hoofdsite blijft bordeaux. */
+body.portal-theme {
+    padding-top: 64px; /* portaal-nav hoogte */
+    --color-primary: #1A3D2A;
+    --color-primary-light: #2A5C3F;
+    --color-primary-dark: #1A3D2A;
+    --color-primary-hover: #2A5C3F;
+    --color-accent: #C9963A;
+    --color-accent-hover: #B8862F;
+    --color-accent-light: #E2C58D;
+    --color-bg-linen: #D6E8DC;
+    --color-text-muted: #6A8A75;
+    --color-border: #C2D9C9;
+    --color-success: #3F7D5A;
+    --color-warning: #BE8A2E;
+    --color-error: #B23A4D;
+    background-color: #EEF5F1;
+}
+
+/* Ouderportaal-specifieke extra vars bovenop portal-theme */
+body.portaal {
+    --color-bg-page: #EEF5F1;
+    --color-sidebar: #1A3D2A;
+    --color-sidebar-hover: #2A5C3F;
+    --color-text-secondary: #2A4A35;
+    background: var(--color-bg-page);
+}
+body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
+
+/* De portaal-nav: bosgroen met gouden accent */
+.portaal-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    background: linear-gradient(100deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    border-bottom: 4px solid var(--color-accent);
+    box-shadow: 0 3px 16px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+.portaal-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    text-decoration: none;
+}
+.portaal-nav-brand img { height: 40px; width: auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); }
+.portaal-nav-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+    font-size: 1.05rem;
+}
+.portaal-nav-brand-text small {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    color: var(--color-accent-light);
+    margin-top: 3px;
+}
+
+.portaal-nav-links { display: flex; align-items: center; gap: 6px; }
+.portaal-nav-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.88);
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.portaal-nav-links a:hover { background: rgba(255,255,255,0.14); color: #fff; transform: translateY(-1px); }
+.portaal-nav-links a.accent {
+    background: var(--color-accent);
+    color: var(--color-primary-dark);
+}
+.portaal-nav-links a.accent:hover { background: var(--color-accent-hover); color: #fff; }
+.portaal-nav-links a.uit { color: rgba(255,255,255,0.65); }
+.portaal-nav-links a.uit:hover { background: rgba(255,255,255,0.10); color: rgba(255,255,255,0.9); }
+
+/* Hamburger (mobiel) */
+.portaal-nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+}
+.portaal-nav-toggle span {
+    width: 24px; height: 3px;
+    background: #fff;
+    border-radius: 2px;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+@media (max-width: 720px) {
+    .portaal-nav-toggle { display: flex; }
+    .portaal-nav-links {
+        position: fixed;
+        top: 64px; left: 0; right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 2px;
+        background: var(--color-primary-light);
+        padding: 10px 14px 16px;
+        border-bottom: 4px solid var(--color-accent);
+        box-shadow: 0 8px 18px color-mix(in srgb, var(--color-primary) 35%, transparent);
+        display: none;
+    }
+    .portaal-nav-links.open { display: flex; }
+    .portaal-nav-links a { padding: 12px 14px; }
+}
+
+/* ==========================================================================
+   Ouderportaal v2 — dashboard-look (hero + lid-kaart)
+   ========================================================================== */
+
+.portaal-wrap { max-width: 860px; margin: 0 auto; }
+
+/* Witte kaart met het geselecteerde lid */
+.portaal-card {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-top: 5px solid var(--kleur, var(--color-accent));
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    padding: 28px 32px 32px;
+}
+.portaal-lid-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 16px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--color-border);
+}
+.portaal-lid-avatar {
+    width: 52px; height: 52px;
+    border-radius: 15px;
+    background: var(--kleur, var(--color-accent));
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.4rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px color-mix(in srgb, var(--kleur, var(--color-accent)) 40%, transparent);
+}
+.portaal-lid-naam { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--color-primary-dark); line-height: 1.1; }
+.portaal-lid-meta { font-size: 0.82rem; color: var(--color-text-muted); margin-top: 4px; text-transform: capitalize; }
+
+/* Items binnen de witte kaart laten opvallen (linnen i.p.v. wit-op-wit) */
+.portaal-card .portaal-kamp { background: var(--color-bg-linen); }
+.portaal-card .portaal-kamp.is-in { background: color-mix(in srgb, var(--color-success) 8%, transparent); }
+.portaal-card .portaal-echo-btn { background: var(--color-bg-linen); }
+.portaal-card .portaal-echo-btn:hover { background: #fff; }
+.portaal-card .portaal-empty { background: var(--color-bg-linen); }
+
+/* Eerste subkop hoeft geen grote bovenmarge in de kaart */
+.portaal-card .portaal-subhead:first-of-type { margin-top: 18px; }
+
+@media (max-width: 560px) {
+    .portaal-card { padding: 18px 18px 22px; }
+}
+
+/* ==========================================================================
+   Ouderportaal v3 — twee kolommen (leden links, webshop-kader rechts)
+   ========================================================================== */
+
+.portaal-wrap { max-width: 1080px; }
+
+.portaal-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 24px;
+    align-items: start;
+}
+.portaal-main { min-width: 0; }
+
+/* Rechterkolom: webshop-kader (sticky meescrollen) */
+.portaal-side { position: sticky; top: 84px; }
+.portaal-shop-card {
+    background: #fff;
+    border: 1px solid var(--color-border);
+    border-top: 5px solid var(--color-accent);
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    padding: 22px 22px 24px;
+}
+.portaal-shop-head {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--color-primary-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.portaal-shop-card > p {
+    font-size: 0.86rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+.portaal-shop-card .portaal-shop-btn { width: 100%; justify-content: center; }
+.portaal-shop-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 20px 0 16px;
+}
+.portaal-shop-subtitle {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-primary-dark);
+    margin-bottom: 12px;
+}
+.portaal-order {
+    background: var(--color-bg-linen);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+}
+.portaal-order-naam { font-weight: 700; font-size: 0.86rem; line-height: 1.3; }
+.portaal-order-meta { font-size: 0.74rem; color: var(--color-text-muted); margin-top: 3px; }
+.portaal-order-status {
+    display: inline-block;
+    font-size: 0.7rem; font-weight: 700; color: #fff;
+    padding: 3px 9px; border-radius: 20px; margin-top: 8px;
+}
+
+@media (max-width: 880px) {
+    .portaal-grid { grid-template-columns: 1fr; }
+    .portaal-side { position: static; }
+}
+
+/* ==========================================================================
+   Ouderportaal v4 — volle breedte (geen zijmarges) + chips links
+   ========================================================================== */
+
+.portaal-wrap {
+    max-width: none;        /* gebruik de volle paginabreedte */
+    margin: 0;
+    padding: 0 36px;
+}
+.kind-chips { justify-content: flex-start; }  /* leden links uitlijnen */
+
+@media (max-width: 560px) {
+    .portaal-wrap { padding: 0 16px; }
+}
+
+/* ==========================================================================
+   Ouderportaal v5 — leden als aparte LINKERKOLOM (3 kolommen)
+   ========================================================================== */
+
+.portaal-grid {
+    grid-template-columns: 210px minmax(0, 1fr) 320px;
+}
+
+/* Kolom 1: leden-selector, verticaal links */
+.portaal-leden { position: sticky; top: 84px; }
+.portaal-leden-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+    padding-left: 4px;
+}
+.portaal-leden .kind-chips {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+}
+.portaal-leden .kind-chip {
+    width: 100%;
+    border-radius: 14px;
+    padding: 9px 14px 9px 9px;
+}
+
+/* Onder 980px: alles onder elkaar, chips terug horizontaal */
+@media (max-width: 980px) {
+    .portaal-grid { grid-template-columns: 1fr; }
+    .portaal-leden { position: static; }
+    .portaal-leden-title { display: none; }
+    .portaal-leden .kind-chips { flex-direction: row; flex-wrap: wrap; }
+    .portaal-leden .kind-chip { width: auto; }
+}
