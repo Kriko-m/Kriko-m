@@ -72,6 +72,7 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
               <li><Link href="/echos" className={isActive('/echos') ? 'nav-active' : ''}>KRIKO ECHO</Link></li>
               <li><Link href="/kalender" className={isActive('/kalender') ? 'nav-active' : ''}>KALENDER</Link></li>
               <li><Link href="/verhuur" className={isActive('/verhuur') ? 'nav-active' : ''}>VERHUUR</Link></li>
+              <li><Link href="/shop" className={isActive('/shop') ? 'nav-active' : ''}>SHOP</Link></li>
             </ul>
             <Link href="/portaal" className="nav-cta-secondary">LOGIN</Link>
             <Link href="/inschrijven" className="nav-cta">INSCHRIJVEN</Link>

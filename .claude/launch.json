@@ -6,6 +6,12 @@
       "runtimeExecutable": "php",
       "runtimeArgs": ["-S", "localhost:8080", "-t", "kriko-m"],
       "port": 8080
+    },
+    {
+      "name": "kriko-next",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "website"],
+      "port": 3000
     }
   ]
 }

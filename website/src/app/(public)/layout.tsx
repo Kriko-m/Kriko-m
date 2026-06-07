@@ -1,12 +1,13 @@
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import CartProvider from '@/components/shop/CartProvider'
 import { getSettings } from '@/lib/db'
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSettings()
 
   return (
-    <>
+    <CartProvider>
       <Header
         alertActive={settings?.alert_active ?? false}
         alertMessage={settings?.alert_message ?? ''}
@@ -21,7 +22,7 @@ export default async function PublicLayout({ children }: { children: React.React
         <i className="fa-solid fa-angles-up"></i>
       </button>
       <ScrollScript />
-    </>
+    </CartProvider>
   )
 }
 
@@ -29,15 +30,6 @@ function ScrollScript() {
   return (
     <script dangerouslySetInnerHTML={{ __html: `
       (function() {
-        // Laadscherm
-        var ls = document.getElementById('loading-screen');
-        if (ls) {
-          if (sessionStorage.getItem('kriko_seen')) {
-            ls.style.display = 'none';
-          } else {
-            sessionStorage.setItem('kriko_seen', '1');
-          }
-        }
         // Scroll-naar-boven knop
         var scrollBtn = document.getElementById('scroll-top-btn');
         if (scrollBtn) {
