@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Scouts Kriko-M Web Platform - Stylesheet
  * Custom Vanilla CSS Design System with Scouts Aesthetics
  */
@@ -9,16 +9,16 @@
    ========================================================================== */
 
 :root {
-    /* ── Kleurenpallet Kriko-M v3 ───────────────────────────────────────────── */
+    /* â”€â”€ Kleurenpallet Kriko-M v3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-    /* Bordeaux — navigatiebalk · knoppen · accenten */
+    /* Bordeaux â€” navigatiebalk Â· knoppen Â· accenten */
     --color-primary: #650B19;
     --color-primary-light: #650B19;
-    /* Bordeaux donker — footer · hover nav · paginatitels · sectiekoppen */
+    /* Bordeaux donker â€” footer Â· hover nav Â· paginatitels Â· sectiekoppen */
     --color-primary-dark: #3a0710;
     --color-primary-hover: #650B19;
 
-    /* Goud — inschrijven-knop · subtitels · decoratieve lijn */
+    /* Goud â€” inschrijven-knop Â· subtitels Â· decoratieve lijn */
     --color-accent: #C9963A;
     --color-accent-hover: #B8862F;
     --color-accent-light: #E2C58D;
@@ -27,11 +27,11 @@
     --color-secondary: var(--color-accent);
     --color-secondary-hover: var(--color-accent-hover);
 
-    /* Crème — pagina-achtergrond · sectie-achtergrond */
+    /* CrÃ¨me â€” pagina-achtergrond Â· sectie-achtergrond */
     --color-bg-linen: #F0ECE4;
-    /* Wit — kaartachtergrond · modals · formulieren */
+    /* Wit â€” kaartachtergrond Â· modals Â· formulieren */
     --color-bg-white: #FFFFFF;
-    /* Tekst — bodytekst · labels · navigatie-items */
+    /* Tekst â€” bodytekst Â· labels Â· navigatie-items */
     --color-text-dark: #1A1A1A;
     --color-text-muted: hsl(345, 10%, 45%);
     --color-border: hsl(345, 15%, 85%);
@@ -42,10 +42,10 @@
     --color-error: hsl(4, 75%, 48%);
 
     /* Takken kleuren */
-    --color-kapoenen: #CABD30;   /* geel-groen · 6–8 jaar */
-    --color-welpen: #2E8B3A;     /* donkergroen · 8–11 jaar */
-    --color-jonggivers: #E07B1A; /* oranje · 11–14 jaar */
-    --color-givers: #1A3FB5;     /* kobaltblauw · 14–17 jaar */
+    --color-kapoenen: #CABD30;   /* geel-groen Â· 6â€“8 jaar */
+    --color-welpen: #2E8B3A;     /* donkergroen Â· 8â€“11 jaar */
+    --color-jonggivers: #E07B1A; /* oranje Â· 11â€“14 jaar */
+    --color-givers: #1A3FB5;     /* kobaltblauw Â· 14â€“17 jaar */
 
     /* Layout Tokens */
     --border-radius-sm: 8px;
@@ -641,7 +641,7 @@ a {
 }
 
 /* ==========================================================================
-   4. Takken — Vic-stijl portretkaarten (homepage & overzicht)
+   4. Takken â€” Vic-stijl portretkaarten (homepage & overzicht)
    ========================================================================== */
 
 .vic-takken-section {
@@ -726,7 +726,7 @@ a {
     text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
-/* ── "Bestel onze groepsdas"-link op de tak-detailpagina ── */
+/* â”€â”€ "Bestel onze groepsdas"-link op de tak-detailpagina â”€â”€ */
 .tak-card-link {
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
@@ -839,7 +839,7 @@ a {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background-image: linear-gradient(color-mix(in srgb, var(--color-primary) 90%, transparent), color-mix(in srgb, var(--color-primary) 90%, transparent)), url('../images/banner-bg.jpg');
+    background-image: linear-gradient(color-mix(in srgb, var(--color-primary) 90%, transparent), color-mix(in srgb, var(--color-primary) 90%, transparent)), url('/images/banner-bg.jpg');
     background-size: cover;
     background-position: center;
     justify-content: center;
@@ -865,7 +865,7 @@ a {
     position: relative;
 }
 
-/* Hero "eyebrow" label — accentlabel boven hero-titels */
+/* Hero "eyebrow" label â€” accentlabel boven hero-titels */
 .hero-eyebrow {
     display: inline-block;
     color: var(--tak-color, var(--color-accent-light));
@@ -885,7 +885,7 @@ a {
 .tak-hero.jonggivers { --tak-color: var(--color-jonggivers); }
 .tak-hero.givers     { --tak-color: var(--color-givers); }
 .tak-hero.algemeen   { --tak-color: var(--color-accent-light); } /* algemene paginakop (niet tak-specifiek) */
-.tak-hero.primair    { --tak-color: var(--color-accent-light); } /* bordeaux paginakop — niet tak-specifiek */
+.tak-hero.primair    { --tak-color: var(--color-accent-light); } /* bordeaux paginakop â€” niet tak-specifiek */
 
 .tak-hero.primair {
     /* Thema-bewust: bordeaux op de publieke site, groen in de portaal-/webshopzone */
@@ -898,7 +898,7 @@ body.portal-theme .tak-hero.primair {
     background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
 }
 .tak-hero.primair::after {
-    content: '⚜';  /* fallback */
+    content: 'âšœ';  /* fallback */
     position: absolute;
     right: 5%;
     top: 50%;
@@ -912,21 +912,21 @@ body.portal-theme .tak-hero.primair {
 .tak-hero.primair .container {
     padding-left: 8px;
 }
-.tak-hero.hero-takken::after    { content: '⚜'; }
-.tak-hero.hero-kalender::after  { content: '📅'; }
-.tak-hero.hero-echos::after     { content: '📰'; }
-.tak-hero.hero-archief::after   { content: '🗂️'; }
-.tak-hero.hero-verslagen::after { content: '📋'; }
-.tak-hero.hero-webshop::after   { content: '🛍️'; }
-.tak-hero.hero-inschrijven::after { content: '✏️'; }
-.tak-hero.hero-contact::after   { content: '✉️'; }
-.tak-hero.hero-checkout::after  { content: '🛒'; }
-.tak-hero.hero-bestelling::after { content: '✅'; }
+.tak-hero.hero-takken::after    { content: 'âšœ'; }
+.tak-hero.hero-kalender::after  { content: 'ðŸ“…'; }
+.tak-hero.hero-echos::after     { content: 'ðŸ“°'; }
+.tak-hero.hero-archief::after   { content: 'ðŸ—‚ï¸'; }
+.tak-hero.hero-verslagen::after { content: 'ðŸ“‹'; }
+.tak-hero.hero-webshop::after   { content: 'ðŸ›ï¸'; }
+.tak-hero.hero-inschrijven::after { content: 'âœï¸'; }
+.tak-hero.hero-contact::after   { content: 'âœ‰ï¸'; }
+.tak-hero.hero-checkout::after  { content: 'ðŸ›’'; }
+.tak-hero.hero-bestelling::after { content: 'âœ…'; }
 
-.tak-hero.kapoenen   { background: linear-gradient(color-mix(in srgb, var(--color-kapoenen) 42%, transparent), color-mix(in srgb, var(--color-kapoenen) 42%, transparent)), url('../images/banner_kapoenen.png') center/cover; }
-.tak-hero.welpen     { background: linear-gradient(color-mix(in srgb, var(--color-welpen) 42%, transparent), color-mix(in srgb, var(--color-welpen) 42%, transparent)), url('../images/banner_welpen.png') center/cover; }
-.tak-hero.jonggivers { background: linear-gradient(color-mix(in srgb, var(--color-jonggivers) 40%, transparent), color-mix(in srgb, var(--color-jonggivers) 40%, transparent)), url('../images/banner_jonggivers.png') center/cover; }
-.tak-hero.givers     { background: linear-gradient(color-mix(in srgb, var(--color-givers) 42%, transparent), color-mix(in srgb, var(--color-givers) 42%, transparent)), url('../images/banner_givers.png') center/cover; }
+.tak-hero.kapoenen   { background: linear-gradient(color-mix(in srgb, var(--color-kapoenen) 42%, transparent), color-mix(in srgb, var(--color-kapoenen) 42%, transparent)), url('/images/banner_kapoenen.png') center/cover; }
+.tak-hero.welpen     { background: linear-gradient(color-mix(in srgb, var(--color-welpen) 42%, transparent), color-mix(in srgb, var(--color-welpen) 42%, transparent)), url('/images/banner_welpen.png') center/cover; }
+.tak-hero.jonggivers { background: linear-gradient(color-mix(in srgb, var(--color-jonggivers) 40%, transparent), color-mix(in srgb, var(--color-jonggivers) 40%, transparent)), url('/images/banner_jonggivers.png') center/cover; }
+.tak-hero.givers     { background: linear-gradient(color-mix(in srgb, var(--color-givers) 42%, transparent), color-mix(in srgb, var(--color-givers) 42%, transparent)), url('/images/banner_givers.png') center/cover; }
 
 .tak-hero-title {
     font-size: 3rem;
@@ -1259,7 +1259,7 @@ body.portal-theme .tak-hero.primair {
     visibility: visible;
 }
 
-/* ── Webshop: producten op volle breedte ──────────────────────────── */
+/* â”€â”€ Webshop: producten op volle breedte â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .shop-products { min-width: 0; }
 .shop-cat { margin-bottom: 56px; }
 .shop-cat:last-child { margin-bottom: 0; }
@@ -1271,8 +1271,8 @@ body.portal-theme .tak-hero.primair {
     color: var(--color-primary-dark);
 }
 
-/* ── Winkelmandje: schuift in/uit langs de rechterrand ────────────────
-   De verticale tab is het handvat én de toggle (geen aparte knop).      */
+/* â”€â”€ Winkelmandje: schuift in/uit langs de rechterrand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   De verticale tab is het handvat Ã©n de toggle (geen aparte knop).      */
 .shop-cart-dock {
     --cart-w: 340px;
     position: fixed;
@@ -1877,7 +1877,7 @@ body.portal-theme .tak-hero.primair {
     height: 100%;
 }
 
-/* Kaart — hoogte vult helft van resterende viewport */
+/* Kaart â€” hoogte vult helft van resterende viewport */
 .echo-card {
     display: flex;
     flex-direction: column;
@@ -1905,10 +1905,10 @@ body.portal-theme .tak-hero.primair {
 }
 
 /* Achtergrondafbeelding + gekleurde rand per tak */
-.echo-card-kapoenen   { background-image: url('../images/tak_kapoenen.jpg');   background-color: #9A9020; border-color: var(--color-kapoenen); }
-.echo-card-welpen     { background-image: url('../images/tak_welpen.jpg');     background-color: #2E8B3A; border-color: var(--color-welpen); }
-.echo-card-jonggivers { background-image: url('../images/tak_jonggivers.jpg'); background-color: #C05A00; border-color: var(--color-jonggivers); }
-.echo-card-givers     { background-image: url('../images/tak_givers.jpg');     background-color: #1A3FB5; border-color: var(--color-givers); }
+.echo-card-kapoenen   { background-image: url('/images/tak_kapoenen.jpg');   background-color: #9A9020; border-color: var(--color-kapoenen); }
+.echo-card-welpen     { background-image: url('/images/tak_welpen.jpg');     background-color: #2E8B3A; border-color: var(--color-welpen); }
+.echo-card-jonggivers { background-image: url('/images/tak_jonggivers.jpg'); background-color: #C05A00; border-color: var(--color-jonggivers); }
+.echo-card-givers     { background-image: url('/images/tak_givers.jpg');     background-color: #1A3FB5; border-color: var(--color-givers); }
 
 .echo-card:hover { transform: translateY(-3px); }
 .echo-card-kapoenen:hover   { box-shadow: 0 6px 24px color-mix(in srgb, var(--color-kapoenen) 45%, transparent); }
@@ -2504,7 +2504,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 /* ==========================================================================
-   Y. Compacte lichte paginakop — algemene (niet tak-specifieke) header
+   Y. Compacte lichte paginakop â€” algemene (niet tak-specifieke) header
    (raakt: kalender, contact, registration-success, admin)
    ========================================================================== */
 .tak-hero.algemeen {
@@ -2639,10 +2639,10 @@ body.portal-theme .tak-hero.primair {
 }
 
 /* ==========================================================================
-   UITBREIDINGSPAKKET — Visueel & Animaties / UX / Inhoud
+   UITBREIDINGSPAKKET â€” Visueel & Animaties / UX / Inhoud
    ========================================================================== */
 
-/* ── Scroll Reveal — bredere klassenset ───────────────── */
+/* â”€â”€ Scroll Reveal â€” bredere klassenset â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .reveal {
     opacity: 0;
     transform: translateY(28px);
@@ -2662,7 +2662,7 @@ body.portal-theme .tak-hero.primair {
 }
 .reveal-right.visible { opacity: 1; transform: translateX(0); }
 
-/* ── Laadscherm ───────────────────────────────────────── */
+/* â”€â”€ Laadscherm â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #loading-screen {
     position: fixed;
     inset: 0;
@@ -2708,7 +2708,7 @@ body.portal-theme .tak-hero.primair {
     to { width: 100%; }
 }
 
-/* ── GDPR Cookiebanner ────────────────────────────────── */
+/* â”€â”€ GDPR Cookiebanner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #cookie-banner {
     position: fixed;
     bottom: 24px;
@@ -2771,7 +2771,7 @@ body.portal-theme .tak-hero.primair {
     #cookie-banner { flex-direction: column; gap: 10px; }
 }
 
-/* ── 404 pagina ───────────────────────────────────────── */
+/* â”€â”€ 404 pagina â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .error-404 {
     display: flex;
     flex-direction: column;
@@ -2801,7 +2801,7 @@ body.portal-theme .tak-hero.primair {
     font-size: 0.95rem;
 }
 
-/* ── Paklijst pagina ──────────────────────────────────── */
+/* â”€â”€ Paklijst pagina â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .paklijst-section {
     background: var(--color-bg-white);
     border-radius: var(--border-radius-lg);
@@ -2850,7 +2850,7 @@ body.portal-theme .tak-hero.primair {
     color: var(--color-text-muted);
 }
 
-/* ── Verslagen / Notulen pagina ───────────────────────── */
+/* â”€â”€ Verslagen / Notulen pagina â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .verslag-item {
     display: flex;
     align-items: center;
@@ -2892,7 +2892,7 @@ body.portal-theme .tak-hero.primair {
     flex-shrink: 0;
 }
 
-/* ── Archief pagina ───────────────────────────────────── */
+/* â”€â”€ Archief pagina â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .archief-year { margin-bottom: 44px; }
 .archief-year-title {
     font-family: 'Nunito', sans-serif;
@@ -2932,7 +2932,7 @@ body.portal-theme .tak-hero.primair {
 .archief-card-date { font-size: 0.8rem; color: var(--color-text-muted); }
 
 /* ==========================================================================
-   Z. Verhuur — foto-hero, fotogalerij & locatiekaart
+   Z. Verhuur â€” foto-hero, fotogalerij & locatiekaart
    ========================================================================== */
 .verhuur-hero {
     height: 480px;
@@ -2997,7 +2997,7 @@ body.portal-theme .tak-hero.primair {
     transform: scale(1.06);
 }
 
-/* Galerij responsive: 3 → 2 → 1 kolommen */
+/* Galerij responsive: 3 â†’ 2 â†’ 1 kolommen */
 @media (max-width: 800px) {
     .verhuur-gallery { grid-template-columns: repeat(2, 1fr); }
 }
@@ -3088,7 +3088,7 @@ body.portal-theme .tak-hero.primair {
     color: var(--color-text-muted);
 }
 
-/* Specs — 2×2 kaartjes (hergebruikt .vh-feature voor de kaart) */
+/* Specs â€” 2Ã—2 kaartjes (hergebruikt .vh-feature voor de kaart) */
 .vh-specs {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -3121,10 +3121,10 @@ body.portal-theme .tak-hero.primair {
 }
 
 /* ==========================================================================
-   Ouderportaal — kind-selector & panelen (huisstijl)
+   Ouderportaal â€” kind-selector & panelen (huisstijl)
    ========================================================================== */
 
-/* Webshop-link bovenaan — opvallend in koper */
+/* Webshop-link bovenaan â€” opvallend in koper */
 .portaal-shop-btn {
     display: inline-flex;
     align-items: center;
@@ -3186,7 +3186,7 @@ body.portal-theme .tak-hero.primair {
 .kind-chip-naam { font-weight: 700; color: var(--color-primary-dark); font-size: 0.98rem; }
 .kind-chip-tak { font-size: 0.76rem; color: var(--color-text-muted); text-transform: capitalize; }
 
-/* ── Ouderportaal: startmenu (hero + boxes) ──────────── */
+/* â”€â”€ Ouderportaal: startmenu (hero + boxes) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .portaal-hero {
     position: relative;
     overflow: hidden;
@@ -3404,11 +3404,11 @@ body.portal-theme .tak-hero.primair {
 }
 
 /* ==========================================================================
-   Ouderportaal — eigen nav & kleurthema (koper-gedomineerd, zelfde palet)
+   Ouderportaal â€” eigen nav & kleurthema (koper-gedomineerd, zelfde palet)
    ========================================================================== */
 
 /* Warm, licht koper-getint canvas i.p.v. het neutrale linnen van de site */
-/* ── Bosgroen portaalthema — gedeeld door login · admin · ouderportaal · leiding
+/* â”€â”€ Bosgroen portaalthema â€” gedeeld door login Â· admin Â· ouderportaal Â· leiding
    Alleen actief als body.portal-theme aanwezig is; hoofdsite blijft bordeaux. */
 body.portal-theme {
     padding-top: 64px; /* portaal-nav hoogte */
@@ -3536,7 +3536,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
 }
 
 /* ==========================================================================
-   Ouderportaal v2 — dashboard-look (hero + lid-kaart)
+   Ouderportaal v2 â€” dashboard-look (hero + lid-kaart)
    ========================================================================== */
 
 .portaal-wrap { max-width: 860px; margin: 0 auto; }
@@ -3586,7 +3586,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
 }
 
 /* ==========================================================================
-   Ouderportaal v3 — twee kolommen (leden links, webshop-kader rechts)
+   Ouderportaal v3 â€” twee kolommen (leden links, webshop-kader rechts)
    ========================================================================== */
 
 .portaal-wrap { max-width: 1080px; }
@@ -3659,7 +3659,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
 }
 
 /* ==========================================================================
-   Ouderportaal v4 — volle breedte (geen zijmarges) + chips links
+   Ouderportaal v4 â€” volle breedte (geen zijmarges) + chips links
    ========================================================================== */
 
 .portaal-wrap {
@@ -3674,7 +3674,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
 }
 
 /* ==========================================================================
-   Ouderportaal v5 — leden als aparte LINKERKOLOM (3 kolommen)
+   Ouderportaal v5 â€” leden als aparte LINKERKOLOM (3 kolommen)
    ========================================================================== */
 
 .portaal-grid {
