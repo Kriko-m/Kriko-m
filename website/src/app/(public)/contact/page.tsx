@@ -1,0 +1,59 @@
+import type { Metadata } from 'next'
+import { getSettings } from '@/lib/db'
+import ContactForm from './ContactForm'
+
+export const metadata: Metadata = { title: 'Contact | Scouts Kriko-M' }
+
+export default async function ContactPage() {
+  const settings = await getSettings()
+
+  return (
+    <>
+      <section className="tak-hero primair hero-contact">
+        <div className="container">
+          <span className="hero-eyebrow">Scouts Kriko-M</span>
+          <h1 className="tak-hero-title">Contact</h1>
+        </div>
+      </section>
+
+      <section className="section container">
+        <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 40 }}>
+
+          <div style={{ background: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', padding: 40, border: '1px solid var(--color-border)' }}>
+            <h2 style={{ marginBottom: 8 }}>Stuur ons een berichtje</h2>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: 28 }}>We antwoorden normaal binnen de 2 werkdagen.</p>
+            <ContactForm />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div className="side-card">
+              <h3>Contactgegevens</h3>
+              <ul className="contact-sidebar-list" style={{ marginTop: 16 }}>
+                <li className="contact-sidebar-item">
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>E-mail</span>
+                  <a href={`mailto:${settings?.contact_email}`} style={{ fontWeight: 600 }}>{settings?.contact_email}</a>
+                </li>
+                <li className="contact-sidebar-item">
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Telefoon</span>
+                  <a href={`tel:${settings?.contact_phone?.replace(/\s+/g,'')}`} style={{ fontWeight: 600 }}>{settings?.contact_phone}</a>
+                </li>
+                <li className="contact-sidebar-item">
+                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Adres</span>
+                  <span style={{ fontWeight: 600, textAlign: 'right' }}>{settings?.contact_address}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="side-card">
+              <h3>Vergaderingen</h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginTop: 8 }}>
+                Elke <strong>zondag van 9:45 tot 12:30</strong> op het VP-plein (Industriepark-Noord 33, Sint-Niklaas).
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </>
+  )
+}
