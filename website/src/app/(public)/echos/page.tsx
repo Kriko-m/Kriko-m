@@ -1,5 +1,6 @@
 import { getEchos, getSettings } from '@/lib/db'
 import type { Metadata } from 'next'
+import { Echo } from '@/lib/types'
 
 export const metadata: Metadata = { title: "Kriko Echo | Scouts Kriko-M" }
 
@@ -23,11 +24,11 @@ export default async function EchosPage() {
   const curM = now.getMonth() + 1, curY = now.getFullYear()
   const nxtM = curM === 12 ? 1 : curM + 1, nxtY = curM === 12 ? curY + 1 : curY
 
-  const isVisible = (e: any) =>
+  const isVisible = (e: Echo) =>
     (e.month === curM && e.year === curY) || (e.month === nxtM && e.year === nxtY)
 
-  const echosByTak: Record<string, any[]> = Object.fromEntries(
-    TAKKEN_KEYS.map(k => [k, allEchos.filter((e: any) => e.tak === k && isVisible(e))])
+  const echosByTak: Record<string, Echo[]> = Object.fromEntries(
+    TAKKEN_KEYS.map(k => [k, (allEchos as Echo[]).filter((e: Echo) => e.tak === k && isVisible(e))])
   )
 
   return (
@@ -54,7 +55,7 @@ export default async function EchosPage() {
                       {pdfs.length === 0 ? (
                         <p className="echo-card-empty">Momenteel geen editie beschikbaar.</p>
                       ) : (
-                        pdfs.map((echo: any) => (
+                        pdfs.map((echo: Echo) => (
                           <a
                             key={echo.id}
                             href={`/api/echos/download/${echo.file_name}`}

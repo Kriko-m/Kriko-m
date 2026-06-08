@@ -40,14 +40,6 @@ function ScrollScript() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           });
         }
-        // Hamburger menu
-        var hamburger = document.getElementById('nav-hamburger');
-        var mainnav = document.getElementById('mainnav');
-        if (hamburger && mainnav) {
-          hamburger.addEventListener('click', function() {
-            mainnav.classList.toggle('nav-open');
-          });
-        }
       })();
     ` }} />
   )

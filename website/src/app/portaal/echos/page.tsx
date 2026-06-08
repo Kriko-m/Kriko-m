@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import PortaalNav from '../_components/PortaalNav'
 import Link from 'next/link'
+import { ParentChild, Echo } from '@/lib/types'
 
 const MAANDEN = ['', 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
 const TAK_KLEUREN: Record<string, string> = {
@@ -22,14 +23,14 @@ export default async function EchosPage() {
     admin.from('echos').select('*').eq('approved', true).order('year', { ascending: false }).order('month', { ascending: false }),
   ])
 
-  const takken = [...new Set((kinderenRes.data ?? []).map((k: any) => k.tak as string))]
-  const echos = echosRes.data ?? []
+  const takken = [...new Set(((kinderenRes.data ?? []) as ParentChild[]).map((k: ParentChild) => k.tak))]
+  const echos = (echosRes.data ?? []) as Echo[]
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 
   return (
     <>
-      <PortaalNav naam={naam} isAdmin={isAdmin} />
+      <PortaalNav naam={naam} isAdmin={isAdmin} role={user.app_metadata?.role} />
       <main style={{ maxWidth: 800, margin: '0 auto', padding: '40px 20px 80px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
           <a href="/portaal/dashboard" style={{ color: '#6A8A75', textDecoration: 'none', fontSize: '.9rem', fontWeight: 600 }}>← Dashboard</a>
@@ -44,7 +45,7 @@ export default async function EchosPage() {
         )}
 
         {takken.map(tak => {
-          const takEchos = echos.filter((e: any) => e.tak === tak)
+          const takEchos = echos.filter((e: Echo) => e.tak === tak)
           const kleur = TAK_KLEUREN[tak] ?? '#888'
           return (
             <div key={tak} style={{ marginBottom: 32 }}>
@@ -55,7 +56,7 @@ export default async function EchosPage() {
                 <p style={{ color: '#6A8A75', fontSize: '.88rem' }}>Nog geen Echo&apos;s beschikbaar voor deze tak.</p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {takEchos.map((echo: any) => {
+                  {takEchos.map((echo: Echo) => {
                     const label = `${MAANDEN[echo.month] ?? ''} ${echo.year}`
                     const url = `${supabaseUrl}/storage/v1/object/public/echos/${echo.file_name}`
                     return (
@@ -75,7 +76,7 @@ export default async function EchosPage() {
           )
         })}
 
-        {takken.length > 0 && echos.filter((e: any) => takken.includes(e.tak)).length === 0 && (
+        {takken.length > 0 && echos.filter((e: Echo) => takken.includes(e.tak)).length === 0 && (
           <p style={{ color: '#6A8A75', textAlign: 'center', padding: '40px 0' }}>Nog geen Echo&apos;s beschikbaar.</p>
         )}
       </main>

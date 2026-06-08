@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
+import { Product, OrderItem } from '@/lib/types'
 
 // Belgische gestructureerde mededeling (Modulo 97), identiek aan de PHP-versie.
 function generateCommunication(orderNumber: number): string {
@@ -43,10 +44,10 @@ export async function POST(req: NextRequest) {
       .from('shop_products')
       .select('id, name, price, sizes, active')
       .eq('active', true)
-    const catalogue = new Map((products ?? []).map((p: any) => [p.id, p]))
+    const catalogue = new Map<string, Product>((products as Product[] ?? []).map((p: Product) => [p.id, p]))
 
     // Mandje valideren — nooit prijzen uit de client vertrouwen
-    const validatedCart: any[] = []
+    const validatedCart: OrderItem[] = []
     let total = 0
     for (const item of cart) {
       const prod = catalogue.get(item.id)

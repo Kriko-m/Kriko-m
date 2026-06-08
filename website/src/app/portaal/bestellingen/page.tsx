@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { getSettings } from '@/lib/db'
+import { Order } from '@/lib/types'
 import PortaalNav from '../_components/PortaalNav'
 import BestellingCard from './BestellingCard'
 
@@ -12,15 +14,27 @@ export default async function BestellingenPage() {
   const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding'
 
   const admin = createAdminClient()
-  const { data: orders } = await admin
-    .from('orders')
-    .select('*')
-    .eq('email', user.email!)
-    .order('created_at', { ascending: false })
+  const [settings, ordersRes] = await Promise.all([
+    getSettings(),
+    admin
+      .from('orders')
+      .select('*')
+      .eq('email', user.email!)
+      .order('created_at', { ascending: false })
+  ])
+
+  const bankIban = settings?.bank_iban || 'BE76 1234 5678 9012'
+  const bankHolder = settings?.bank_holder || 'Scouts Kriko-M vzw'
+
+  const orders = ((ordersRes.data ?? []) as Order[]).map(order => ({
+    ...order,
+    bank_iban: bankIban,
+    bank_holder: bankHolder,
+  }))
 
   return (
     <>
-      <PortaalNav naam={naam} isAdmin={isAdmin} />
+      <PortaalNav naam={naam} isAdmin={isAdmin} role={user.app_metadata?.role} />
       <main style={{ maxWidth: 800, margin: '0 auto', padding: '40px 20px 80px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
@@ -38,7 +52,7 @@ export default async function BestellingenPage() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {orders.map((order: any) => (
+            {orders.map((order: Order) => (
               <BestellingCard key={order.id} order={order} />
             ))}
           </div>

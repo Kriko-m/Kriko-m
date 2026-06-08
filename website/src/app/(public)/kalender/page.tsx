@@ -2,6 +2,7 @@ import { getCalendarEvents } from '@/lib/db'
 import type { Metadata } from 'next'
 import CalendarGrid from '@/components/CalendarGrid'
 import Link from 'next/link'
+import { CalendarEvent } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Kalender | Scouts Kriko-M' }
 
@@ -9,16 +10,16 @@ const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Aug
 const MONTHS_SHORT: Record<number, string> = {1:'Jan',2:'Feb',3:'Mrt',4:'Apr',5:'Mei',6:'Jun',7:'Jul',8:'Aug',9:'Sep',10:'Okt',11:'Nov',12:'Dec'}
 const WEEKDAYS = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag']
 
-function googleCalUrl(event: any) {
+function googleCalUrl(event: CalendarEvent) {
   const d = event.date.replace(/-/g, '')
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${d}/${d}&details=${encodeURIComponent(event.description??'')}&location=${encodeURIComponent(event.location??'')}`
 }
 
 export default async function KalenderPage() {
-  const events = await getCalendarEvents()
+  const events = (await getCalendarEvents()) as CalendarEvent[]
   const today = new Date(); today.setHours(0,0,0,0)
-  const upcoming = events.filter((e: any) => new Date(e.date) >= today)
-  const gridEvents = events.map((e: any) => ({ id: e.id, date: e.date, title: e.title, time: e.time }))
+  const upcoming = events.filter((e: CalendarEvent) => new Date(e.date) >= today)
+  const gridEvents = events.map((e: CalendarEvent) => ({ id: e.id, date: e.date, title: e.title, time: e.time }))
 
   return (
     <>
@@ -64,7 +65,7 @@ export default async function KalenderPage() {
               {upcoming.length === 0 ? (
                 <p className="cal-upcoming-empty">Er zijn momenteel geen aankomende activiteiten gepland.</p>
               ) : (
-                upcoming.map((event: any) => {
+                upcoming.map((event: CalendarEvent) => {
                   const d = new Date(event.date)
                   const day = String(d.getDate()).padStart(2, '0')
                   const month = MONTHS_SHORT[d.getMonth() + 1]

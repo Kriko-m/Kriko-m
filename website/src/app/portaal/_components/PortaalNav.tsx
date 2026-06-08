@@ -7,9 +7,10 @@ import { createClient } from '@/lib/supabase-browser'
 interface Props {
   naam: string
   isAdmin: boolean
+  role?: string
 }
 
-export default function PortaalNav({ naam, isAdmin }: Props) {
+export default function PortaalNav({ naam, isAdmin, role }: Props) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -21,12 +22,15 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
     router.refresh()
   }
 
+  const isLeiding = isAdmin || role === 'leiding'
+
   const links = [
     { href: '/portaal/dashboard', label: '🏠 Dashboard' },
     { href: '/portaal/kinderen', label: '👧 Leden' },
     { href: '/portaal/kampen', label: '🏕️ Kampen' },
     { href: '/portaal/echos', label: '📰 Echo\'s' },
     { href: '/portaal/bestellingen', label: '🛍️ Bestellingen' },
+    ...(isLeiding ? [{ href: '/portaal/verslagen', label: '📋 Verslagen' }] : []),
     ...(isAdmin ? [{ href: '/portaal/admin', label: '⚙️ Beheer' }] : []),
   ]
 

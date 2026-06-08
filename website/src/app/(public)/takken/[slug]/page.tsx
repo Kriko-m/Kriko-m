@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getSettings, getEchos } from '@/lib/db'
 import type { Metadata } from 'next'
 import CopyButton from '@/components/CopyButton'
+import { Echo, Leader } from '@/lib/types'
 
 const TAK_DARK: Record<string, string> = {
   kapoenen:   '#d4780a',
@@ -39,8 +40,8 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
   const curM = now.getMonth() + 1, curY = now.getFullYear()
   const nxtM = curM === 12 ? 1 : curM + 1, nxtY = curM === 12 ? curY + 1 : curY
 
-  const recentEchos = allEchos
-    .filter((e: any) => e.tak === slug && (
+  const recentEchos = (allEchos as Echo[])
+    .filter((e: Echo) => e.tak === slug && (
       (e.month === curM && e.year === curY) ||
       (e.month === nxtM && e.year === nxtY)
     ))
@@ -82,7 +83,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                 Dit team staat elke zondag klaar. Heb je een vraag? Spreek ons gerust aan of stuur een mailtje.
               </p>
               <div className="leaders-grid">
-                {(tak.leaders ?? []).map((leader: any) => {
+                {(tak.leaders ?? []).map((leader: Leader) => {
                   const parts = leader.name.split(' ')
                   const initials = parts.length >= 2
                     ? parts[0][0] + parts[parts.length - 1][0]
@@ -120,8 +121,8 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                 {recentEchos.length === 0 ? (
                   <p className="echo-card-empty" style={{ color: 'rgba(255,255,255,0.7)' }}>Momenteel geen editie beschikbaar.</p>
                 ) : (
-                  recentEchos.map((echo: any) => (
-                    <a key={echo.id} href={`/echos/download/${echo.file_name}`} target="_blank" rel="noopener" className="echo-card-pdf-btn">
+                  recentEchos.map((echo: Echo) => (
+                    <a key={echo.id} href={`/api/echos/download/${echo.file_name}`} target="_blank" rel="noopener" className="echo-card-pdf-btn">
                       <span className="echo-pdf-left">
                         <i className="fa-solid fa-file-pdf"></i>
                         <span className="echo-pdf-maand">{MONTHS_NL[echo.month]} {echo.year}</span>

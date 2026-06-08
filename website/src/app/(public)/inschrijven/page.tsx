@@ -59,7 +59,7 @@ export default async function InschrijvenPage() {
                   <div style={{ backgroundColor: 'var(--color-bg-linen)', borderRadius: 'var(--border-radius-md)', padding: '12px 16px', border: '1px solid var(--color-border)', fontSize: '0.9rem', marginTop: 10 }}>
                     <strong>Rekeningnummer:</strong> <code>BE59 7360 6413 2626</code><br />
                     <strong>Begunstigde:</strong> Scouts Kriko-M<br />
-                    <strong>Mededeling:</strong> "Lidgeld [Naam kind] + [Tak]"
+                    <strong>Mededeling:</strong> &ldquo;Lidgeld [Naam kind] + [Tak]&rdquo;
                   </div>
                 </>,
               },

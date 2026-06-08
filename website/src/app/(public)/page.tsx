@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getCalendarEvents } from '@/lib/db'
 import HeroCTA from '@/components/HeroCTA'
+import { CalendarEvent } from '@/lib/types'
 
 const MONTHS_NL: Record<number, string> = {
   1: 'Jan', 2: 'Feb', 3: 'Mrt', 4: 'Apr', 5: 'Mei', 6: 'Jun',
@@ -9,7 +10,7 @@ const MONTHS_NL: Record<number, string> = {
 }
 
 export default async function HomePage() {
-  const events = await getCalendarEvents()
+  const events = (await getCalendarEvents()) as CalendarEvent[]
 
   return (
     <>
@@ -115,7 +116,7 @@ export default async function HomePage() {
               {events.length === 0 ? (
                 <p style={{ color: 'var(--color-text-muted)' }}>Er zijn momenteel geen geplande groepsactiviteiten.</p>
               ) : (
-                events.map((event: any) => {
+                events.map((event: CalendarEvent) => {
                   const d = new Date(event.date)
                   return (
                     <div key={event.id} className="calendar-item">

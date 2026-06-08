@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { Order, OrderItem } from '@/lib/types'
 
 const STATUS_LABELS: Record<string, { label: string; kleur: string }> = {
   pending:          { label: 'Wachten op betaling', kleur: '#BE8A2E' },
@@ -9,7 +10,7 @@ const STATUS_LABELS: Record<string, { label: string; kleur: string }> = {
   cancelled:        { label: 'Geannuleerd',          kleur: '#B23A4D' },
 }
 
-export default function BestellingCard({ order }: { order: any }) {
+export default function BestellingCard({ order }: { order: Order }) {
   const [status, setStatus] = useState(order.status)
   const [loading, setLoading] = useState(false)
   const st = STATUS_LABELS[status] ?? { label: status, kleur: '#888' }
@@ -18,8 +19,8 @@ export default function BestellingCard({ order }: { order: any }) {
     ? new Date(order.created_at).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' })
     : ''
 
-  const items: any[] = order.items ?? []
-  const itemsTekst = items.map((i: any) => `${i.quantity}× ${i.name}`).join(', ')
+  const items: OrderItem[] = order.items ?? []
+  const itemsTekst = items.map((i: OrderItem) => `${i.quantity}× ${i.name}`).join(', ')
 
   async function meldBetaling() {
     setLoading(true)

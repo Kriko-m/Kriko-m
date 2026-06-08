@@ -20,7 +20,7 @@ export default async function AdminKampenPage() {
 
   return (
     <>
-      <PortaalNav naam={naam} isAdmin={isAdmin} />
+      <PortaalNav naam={naam} isAdmin={isAdmin} role={user.app_metadata?.role} />
       <main style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 20px 80px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
           <a href="/portaal/admin" style={{ color: '#6A8A75', textDecoration: 'none', fontSize: '.9rem', fontWeight: 600 }}>← Beheer</a>

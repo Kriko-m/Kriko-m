@@ -20,7 +20,7 @@ interface Kind {
   ga_id?: string
 }
 
-export default function KinderenBeheer({ kinderen: initial, parentId }: { kinderen: Kind[]; parentId: string }) {
+export default function KinderenBeheer({ kinderen: initial }: { kinderen: Kind[]; parentId: string }) {
   const [kinderen, setKinderen] = useState<Kind[]>(initial)
   const [adding, setAdding] = useState(false)
   const [loading, setLoading] = useState(false)

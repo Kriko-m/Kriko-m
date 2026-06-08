@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { Order, Message as DbMessage, Settings, OrderItem } from '@/lib/types'
 
 const STATUS_OPTIES = ['pending', 'waiting_approval', 'paid', 'completed', 'cancelled']
 const STATUS_LABELS: Record<string, string> = {
@@ -16,14 +17,14 @@ const STATUS_KLEUREN: Record<string, string> = {
 type Tab = 'bestellingen' | 'berichten' | 'instellingen'
 
 export default function AdminTabs({ orders: initialOrders, messages: initialMessages, settings: initialSettings }: {
-  orders: any[]
-  messages: any[]
-  settings: any
+  orders: Order[]
+  messages: DbMessage[]
+  settings: Settings
 }) {
   const [tab, setTab] = useState<Tab>('bestellingen')
-  const [orders, setOrders] = useState(initialOrders)
-  const [messages, setMessages] = useState(initialMessages)
-  const [settings, setSettings] = useState(initialSettings)
+  const [orders, setOrders] = useState<Order[]>(initialOrders)
+  const [messages, setMessages] = useState<DbMessage[]>(initialMessages)
+  const [settings, setSettings] = useState<Settings>(initialSettings)
   const [saving, setSaving] = useState(false)
   const [flash, setFlash] = useState('')
 
@@ -34,7 +35,7 @@ export default function AdminTabs({ orders: initialOrders, messages: initialMess
     setTimeout(() => setFlash(''), 3000)
   }
 
-  async function updateOrderStatus(id: string, status: string) {
+  async function updateOrderStatus(id: string, status: Order['status']) {
     const res = await fetch(`/api/admin/orders/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
     if (res.ok) {
       setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))
@@ -100,7 +101,7 @@ export default function AdminTabs({ orders: initialOrders, messages: initialMess
             const st = STATUS_LABELS[order.status] ?? order.status
             const kleur = STATUS_KLEUREN[order.status] ?? '#888'
             const date = order.created_at ? new Date(order.created_at).toLocaleDateString('nl-BE') : ''
-            const items: any[] = order.items ?? []
+            const items: OrderItem[] = order.items ?? []
             return (
               <div key={order.id} style={{ background: '#fff', border: '1px solid #C2D9C9', borderRadius: 14, padding: '18px 20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
@@ -112,7 +113,7 @@ export default function AdminTabs({ orders: initialOrders, messages: initialMess
                     </div>
                     <div style={{ fontSize: '.82rem', color: '#6A8A75' }}>{order.email}</div>
                     <div style={{ fontSize: '.85rem', marginTop: 6, color: '#3A5A42' }}>
-                      {items.map((i: any) => `${i.quantity}× ${i.name} (${i.size})`).join(', ')}
+                      {items.map((i: OrderItem) => `${i.quantity}× ${i.name} (${i.size})`).join(', ')}
                     </div>
                     <div style={{ fontWeight: 700, color: '#1A3D2A', marginTop: 4 }}>€{Number(order.total).toFixed(2).replace('.', ',')}</div>
                     {order.communication && (
@@ -125,7 +126,7 @@ export default function AdminTabs({ orders: initialOrders, messages: initialMess
                     <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: '.76rem', fontWeight: 700, background: `${kleur}22`, color: kleur }}>{st}</span>
                     <select
                       value={order.status}
-                      onChange={e => updateOrderStatus(order.id, e.target.value)}
+                      onChange={e => updateOrderStatus(order.id, e.target.value as Order['status'])}
                       style={{ padding: '6px 10px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.82rem', cursor: 'pointer' }}
                     >
                       {STATUS_OPTIES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
@@ -178,7 +179,7 @@ export default function AdminTabs({ orders: initialOrders, messages: initialMess
           ].map(f => (
             <div key={f.name}>
               <label style={{ display: 'block', fontSize: '.82rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }}>{f.label}</label>
-              <input name={f.name} defaultValue={settings?.[f.name] ?? ''} placeholder={f.placeholder}
+              <input name={f.name} defaultValue={(settings as any)?.[f.name] ?? ''} placeholder={f.placeholder}
                 style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' }} />
             </div>
           ))}

@@ -6,16 +6,25 @@ const TAK_KLEUREN: Record<string, string> = {
   kapoenen: '#F4C842', welpen: '#5D9E6C', jonggivers: '#4A7BBF', givers: '#C9963A', alle: '#1A3D2A',
 }
 
-interface Kamp {
-  id: string; naam: string; tak: string; datum_van: string; datum_tot: string;
-  locatie: string; beschrijving: string; open_voor_inschrijving: boolean; prijs?: number;
+import { Kamp } from '@/lib/types'
+
+interface KampFormState {
+  id?: string
+  naam: string
+  tak: string
+  datum_van: string
+  datum_tot: string
+  locatie: string
+  beschrijving: string
+  open_voor_inschrijving: boolean
+  prijs: string | number
 }
 
-const LEEG_KAMP = { naam: '', tak: 'welpen', datum_van: '', datum_tot: '', locatie: '', beschrijving: '', open_voor_inschrijving: false, prijs: '' }
+const LEEG_KAMP: KampFormState = { naam: '', tak: 'welpen', datum_van: '', datum_tot: '', locatie: '', beschrijving: '', open_voor_inschrijving: false, prijs: '' }
 
 export default function KampenAdmin({ kampen: initial }: { kampen: Kamp[] }) {
   const [kampen, setKampen] = useState<Kamp[]>(initial)
-  const [form, setForm] = useState<any>(LEEG_KAMP)
+  const [form, setForm] = useState<KampFormState>(LEEG_KAMP)
   const [editId, setEditId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -89,21 +98,21 @@ export default function KampenAdmin({ kampen: initial }: { kampen: Kamp[] }) {
         <form onSubmit={handleSubmit} style={{ background: '#fff', border: '1.5px solid #2A5C3F', borderRadius: 16, padding: '24px 26px', marginBottom: 28 }}>
           <h3 style={{ margin: '0 0 20px', color: '#1A3D2A', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>{editId ? 'Kamp bewerken' : 'Nieuw kamp'}</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
-            <div><label style={labelStyle}>Naam</label><input style={inputStyle} value={form.naam} onChange={e => setForm((p: any) => ({...p, naam: e.target.value}))} required /></div>
+             <div><label style={labelStyle}>Naam</label><input style={inputStyle} value={form.naam} onChange={e => setForm(p => ({...p, naam: e.target.value}))} required /></div>
             <div>
               <label style={labelStyle}>Tak</label>
-              <select style={inputStyle} value={form.tak} onChange={e => setForm((p: any) => ({...p, tak: e.target.value}))}>
+              <select style={inputStyle} value={form.tak} onChange={e => setForm(p => ({...p, tak: e.target.value}))}>
                 {TAKKEN.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
-            <div><label style={labelStyle}>Datum van</label><input type="date" style={inputStyle} value={form.datum_van} onChange={e => setForm((p: any) => ({...p, datum_van: e.target.value}))} required /></div>
-            <div><label style={labelStyle}>Datum tot</label><input type="date" style={inputStyle} value={form.datum_tot} onChange={e => setForm((p: any) => ({...p, datum_tot: e.target.value}))} required /></div>
-            <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.locatie} onChange={e => setForm((p: any) => ({...p, locatie: e.target.value}))} /></div>
-            <div><label style={labelStyle}>Prijs (€)</label><input type="number" min="0" step="0.01" style={inputStyle} value={form.prijs} onChange={e => setForm((p: any) => ({...p, prijs: e.target.value}))} placeholder="0" /></div>
-            <div style={{ gridColumn: '1 / -1' }}><label style={labelStyle}>Beschrijving</label><textarea style={{...inputStyle, resize: 'vertical'}} rows={3} value={form.beschrijving} onChange={e => setForm((p: any) => ({...p, beschrijving: e.target.value}))} /></div>
+            <div><label style={labelStyle}>Datum van</label><input type="date" style={inputStyle} value={form.datum_van} onChange={e => setForm(p => ({...p, datum_van: e.target.value}))} required /></div>
+            <div><label style={labelStyle}>Datum tot</label><input type="date" style={inputStyle} value={form.datum_tot} onChange={e => setForm(p => ({...p, datum_tot: e.target.value}))} required /></div>
+            <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.locatie} onChange={e => setForm(p => ({...p, locatie: e.target.value}))} /></div>
+            <div><label style={labelStyle}>Prijs (€)</label><input type="number" min="0" step="0.01" style={inputStyle} value={form.prijs} onChange={e => setForm(p => ({...p, prijs: e.target.value}))} placeholder="0" /></div>
+            <div style={{ gridColumn: '1 / -1' }}><label style={labelStyle}>Beschrijving</label><textarea style={{...inputStyle, resize: 'vertical'}} rows={3} value={form.beschrijving} onChange={e => setForm(p => ({...p, beschrijving: e.target.value}))} /></div>
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, fontSize: '.88rem', color: '#1A3D2A' }}>
-                <input type="checkbox" checked={form.open_voor_inschrijving} onChange={e => setForm((p: any) => ({...p, open_voor_inschrijving: e.target.checked}))} />
+                <input type="checkbox" checked={form.open_voor_inschrijving} onChange={e => setForm(p => ({...p, open_voor_inschrijving: e.target.checked}))} />
                 Meteen openstellen voor inschrijving
               </label>
             </div>
@@ -135,6 +144,10 @@ export default function KampenAdmin({ kampen: initial }: { kampen: Kamp[] }) {
                 <div style={{ fontSize: '.82rem', color: '#6A8A75', marginTop: 3 }}>📅 {periode} &nbsp;·&nbsp; 📍 {kamp.locatie}</div>
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <a href={`/api/admin/kampen/${kamp.id}/export`} download
+                  style={{ padding: '6px 12px', border: '1.5px solid #C9963A', borderRadius: 8, background: '#C9963A', color: '#fff', fontSize: '.78rem', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+                  Exporteren (CSV)
+                </a>
                 <button onClick={() => togglePubliek(kamp.id, kamp.open_voor_inschrijving)}
                   style={{ padding: '6px 12px', border: `1.5px solid ${kamp.open_voor_inschrijving ? '#B23A4D' : '#3F7D5A'}`, borderRadius: 8, background: 'none', color: kamp.open_voor_inschrijving ? '#B23A4D' : '#3F7D5A', fontSize: '.78rem', fontWeight: 700, cursor: 'pointer' }}>
                   {kamp.open_voor_inschrijving ? 'Verbergen' : 'Publiceren'}

@@ -16,7 +16,7 @@ export async function PATCH(req: NextRequest) {
 
   const body = await req.json()
   const allowed = ['scouts_year', 'bank_iban', 'bank_bic', 'bank_holder', 'contact_email', 'contact_phone', 'contact_address', 'alert_message', 'alert_active']
-  const update: Record<string, any> = {}
+  const update: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) {
       update[key] = key === 'alert_active' ? body[key] === 'true' || body[key] === true : String(body[key]).slice(0, 500)

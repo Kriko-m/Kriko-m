@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getShopProducts } from '@/lib/db'
 import ShopProductCard from '@/components/shop/ShopProductCard'
 import CartDrawer from '@/components/shop/CartDrawer'
+import { Product } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Webshop – Scouts Kriko-M' }
 
@@ -12,13 +13,13 @@ const CATEGORIES: Record<string, string> = {
 }
 
 export default async function ShopPage() {
-  const products = await getShopProducts()
+  const products = (await getShopProducts()) as Product[]
 
   const grouped = Object.entries(CATEGORIES)
     .map(([key, label]) => ({
       key,
       label,
-      items: products.filter((p: any) => p.category === key),
+      items: products.filter((p: Product) => p.category === key),
     }))
     .filter(g => g.items.length > 0)
 
@@ -57,7 +58,7 @@ export default async function ShopPage() {
               <div key={key} className="shop-cat">
                 <h3 className="shop-cat-title">{label}</h3>
                 <div className="shop-grid">
-                  {items.map((product: any) => (
+                  {items.map((product: Product) => (
                     <ShopProductCard key={product.id} product={product} />
                   ))}
                 </div>

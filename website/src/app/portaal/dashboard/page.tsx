@@ -14,13 +14,49 @@ export default async function DashboardPage() {
 
   // Bestellingen tellen
   const admin = createAdminClient()
-  const { data: orders } = await admin.from('orders').select('id, status').eq('email', user.email!)
+  const [ordersRes, parentChildrenRes, inschrijvingenRes] = await Promise.all([
+    admin.from('orders').select('id, status').eq('email', user.email!),
+    admin.from('parent_children').select('id').eq('parent_id', user.id),
+    admin.from('kampinschrijvingen').select('id').eq('door', user.id),
+  ])
+
+  const orders = ordersRes.data
   const aantalBestellingen = orders?.length ?? 0
   const openBestellingen = orders?.filter(o => o.status === 'pending').length ?? 0
+  const aantalKinderen = parentChildrenRes.data?.length ?? 0
+  const aantalInschrijvingen = inschrijvingenRes.data?.length ?? 0
 
   const voornaam = naam.split(' ')[0]
 
   const menu = [
+    {
+      href: '/portaal/kinderen',
+      icon: '👧',
+      titel: 'Gekoppelde leden',
+      desc: 'Beheer de kinderen gekoppeld aan jouw account.',
+      stat: aantalKinderen > 0
+        ? `${aantalKinderen} ${aantalKinderen === 1 ? 'kind' : 'kinderen'} gekoppeld`
+        : 'Geen kinderen gekoppeld',
+      kleur: '#F4C842',
+    },
+    {
+      href: '/portaal/kampen',
+      icon: '🏕️',
+      titel: 'Kampen & Weekenden',
+      desc: 'Schrijf je kinderen in voor weekenden en kampen.',
+      stat: aantalInschrijvingen > 0
+        ? `${aantalInschrijvingen} active ${aantalInschrijvingen === 1 ? 'inschrijving' : 'inschrijvingen'}`
+        : 'Schrijf in voor een kamp',
+      kleur: '#4A7BBF',
+    },
+    {
+      href: '/portaal/echos',
+      icon: '📰',
+      titel: 'Kriko Echo\'s',
+      desc: 'Bekijk en download de maandelijkse planningen per tak.',
+      stat: 'Tak bulletins',
+      kleur: '#8A9A8A',
+    },
     {
       href: '/portaal/bestellingen',
       icon: '🛍️',
@@ -51,7 +87,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <PortaalNav naam={naam} isAdmin={isAdmin} />
+      <PortaalNav naam={naam} isAdmin={isAdmin} role={user.app_metadata?.role} />
       <main style={{ maxWidth: 900, margin: '0 auto', padding: '40px 20px 80px' }}>
 
         {/* Hero */}
