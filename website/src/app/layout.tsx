@@ -24,9 +24,14 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {
             try {
-              if (window.location.pathname.startsWith('/portaal')) {
+              var path = window.location.pathname;
+              if (path === '/portaal' || path === '/portaal/') {
                 document.body.classList.add('portal-theme', 'portaal');
                 document.body.style.paddingTop = '0';
+                document.body.style.backgroundColor = '#EEF5F1';
+              } else if (path.startsWith('/portaal/')) {
+                document.body.classList.add('portal-theme', 'portaal');
+                document.body.style.paddingTop = '64px';
                 document.body.style.backgroundColor = '#EEF5F1';
               }
             } catch (e) {}
