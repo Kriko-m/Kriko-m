@@ -5,8 +5,9 @@ import AdminTabs from './AdminTabs'
 
 export default async function AdminPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) redirect('/portaal')
+  const user = session.user
 
   const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding'
   if (!isAdmin) redirect('/portaal/dashboard')
@@ -14,11 +15,14 @@ export default async function AdminPage() {
   const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker'
   const admin = createAdminClient()
 
-  const [ordersRes, messagesRes, settingsRes] = await Promise.all([
+  const [authRes, ordersRes, messagesRes, settingsRes] = await Promise.all([
+    supabase.auth.getUser(),
     admin.from('orders').select('*').order('created_at', { ascending: false }),
     admin.from('messages').select('*').order('created_at', { ascending: false }),
     admin.from('settings').select('*').single(),
   ])
+
+  if (authRes.error || !authRes.data.user) redirect('/portaal')
 
   return (
     <>

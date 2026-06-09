@@ -7,8 +7,9 @@ import BestellingCard from './BestellingCard'
 
 export default async function BestellingenPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) redirect('/portaal')
+  const user = session.user
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
@@ -18,7 +19,8 @@ export default async function BestellingenPage() {
   const isAdmin = role === 'admin' || role === 'groepsleiding'
 
   const admin = createAdminClient()
-  const [settings, ordersRes] = await Promise.all([
+  const [authRes, settings, ordersRes] = await Promise.all([
+    supabase.auth.getUser(),
     getSettings(),
     admin
       .from('orders')
@@ -26,6 +28,8 @@ export default async function BestellingenPage() {
       .eq('email', user.email!)
       .order('created_at', { ascending: false })
   ])
+
+  if (authRes.error || !authRes.data.user) redirect('/portaal')
 
   const bankIban = settings?.bank_iban || 'BE76 1234 5678 9012'
   const bankHolder = settings?.bank_holder || 'Scouts Kriko-M vzw'

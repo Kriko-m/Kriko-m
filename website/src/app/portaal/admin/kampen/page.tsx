@@ -5,18 +5,26 @@ import KampenAdmin from './KampenAdmin'
 
 export default async function AdminKampenPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) redirect('/portaal')
+  const user = session.user
 
   const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding'
   if (!isAdmin) redirect('/portaal/dashboard')
 
   const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker'
   const admin = createAdminClient()
-  const { data: kampen } = await admin
-    .from('kampen')
-    .select('*, kamp_bestanden(*)')
-    .order('datum_van', { ascending: true })
+
+  const [authRes, kampenRes] = await Promise.all([
+    supabase.auth.getUser(),
+    admin
+      .from('kampen')
+      .select('*, kamp_bestanden(*)')
+      .order('datum_van', { ascending: true })
+  ])
+
+  if (authRes.error || !authRes.data.user) redirect('/portaal')
+  const kampen = kampenRes.data
 
   return (
     <>

@@ -5,8 +5,9 @@ import KampenView from './KampenView'
 
 export default async function KampenPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) redirect('/portaal')
+  const user = session.user
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
@@ -16,11 +17,14 @@ export default async function KampenPage() {
   const isAdmin = role === 'admin' || role === 'groepsleiding'
 
   const admin = createAdminClient()
-  const [kinderenRes, kampenRes, inschrijvingenRes] = await Promise.all([
+  const [authRes, kinderenRes, kampenRes, inschrijvingenRes] = await Promise.all([
+    supabase.auth.getUser(),
     admin.from('parent_children').select('*').eq('parent_id', user.id),
     admin.from('kampen').select('*, kamp_bestanden(*)').eq('open_voor_inschrijving', true).order('datum_van', { ascending: true }),
     admin.from('kampinschrijvingen').select('kamp_id, ga_id'),
   ])
+
+  if (authRes.error || !authRes.data.user) redirect('/portaal')
 
   return (
     <>

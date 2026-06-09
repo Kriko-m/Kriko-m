@@ -5,8 +5,9 @@ import KinderenBeheer from './KinderenBeheer'
 
 export default async function KinderenPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) redirect('/portaal')
+  const user = session.user
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
@@ -16,11 +17,17 @@ export default async function KinderenPage() {
   const isAdmin = role === 'admin' || role === 'groepsleiding'
 
   const admin = createAdminClient()
-  const { data: kinderen } = await admin
-    .from('parent_children')
-    .select('*')
-    .eq('parent_id', user.id)
-    .order('added_at', { ascending: true })
+  const [authRes, kinderenRes] = await Promise.all([
+    supabase.auth.getUser(),
+    admin
+      .from('parent_children')
+      .select('*')
+      .eq('parent_id', user.id)
+      .order('added_at', { ascending: true })
+  ])
+
+  if (authRes.error || !authRes.data.user) redirect('/portaal')
+  const kinderen = kinderenRes.data
 
   return (
     <>

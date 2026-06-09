@@ -6,8 +6,9 @@ import { Kamp, Echo } from '@/lib/types'
 
 export default async function LeidingPortaalPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) redirect('/portaal')
+  const user = session.user
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
@@ -17,10 +18,13 @@ export default async function LeidingPortaalPage() {
   const isAdmin = role === 'admin' || role === 'groepsleiding'
 
   const admin = createAdminClient()
-  const [kampenRes, echosRes] = await Promise.all([
+  const [authRes, kampenRes, echosRes] = await Promise.all([
+    supabase.auth.getUser(),
     admin.from('kampen').select('*, kamp_bestanden(*)').order('datum_van', { ascending: true }),
     admin.from('echos').select('*').order('year', { ascending: false }).order('month', { ascending: false }),
   ])
+
+  if (authRes.error || !authRes.data.user) redirect('/portaal')
 
   const kampen = (kampenRes.data ?? []) as Kamp[]
   const echos = (echosRes.data ?? []) as Echo[]

@@ -7,8 +7,9 @@ import { Verslag } from '@/lib/types'
 
 export default async function VerslagenPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) redirect('/portaal')
+  const user = session.user
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
@@ -17,7 +18,12 @@ export default async function VerslagenPage() {
   const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker'
   const isAdmin = role === 'admin' || role === 'groepsleiding'
 
-  const verslagen = (await getVerslagen()) as Verslag[]
+  const [authRes, verslagen] = await Promise.all([
+    supabase.auth.getUser(),
+    getVerslagen()
+  ])
+
+  if (authRes.error || !authRes.data.user) redirect('/portaal')
 
   return (
     <>

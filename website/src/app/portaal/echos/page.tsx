@@ -11,8 +11,9 @@ const TAK_KLEUREN: Record<string, string> = {
 
 export default async function EchosPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) redirect('/portaal')
+  const user = session.user
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
@@ -22,10 +23,13 @@ export default async function EchosPage() {
   const isAdmin = role === 'admin' || role === 'groepsleiding'
 
   const admin = createAdminClient()
-  const [kinderenRes, echosRes] = await Promise.all([
+  const [authRes, kinderenRes, echosRes] = await Promise.all([
+    supabase.auth.getUser(),
     admin.from('parent_children').select('tak').eq('parent_id', user.id),
     admin.from('echos').select('*').eq('approved', true).order('year', { ascending: false }).order('month', { ascending: false }),
   ])
+
+  if (authRes.error || !authRes.data.user) redirect('/portaal')
 
   const takken = [...new Set(((kinderenRes.data ?? []) as ParentChild[]).map((k: ParentChild) => k.tak))]
   const echos = (echosRes.data ?? []) as Echo[]

@@ -6,19 +6,23 @@ import Link from 'next/link'
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) redirect('/portaal')
+  const user = session.user
 
   const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker'
   const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding'
 
   // Bestellingen tellen
   const admin = createAdminClient()
-  const [ordersRes, parentChildrenRes, inschrijvingenRes] = await Promise.all([
+  const [authRes, ordersRes, parentChildrenRes, inschrijvingenRes] = await Promise.all([
+    supabase.auth.getUser(),
     admin.from('orders').select('id, status').eq('email', user.email!),
     admin.from('parent_children').select('id').eq('parent_id', user.id),
     admin.from('kampinschrijvingen').select('id').eq('door', user.id),
   ])
+
+  if (authRes.error || !authRes.data.user) redirect('/portaal')
 
   const orders = ordersRes.data
   const aantalBestellingen = orders?.length ?? 0
