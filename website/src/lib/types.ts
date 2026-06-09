@@ -38,6 +38,7 @@ export interface CalendarEvent {
   time: string
   location: string
   description: string
+  tak: 'groep' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
   created_at?: string
 }
 
@@ -102,6 +103,8 @@ export interface Kamp {
   prijs: number
   foto: string
   paklijst: any // JSON
+  briefadres: string
+  contact_info: string
   aangemaakt_op?: string
   aangemaakt_door?: string
   kamp_bestanden?: KampBestand[]

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
-import { getCalendarEvents } from '@/lib/db'
+import { getCalendarEvents, getKampen } from '@/lib/db'
+import { Kamp } from '@/lib/types'
 
 const CAL_TZ = 'Europe/Brussels'
 
@@ -10,6 +11,7 @@ interface DatabaseEvent {
   time: string
   location: string
   description: string
+  tak: string
 }
 
 function escapeIcsText(str: string): string {
@@ -52,16 +54,30 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const singleId = searchParams.get('event')
+    const takkenParam = searchParams.get('takken')
 
-    let events = (await getCalendarEvents()) as DatabaseEvent[]
-    if (singleId) {
-      events = events.filter(e => e.id === singleId)
+    // Parse filters
+    const allTakken = ['groep', 'kapoenen', 'welpen', 'jonggivers', 'givers']
+    let selectedTakken = allTakken
+    if (takkenParam) {
+      selectedTakken = takkenParam.split(',').map(t => t.trim().toLowerCase()).filter(t => allTakken.includes(t))
     }
 
-    // Sort chronologically
-    events.sort((a, b) => a.date.localeCompare(b.date))
+    let calendarEvents = (await getCalendarEvents()) as DatabaseEvent[]
+    let camps = (await getKampen()) as Kamp[]
 
-    const nowStr = toUtcIcsString(new Date())
+    // If a single event is requested
+    if (singleId) {
+      calendarEvents = calendarEvents.filter(e => e.id === singleId)
+      camps = []
+    } else {
+      // Filter calendar events by branch (tak)
+      calendarEvents = calendarEvents.filter(e => {
+        const tak = e.tak || 'groep'
+        return selectedTakken.includes(tak)
+      })
+    }
+
     const lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
@@ -72,7 +88,10 @@ export async function GET(request: NextRequest) {
       'X-WR-TIMEZONE:' + CAL_TZ,
     ]
 
-    for (const event of events) {
+    const nowStr = toUtcIcsString(new Date())
+
+    // 1. Process regular calendar events
+    for (const event of calendarEvents) {
       const { start, end, allDay } = parseEventDates(event)
       const uid = `${event.id}@kriko-m.be`
 
@@ -81,7 +100,6 @@ export async function GET(request: NextRequest) {
       lines.push(`DTSTAMP:${nowStr}`)
 
       if (allDay) {
-        // Format: YYYYMMDD
         const startYmd = start.toISOString().slice(0, 10).replace(/-/g, '')
         const endYmd = end.toISOString().slice(0, 10).replace(/-/g, '')
         lines.push(`DTSTART;VALUE=DATE:${startYmd}`)
@@ -91,7 +109,9 @@ export async function GET(request: NextRequest) {
         lines.push(`DTEND:${toUtcIcsString(end)}`)
       }
 
-      lines.push(`SUMMARY:${escapeIcsText(event.title ?? 'Activiteit')}`)
+      // Add tak prefix for better readability in parents' calendar feed (if it's not a group event)
+      const prefix = event.tak && event.tak !== 'groep' ? `[${event.tak.charAt(0).toUpperCase() + event.tak.slice(1)}] ` : ''
+      lines.push(`SUMMARY:${escapeIcsText(prefix + (event.title ?? 'Activiteit'))}`)
       if (event.description) {
         lines.push(`DESCRIPTION:${escapeIcsText(event.description)}`)
       }
@@ -99,6 +119,53 @@ export async function GET(request: NextRequest) {
         lines.push(`LOCATION:${escapeIcsText(event.location)}`)
       }
       lines.push('END:VEVENT')
+    }
+
+    // 2. Process camps (camps are multi-day, all-day events)
+    if (!singleId) {
+      const activeCamps = camps.filter(c => {
+        if (!c.open_voor_inschrijving) return false
+        if (c.tak === 'alle') return true // General camp/weekend matches any filter
+        return selectedTakken.includes(c.tak)
+      })
+
+      for (const camp of activeCamps) {
+        const uid = `${camp.id}@kriko-m.be`
+        
+        // Parse dates: datum_van and datum_tot are YYYY-MM-DD
+        const startYmd = camp.datum_van.replace(/-/g, '')
+        
+        // Add 1 day to end date since DTEND is exclusive in ICS for all-day events
+        const endDate = new Date(camp.datum_tot + 'T00:00:00')
+        endDate.setDate(endDate.getDate() + 1)
+        const endYmd = endDate.toISOString().slice(0, 10).replace(/-/g, '')
+
+        lines.push('BEGIN:VEVENT')
+        lines.push(`UID:${escapeIcsText(uid)}`)
+        lines.push(`DTSTAMP:${nowStr}`)
+        lines.push(`DTSTART;VALUE=DATE:${startYmd}`)
+        lines.push(`DTEND;VALUE=DATE:${endYmd}`)
+
+        const takName = camp.tak === 'alle' ? 'Groep' : camp.tak.charAt(0).toUpperCase() + camp.tak.slice(1)
+        lines.push(`SUMMARY:${escapeIcsText(`🏕️ Weekend/Kamp [${takName}]: ${camp.naam}`)}`)
+
+        let desc = camp.beschrijving || ''
+        if (camp.prijs > 0) {
+          desc += `\n\nPrijs: €${camp.prijs.toFixed(2).replace('.', ',')}`
+        }
+        if (camp.briefadres) {
+          desc += `\n\nBriefadres:\n${camp.briefadres}`
+        }
+        if (camp.contact_info) {
+          desc += `\n\nContact leiding:\n${camp.contact_info}`
+        }
+        
+        lines.push(`DESCRIPTION:${escapeIcsText(desc)}`)
+        if (camp.locatie) {
+          lines.push(`LOCATION:${escapeIcsText(camp.locatie)}`)
+        }
+        lines.push('END:VEVENT')
+      }
     }
 
     lines.push('END:VCALENDAR')

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import PortaalNav from '../_components/PortaalNav'
 import LeidingPanel from './LeidingPanel'
-import { Kamp, Echo } from '@/lib/types'
+import { Kamp, Echo, CalendarEvent } from '@/lib/types'
 
 export default async function LeidingPortaalPage() {
   const supabase = await createServerSupabaseClient()
@@ -18,16 +18,18 @@ export default async function LeidingPortaalPage() {
   const isAdmin = role === 'admin' || role === 'groepsleiding'
 
   const admin = createAdminClient()
-  const [authRes, kampenRes, echosRes] = await Promise.all([
+  const [authRes, kampenRes, echosRes, calendarRes] = await Promise.all([
     supabase.auth.getUser(),
     admin.from('kampen').select('*, kamp_bestanden(*)').order('datum_van', { ascending: true }),
     admin.from('echos').select('*').order('year', { ascending: false }).order('month', { ascending: false }),
+    admin.from('calendar').select('*').order('date', { ascending: true }),
   ])
 
   if (authRes.error || !authRes.data.user) redirect('/portaal')
 
   const kampen = (kampenRes.data ?? []) as Kamp[]
   const echos = (echosRes.data ?? []) as Echo[]
+  const calendarEvents = (calendarRes.data ?? []) as CalendarEvent[]
 
   return (
     <>
@@ -38,7 +40,7 @@ export default async function LeidingPortaalPage() {
           <h1 style={{ fontSize: '1.6rem', fontWeight: 900, fontFamily: 'var(--font-heading, Nunito, sans-serif)', color: '#1A3D2A', margin: 0 }}>🛡️ Leidersportaal</h1>
         </div>
 
-        <LeidingPanel initialKampen={kampen} initialEchos={echos} role={role} />
+        <LeidingPanel initialKampen={kampen} initialEchos={echos} initialCalendar={calendarEvents} role={role} />
       </main>
     </>
   )

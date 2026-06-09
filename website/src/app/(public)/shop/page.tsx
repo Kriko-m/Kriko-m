@@ -79,6 +79,40 @@ export default async function ShopPage() {
                     <ShopProductCard key={product.id} product={product} />
                   ))}
                 </div>
+
+                {(key === 'uniform' || key === 'accessoires') && (
+                  <div style={{
+                    background: '#fff',
+                    border: '1.5px solid #C2D9C9',
+                    borderRadius: 'var(--border-radius-lg)',
+                    padding: '24px 28px',
+                    marginTop: 24,
+                    display: 'flex',
+                    gap: 20,
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}>
+                    <span style={{ fontSize: '2.5rem', display: 'block', filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.04))' }}>🪡</span>
+                    <div style={{ flex: 1, minWidth: 240 }}>
+                      <h4 style={{ color: 'var(--color-primary-dark)', fontSize: '1.1rem', margin: '0 0 6px', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 800 }}>
+                        Waar horen deze kentekens op het hemd?
+                      </h4>
+                      <p style={{ fontSize: '0.88rem', color: 'var(--color-text-dark)', margin: 0, lineHeight: 1.5 }}>
+                        Niet helemaal zeker waar je het jaarkenteken, de belofte badge of het takkenteken moet opnaaien? 
+                        Bekijk de officiële richtlijnen en schematische tekeningen op de website van{' '}
+                        <a 
+                          href="https://www.scoutsengidsenvlaanderen.be/scoutskentekens" 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{ color: 'var(--color-accent)', fontWeight: 700, textDecoration: 'underline' }}
+                        >
+                          Scouts &amp; Gidsen Vlaanderen
+                        </a>. Zo zit elk schildje meteen op de juiste plek!
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             ))
           )}

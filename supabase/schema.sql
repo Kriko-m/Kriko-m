@@ -53,6 +53,7 @@ CREATE TABLE calendar (
   time        TEXT    NOT NULL DEFAULT '',
   location    TEXT    NOT NULL DEFAULT '',
   description TEXT    NOT NULL DEFAULT '',
+  tak         TEXT    NOT NULL DEFAULT 'groep' CHECK (tak IN ('groep','kapoenen','welpen','jonggivers','givers')),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -150,6 +151,8 @@ CREATE TABLE kampen (
   foto                  TEXT    NOT NULL DEFAULT '',
   -- Paklijst als JSON: [{ categorie: string, items: string[] }]
   paklijst              JSONB   NOT NULL DEFAULT '[]',
+  briefadres            TEXT    NOT NULL DEFAULT '',
+  contact_info          TEXT    NOT NULL DEFAULT '',
   aangemaakt_op         TIMESTAMPTZ NOT NULL DEFAULT now(),
   aangemaakt_door       TEXT    NOT NULL DEFAULT ''
 );

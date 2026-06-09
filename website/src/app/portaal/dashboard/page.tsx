@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase'
 import { createAdminClient } from '@/lib/supabase'
 import PortaalNav from '../_components/PortaalNav'
 import Link from 'next/link'
+import TourBanner from './TourBanner'
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
@@ -155,6 +156,8 @@ export default async function DashboardPage() {
             )}
           </div>
         </div>
+
+        {!isLeiding && <TourBanner />}
 
         {/* Menu kaarten */}
         <h2 style={{ fontSize: '1rem', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#6A8A75', marginBottom: 16 }}>Waar wil je naartoe?</h2>

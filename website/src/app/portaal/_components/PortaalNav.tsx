@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase-browser'
 import { useEffect, useState } from 'react'
+import PortalTourModal from './PortalTourModal'
 
 interface Props {
   naam: string
@@ -20,6 +21,7 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
   // State elements for navigation dropdown & account settings modal
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [showSettingsModal, setShowSettingsModal] = useState(false)
+  const [showTourModal, setShowTourModal] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [displayName, setDisplayName] = useState(naam)
   const [newName, setNewName] = useState(naam)
@@ -31,6 +33,13 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
   useEffect(() => {
     setDisplayName(naam)
   }, [naam])
+
+  // Listen for custom trigger to start tour
+  useEffect(() => {
+    const handleTrigger = () => setShowTourModal(true)
+    window.addEventListener('kriko_trigger_tour', handleTrigger)
+    return () => window.removeEventListener('kriko_trigger_tour', handleTrigger)
+  }, [])
 
   // Retrieve user email asynchronously
   useEffect(() => {
@@ -104,6 +113,7 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
     : [
         { href: '/portaal/dashboard', label: '🏠 Dashboard' },
         { href: '/portaal/kinderen', label: '👧 Leden' },
+        { href: '/portaal/kalender', label: '📅 Kalender' },
         { href: '/portaal/kampen', label: '🏕️ Kampen' },
         { href: '/portaal/echos', label: '📰 Echo\'s' },
         { href: '/portaal/bestellingen', label: '🛍️ Bestellingen' },
@@ -186,6 +196,15 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
                         <Link href="/portaal/bestellingen" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
                           <span>🛍️ Mijn Bestellingen</span>
                         </Link>
+                        <button
+                          onClick={() => {
+                            setDropdownOpen(false)
+                            setShowTourModal(true)
+                          }}
+                          className="portaal-dropdown-item"
+                        >
+                          <span>💡 Rondleiding starten</span>
+                        </button>
                       </>
                     )}
                     {isLeiding && (
@@ -282,6 +301,8 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
           </div>
         </div>
       )}
+      {/* Interactive Tour Walkthrough */}
+      <PortalTourModal isOpen={showTourModal} onClose={() => setShowTourModal(false)} />
     </>
   )
 }
