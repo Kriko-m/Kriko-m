@@ -30,7 +30,10 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
     { href: '/portaal/kampen', label: '🏕️ Kampen' },
     { href: '/portaal/echos', label: '📰 Echo\'s' },
     { href: '/portaal/bestellingen', label: '🛍️ Bestellingen' },
-    ...(isLeiding ? [{ href: '/portaal/verslagen', label: '📋 Verslagen' }] : []),
+    ...(isLeiding ? [
+      { href: '/portaal/leiding', label: '🛡️ Leiding' },
+      { href: '/portaal/verslagen', label: '📋 Verslagen' }
+    ] : []),
     ...(isAdmin ? [{ href: '/portaal/admin', label: '⚙️ Beheer' }] : []),
   ]
 

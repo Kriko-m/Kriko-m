@@ -1,9 +1,15 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
+import { createServerSupabaseClient } from '@/lib/supabase'
 import CheckoutForm from './CheckoutForm'
 
 export const metadata: Metadata = { title: 'Afrekenen – Scouts Kriko-M' }
 
-export default function CheckoutPage() {
+export default async function CheckoutPage() {
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/portaal?login_vereist=webshop')
+
   return (
     <>
       <section className="tak-hero primair hero-checkout">

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getShopProducts } from '@/lib/db'
+import { createServerSupabaseClient } from '@/lib/supabase'
 import ShopProductCard from '@/components/shop/ShopProductCard'
 import CartDrawer from '@/components/shop/CartDrawer'
 import { Product } from '@/lib/types'
@@ -14,6 +15,9 @@ const CATEGORIES: Record<string, string> = {
 
 export default async function ShopPage() {
   const products = (await getShopProducts()) as Product[]
+  const supabase = await createServerSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const ingelogd = !!user
 
   const grouped = Object.entries(CATEGORIES)
     .map(([key, label]) => ({
@@ -36,6 +40,19 @@ export default async function ShopPage() {
       </section>
 
       <section className="section container">
+        {!ingelogd && (
+          <div style={{ backgroundColor: 'hsla(145, 33%, 36%, 0.10)', border: '2px solid var(--color-primary)', borderRadius: 'var(--border-radius-lg)', padding: '22px 24px', marginBottom: 28, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+            <i className="fa-solid fa-info-circle" style={{ fontSize: '1.6rem', color: 'var(--color-primary)', flexShrink: 0 }}></i>
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <strong style={{ display: 'block', color: 'var(--color-primary-dark)', fontSize: '1.1rem', marginBottom: 2 }}>Je bekijkt de webshop als gast</strong>
+              <span style={{ fontSize: '0.95rem', color: 'var(--color-text-dark)', lineHeight: 1.5 }}>Bekijken kan vrij, maar om artikelen in je winkelmandje te leggen en te bestellen moet je inloggen met je ouder- of leidingsaccount.</span>
+            </div>
+            <a href="/portaal?login_vereist=webshop" className="btn btn-secondary" style={{ flexShrink: 0, textDecoration: 'none' }}>
+              Inloggen om te bestellen
+            </a>
+          </div>
+        )}
+
         <div style={{ background: 'hsla(29,57%,46%,0.1)', border: '2px dashed var(--color-accent)', borderRadius: 'var(--border-radius-lg)', padding: 24, marginBottom: 40, display: 'flex', gap: 16, alignItems: 'flex-start' }}>
           <i className="fa-solid fa-circle-info" style={{ fontSize: '1.4rem', color: 'var(--color-secondary)', flexShrink: 0, marginTop: 2 }} />
           <div>
@@ -59,7 +76,7 @@ export default async function ShopPage() {
                 <h3 className="shop-cat-title">{label}</h3>
                 <div className="shop-grid">
                   {items.map((product: Product) => (
-                    <ShopProductCard key={product.id} product={product} />
+                    <ShopProductCard key={product.id} product={product} ingelogd={ingelogd} />
                   ))}
                 </div>
               </div>
@@ -68,7 +85,7 @@ export default async function ShopPage() {
         </div>
       </section>
 
-      <CartDrawer />
+      {ingelogd && <CartDrawer />}
     </>
   )
 }

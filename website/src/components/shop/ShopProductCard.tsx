@@ -12,7 +12,7 @@ interface Product {
   sizes?: string[]
 }
 
-export default function ShopProductCard({ product }: { product: Product }) {
+export default function ShopProductCard({ product, ingelogd = true }: { product: Product; ingelogd?: boolean }) {
   const { addItem } = useCart()
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] ?? 'Standaard')
   const [added, setAdded] = useState(false)
@@ -55,29 +55,42 @@ export default function ShopProductCard({ product }: { product: Product }) {
         <div className="shop-card-price">€{product.price.toFixed(2).replace('.', ',')}</div>
         <p className="shop-card-desc">{product.description}</p>
 
-        {product.sizes && product.sizes.length > 0 && (
+        {ingelogd ? (
           <>
-            <label className="form-label" style={{ marginBottom: 4, fontSize: '0.8rem' }}>
-              Selecteer Maat:
-            </label>
-            <select
-              className="shop-size-select"
-              value={selectedSize}
-              onChange={e => setSelectedSize(e.target.value)}
-            >
-              {product.sizes.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </>
-        )}
+            {product.sizes && product.sizes.length > 0 && (
+              <>
+                <label className="form-label" style={{ marginBottom: 4, fontSize: '0.8rem' }}>
+                  Selecteer Maat:
+                </label>
+                <select
+                  className="shop-size-select"
+                  value={selectedSize}
+                  onChange={e => setSelectedSize(e.target.value)}
+                >
+                  {product.sizes.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </>
+            )}
 
-        <button
-          className="btn btn-secondary btn-add-to-cart"
-          style={{ width: '100%', marginTop: 'auto' }}
-          onClick={handleAdd}
-        >
-          <i className="fa-solid fa-bag-shopping" style={{ marginRight: 8 }} />
-          {added ? 'Toegevoegd!' : 'In winkelmandje'}
-        </button>
+            <button
+              className="btn btn-secondary btn-add-to-cart"
+              style={{ width: '100%', marginTop: 'auto' }}
+              onClick={handleAdd}
+            >
+              <i className="fa-solid fa-bag-shopping" style={{ marginRight: 8 }} />
+              {added ? 'Toegevoegd!' : 'In winkelmandje'}
+            </button>
+          </>
+        ) : (
+          <a
+            href="/portaal?login_vereist=webshop"
+            className="btn btn-outline"
+            style={{ width: '100%', marginTop: 'auto', textDecoration: 'none', textAlign: 'center' }}
+          >
+            <i className="fa-solid fa-right-to-bracket" style={{ marginRight: 8 }} />
+            Log in om te bestellen
+          </a>
+        )}
       </div>
     </div>
   )

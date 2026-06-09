@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 
-async function requireAdmin() {
+async function requireLeiding() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
   const role = user.app_metadata?.role
-  if (role !== 'admin' && role !== 'groepsleiding') return null
+  if (role !== 'admin' && role !== 'groepsleiding' && role !== 'leiding') return null
   return user
 }
 
 export async function POST(req: NextRequest) {
-  const user = await requireAdmin()
+  const user = await requireLeiding()
   if (!user) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const body = await req.json()

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase'
+import { createAdminClient, createServerSupabaseClient } from '@/lib/supabase'
 import { Product, OrderItem } from '@/lib/types'
 
 // Belgische gestructureerde mededeling (Modulo 97), identiek aan de PHP-versie.
@@ -28,6 +28,10 @@ export async function POST(req: NextRequest) {
     if (!Array.isArray(cart) || cart.length === 0) {
       return NextResponse.json({ error: 'Je winkelmandje is leeg.' }, { status: 400 })
     }
+
+    const clientSupabase = await createServerSupabaseClient()
+    const { data: { user } } = await clientSupabase.auth.getUser()
+    const parentId = user?.id || null
 
     const supabase = createAdminClient()
 
@@ -78,6 +82,7 @@ export async function POST(req: NextRequest) {
         items: validatedCart,
         total,
         communication: '', // wordt hieronder bijgewerkt
+        parent_id: parentId,
       })
       .select('id, order_number, order_ref')
       .single()
