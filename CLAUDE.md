@@ -65,3 +65,9 @@ Always use these colors and fonts to keep the UI consistent and professional.
    * The navigation links in `PortaalNav` scroll horizontally on mobile screens using `flex-nowrap` and `overflow-x-auto`. Keep it this way; do not wrap them or hide them behind hamburgers.
 6. **Responsive Layouts:**
    * Use `.portal-grid-layout` (which drops from 2-column `1fr 3fr` to 1-column layout on media query max-width 768px) instead of inline styles for main portal layouts like `LeidingPanel.tsx`.
+
+---
+
+## Git Workflow & Automated Push
+
+* **Automated Git Push:** After completing and verifying a major change, bug fix, or feature update, the AI assistant should automatically stage, commit, and push the changes to GitHub without waiting for an explicit push request from the user. Use semantic commit messages (e.g. `feat:`, `fix:`, `docs:`, `style:`).
