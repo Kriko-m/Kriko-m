@@ -1,51 +1,70 @@
-/**
- * Server-side database helpers — enkel gebruiken in Server Components en API routes.
- * Gebruik createAdminClient() zodat RLS omzeild wordt voor server-to-server calls.
- */
+import { unstable_cache } from 'next/cache'
 import { createAdminClient } from './supabase'
 
-export async function getSettings() {
-  const supabase = createAdminClient()
-  const { data } = await supabase.from('settings').select('*').single()
-  return data
-}
+export const getSettings = unstable_cache(
+  async () => {
+    const supabase = createAdminClient()
+    const { data } = await supabase.from('settings').select('*').single()
+    return data
+  },
+  ['settings-cache'],
+  { revalidate: 300, tags: ['settings'] }
+)
 
-export async function getCalendarEvents() {
-  const supabase = createAdminClient()
-  const { data } = await supabase
-    .from('calendar')
-    .select('*')
-    .order('date', { ascending: true })
-  return data ?? []
-}
+export const getCalendarEvents = unstable_cache(
+  async () => {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from('calendar')
+      .select('*')
+      .order('date', { ascending: true })
+    return data ?? []
+  },
+  ['calendar-cache'],
+  { revalidate: 300, tags: ['calendar'] }
+)
 
-export async function getEchos() {
-  const supabase = createAdminClient()
-  const { data } = await supabase
-    .from('echos')
-    .select('*')
-    .eq('approved', true)
-    .order('year', { ascending: false })
-    .order('month', { ascending: false })
-  return data ?? []
-}
+export const getEchos = unstable_cache(
+  async () => {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from('echos')
+      .select('*')
+      .eq('approved', true)
+      .order('year', { ascending: false })
+      .order('month', { ascending: false })
+    return data ?? []
+  },
+  ['echos-cache'],
+  { revalidate: 300, tags: ['echos'] }
+)
 
-export async function getShopProducts() {
-  const supabase = createAdminClient()
-  const { data } = await supabase
-    .from('shop_products')
-    .select('*')
-    .eq('active', true)
-    .order('sort_order', { ascending: true })
-  return data ?? []
-}
+export const getShopProducts = unstable_cache(
+  async () => {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from('shop_products')
+      .select('*')
+      .eq('active', true)
+      .order('sort_order', { ascending: true })
+    return data ?? []
+  },
+  ['shop-products-cache'],
+  { revalidate: 300, tags: ['shop-products'] }
+)
 
-export async function getKampen(tak?: string) {
-  const supabase = createAdminClient()
-  let query = supabase.from('kampen').select('*, kamp_bestanden(*)').order('datum_van', { ascending: true })
-  if (tak) query = query.eq('tak', tak)
-  const { data } = await query
-  return data ?? []
+export const getKampen = (tak?: string) => {
+  return unstable_cache(
+    async () => {
+      const supabase = createAdminClient()
+      let query = supabase.from('kampen').select('*, kamp_bestanden(*)').order('datum_van', { ascending: true })
+      if (tak) query = query.eq('tak', tak)
+      const { data } = await query
+      return data ?? []
+    },
+    ['kampen-cache', tak ?? 'all'],
+    { revalidate: 300, tags: ['kampen', tak ? `kampen-${tak}` : 'kampen-all'] }
+  )()
 }
 
 export async function getOrders() {
@@ -66,12 +85,16 @@ export async function getMessages() {
   return data ?? []
 }
 
-export async function getVerslagen() {
-  const supabase = createAdminClient()
-  const { data } = await supabase
-    .from('verslagen')
-    .select('*')
-    .eq('published', true)
-    .order('date', { ascending: false })
-  return data ?? []
-}
+export const getVerslagen = unstable_cache(
+  async () => {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from('verslagen')
+      .select('*')
+      .eq('published', true)
+      .order('date', { ascending: false })
+    return data ?? []
+  },
+  ['verslagen-cache'],
+  { revalidate: 300, tags: ['verslagen'] }
+)

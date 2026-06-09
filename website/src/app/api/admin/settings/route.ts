@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { revalidateTag } from 'next/cache'
 
 async function requireAdmin() {
   const supabase = await createServerSupabaseClient()
@@ -26,5 +27,7 @@ export async function PATCH(req: NextRequest) {
   const admin = createAdminClient()
   const { data, error } = await admin.from('settings').update(update).eq('id', 1).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  
+  revalidateTag('settings', 'max')
   return NextResponse.json(data)
 }

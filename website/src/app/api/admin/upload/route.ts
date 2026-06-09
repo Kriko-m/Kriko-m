@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { revalidateTag } from 'next/cache'
 
 async function requireLeiding() {
   const supabase = await createServerSupabaseClient()
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest) {
 
       if (dbError) throw dbError
 
+      revalidateTag('kampen', 'max')
       return NextResponse.json(data)
     }
 
@@ -89,6 +91,7 @@ export async function POST(req: NextRequest) {
 
       if (dbError) throw dbError
 
+      revalidateTag('kampen', 'max')
       return NextResponse.json(data)
     }
 
@@ -128,6 +131,7 @@ export async function POST(req: NextRequest) {
 
       if (dbError) throw dbError
 
+      revalidateTag('echos', 'max')
       return NextResponse.json(data)
     }
 

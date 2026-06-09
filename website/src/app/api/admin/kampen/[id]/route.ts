@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { revalidateTag } from 'next/cache'
 
 async function requireLeiding() {
   const supabase = await createServerSupabaseClient()
@@ -28,6 +29,8 @@ export async function PATCH(
   const admin = createAdminClient()
   const { data, error } = await admin.from('kampen').update(update).eq('id', id).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  
+  revalidateTag('kampen', 'max')
   return NextResponse.json(data)
 }
 
@@ -41,5 +44,7 @@ export async function DELETE(
   const { id } = await params
   const admin = createAdminClient()
   await admin.from('kampen').delete().eq('id', id)
+  
+  revalidateTag('kampen', 'max')
   return NextResponse.json({ ok: true })
 }

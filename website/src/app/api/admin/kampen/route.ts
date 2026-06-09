@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { revalidateTag } from 'next/cache'
 
 async function requireLeiding() {
   const supabase = await createServerSupabaseClient()
@@ -23,5 +24,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  
+  revalidateTag('kampen', 'max')
   return NextResponse.json(data)
 }

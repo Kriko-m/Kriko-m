@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { revalidateTag } from 'next/cache'
 
 async function requireLeiding() {
   const supabase = await createServerSupabaseClient()
@@ -35,6 +36,7 @@ export async function DELETE(
     const { error } = await admin.from('echos').delete().eq('id', id)
     if (error) throw error
 
+    revalidateTag('echos', 'max')
     return NextResponse.json({ ok: true })
   } catch (err: any) {
     console.error('Delete Echo error:', err)
