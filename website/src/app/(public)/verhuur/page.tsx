@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getSettings } from '@/lib/db'
 import PhotoGallery from '@/components/PhotoGallery'
-import Image from 'next/image'
+import FadeInImage from '@/components/FadeInImage'
 
 export const metadata: Metadata = { title: 'Verhuur lokaal | Scouts Kriko-M' }
 
@@ -15,7 +15,7 @@ export default async function VerhuurPage() {
   return (
     <>
       <section className="verhuur-hero" style={{ position: 'relative', overflow: 'hidden' }}>
-        <Image
+        <FadeInImage
           src="/images/verhuur/lokaal-04.jpg"
           alt="Scouts Kriko-M Lokaal"
           fill
