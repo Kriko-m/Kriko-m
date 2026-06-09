@@ -8,8 +8,12 @@ export default async function KinderenPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/portaal')
 
+  const role = user.app_metadata?.role || ''
+  const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
+  if (isLeiding) redirect('/portaal/dashboard')
+
   const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker'
-  const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding'
+  const isAdmin = role === 'admin' || role === 'groepsleiding'
 
   const admin = createAdminClient()
   const { data: kinderen } = await admin

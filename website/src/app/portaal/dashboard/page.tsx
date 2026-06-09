@@ -28,62 +28,92 @@ export default async function DashboardPage() {
 
   const voornaam = naam.split(' ')[0]
 
-  const menu = [
-    {
-      href: '/portaal/kinderen',
-      icon: '👧',
-      titel: 'Gekoppelde leden',
-      desc: 'Beheer de kinderen gekoppeld aan jouw account.',
-      stat: aantalKinderen > 0
-        ? `${aantalKinderen} ${aantalKinderen === 1 ? 'kind' : 'kinderen'} gekoppeld`
-        : 'Geen kinderen gekoppeld',
-      kleur: '#F4C842',
-    },
-    {
-      href: '/portaal/kampen',
-      icon: '🏕️',
-      titel: 'Kampen & Weekenden',
-      desc: 'Schrijf je kinderen in voor weekenden en kampen.',
-      stat: aantalInschrijvingen > 0
-        ? `${aantalInschrijvingen} active ${aantalInschrijvingen === 1 ? 'inschrijving' : 'inschrijvingen'}`
-        : 'Schrijf in voor een kamp',
-      kleur: '#4A7BBF',
-    },
-    {
-      href: '/portaal/echos',
-      icon: '📰',
-      titel: 'Kriko Echo\'s',
-      desc: 'Bekijk en download de maandelijkse planningen per tak.',
-      stat: 'Tak bulletins',
-      kleur: '#8A9A8A',
-    },
-    {
-      href: '/portaal/bestellingen',
-      icon: '🛍️',
-      titel: 'Mijn bestellingen',
-      desc: 'Bekijk je bestellingen en meld betalingen.',
-      stat: aantalBestellingen > 0
-        ? `${openBestellingen > 0 ? openBestellingen + ' wachten op betaling · ' : ''}${aantalBestellingen} totaal`
-        : 'Nog geen bestellingen',
-      kleur: '#C9963A',
-    },
-    {
-      href: '/shop',
-      icon: '🛒',
-      titel: 'Naar de webshop',
-      desc: 'Bestel kledij, uniform en accessoires.',
-      stat: 'Kriko-M merchandise',
-      kleur: '#2A5C3F',
-    },
-    ...(isAdmin ? [{
-      href: '/portaal/admin',
-      icon: '⚙️',
-      titel: 'Beheer',
-      desc: 'Bestellingen beheren, instellingen en contactberichten.',
-      stat: 'Groepsleiding',
-      kleur: '#1A3D2A',
-    }] : []),
-  ]
+  const role = user.app_metadata?.role || ''
+  const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
+
+  const menu = isLeiding
+    ? [
+        {
+          href: '/portaal/leiding',
+          icon: '🛡️',
+          titel: 'Leidersportaal',
+          desc: 'Kampen beheren en maandelijkse planningen (Echo\'s) uploaden.',
+          stat: role === 'groepsleiding' ? 'Groepsleiding' : 'Takleiding',
+          kleur: '#2A5C3F',
+        },
+        {
+          href: '/portaal/verslagen',
+          icon: '📋',
+          titel: 'Verslagen & Notulen',
+          desc: 'Bekijk notulen en documenten van vergaderingen.',
+          stat: 'Leiding documenten',
+          kleur: '#8A9A8A',
+        },
+        ...(isAdmin ? [{
+          href: '/portaal/admin',
+          icon: '⚙️',
+          titel: 'Beheer',
+          desc: 'Bestellingen beheren, instellingen en contactberichten.',
+          stat: 'Groepsleiding',
+          kleur: '#1A3D2A',
+        }] : []),
+        {
+          href: '/shop',
+          icon: '🛒',
+          titel: 'Naar de webshop',
+          desc: 'Bestel kledij, uniform en accessoires.',
+          stat: 'Kriko-M merchandise',
+          kleur: '#C9963A',
+        },
+      ]
+    : [
+        {
+          href: '/portaal/kinderen',
+          icon: '👧',
+          titel: 'Gekoppelde leden',
+          desc: 'Beheer de kinderen gekoppeld aan jouw account.',
+          stat: aantalKinderen > 0
+            ? `${aantalKinderen} ${aantalKinderen === 1 ? 'kind' : 'kinderen'} gekoppeld`
+            : 'Geen kinderen gekoppeld',
+          kleur: '#F4C842',
+        },
+        {
+          href: '/portaal/kampen',
+          icon: '🏕️',
+          titel: 'Kampen & Weekenden',
+          desc: 'Schrijf je kinderen in voor weekenden en kampen.',
+          stat: aantalInschrijvingen > 0
+            ? `${aantalInschrijvingen} active ${aantalInschrijvingen === 1 ? 'inschrijving' : 'inschrijvingen'}`
+            : 'Schrijf in voor een kamp',
+          kleur: '#4A7BBF',
+        },
+        {
+          href: '/portaal/echos',
+          icon: '📰',
+          titel: 'Kriko Echo\'s',
+          desc: 'Bekijk en download de maandelijkse planningen per tak.',
+          stat: 'Tak bulletins',
+          kleur: '#8A9A8A',
+        },
+        {
+          href: '/portaal/bestellingen',
+          icon: '🛍️',
+          titel: 'Mijn bestellingen',
+          desc: 'Bekijk je bestellingen en meld betalingen.',
+          stat: aantalBestellingen > 0
+            ? `${openBestellingen > 0 ? openBestellingen + ' wachten op betaling · ' : ''}${aantalBestellingen} totaal`
+            : 'Nog geen bestellingen',
+          kleur: '#C9963A',
+        },
+        {
+          href: '/shop',
+          icon: '🛒',
+          titel: 'Naar de webshop',
+          desc: 'Bestel kledij, uniform en accessoires.',
+          stat: 'Kriko-M merchandise',
+          kleur: '#2A5C3F',
+        },
+      ]
 
   return (
     <>
@@ -98,16 +128,26 @@ export default async function DashboardPage() {
             Hallo, {voornaam}! 👋
           </h1>
           <p style={{ color: 'rgba(255,255,255,.82)', fontSize: '.92rem', margin: 0, lineHeight: 1.5 }}>
-            Beheer alles voor jouw kinderen bij Scouts Kriko-M.
+            {isLeiding
+              ? 'Beheer en bewerk scoutsgegevens in het leidersportaal.'
+              : 'Beheer alles voor jouw kinderen bij Scouts Kriko-M.'}
           </p>
           <div style={{ display: 'flex', gap: 24, marginTop: 20, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.7)' }}>
-              <strong style={{ color: '#fff' }}>{aantalBestellingen}</strong> {aantalBestellingen === 1 ? 'bestelling' : 'bestellingen'}
-            </span>
-            {openBestellingen > 0 && (
-              <span style={{ fontSize: '.85rem', color: '#f59e0b' }}>
-                ⚠ <strong>{openBestellingen}</strong> wachten op betaling
+            {isLeiding ? (
+              <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.85)' }}>
+                Ingelogd als <strong style={{ color: '#fff', textTransform: 'capitalize' }}>{role}</strong>
               </span>
+            ) : (
+              <>
+                <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.7)' }}>
+                  <strong style={{ color: '#fff' }}>{aantalBestellingen}</strong> {aantalBestellingen === 1 ? 'bestelling' : 'bestellingen'}
+                </span>
+                {openBestellingen > 0 && (
+                  <span style={{ fontSize: '.85rem', color: '#f59e0b' }}>
+                    ⚠ <strong>{openBestellingen}</strong> wachten op betaling
+                  </span>
+                )}
+              </>
             )}
           </div>
         </div>

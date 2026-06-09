@@ -32,18 +32,20 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
 
   const isLeiding = isAdmin || role === 'leiding'
 
-  const links = [
-    { href: '/portaal/dashboard', label: '🏠 Dashboard' },
-    { href: '/portaal/kinderen', label: '👧 Leden' },
-    { href: '/portaal/kampen', label: '🏕️ Kampen' },
-    { href: '/portaal/echos', label: '📰 Echo\'s' },
-    { href: '/portaal/bestellingen', label: '🛍️ Bestellingen' },
-    ...(isLeiding ? [
-      { href: '/portaal/leiding', label: '🛡️ Leiding' },
-      { href: '/portaal/verslagen', label: '📋 Verslagen' }
-    ] : []),
-    ...(isAdmin ? [{ href: '/portaal/admin', label: '⚙️ Beheer' }] : []),
-  ]
+  const links = isLeiding
+    ? [
+        { href: '/portaal/dashboard', label: '🏠 Dashboard' },
+        { href: '/portaal/leiding', label: '🛡️ Leiding' },
+        { href: '/portaal/verslagen', label: '📋 Verslagen' },
+        ...(isAdmin ? [{ href: '/portaal/admin', label: '⚙️ Beheer' }] : []),
+      ]
+    : [
+        { href: '/portaal/dashboard', label: '🏠 Dashboard' },
+        { href: '/portaal/kinderen', label: '👧 Leden' },
+        { href: '/portaal/kampen', label: '🏕️ Kampen' },
+        { href: '/portaal/echos', label: '📰 Echo\'s' },
+        { href: '/portaal/bestellingen', label: '🛍️ Bestellingen' },
+      ]
 
   return (
     <header style={{ background: '#1A3D2A', color: '#fff', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, boxShadow: '0 2px 12px rgba(0,0,0,.15)' }}>

@@ -8,7 +8,7 @@ import { Verslag } from '@/lib/types'
 export default async function VerslagenPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal/leiding-login')
+  if (!user) redirect('/portaal')
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
