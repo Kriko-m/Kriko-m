@@ -7,7 +7,7 @@ import { Kamp, Echo } from '@/lib/types'
 export default async function LeidingPortaalPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  if (!user) redirect('/portaal/leiding-login')
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'

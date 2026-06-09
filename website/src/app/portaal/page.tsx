@@ -1,28 +1,27 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-browser'
 
-type Tab = 'ouder' | 'leiding'
 type SubTab = 'login' | 'register'
-
-const DEMO_KNOPPEN = [
-  { rol: 'ouder',         label: 'Demo Ouder',         kleur: '#2A5C3F', omschrijving: 'Ouder met kinderen' },
-  { rol: 'leiding',       label: 'Demo Leiding',        kleur: '#1A3D2A', omschrijving: 'Tak-leiding' },
-  { rol: 'groepsleiding', label: 'Demo Groepsleiding',  kleur: '#1A3D2A', omschrijving: 'Volledig beheer' },
-]
 
 export default function PortaalPage() {
   const router = useRouter()
-  const [tab, setTab] = useState<Tab>('ouder')
   const [subTab, setSubTab] = useState<SubTab>('login')
   const [status, setStatus] = useState<'idle' | 'loading'>('idle')
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
 
   const supabase = createClient()
+
+  useEffect(() => {
+    document.body.style.paddingTop = '0'
+    return () => {
+      document.body.style.paddingTop = ''
+    }
+  }, [])
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -105,126 +104,71 @@ export default function PortaalPage() {
       {/* Card */}
       <div style={{ width: '100%', maxWidth: 520, background: '#fff', borderRadius: 22, boxShadow: '0 16px 50px rgba(26,61,42,.13)', border: '1px solid #C2D9C9', overflow: 'hidden' }}>
 
-        {/* Hoofd-tabs: Ouder / Leiding */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '2px solid #C2D9C9' }}>
-          {(['ouder', 'leiding'] as Tab[]).map(t => (
-            <button key={t} onClick={() => { setTab(t); setError(''); setInfo(''); setSubTab('login') }}
-              style={{
-                padding: '18px 16px', background: tab === t ? 'color-mix(in srgb,#1A3D2A 6%,transparent)' : 'none',
-                border: 'none', borderBottom: tab === t ? '2px solid #1A3D2A' : 'none',
-                marginBottom: tab === t ? -2 : 0,
-                fontFamily: 'inherit', fontSize: '1rem', fontWeight: 600, cursor: 'pointer',
-                color: tab === t ? '#1A3D2A' : '#6A8A75',
-              }}>
-              {t === 'ouder' ? '👨‍👩‍👧 Ouder / Lid' : '🛡️ Leiding'}
-            </button>
-          ))}
-        </div>
-
         <div style={{ padding: '32px 40px 38px' }}>
+          {/* Title */}
+          <div style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontSize: '1.35rem', fontWeight: 900, color: '#1A3D2A', marginBottom: 6 }}>Inloggen — Ouderportaal</div>
+          <div style={{ fontSize: '.88rem', color: '#6A8A75', marginBottom: 24, lineHeight: 1.55 }}>
+            Log in op je ouderportaal of registreer een nieuw account.
+          </div>
 
-          {/* ── OUDER TAB ── */}
-          {tab === 'ouder' && (
-            <>
-              {/* Sub-tabs: login / register */}
-              <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid #C2D9C9' }}>
-                {(['login', 'register'] as SubTab[]).map(st => (
-                  <button key={st} onClick={() => { setSubTab(st); setError('') }}
-                    style={{
-                      flex: 1, padding: '10px 0', background: 'none', border: 'none',
-                      borderBottom: subTab === st ? '2px solid #1A3D2A' : '2px solid transparent',
-                      fontFamily: 'inherit', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer',
-                      color: subTab === st ? '#1A3D2A' : '#6A8A75', marginBottom: -1,
-                    }}>
-                    {st === 'login' ? '🔑 Inloggen' : '📝 Registreren'}
-                  </button>
-                ))}
-              </div>
-
-              {error && <div style={{ padding: '10px 14px', borderRadius: 10, fontSize: '.85rem', fontWeight: 600, textAlign: 'center', marginBottom: 18, background: 'hsla(349,51%,47%,.1)', border: '1.5px solid #B23A4D', color: '#B23A4D' }}>{error}</div>}
-
-              {subTab === 'login' ? (
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div>
-                    <label style={labelStyle}>E-mailadres</label>
-                    <input type="email" name="email" required placeholder="naam@voorbeeld.be" autoFocus style={inputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Wachtwoord</label>
-                    <input type="password" name="password" required placeholder="••••••••" style={inputStyle} />
-                  </div>
-                  <button type="submit" disabled={status === 'loading'} style={btnPrimary}>
-                    {status === 'loading' ? 'Bezig…' : 'Inloggen →'}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div>
-                    <label style={labelStyle}>Naam</label>
-                    <input type="text" name="naam" required placeholder="Voornaam Achternaam" autoFocus style={inputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>E-mailadres</label>
-                    <input type="email" name="email" required placeholder="naam@voorbeeld.be" style={inputStyle} />
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Wachtwoord <span style={{ fontWeight: 400, color: '#6A8A75' }}>(min. 6 tekens)</span></label>
-                    <input type="password" name="password" required placeholder="••••••••" minLength={6} style={inputStyle} />
-                  </div>
-                  <button type="submit" disabled={status === 'loading'} style={btnPrimary}>
-                    {status === 'loading' ? 'Bezig…' : 'Account aanmaken →'}
-                  </button>
-                </form>
-              )}
-
-              {/* Demo ouder */}
-              <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid #C2D9C9' }}>
-                <button onClick={() => demoLogin('ouder')} disabled={status === 'loading'}
-                  style={{ width: '100%', padding: '11px', background: 'none', border: '1.5px dashed #6A8A75', borderRadius: 12, fontFamily: 'inherit', fontSize: '.88rem', fontWeight: 600, color: '#6A8A75', cursor: 'pointer' }}>
-                  Demo ouder-account gebruiken
-                </button>
-              </div>
-            </>
-          )}
-
-          {/* ── LEIDING TAB ── */}
-          {tab === 'leiding' && (
-            <>
-              <div style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontSize: '1.25rem', fontWeight: 900, color: '#1A3D2A', marginBottom: 6 }}>Inloggen — Leiding</div>
-              <div style={{ fontSize: '.88rem', color: '#6A8A75', marginBottom: 24, lineHeight: 1.55 }}>
-                Log in met je <strong>Scouts & Gidsen Vlaanderen</strong>-account. Je rol en takken worden automatisch herkend.
-              </div>
-
-              {error && <div style={{ padding: '10px 14px', borderRadius: 10, fontSize: '.85rem', fontWeight: 600, textAlign: 'center', marginBottom: 18, background: 'hsla(349,51%,47%,.1)', border: '1.5px solid #B23A4D', color: '#B23A4D' }}>{error}</div>}
-
-              {/* S&G OAuth knop (placeholder) */}
-              <button disabled style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: '14px', background: '#E8EEF0', border: '1.5px solid #C2D9C9', borderRadius: 14, fontFamily: 'inherit', fontSize: '1rem', fontWeight: 700, color: '#6A8A75', cursor: 'not-allowed', marginBottom: 8 }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" /></svg>
-                Inloggen via Scouts & Gidsen
+          {/* Sub-tabs: login / register */}
+          <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid #C2D9C9' }}>
+            {(['login', 'register'] as SubTab[]).map(st => (
+              <button key={st} onClick={() => { setSubTab(st); setError('') }}
+                style={{
+                  flex: 1, padding: '10px 0', background: 'none', border: 'none',
+                  borderBottom: subTab === st ? '2px solid #1A3D2A' : '2px solid transparent',
+                  fontFamily: 'inherit', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer',
+                  color: subTab === st ? '#1A3D2A' : '#6A8A75', marginBottom: -1,
+                }}>
+                {st === 'login' ? '🔑 Inloggen' : '📝 Registreren'}
               </button>
-              <p style={{ fontSize: '.75rem', color: '#6A8A75', textAlign: 'center', marginBottom: 24 }}>
-                S&G OAuth wordt actief zodra de API-key geconfigureerd is.
-              </p>
+            ))}
+          </div>
 
-              {/* Scheidingslijn */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-                <div style={{ flex: 1, height: 1, background: '#C2D9C9' }} />
-                <span style={{ fontSize: '.75rem', fontWeight: 700, color: '#6A8A75', textTransform: 'uppercase', letterSpacing: '.08em' }}>Demo-accounts</span>
-                <div style={{ flex: 1, height: 1, background: '#C2D9C9' }} />
-              </div>
+          {error && <div style={{ padding: '10px 14px', borderRadius: 10, fontSize: '.85rem', fontWeight: 600, textAlign: 'center', marginBottom: 18, background: 'hsla(349,51%,47%,.1)', border: '1.5px solid #B23A4D', color: '#B23A4D' }}>{error}</div>}
 
-              {/* Demo knoppen leiding */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {DEMO_KNOPPEN.filter(d => d.rol !== 'ouder').map(d => (
-                  <button key={d.rol} onClick={() => demoLogin(d.rol)} disabled={status === 'loading'}
-                    style={{ padding: '13px 16px', background: d.kleur, color: '#fff', border: 'none', borderRadius: 12, fontFamily: 'inherit', fontSize: '.95rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: status === 'loading' ? .7 : 1 }}>
-                    <span>{d.label}</span>
-                    <span style={{ fontSize: '.75rem', fontWeight: 400, opacity: .8 }}>{d.omschrijving}</span>
-                  </button>
-                ))}
+          {subTab === 'login' ? (
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={labelStyle}>E-mailadres</label>
+                <input type="email" name="email" required placeholder="naam@voorbeeld.be" autoFocus style={inputStyle} />
               </div>
-            </>
+              <div>
+                <label style={labelStyle}>Wachtwoord</label>
+                <input type="password" name="password" required placeholder="••••••••" style={inputStyle} />
+              </div>
+              <button type="submit" disabled={status === 'loading'} style={btnPrimary}>
+                {status === 'loading' ? 'Bezig…' : 'Inloggen →'}
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={labelStyle}>Naam</label>
+                <input type="text" name="naam" required placeholder="Voornaam Achternaam" autoFocus style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>E-mailadres</label>
+                <input type="email" name="email" required placeholder="naam@voorbeeld.be" style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Wachtwoord <span style={{ fontWeight: 400, color: '#6A8A75' }}>(min. 6 tekens)</span></label>
+                <input type="password" name="password" required placeholder="••••••••" minLength={6} style={inputStyle} />
+              </div>
+              <button type="submit" disabled={status === 'loading'} style={btnPrimary}>
+                {status === 'loading' ? 'Bezig…' : 'Account aanmaken →'}
+              </button>
+            </form>
           )}
+
+          {/* Demo ouder */}
+          <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid #C2D9C9' }}>
+            <button onClick={() => demoLogin('ouder')} disabled={status === 'loading'}
+              style={{ width: '100%', padding: '11px', background: 'none', border: '1.5px dashed #6A8A75', borderRadius: 12, fontFamily: 'inherit', fontSize: '.88rem', fontWeight: 600, color: '#6A8A75', cursor: 'pointer' }}>
+              Demo ouder-account gebruiken
+            </button>
+          </div>
 
         </div>
       </div>

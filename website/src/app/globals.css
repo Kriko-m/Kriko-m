@@ -311,6 +311,10 @@ a {
     flex-shrink: 0;
 }
 
+.nav-mobile-only {
+    display: none !important;
+}
+
 .arrow {
     font-size: 0.55rem;
     margin-left: 5px;
@@ -1749,6 +1753,10 @@ body.portal-theme .tak-hero.primair {
 
     .nav-hamburger {
         display: flex;
+    }
+
+    .nav-mobile-only {
+        display: block !important;
     }
 
     .nav-links {

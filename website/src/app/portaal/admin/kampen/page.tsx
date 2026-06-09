@@ -6,7 +6,7 @@ import KampenAdmin from './KampenAdmin'
 export default async function AdminKampenPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal')
+  if (!user) redirect('/portaal/leiding-login')
 
   const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding'
   if (!isAdmin) redirect('/portaal/dashboard')
