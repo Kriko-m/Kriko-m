@@ -3481,13 +3481,46 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
     top: 0; left: 0; right: 0;
     height: 64px;
     z-index: 120;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 22px;
     background: linear-gradient(100deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
     border-bottom: 4px solid var(--color-accent);
     box-shadow: 0 3px 16px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.portaal-nav-container {
+    width: 100%;
+    padding: 0 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 60px; /* Aligns with 64px header height minus the 4px border-bottom */
+}
+
+.portaal-nav-scroll {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-left: 12px;
+    padding-right: 12px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    justify-content: center;
+}
+
+@media (max-width: 1024px) {
+    .portaal-nav-scroll {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    .portaal-nav-container {
+        padding: 0 16px;
+        gap: 12px;
+    }
 }
 .portaal-nav-brand {
     display: flex;

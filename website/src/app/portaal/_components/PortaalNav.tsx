@@ -122,27 +122,13 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
   return (
     <>
       <header className="portaal-nav">
-        <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', padding: '0 20px', display: 'flex', alignItems: 'center', gap: 16, height: 64 }}>
+        <div className="portaal-nav-container">
           <Link href="/portaal/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
             <Image src="/images/logo-finaal.png" alt="Kriko-M" width={36} height={36} style={{ objectFit: 'contain' }} />
             <span style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '1.1rem', color: '#fff', letterSpacing: '.04em' }}>Portaal</span>
           </Link>
 
-          <nav
-            style={{
-              display: 'flex',
-              gap: 6,
-              flex: 1,
-              flexWrap: 'nowrap',
-              overflowX: 'auto',
-              WebkitOverflowScrolling: 'touch',
-              paddingLeft: 12,
-              paddingRight: 12,
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
-            className="portaal-nav-scroll"
-          >
+          <nav className="portaal-nav-scroll">
             {links.map(l => {
               const active = pathname.startsWith(l.href)
               return (
