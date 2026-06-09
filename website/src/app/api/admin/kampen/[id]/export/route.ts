@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { fetchMember } from '@/lib/groepsadmin'
 
 async function requireLeiding() {
   const supabase = await createServerSupabaseClient()
@@ -31,6 +32,11 @@ export async function GET(
   const { id: kampId } = await params
   const admin = createAdminClient()
 
+  // Get leader session to extract OAuth provider token for Groepsadmin calls
+  const supabase = await createServerSupabaseClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.provider_token ?? 'mock_token'
+
   // Kamp info ophalen
   const { data: kamp } = await admin
     .from('kampen')
@@ -51,11 +57,44 @@ export async function GET(
   const inschrijvingen = inschrijvingenRes.data ?? []
   const children = childrenRes.data ?? []
 
-  // Map ga_id naar kindgegevens
+  // Map ga_id naar kindgegevens (local DB fallback)
   const childrenMap = new Map<string, { voornaam: string; tak: string }>()
   children.forEach(c => {
     childrenMap.set(c.ga_id, { voornaam: c.voornaam, tak: c.tak })
   })
+
+  // Resolve member info from Groepsadmin API
+  const records = await Promise.all(
+    inschrijvingen.map(async (ins) => {
+      try {
+        const memberInfo = await fetchMember(token, ins.ga_id)
+        return {
+          ins,
+          voornaam: memberInfo.voornaam || childrenMap.get(ins.ga_id)?.voornaam || 'Onbekend',
+          achternaam: memberInfo.achternaam || '',
+          geboortedatum: memberInfo.geboortedatum || '',
+          tak: memberInfo.tak || childrenMap.get(ins.ga_id)?.tak || 'Onbekend',
+          medisch: memberInfo.medisch
+        }
+      } catch (err) {
+        console.error(`Failed to fetch Groepsadmin details for ${ins.ga_id}:`, err)
+        const childInfo = childrenMap.get(ins.ga_id)
+        return {
+          ins,
+          voornaam: childInfo?.voornaam ?? 'Onbekend',
+          achternaam: 'Onbekend',
+          geboortedatum: 'Onbekend',
+          tak: childInfo?.tak ?? 'Onbekend',
+          medisch: {
+            allergieen: 'Fout bij ophalen',
+            dieet: 'Fout bij ophalen',
+            medicatie: 'Fout bij ophalen',
+            opmerkingen: 'Fout bij ophalen'
+          }
+        }
+      }
+    })
+  )
 
   // CSV lines
   const lines: string[] = []
@@ -72,27 +111,38 @@ export async function GET(
   lines.push([
     '#',
     'Voornaam',
+    'Achternaam',
+    'Geboortedatum',
     'Tak',
+    'Allergieën',
+    'Dieet',
+    'Medicatie',
+    'Medische opmerkingen',
     'Opmerking ouder',
     'Lidnummer (ga_id)',
     'Registratiedatum'
   ].map(escapeCsvValue).join(';'))
 
-  if (inschrijvingen.length === 0) {
+  if (records.length === 0) {
     lines.push(['(nog geen inschrijvingen voor dit kamp)'].map(escapeCsvValue).join(';'))
   } else {
-    inschrijvingen.forEach((ins, idx) => {
-      const childInfo = childrenMap.get(ins.ga_id)
-      const regDate = ins.ingeschreven_op
-        ? new Date(ins.ingeschreven_op).toLocaleString('nl-BE')
+    records.forEach((record, idx) => {
+      const regDate = record.ins.ingeschreven_op
+        ? new Date(record.ins.ingeschreven_op).toLocaleString('nl-BE')
         : ''
 
       lines.push([
         idx + 1,
-        childInfo?.voornaam ?? 'Onbekend',
-        childInfo?.tak ? childInfo.tak.charAt(0).toUpperCase() + childInfo.tak.slice(1) : 'Onbekend',
-        ins.opmerking ?? '',
-        ins.ga_id ?? '',
+        record.voornaam,
+        record.achternaam,
+        record.geboortedatum,
+        record.tak ? record.tak.charAt(0).toUpperCase() + record.tak.slice(1) : 'Onbekend',
+        record.medisch.allergieen ?? '-',
+        record.medisch.dieet ?? '-',
+        record.medisch.medicatie ?? '-',
+        record.medisch.opmerkingen ?? '-',
+        record.ins.opmerking ?? '',
+        record.ins.ga_id ?? '',
         regDate
       ].map(escapeCsvValue).join(';'))
     })

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { createServerSupabaseClient } from '@/lib/supabase'
 
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
@@ -11,8 +11,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Ongeldige gegevens' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
-  const { data, error } = await admin
+  const { data, error } = await supabase
     .from('parent_children')
     .insert({ parent_id: user.id, voornaam: voornaam.trim(), tak, ga_id: `manual_${user.id}_${Date.now()}` })
     .select()

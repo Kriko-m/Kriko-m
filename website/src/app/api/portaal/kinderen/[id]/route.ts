@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { createServerSupabaseClient } from '@/lib/supabase'
 
 export async function DELETE(
   _req: NextRequest,
@@ -10,19 +10,22 @@ export async function DELETE(
   if (!user) return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
 
   const { id } = await params
-  const admin = createAdminClient()
 
-  // Verifieer dat dit kind van deze ouder is
-  const { data: kind } = await admin
+  // RLS restricts delete operations to parent_children owned by the logged-in user.
+  // Using .select() tells us if a row was actually deleted.
+  const { data, error } = await supabase
     .from('parent_children')
-    .select('parent_id')
+    .delete()
     .eq('id', id)
-    .single()
+    .select('id')
 
-  if (!kind || kind.parent_id !== user.id) {
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  if (!data || data.length === 0) {
     return NextResponse.json({ error: 'Niet gevonden' }, { status: 404 })
   }
 
-  await admin.from('parent_children').delete().eq('id', id)
   return NextResponse.json({ ok: true })
 }

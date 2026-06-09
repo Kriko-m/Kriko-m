@@ -286,6 +286,22 @@ CREATE POLICY "Ouder: eigen inschrijvingen"  ON kampinschrijvingen FOR SELECT
     WHERE pc.parent_id = auth.uid() AND pc.ga_id = kampinschrijvingen.ga_id
   ));
 
+CREATE POLICY "Ouder: inschrijving toevoegen" ON kampinschrijvingen FOR INSERT
+  WITH CHECK (
+    door = auth.uid()::text AND EXISTS (
+      SELECT 1 FROM parent_children pc
+      WHERE pc.parent_id = auth.uid() AND pc.ga_id = kampinschrijvingen.ga_id
+    )
+  );
+
+CREATE POLICY "Ouder: inschrijving verwijderen" ON kampinschrijvingen FOR DELETE
+  USING (
+    door = auth.uid()::text OR EXISTS (
+      SELECT 1 FROM parent_children pc
+      WHERE pc.parent_id = auth.uid() AND pc.ga_id = kampinschrijvingen.ga_id
+    )
+  );
+
 -- Contactberichten: iedereen mag schrijven (anoniem contactformulier)
 CREATE POLICY "Iedereen mag contact sturen"  ON messages FOR INSERT WITH CHECK (true);
 
