@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getSettings } from '@/lib/db'
 import ContactForm from './ContactForm'
+import CopyButton from '@/components/CopyButton'
 
 export const metadata: Metadata = { title: 'Contact | Scouts Kriko-M' }
 
@@ -31,7 +32,24 @@ export default async function ContactPage() {
               <ul className="contact-sidebar-list" style={{ marginTop: 16 }}>
                 <li className="contact-sidebar-item">
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>E-mail</span>
-                  <a href={`mailto:${settings?.contact_email}`} style={{ fontWeight: 600 }}>{settings?.contact_email}</a>
+                  <CopyButton
+                    text={settings?.contact_email ?? ''}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--color-primary)',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      padding: 0,
+                      fontFamily: 'inherit',
+                      fontSize: 'inherit',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    {settings?.contact_email} <i className="fas fa-copy" style={{ fontSize: '0.85em', opacity: 0.7 }}></i>
+                  </CopyButton>
                 </li>
                 <li className="contact-sidebar-item">
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Telefoon</span>
@@ -39,7 +57,15 @@ export default async function ContactPage() {
                 </li>
                 <li className="contact-sidebar-item">
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Adres</span>
-                  <span style={{ fontWeight: 600, textAlign: 'right' }}>{settings?.contact_address}</span>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings?.contact_address ?? '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontWeight: 600, color: 'var(--color-primary)', textAlign: 'right', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                    className="address-map-link"
+                  >
+                    {settings?.contact_address} <i className="fa-solid fa-map-location-dot" style={{ fontSize: '0.85em', opacity: 0.7 }}></i>
+                  </a>
                 </li>
               </ul>
             </div>

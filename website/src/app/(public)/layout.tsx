@@ -12,7 +12,9 @@ export default async function PublicLayout({ children }: { children: React.React
         alertActive={settings?.alert_active ?? false}
         alertMessage={settings?.alert_message ?? ''}
       />
-      {children}
+      <div className="public-layout-content">
+        {children}
+      </div>
       <Footer
         contactEmail={settings?.contact_email}
         contactPhone={settings?.contact_phone}

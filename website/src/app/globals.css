@@ -97,6 +97,9 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+}
+
+.public-layout-content {
     padding-top: 70px;
 }
 
@@ -594,8 +597,8 @@ a {
 }
 
 .hero-title {
-    font-family: 'Nunito', Arial, sans-serif;
-    font-size: 7rem;
+    font-family: 'Londrina Solid', 'Nunito', Arial, sans-serif;
+    font-size: 7.2rem;
     font-weight: 900;
     color: var(--color-bg-white);
     letter-spacing: 0.08em;
@@ -869,6 +872,7 @@ a {
     border-bottom: 4px solid var(--color-accent-light);
     position: relative;
     overflow: hidden;
+    background-color: var(--tak-color, var(--color-primary-dark));
 }
 
 .tak-hero-img {
@@ -923,7 +927,7 @@ body.portal-theme .tak-hero.primair {
     background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
 }
 .tak-hero.primair::after {
-    content: 'âšœ';  /* fallback */
+    content: '\269C';  /* fallback Fleur-de-lis */
     position: absolute;
     right: 5%;
     top: 50%;
@@ -937,22 +941,27 @@ body.portal-theme .tak-hero.primair {
 .tak-hero.primair .container {
     padding-left: 8px;
 }
-.tak-hero.hero-takken::after    { content: 'âšœ'; }
-.tak-hero.hero-kalender::after  { content: 'ðŸ“…'; }
-.tak-hero.hero-echos::after     { content: 'ðŸ“°'; }
-.tak-hero.hero-archief::after   { content: 'ðŸ—‚ï¸'; }
-.tak-hero.hero-verslagen::after { content: 'ðŸ“‹'; }
-.tak-hero.hero-webshop::after   { content: 'ðŸ›ï¸'; }
-.tak-hero.hero-inschrijven::after { content: 'âœï¸'; }
-.tak-hero.hero-contact::after   { content: 'âœ‰ï¸'; }
-.tak-hero.hero-checkout::after  { content: 'ðŸ›’'; }
-.tak-hero.hero-bestelling::after { content: 'âœ…'; }
+.tak-hero.hero-takken::after    { content: '\269C'; }
+.tak-hero.hero-kalender::after  { content: '\1F4C5'; }
+.tak-hero.hero-echos::after     { content: '\1F4F0'; }
+.tak-hero.hero-archief::after   { content: '\1F4C1'; }
+.tak-hero.hero-verslagen::after { content: '\1F4CB'; }
+.tak-hero.hero-webshop::after   { content: '\1F6CD'; }
+.tak-hero.hero-inschrijven::after { content: '\270D'; }
+.tak-hero.hero-contact::after   { content: '\2709'; }
+.tak-hero.hero-checkout::after  { content: '\1F6D2'; }
+.tak-hero.hero-bestelling::after { content: '\2705'; }
 
 /* Banners worden nu via Next.js <Image> component en WebP ingeladen in takken/[slug]/page.tsx voor snellere laadtijden */
 
 .tak-hero-title {
-    font-size: 3rem;
+    font-family: 'Londrina Solid', 'Nunito', Arial, sans-serif;
+    font-size: 3.4rem;
+    font-weight: 900;
     color: var(--color-bg-white);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
 }
 
 .tak-layout {
@@ -2654,8 +2663,8 @@ body.portal-theme .tak-hero.primair {
 }
 
 .page-header-title {
-    font-family: 'Nunito', Arial, sans-serif;
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-family: 'Londrina Solid', 'Nunito', Arial, sans-serif;
+    font-size: clamp(2.2rem, 4.5vw, 3.4rem);
     font-weight: 900;
     color: var(--color-primary);
     letter-spacing: 0.06em;
@@ -2967,6 +2976,7 @@ body.portal-theme .tak-hero.primair {
     border-bottom: 4px solid var(--color-accent);
     display: flex;
     align-items: center;
+    background-color: var(--color-primary-dark);
 }
 
 .verhuur-hero-inner {
@@ -2979,11 +2989,12 @@ body.portal-theme .tak-hero.primair {
 .verhuur-hero-title {
     margin: 0;
     color: #fff;
-    font-family: 'Nunito', Arial, sans-serif;
-    font-size: 3rem;
+    font-family: 'Londrina Solid', 'Nunito', Arial, sans-serif;
+    font-size: 3.4rem;
     font-weight: 900;
     line-height: 1;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
 }
 
@@ -3936,4 +3947,23 @@ body.portal-theme .portaal-nav {
 
 .portal-subtab-btn.active::after {
     transform: scaleX(1);
+}
+
+/* Hide scrollbar for horizontal scrolling nav on mobile */
+.portaal-nav-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* Responsive Grid Layout for portal sidebar/main view */
+.portal-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+    .portal-grid-layout {
+        grid-template-columns: 1fr;
+    }
 }

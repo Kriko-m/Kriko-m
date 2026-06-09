@@ -245,7 +245,7 @@ export default function LeidingPanel({ initialKampen, initialEchos, role }: Leid
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: 24, alignItems: 'flex-start' }}>
+      <div className="portal-grid-layout">
         {/* Sidebar: Tak selection */}
         <aside style={{ background: '#fff', border: '1px solid #C2D9C9', borderRadius: 18, padding: 18, boxShadow: 'var(--shadow-sm)' }}>
           <div style={{ fontSize: '.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.08em', color: '#6A8A75', marginBottom: 12 }}>Tak selecteren</div>

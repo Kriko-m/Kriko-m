@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getSettings } from '@/lib/db'
 import PhotoGallery from '@/components/PhotoGallery'
+import Image from 'next/image'
 
 export const metadata: Metadata = { title: 'Verhuur lokaal | Scouts Kriko-M' }
 
@@ -13,11 +14,15 @@ export default async function VerhuurPage() {
 
   return (
     <>
-      <section
-        className="verhuur-hero"
-        style={{ backgroundImage: "url('/images/verhuur/lokaal-04.jpg')" }}
-      >
-        <div className="container verhuur-hero-inner">
+      <section className="verhuur-hero" style={{ position: 'relative', overflow: 'hidden' }}>
+        <Image
+          src="/images/verhuur/lokaal-04.jpg"
+          alt="Scouts Kriko-M Lokaal"
+          fill
+          priority
+          style={{ objectFit: 'cover', objectPosition: 'center 42%' }}
+        />
+        <div className="container verhuur-hero-inner" style={{ position: 'relative', zIndex: 2 }}>
           <h1 className="verhuur-hero-title">Ons lokaal</h1>
           <a href={KAMPAS_URL} target="_blank" rel="noopener" className="btn btn-primary verhuur-hero-btn">
             <i className="fas fa-calendar-check" style={{ marginRight: 8 }}></i>Reserveer via KAMPAS

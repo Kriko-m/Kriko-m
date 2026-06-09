@@ -83,7 +83,7 @@ export default async function InschrijvenPage() {
 
           {/* Zijbalk */}
           <div>
-            <div className="side-card" style={{ backgroundColor: 'var(--color-primary-dark)', color: 'var(--color-bg-white)', border: 'none' }}>
+            <div className="side-card" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-white)', border: 'none' }}>
               <h3 style={{ color: 'var(--color-accent-light)', borderBottom: '1px dashed rgba(255,255,255,0.2)', paddingBottom: 12 }}>Jaarlijks Lidgeld</h3>
               <p style={{ fontSize: '0.95rem', color: 'hsla(0,0%,100%,0.85)', marginBottom: 20 }}>
                 Tarieven voor het scoutsjaar <strong>{year}</strong>:

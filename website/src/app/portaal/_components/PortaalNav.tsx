@@ -55,7 +55,21 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
           <span style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '1.1rem', color: '#fff', letterSpacing: '.04em' }}>Portaal</span>
         </Link>
 
-        <nav style={{ display: 'flex', gap: 4, flex: 1, flexWrap: 'wrap', justifyContent: 'flex-start', paddingLeft: 24 }}>
+        <nav
+          style={{
+            display: 'flex',
+            gap: 6,
+            flex: 1,
+            flexWrap: 'nowrap',
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            paddingLeft: 12,
+            paddingRight: 12,
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+          className="portaal-nav-scroll"
+        >
           {links.map(l => {
             const active = pathname.startsWith(l.href)
             return (

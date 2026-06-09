@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { getSettings, getEchos } from '@/lib/db'
 import type { Metadata } from 'next'
 import CopyButton from '@/components/CopyButton'
+import WhatsAppJoinButton from '@/components/WhatsAppJoinButton'
 import { Echo, Leader } from '@/lib/types'
 
 const TAK_DARK: Record<string, string> = {
@@ -155,12 +156,10 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               >
                 <i className="fas fa-copy"></i> {tak.email}
               </CopyButton>
-              {tak.whatsapp_url && (
-                <a href={tak.whatsapp_url} target="_blank" rel="noopener"
-                   className="btn" style={{ marginTop: 4, width: '100%', background: 'transparent', color: '#25D366', border: '1.5px solid #25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                  <i className="fab fa-whatsapp" style={{ fontSize: '1.1rem' }}></i> Doe mee op WhatsApp
-                </a>
-              )}
+              <WhatsAppJoinButton
+                takName={tak.name}
+                whatsappUrl={tak.whatsapp_url || `https://chat.whatsapp.com/placeholder-${slug}`}
+              />
             </div>
 
             {/* Uniform kaart */}
