@@ -42,9 +42,9 @@ export default async function EchosPage() {
         </div>
 
         {takken.length === 0 && (
-          <div style={{ background: '#fff8e1', border: '1.5px solid #f59e0b', borderRadius: 12, padding: '14px 18px', marginBottom: 24, fontSize: '.88rem', color: '#92400e' }}>
-            Voeg eerst je kinderen toe om relevante Echo&apos;s te zien.{' '}
-            <Link href="/portaal/kinderen" style={{ fontWeight: 700, color: '#92400e' }}>Leden beheren →</Link>
+          <div style={{ background: '#fff8e1', border: '1.5px solid #f59e0b', borderRadius: 'var(--border-radius-md)', padding: '16px 20px', marginBottom: 24, fontSize: '.88rem', color: '#92400e', lineHeight: 1.6 }}>
+            📋 Info: Voeg eerst je kinderen toe om relevante Echo&apos;s te zien.{' '}
+            <Link href="/portaal/kinderen" style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>Leden beheren →</Link>
           </div>
         )}
 
@@ -53,24 +53,24 @@ export default async function EchosPage() {
           const kleur = TAK_KLEUREN[tak] ?? '#888'
           return (
             <div key={tak} style={{ marginBottom: 32 }}>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: kleur, textTransform: 'capitalize', letterSpacing: '.04em', marginBottom: 12, paddingBottom: 8, borderBottom: `2px solid ${kleur}44` }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: kleur, textTransform: 'capitalize', letterSpacing: '.04em', marginBottom: 16, paddingBottom: 8, borderBottom: `3px solid ${kleur}33`, fontFamily: 'Outfit, sans-serif' }}>
                 {tak}
               </h2>
               {takEchos.length === 0 ? (
                 <p style={{ color: '#6A8A75', fontSize: '.88rem' }}>Nog geen Echo&apos;s beschikbaar voor deze tak.</p>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {takEchos.map((echo: Echo) => {
                     const label = `${MAANDEN[echo.month] ?? ''} ${echo.year}`
                     const url = `${supabaseUrl}/storage/v1/object/public/echos/${echo.file_name}`
                     return (
-                      <a key={echo.id} href={url} target="_blank" rel="noopener"
-                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 18px', background: '#fff', border: '1px solid #C2D9C9', borderRadius: 10, textDecoration: 'none', color: '#1A3D2A', transition: 'background .15s' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <span style={{ fontSize: '1.3rem' }}>📄</span>
-                          <span style={{ fontWeight: 700 }}>Kriko Echo — {label}</span>
+                      <a key={echo.id} href={url} target="_blank" rel="noopener" className="portal-item-row"
+                        style={{ '--kleur': kleur } as React.CSSProperties}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <span style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center' }}>📄</span>
+                          <span style={{ fontWeight: 700, color: 'var(--color-primary-dark)', fontSize: '0.98rem' }}>Kriko Echo — {label}</span>
                         </span>
-                        <span style={{ fontSize: '.8rem', color: '#6A8A75', fontWeight: 600 }}>Openen ↗</span>
+                        <span className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '.78rem', boxShadow: 'none' }}>Openen ↗</span>
                       </a>
                     )
                   })}

@@ -44,6 +44,13 @@ export default async function InschrijvenPage() {
                      className="btn btn-secondary" style={{ fontSize: '0.9rem', padding: '8px 18px', margin: '14px 0', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                     <i className="fa-solid fa-arrow-up-right-from-square"></i> Inschrijvingsformulier invullen
                   </a>
+                  <div style={{ backgroundColor: 'rgba(101,11,25,0.06)', borderLeft: '4px solid var(--color-primary)', borderRadius: 'var(--border-radius-sm)', padding: '14px 18px', margin: '16px 0', fontSize: '0.85rem', color: 'var(--color-primary-dark)', lineHeight: 1.5 }}>
+                    <strong>⚠️ Let op, twee verschillende platformen:</strong>
+                    <ul style={{ paddingLeft: 16, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <li><strong>Scouts & Gidsen Vlaanderen (Groepsadmin):</strong> Hier vul je de officiële medische fiche in en word je lid voor de verzekering.</li>
+                      <li><strong>Kriko-M Ouderportaal (deze site):</strong> Hier log je in om je kind in te schrijven voor weekends/kampen en om webshop-bestellingen te doen.</li>
+                    </ul>
+                  </div>
                   <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
                     <strong>Al lid?</strong> Log in via{' '}
                     <a href="https://groepsadmin.scoutsengidsenvlaanderen.be/groepsadmin/client/" target="_blank" rel="noopener" style={{ color: 'var(--color-primary)', fontWeight: 600 }}>

@@ -84,10 +84,10 @@ export default function KampenView({ kinderen, kampen, inschrijvingen: init }: {
   return (
     <div>
       {flash && (
-        <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 16px', borderRadius: 10, marginBottom: 20, fontWeight: 600, fontSize: '.88rem' }}>{flash}</div>
+        <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '12px 18px', borderRadius: 12, marginBottom: 20, fontWeight: 600, fontSize: '.88rem' }}>{flash}</div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
         {relevanteKampen.map(kamp => {
           const van = new Date(kamp.datum_van)
           const tot = new Date(kamp.datum_tot)
@@ -97,26 +97,26 @@ export default function KampenView({ kinderen, kampen, inschrijvingen: init }: {
           const bestanden = kamp.kamp_bestanden ?? []
 
           return (
-            <div key={kamp.id} style={{ background: '#fff', border: '1px solid #C2D9C9', borderRadius: 18, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,.06)' }}>
+            <div key={kamp.id} className="portal-sub-card" style={{ padding: 0, overflow: 'hidden' }}>
               {/* Header */}
-              <div style={{ background: `${kleur}22`, borderBottom: `3px solid ${kleur}`, padding: '18px 22px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+              <div style={{ background: `${kleur}15`, borderBottom: `3px solid ${kleur}`, padding: '24px 30px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
                   <div>
-                    <span style={{ fontSize: '.7rem', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: kleur }}>{kamp.tak}</span>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#1A3D2A', margin: '4px 0 6px', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>{kamp.naam}</h2>
-                    <div style={{ fontSize: '.85rem', color: '#3A5A42' }}>📅 {periode} &nbsp;·&nbsp; 📍 {kamp.locatie}</div>
+                    <span style={{ fontSize: '.75rem', fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: kleur }}>{kamp.tak}</span>
+                    <h2 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#1A3D2A', margin: '4px 0 6px', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>{kamp.naam}</h2>
+                    <div style={{ fontSize: '.88rem', color: '#3A5A42', fontWeight: 500 }}>📅 {periode} &nbsp;·&nbsp; 📍 {kamp.locatie}</div>
                   </div>
                   {kamp.prijs != null && kamp.prijs > 0 && (
-                    <div style={{ fontWeight: 800, fontSize: '1.2rem', color: '#1A3D2A', alignSelf: 'center' }}>€{kamp.prijs.toFixed(2).replace('.', ',')}</div>
+                    <div style={{ fontWeight: 800, fontSize: '1.35rem', color: '#1A3D2A', alignSelf: 'center', fontFamily: 'Outfit, sans-serif' }}>€{kamp.prijs.toFixed(2).replace('.', ',')}</div>
                   )}
                 </div>
-                {kamp.beschrijving && <p style={{ fontSize: '.88rem', color: '#3A5A42', marginTop: 10, lineHeight: 1.5 }}>{kamp.beschrijving}</p>}
+                {kamp.beschrijving && <p style={{ fontSize: '.92rem', color: '#3A5A42', marginTop: 12, lineHeight: 1.6 }}>{kamp.beschrijving}</p>}
                 {bestanden.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
                     {bestanden.map(b => (
                       <a key={b.id} href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kamp-bestanden/${b.file_name}`}
-                        target="_blank" rel="noopener"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#fff', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '.8rem', fontWeight: 600, color: '#1A3D2A', textDecoration: 'none' }}>
+                        target="_blank" rel="noopener" className="btn btn-outline"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#fff', border: '1px solid var(--color-border)', fontSize: '.8rem', fontWeight: 600, color: '#1A3D2A', textDecoration: 'none', boxShadow: 'none' }}>
                         {BESTAND_LABELS[b.type] ?? '📎 Bijlage'} — {b.naam}
                       </a>
                     ))}
@@ -125,39 +125,40 @@ export default function KampenView({ kinderen, kampen, inschrijvingen: init }: {
               </div>
 
               {/* Inschrijvingen per kind */}
-              <div style={{ padding: '16px 22px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ padding: '20px 30px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {kindVoorKamp.map(kind => {
                   const inschr = isIn(kamp.id, kind.ga_id)
                   const key = `${kamp.id}-${kind.ga_id}`
                   const isLoading = loading === key
                   const kindKleur = TAK_KLEUREN[kind.tak] ?? '#888'
                   return (
-                    <div key={kind.id} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, padding: '12px 16px', background: inschr ? 'hsla(145,33%,36%,.06)' : '#f8faf9', borderRadius: 10, border: `1px solid ${inschr ? '#3F7D5A44' : '#C2D9C9'}` }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: '50%', background: `${kindKleur}33`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: kindKleur, fontSize: '.9rem', flexShrink: 0 }}>
+                    <div key={kind.id} className="portal-item-row" style={{ '--kleur': kindKleur, background: inschr ? 'rgba(63, 125, 90, 0.05)' : '#fff', borderColor: inschr ? 'rgba(63, 125, 90, 0.3)' : 'var(--color-border)' } as React.CSSProperties}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ width: 38, height: 38, borderRadius: '50%', background: `${kindKleur}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, color: kindKleur, fontSize: '.95rem', flexShrink: 0 }}>
                           {(kind.voornaam?.[0] ?? '?').toUpperCase()}
                         </div>
                         <div>
-                          <div style={{ fontWeight: 700, color: '#1A3D2A', fontSize: '.95rem' }}>{kind.voornaam}</div>
-                          {inschr && <div style={{ fontSize: '.75rem', color: '#3F7D5A', fontWeight: 700 }}>✓ Ingeschreven</div>}
+                          <div style={{ fontWeight: 700, color: '#1A3D2A', fontSize: '1rem' }}>{kind.voornaam}</div>
+                          {inschr && <div style={{ fontSize: '.78rem', color: '#3F7D5A', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>✓ Ingeschreven</div>}
                         </div>
                       </div>
                       {inschr ? (
-                        <button onClick={() => uitschrijven(kamp.id, kind.ga_id)} disabled={isLoading}
-                          style={{ padding: '6px 14px', border: '1.5px solid #B23A4D', borderRadius: 8, background: 'none', color: '#B23A4D', fontSize: '.8rem', fontWeight: 700, cursor: 'pointer' }}>
+                        <button onClick={() => uitschrijven(kamp.id, kind.ga_id)} disabled={isLoading} className="btn btn-outline"
+                          style={{ padding: '6px 14px', fontSize: '0.8rem', color: 'var(--color-error)', borderColor: 'var(--color-error)', boxShadow: 'none' }}>
                           {isLoading ? '…' : 'Uitschrijven'}
                         </button>
                       ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                           <textarea
                             placeholder="Opmerking voor de leiding (optioneel)"
                             value={opmerkingen[key] ?? ''}
                             onChange={e => setOpmerkingen(prev => ({ ...prev, [key]: e.target.value }))}
-                            rows={2}
-                            style={{ padding: '6px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.8rem', width: 240, resize: 'none' }}
+                            rows={1}
+                            className="form-control"
+                            style={{ padding: '8px 12px', fontSize: '.85rem', width: 240, resize: 'none', height: 38, minHeight: 38 }}
                           />
-                          <button onClick={() => inschrijven(kamp.id, kind.ga_id, opmerkingen[key] ?? '')} disabled={isLoading}
-                            style={{ padding: '7px 16px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontSize: '.85rem', fontWeight: 700, cursor: 'pointer' }}>
+                          <button onClick={() => inschrijven(kamp.id, kind.ga_id, opmerkingen[key] ?? '')} disabled={isLoading} className="btn btn-primary"
+                            style={{ padding: '8px 18px', fontSize: '.85rem', height: 38 }}>
                             {isLoading ? 'Bezig…' : '✓ Inschrijven'}
                           </button>
                         </div>

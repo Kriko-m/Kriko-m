@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: 'Afrekenen – Scouts Kriko-M' }
 export default async function CheckoutPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/portaal?login_vereist=webshop')
+  const ingelogd = !!user
 
   return (
     <>
@@ -21,7 +21,7 @@ export default async function CheckoutPage() {
           </p>
         </div>
       </section>
-      <CheckoutForm />
+      <CheckoutForm ingelogd={ingelogd} />
     </>
   )
 }

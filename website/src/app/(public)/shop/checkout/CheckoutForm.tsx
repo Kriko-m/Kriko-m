@@ -10,7 +10,7 @@ const TAKKEN = [
   { value: 'givers', label: 'Givers (14–17j)' },
 ]
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ ingelogd }: { ingelogd: boolean }) {
   const { items, totalPrice, clearCart } = useCart()
   const router = useRouter()
   const [status, setStatus] = useState<'idle' | 'sending'>('idle')
@@ -62,6 +62,18 @@ export default function CheckoutForm() {
           <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, marginBottom: 24, color: 'var(--color-primary-dark)' }}>
             Contact & Bestelgegevens
           </h3>
+
+          {!ingelogd && (
+            <div style={{ background: 'var(--color-bg-white)', border: '2px dashed var(--color-accent)', borderRadius: 'var(--border-radius-md)', padding: '18px 20px', marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <strong style={{ display: 'block', color: 'var(--color-primary-dark)', fontSize: '0.98rem', marginBottom: 2 }}>Afrekenen als gast</strong>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Je bent niet ingelogd. Log in om deze bestelling automatisch aan je account te koppelen, of ga door als gast.</span>
+              </div>
+              <a href="/portaal?login_vereist=webshop&redirect=/shop/checkout" className="btn btn-secondary" style={{ fontSize: '0.85rem', padding: '8px 16px', textDecoration: 'none' }}>
+                Inloggen
+              </a>
+            </div>
+          )}
 
           {error && (
             <div style={{ background: 'hsla(4,75%,48%,0.1)', border: '2px solid var(--color-error)', color: 'var(--color-error)', padding: 16, borderRadius: 'var(--border-radius-md)', marginBottom: 24, fontWeight: 600 }}>

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getSettings, getEchos } from '@/lib/db'
 import type { Metadata } from 'next'
 import CopyButton from '@/components/CopyButton'
@@ -54,6 +55,15 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
       <style>{`:root { --tak-color: var(--color-${slug}); --tak-color-dark: ${dark}; }`}</style>
 
       <section className={`tak-hero ${slug}`}>
+        <Image
+          src={`/images/banner_${slug}.webp`}
+          alt={tak.name}
+          fill
+          priority
+          style={{ objectFit: 'cover' }}
+          className="tak-hero-img"
+        />
+        <div className="tak-hero-overlay" />
         <div className="container">
           <h2 className="tak-hero-title">{tak.name}</h2>
         </div>

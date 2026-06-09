@@ -48,30 +48,55 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
       ]
 
   return (
-    <header style={{ background: '#1A3D2A', color: '#fff', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, boxShadow: '0 2px 12px rgba(0,0,0,.15)' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', gap: 16, height: 64 }}>
+    <header className="portaal-nav">
+      <div style={{ maxWidth: 1200, margin: '0 auto', width: '100%', padding: '0 20px', display: 'flex', alignItems: 'center', gap: 16, height: 64 }}>
         <Link href="/portaal/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
           <Image src="/images/logo-finaal.png" alt="Kriko-M" width={36} height={36} style={{ objectFit: 'contain' }} />
           <span style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '1.1rem', color: '#fff', letterSpacing: '.04em' }}>Portaal</span>
         </Link>
 
-        <nav style={{ display: 'flex', gap: 2, flex: 1, flexWrap: 'wrap' }}>
-          {links.map(l => (
-            <Link key={l.href} href={l.href}
-              style={{
-                padding: '6px 12px', borderRadius: 8, fontSize: '.82rem', fontWeight: 600, textDecoration: 'none',
-                color: pathname.startsWith(l.href) ? '#C9963A' : 'rgba(255,255,255,.75)',
-                background: pathname.startsWith(l.href) ? 'rgba(201,150,58,.12)' : 'none',
-              }}>
-              {l.label}
-            </Link>
-          ))}
+        <nav style={{ display: 'flex', gap: 4, flex: 1, flexWrap: 'wrap', justifyContent: 'flex-start', paddingLeft: 24 }}>
+          {links.map(l => {
+            const active = pathname.startsWith(l.href)
+            return (
+              <Link key={l.href} href={l.href}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 50,
+                  fontSize: '0.8rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  textDecoration: 'none',
+                  fontFamily: 'var(--font-heading, Nunito, sans-serif)',
+                  color: active ? '#C9963A' : 'rgba(255,255,255,.8)',
+                  background: active ? 'rgba(201,150,58,0.12)' : 'transparent',
+                  transition: 'all var(--transition-fast)'
+                }}>
+                {l.label}
+              </Link>
+            )
+          })}
         </nav>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
           <span style={{ fontSize: '.78rem', color: 'rgba(255,255,255,.6)', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{naam}</span>
-          <button onClick={handleLogout}
-            style={{ padding: '5px 12px', borderRadius: 8, border: '1.5px solid rgba(255,255,255,.3)', background: 'none', color: 'rgba(255,255,255,.8)', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={handleLogout} className="btn"
+            style={{
+              padding: '6px 16px',
+              borderRadius: 50,
+              border: '1.5px solid rgba(255,255,255,.3)',
+              background: 'transparent',
+              color: '#fff',
+              fontSize: '0.75rem',
+              fontWeight: 800,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxShadow: 'none',
+              fontFamily: 'var(--font-heading, Nunito, sans-serif)',
+              transition: 'all var(--transition-fast)'
+            }}>
             Uitloggen
           </button>
         </div>

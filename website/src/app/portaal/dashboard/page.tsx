@@ -154,13 +154,20 @@ export default async function DashboardPage() {
 
         {/* Menu kaarten */}
         <h2 style={{ fontSize: '1rem', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#6A8A75', marginBottom: 16 }}>Waar wil je naartoe?</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
           {menu.map(item => (
-            <Link key={item.href} href={item.href} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 10, background: '#fff', border: `2px solid ${item.kleur}22`, borderRadius: 16, padding: '22px 24px', transition: 'transform .15s, box-shadow .15s', boxShadow: '0 2px 12px rgba(0,0,0,.06)' }}>
-              <span style={{ fontSize: '2rem', lineHeight: 1 }}>{item.icon}</span>
-              <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#1A3D2A' }}>{item.titel}</span>
-              <span style={{ fontSize: '.85rem', color: '#6A8A75', lineHeight: 1.5, flex: 1 }}>{item.desc}</span>
-              <span style={{ fontSize: '.78rem', fontWeight: 700, color: item.kleur }}>{item.stat}</span>
+            <Link
+              key={item.href}
+              href={item.href}
+              className="dashboard-menu-card"
+              style={{ '--kleur': item.kleur, '--kleur-light': `${item.kleur}22` } as React.CSSProperties}
+            >
+              <span className="menu-icon">{item.icon}</span>
+              <span className="menu-titel">{item.titel}</span>
+              <span className="menu-desc">{item.desc}</span>
+              <span className="menu-stat">
+                {item.stat} &raquo;
+              </span>
             </Link>
           ))}
         </div>

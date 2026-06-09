@@ -17,7 +17,7 @@ export default async function HomePage() {
       {/* 1. Hero */}
       <section className="hero">
         <Image
-          src="/images/hero-nieuw.png"
+          src="/images/hero-nieuw.webp"
           alt="Scouts Kriko-M"
           className="hero-img"
           fill
@@ -65,7 +65,7 @@ export default async function HomePage() {
               boxShadow: 'var(--shadow-lg)',
               border: '4px solid var(--color-bg-white)',
               transform: 'rotate(-2deg)',
-              background: 'linear-gradient(rgba(102,12,25,0.2), rgba(102,12,25,0.2)), url(/images/hero-bg.jpg) center/cover',
+              background: 'linear-gradient(rgba(102,12,25,0.2), rgba(102,12,25,0.2)), url(/images/hero-bg.webp) center/cover',
             }} />
           </div>
         </div>

@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 import { useCart } from './CartProvider'
 
 interface Product {
@@ -12,7 +13,7 @@ interface Product {
   sizes?: string[]
 }
 
-export default function ShopProductCard({ product, ingelogd = true }: { product: Product; ingelogd?: boolean }) {
+export default function ShopProductCard({ product }: { product: Product }) {
   const { addItem } = useCart()
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] ?? 'Standaard')
   const [added, setAdded] = useState(false)
@@ -39,8 +40,15 @@ export default function ShopProductCard({ product, ingelogd = true }: { product:
     <div className="shop-card">
       <div className="shop-card-image">
         {product.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{ objectFit: 'cover' }}
+            />
+          </div>
         ) : (
           <div style={{ display: 'flex', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center', background: 'var(--color-primary-light)', color: 'var(--color-bg-white)', position: 'relative' }}>
             <i className="fa-solid fa-shirt" style={{ fontSize: '3rem', opacity: 0.35 }} />
@@ -55,42 +63,29 @@ export default function ShopProductCard({ product, ingelogd = true }: { product:
         <div className="shop-card-price">€{product.price.toFixed(2).replace('.', ',')}</div>
         <p className="shop-card-desc">{product.description}</p>
 
-        {ingelogd ? (
+        {product.sizes && product.sizes.length > 0 && (
           <>
-            {product.sizes && product.sizes.length > 0 && (
-              <>
-                <label className="form-label" style={{ marginBottom: 4, fontSize: '0.8rem' }}>
-                  Selecteer Maat:
-                </label>
-                <select
-                  className="shop-size-select"
-                  value={selectedSize}
-                  onChange={e => setSelectedSize(e.target.value)}
-                >
-                  {product.sizes.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </>
-            )}
-
-            <button
-              className="btn btn-secondary btn-add-to-cart"
-              style={{ width: '100%', marginTop: 'auto' }}
-              onClick={handleAdd}
+            <label className="form-label" style={{ marginBottom: 4, fontSize: '0.8rem' }}>
+              Selecteer Maat:
+            </label>
+            <select
+              className="shop-size-select"
+              value={selectedSize}
+              onChange={e => setSelectedSize(e.target.value)}
             >
-              <i className="fa-solid fa-bag-shopping" style={{ marginRight: 8 }} />
-              {added ? 'Toegevoegd!' : 'In winkelmandje'}
-            </button>
+              {product.sizes.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
           </>
-        ) : (
-          <a
-            href="/portaal?login_vereist=webshop"
-            className="btn btn-outline"
-            style={{ width: '100%', marginTop: 'auto', textDecoration: 'none', textAlign: 'center' }}
-          >
-            <i className="fa-solid fa-right-to-bracket" style={{ marginRight: 8 }} />
-            Log in om te bestellen
-          </a>
         )}
+
+        <button
+          className="btn btn-secondary btn-add-to-cart"
+          style={{ width: '100%', marginTop: 'auto' }}
+          onClick={handleAdd}
+        >
+          <i className="fa-solid fa-bag-shopping" style={{ marginRight: 8 }} />
+          {added ? 'Toegevoegd!' : 'In winkelmandje'}
+        </button>
       </div>
     </div>
   )

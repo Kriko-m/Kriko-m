@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 
 export default function PhotoGallery({ photos }: { photos: string[] }) {
   const [lightbox, setLightbox] = useState<number|null>(null)
@@ -13,9 +14,15 @@ export default function PhotoGallery({ photos }: { photos: string[] }) {
             className="verhuur-photo"
             aria-label={`Foto ${i+1} vergroten`}
             onClick={() => setLightbox(i)}
-            style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+            style={{ cursor: 'pointer', background: 'none', border: 'none', padding: 0, position: 'relative', width: '100%' }}
           >
-            <img src={src} alt={`Lokaal Scouts Kriko-M — foto ${i+1}`} loading="lazy" />
+            <Image
+              src={src}
+              alt={`Lokaal Scouts Kriko-M — foto ${i+1}`}
+              fill
+              sizes="(max-width: 480px) 100vw, (max-width: 800px) 50vw, 33vw"
+              style={{ objectFit: 'cover' }}
+            />
           </button>
         ))}
       </div>

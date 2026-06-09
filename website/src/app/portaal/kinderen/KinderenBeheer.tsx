@@ -64,37 +64,37 @@ export default function KinderenBeheer({ kinderen: initial }: { kinderen: Kind[]
   return (
     <div>
       {flash && (
-        <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 16px', borderRadius: 10, marginBottom: 20, fontWeight: 600, fontSize: '.88rem' }}>{flash}</div>
+        <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '12px 18px', borderRadius: 12, marginBottom: 20, fontWeight: 600, fontSize: '.88rem' }}>{flash}</div>
       )}
 
-      <div style={{ background: '#fff8e1', border: '1.5px solid #f59e0b', borderRadius: 12, padding: '14px 18px', marginBottom: 24, fontSize: '.85rem', color: '#92400e', lineHeight: 1.5 }}>
-        <strong>📋 Info:</strong> Voeg hier de kinderen toe die bij jouw account horen. Naam en tak worden gebruikt voor kamp-inschrijvingen. Zodra S&G OAuth actief is, worden leden automatisch gesynchroniseerd.
+      <div style={{ background: '#fff8e1', border: '1.5px solid #f59e0b', borderRadius: 'var(--border-radius-md)', padding: '16px 20px', marginBottom: 24, fontSize: '.88rem', color: '#92400e', lineHeight: 1.6 }}>
+        <strong>📋 Info:</strong> Voeg hier de kinderen toe die bij jouw account horen. Naam en tak worden gebruikt voor kamp-inschrijvingen. Zodra S&amp;G OAuth actief is, worden leden automatisch gesynchroniseerd.
       </div>
 
       {kinderen.length === 0 && !adding && (
-        <div style={{ textAlign: 'center', padding: '40px 20px', color: '#6A8A75' }}>
-          <div style={{ fontSize: '3rem', marginBottom: 12 }}>👶</div>
-          <p>Nog geen leden gekoppeld aan jouw account.</p>
+        <div style={{ textAlign: 'center', padding: '50px 20px', color: '#6A8A75' }}>
+          <div style={{ fontSize: '3.5rem', marginBottom: 12 }}>👶</div>
+          <p style={{ fontWeight: 500 }}>Nog geen leden gekoppeld aan jouw account.</p>
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 24 }}>
         {kinderen.map(kind => {
           const kleur = TAK_KLEUREN[kind.tak] ?? '#888'
           return (
-            <div key={kind.id} style={{ background: '#fff', border: '1px solid #C2D9C9', borderRadius: 14, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                <div style={{ width: 44, height: 44, borderRadius: '50%', background: `${kleur}33`, border: `2px solid ${kleur}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.1rem', color: kleur, flexShrink: 0 }}>
+            <div key={kind.id} className="portal-item-row" style={{ '--kleur': kleur } as React.CSSProperties}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', background: `${kleur}18`, border: `2px solid ${kleur}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.1rem', color: kleur, flexShrink: 0 }}>
                   {(kind.voornaam?.[0] ?? '?').toUpperCase()}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '1rem', color: '#1A3D2A' }}>{kind.voornaam}</div>
-                  <div style={{ fontSize: '.8rem', color: '#6A8A75', textTransform: 'capitalize' }}>{kind.tak}</div>
+                  <div style={{ fontWeight: 700, fontSize: '1.05rem', color: '#1A3D2A' }}>{kind.voornaam}</div>
+                  <div style={{ fontSize: '.8rem', color: '#6A8A75', textTransform: 'capitalize', fontWeight: 600 }}>{kind.tak}</div>
                 </div>
               </div>
-              <button onClick={() => handleVerwijder(kind.id, kind.voornaam)}
-                style={{ background: 'none', border: '1.5px solid #B23A4D', color: '#B23A4D', padding: '5px 12px', borderRadius: 8, fontSize: '.78rem', fontWeight: 600, cursor: 'pointer' }}>
-                Verwijder
+              <button onClick={() => handleVerwijder(kind.id, kind.voornaam)} className="btn btn-outline"
+                style={{ padding: '6px 14px', fontSize: '0.8rem', color: 'var(--color-error)', borderColor: 'var(--color-error)', boxShadow: 'none' }}>
+                Verwijderen
               </button>
             </div>
           )
@@ -102,38 +102,34 @@ export default function KinderenBeheer({ kinderen: initial }: { kinderen: Kind[]
       </div>
 
       {adding ? (
-        <form onSubmit={handleAdd} style={{ background: '#fff', border: '1.5px dashed #2A5C3F', borderRadius: 14, padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <strong style={{ color: '#1A3D2A' }}>Lid toevoegen</strong>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+        <form onSubmit={handleAdd} className="portal-sub-card" style={{ borderStyle: 'dashed', borderColor: 'var(--color-primary-light)', gap: 16 }}>
+          <strong style={{ color: '#1A3D2A', fontSize: '1.15rem' }}>Lid toevoegen</strong>
+          <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: 160 }}>
-              <label style={{ display: 'block', fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 5 }}>Voornaam</label>
-              <input name="voornaam" required placeholder="Voornaam" autoFocus
-                style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' }} />
+              <label className="form-label" style={{ display: 'block', fontSize: '.82rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }}>Voornaam</label>
+              <input name="voornaam" required placeholder="Voornaam" autoFocus className="form-control" />
             </div>
             <div style={{ flex: 1, minWidth: 160 }}>
-              <label style={{ display: 'block', fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 5 }}>Tak</label>
-              <select name="tak" required defaultValue=""
-                style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' }}>
+              <label className="form-label" style={{ display: 'block', fontSize: '.82rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }}>Tak</label>
+              <select name="tak" required defaultValue="" className="form-control">
                 <option value="" disabled>Kies tak</option>
                 {TAKKEN.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button type="submit" disabled={loading}
-              style={{ padding: '9px 20px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 700, cursor: 'pointer' }}>
+          <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+            <button type="submit" disabled={loading} className="btn btn-primary" style={{ padding: '10px 24px' }}>
               {loading ? 'Bezig…' : 'Toevoegen'}
             </button>
-            <button type="button" onClick={() => setAdding(false)}
-              style={{ padding: '9px 20px', background: 'none', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, cursor: 'pointer', color: '#6A8A75' }}>
+            <button type="button" onClick={() => setAdding(false)} className="btn btn-outline" style={{ padding: '10px 24px' }}>
               Annuleer
             </button>
           </div>
         </form>
       ) : (
-        <button onClick={() => setAdding(true)}
-          style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '14px 18px', background: 'none', border: '1.5px dashed #C9963A', borderRadius: 14, cursor: 'pointer', color: '#C9963A', fontWeight: 700, fontSize: '.92rem' }}>
-          <span style={{ fontSize: '1.3rem' }}>+</span> Lid toevoegen
+        <button onClick={() => setAdding(true)} className="btn btn-outline"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: '16px', borderStyle: 'dashed', borderColor: 'var(--color-secondary)', color: 'var(--color-secondary)', background: 'transparent' }}>
+          <span style={{ fontSize: '1.3rem', fontWeight: 'bold' }}>+</span> Lid toevoegen
         </button>
       )}
     </div>
