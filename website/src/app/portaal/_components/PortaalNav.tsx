@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase-browser'
+import { useEffect } from 'react'
 
 interface Props {
   naam: string
@@ -14,6 +15,13 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    document.body.classList.add('portal-theme', 'portaal')
+    return () => {
+      document.body.classList.remove('portal-theme', 'portaal')
+    }
+  }, [])
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -38,7 +46,7 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
   ]
 
   return (
-    <header style={{ background: '#1A3D2A', color: '#fff', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 2px 12px rgba(0,0,0,.15)' }}>
+    <header style={{ background: '#1A3D2A', color: '#fff', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, boxShadow: '0 2px 12px rgba(0,0,0,.15)' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', display: 'flex', alignItems: 'center', gap: 16, height: 64 }}>
         <Link href="/portaal/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
           <Image src="/images/logo-finaal.png" alt="Kriko-M" width={36} height={36} style={{ objectFit: 'contain' }} />

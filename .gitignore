@@ -3,11 +3,6 @@
 .env.local
 .env.*.local
 
-# Data directory (flat-file database — bevat wachtwoorden en klantgegevens)
-data/
-
-# Uploads (gebruikersbestanden — te groot voor git)
-kriko-m/uploads/
 
 # Node.js (voor de Next.js migratie later)
 node_modules/
