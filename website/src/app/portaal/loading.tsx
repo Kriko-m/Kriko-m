@@ -14,7 +14,8 @@ export default function PortaalLoading() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 16
+      gap: 16,
+      paddingBottom: 80
     }}>
       <img src="/images/logo-finaal.png" alt="Kriko-M laden…" style={{ width: 80, height: 80, objectFit: 'contain', animation: 'pulse 1.5s infinite ease-in-out' }} />
       <div style={{ fontSize: '1rem', fontWeight: 600, color: '#1A3D2A', letterSpacing: '0.5px', fontFamily: 'Outfit, sans-serif' }}>
