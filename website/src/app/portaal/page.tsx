@@ -35,6 +35,7 @@ function PortaalContent() {
   const [tab, setTab] = useState<Tab>('ouder')
   const [subTab, setSubTab] = useState<SubTab>('login')
   const [status, setStatus] = useState<'idle' | 'loading'>('idle')
+  const [loadingRole, setLoadingRole] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
 
@@ -80,16 +81,16 @@ function PortaalContent() {
   }
 
   async function demoLogin(rol: string) {
-    setStatus('loading'); setError('')
+    setStatus('loading'); setLoadingRole(rol); setError('')
     const res = await fetch('/api/demo-login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ rol }),
     })
-    if (!res.ok) { setError('Demo-login mislukt.'); setStatus('idle'); return }
+    if (!res.ok) { setError('Demo-login mislukt.'); setStatus('idle'); setLoadingRole(null); return }
     const { email, password } = await res.json()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) { setError('Demo-login mislukt: ' + error.message); setStatus('idle') }
+    if (error) { setError('Demo-login mislukt: ' + error.message); setStatus('idle'); setLoadingRole(null) }
     else { router.push(redirectTo); router.refresh() }
   }
 
@@ -189,7 +190,7 @@ function PortaalContent() {
               {/* Demo ouder */}
               <div style={{ marginTop: 22, paddingTop: 18, borderTop: '1px solid #C2D9C9' }}>
                 <button onClick={() => demoLogin('ouder')} disabled={status === 'loading'} className="btn btn-outline"
-                  style={{ width: '100%', padding: '11px', borderStyle: 'dashed', background: 'transparent' }}>
+                  style={{ width: '100%', padding: '11px', borderStyle: 'dashed', background: 'transparent', opacity: loadingRole === 'ouder' ? 0.7 : 1 }}>
                   Demo ouder-account gebruiken
                 </button>
               </div>
@@ -226,7 +227,7 @@ function PortaalContent() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {DEMO_KNOPPEN.filter(d => d.rol !== 'ouder').map(d => (
                   <button key={d.rol} onClick={() => demoLogin(d.rol)} disabled={status === 'loading'} className="btn"
-                    style={{ padding: '13px 16px', background: d.kleur, color: '#fff', border: 'none', fontSize: '.95rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: status === 'loading' ? .7 : 1 }}>
+                    style={{ padding: '13px 16px', background: d.kleur, color: '#fff', border: 'none', fontSize: '.95rem', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: loadingRole === d.rol ? .7 : 1 }}>
                     <span>{d.label}</span>
                     <span style={{ fontSize: '.75rem', fontWeight: 400, opacity: .8 }}>{d.omschrijving}</span>
                   </button>

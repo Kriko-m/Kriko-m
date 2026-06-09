@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { getSettings } from '@/lib/db'
 import PhotoGallery from '@/components/PhotoGallery'
-import FadeInImage from '@/components/FadeInImage'
 
 export const metadata: Metadata = { title: 'Verhuur lokaal | Scouts Kriko-M' }
 
@@ -15,12 +14,13 @@ export default async function VerhuurPage() {
   return (
     <>
       <section className="verhuur-hero" style={{ position: 'relative', overflow: 'hidden' }}>
-        <FadeInImage
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/images/verhuur/lokaal-04.jpg"
           alt="Scouts Kriko-M Lokaal"
-          fill
-          priority
-          style={{ objectFit: 'cover', objectPosition: 'center 42%' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 42%', zIndex: 1 }}
+          className="verhuur-hero-img"
+          fetchPriority="high"
         />
         <div className="container verhuur-hero-inner" style={{ position: 'relative', zIndex: 2 }}>
           <h1 className="verhuur-hero-title">Ons lokaal</h1>

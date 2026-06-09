@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import FadeInImage from '@/components/FadeInImage'
 import { getSettings, getEchos } from '@/lib/db'
 import type { Metadata } from 'next'
 import CopyButton from '@/components/CopyButton'
@@ -55,14 +54,14 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
     <>
       <style>{`:root { --tak-color: var(--color-${slug}); --tak-color-dark: ${dark}; }`}</style>
 
-      <section className={`tak-hero ${slug}`}>
-        <FadeInImage
+      <section className={`tak-hero ${slug}`} style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={`/images/banner_${slug}.webp`}
           alt={tak.name}
-          fill
-          priority
-          style={{ objectFit: 'cover' }}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
           className="tak-hero-img"
+          fetchPriority="high"
         />
         <div className="tak-hero-overlay" />
         <div className="container">

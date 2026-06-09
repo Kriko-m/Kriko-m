@@ -154,7 +154,7 @@ export default async function DashboardPage() {
 
         {/* Menu kaarten */}
         <h2 style={{ fontSize: '1rem', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#6A8A75', marginBottom: 16 }}>Waar wil je naartoe?</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 20 }}>
+        <div className="portal-dashboard-grid">
           {menu.map(item => (
             <Link
               key={item.href}
