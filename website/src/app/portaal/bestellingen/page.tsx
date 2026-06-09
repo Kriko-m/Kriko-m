@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import { getSettings } from '@/lib/db'
 import { Order } from '@/lib/types'
-import PortaalNav from '../_components/PortaalNav'
 import BestellingCard from './BestellingCard'
 
 export default async function BestellingenPage() {
@@ -42,7 +41,6 @@ export default async function BestellingenPage() {
 
   return (
     <>
-      <PortaalNav naam={naam} isAdmin={isAdmin} role={user.app_metadata?.role} />
       <main style={{ maxWidth: 800, margin: '0 auto', padding: '40px 20px 80px' }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>

@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { createAdminClient } from '@/lib/supabase'
-import PortaalNav from '../_components/PortaalNav'
 import Link from 'next/link'
 import TourBanner from './TourBanner'
 
@@ -58,7 +57,7 @@ export default async function DashboardPage() {
           href: '/portaal/admin',
           icon: '⚙️',
           titel: 'Beheer',
-          desc: 'Bestellingen beheren, instellingen en contactberichten.',
+          desc: 'Bestellingen beheren, instellingen and contactberichten.',
           stat: 'Groepsleiding',
           kleur: '#1A3D2A',
         }] : []),
@@ -88,7 +87,7 @@ export default async function DashboardPage() {
           titel: 'Kampen & Weekenden',
           desc: 'Schrijf je kinderen in voor weekenden en kampen.',
           stat: aantalInschrijvingen > 0
-            ? `${aantalInschrijvingen} active ${aantalInschrijvingen === 1 ? 'inschrijving' : 'inschrijvingen'}`
+            ? `${aantalInschrijvingen} actieve ${aantalInschrijvingen === 1 ? 'inschrijving' : 'inschrijvingen'}`
             : 'Schrijf in voor een kamp',
           kleur: '#4A7BBF',
         },
@@ -122,7 +121,6 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <PortaalNav naam={naam} isAdmin={isAdmin} role={user.app_metadata?.role} />
       <main style={{ maxWidth: 900, margin: '0 auto', padding: '40px 20px 80px' }}>
 
         {/* Hero */}

@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
-import PortaalNav from '../_components/PortaalNav'
 import Link from 'next/link'
 import { ParentChild, Echo } from '@/lib/types'
 
@@ -38,7 +37,6 @@ export default async function EchosPage() {
 
   return (
     <>
-      <PortaalNav naam={naam} isAdmin={isAdmin} role={user.app_metadata?.role} />
       <main style={{ maxWidth: 800, margin: '0 auto', padding: '40px 20px 80px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
           <a href="/portaal/dashboard" style={{ color: '#6A8A75', textDecoration: 'none', fontSize: '.9rem', fontWeight: 600 }}>← Dashboard</a>

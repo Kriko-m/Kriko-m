@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import { getVerslagen } from '@/lib/db'
-import PortaalNav from '../_components/PortaalNav'
 import VerslagenClient from './VerslagenClient'
 import { Verslag } from '@/lib/types'
 
@@ -27,7 +26,6 @@ export default async function VerslagenPage() {
 
   return (
     <>
-      <PortaalNav naam={naam} isAdmin={isAdmin} role={role} />
       <main style={{ maxWidth: 800, margin: '0 auto', padding: '40px 20px 80px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
           <a href="/portaal/dashboard" style={{ color: '#6A8A75', textDecoration: 'none', fontSize: '.9rem', fontWeight: 600 }}>← Dashboard</a>
