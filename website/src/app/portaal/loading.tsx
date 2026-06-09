@@ -1,6 +1,21 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
+
 export default function PortaalLoading() {
+  const pathname = usePathname()
+  const hasNav = pathname !== '/portaal' && pathname !== '/portaal/'
+
   return (
-    <div style={{ minHeight: '100vh', background: '#EEF5F1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+    <div style={{
+      minHeight: hasNav ? 'calc(100vh - 64px)' : '100vh',
+      background: '#EEF5F1',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 16
+    }}>
       <img src="/images/logo-finaal.png" alt="Kriko-M laden…" style={{ width: 80, height: 80, objectFit: 'contain', animation: 'pulse 1.5s infinite ease-in-out' }} />
       <div style={{ fontSize: '1rem', fontWeight: 600, color: '#1A3D2A', letterSpacing: '0.5px', fontFamily: 'Outfit, sans-serif' }}>
         Laden...
