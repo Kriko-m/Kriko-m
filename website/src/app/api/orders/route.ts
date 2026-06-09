@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
 
     const clientSupabase = await createServerSupabaseClient()
     const { data: { user } } = await clientSupabase.auth.getUser()
-    const parentId = user?.id || null
+    if (!user) {
+      return NextResponse.json({ error: 'Je moet ingelogd zijn om een bestelling te plaatsen.' }, { status: 401 })
+    }
+    const parentId = user.id
 
     const supabase = createAdminClient()
 

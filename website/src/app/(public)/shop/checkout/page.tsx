@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createServerSupabaseClient } from '@/lib/supabase'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import CheckoutForm from './CheckoutForm'
 
 export const metadata: Metadata = { title: 'Afrekenen – Scouts Kriko-M' }
@@ -8,7 +8,21 @@ export const metadata: Metadata = { title: 'Afrekenen – Scouts Kriko-M' }
 export default async function CheckoutPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const ingelogd = !!user
+
+  if (!user) {
+    redirect('/portaal?login_vereist=webshop&redirect=/shop/checkout')
+  }
+
+  // Fetch parent's children to pre-fill name/tak dropdowns
+  const admin = createAdminClient()
+  const { data: kinderen } = await admin
+    .from('parent_children')
+    .select('id, voornaam, tak')
+    .eq('parent_id', user.id)
+    .order('voornaam', { ascending: true })
+
+  const parentName = user.user_metadata?.naam || ''
+  const parentEmail = user.email || ''
 
   return (
     <>
@@ -21,7 +35,11 @@ export default async function CheckoutPage() {
           </p>
         </div>
       </section>
-      <CheckoutForm ingelogd={ingelogd} />
+      <CheckoutForm 
+        parentName={parentName} 
+        parentEmail={parentEmail} 
+        kinderen={kinderen ?? []} 
+      />
     </>
   )
 }

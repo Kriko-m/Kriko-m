@@ -3986,3 +3986,243 @@ body.portal-theme .portaal-nav {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   Ouderportaal Profile Dropdown & Modal Styles
+   ========================================================================== */
+
+.portaal-profile-container {
+    position: relative;
+    display: inline-block;
+}
+
+.portaal-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50px;
+    padding: 6px 14px;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all var(--transition-fast, 0.2s ease);
+}
+
+.portaal-profile-btn:hover,
+.portaal-profile-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--color-accent);
+}
+
+.portaal-profile-btn i.fa-circle-user {
+    font-size: 1.2rem;
+    color: var(--color-accent-light);
+}
+
+.portaal-profile-btn i.fa-chevron-down {
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+}
+
+.portaal-profile-btn.active i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.portaal-profile-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 240px;
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    overflow: hidden;
+    animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.portaal-dropdown-header {
+    padding: 14px 16px;
+    background: var(--color-bg-linen);
+    border-bottom: 1px solid var(--color-border);
+    line-height: 1.35;
+}
+
+.portaal-dropdown-header .user-name {
+    display: block;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--color-primary-dark);
+}
+
+.portaal-dropdown-header .user-email {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.portaal-dropdown-menu {
+    padding: 6px 0;
+}
+
+.portaal-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--transition-fast, 0.2s ease);
+}
+
+.portaal-dropdown-item:hover {
+    background: rgba(26, 61, 42, 0.05);
+    color: var(--color-primary);
+}
+
+.portaal-dropdown-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 6px 0;
+}
+
+/* Logout icon button in nav */
+.portaal-logout-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all var(--transition-fast, 0.2s ease);
+}
+
+.portaal-logout-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+/* Account Settings Modal Overlay & Cards */
+.portaal-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+}
+
+.portaal-modal-card {
+    width: 90%;
+    max-width: 420px;
+    background: var(--color-bg-white);
+    border-radius: var(--border-radius-lg);
+    border-top: 5px solid var(--color-accent);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.portaal-modal-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.portaal-modal-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-primary-dark);
+    margin: 0;
+}
+
+.portaal-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.portaal-modal-close:hover {
+    color: var(--color-error);
+}
+
+.portaal-modal-body {
+    padding: 20px;
+}
+
+.portaal-modal-footer {
+    padding: 12px 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: var(--color-bg-linen);
+    border-top: 1px solid var(--color-border);
+}
+
+.portaal-modal-alert {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.portaal-modal-alert.error {
+    background: hsla(349, 51%, 47%, 0.08);
+    border: 1.5px solid var(--color-error);
+    color: var(--color-error);
+}
+
+.portaal-modal-alert.success {
+    background: hsla(145, 33%, 36%, 0.08);
+    border: 1.5px solid var(--color-success);
+    color: var(--color-success);
+}
+

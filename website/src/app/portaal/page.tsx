@@ -41,12 +41,7 @@ function PortaalContent() {
 
   const supabase = createClient()
 
-  useEffect(() => {
-    document.body.style.paddingTop = '0'
-    return () => {
-      document.body.style.paddingTop = ''
-    }
-  }, [])
+
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

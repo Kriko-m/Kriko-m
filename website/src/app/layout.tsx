@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import ThemeSynchronizer from "@/components/ThemeSynchronizer";
 
 export const metadata: Metadata = {
   title: "Scouts Kriko-M",
@@ -37,6 +38,7 @@ export default function RootLayout({
             } catch (e) {}
           })();
         ` }} />
+        <ThemeSynchronizer />
         {children}
       </body>
     </html>
