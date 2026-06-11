@@ -2,6 +2,49 @@
 
 This file provides system context, tech stack specifications, styling guidelines, and command references for AI assistants working on this repository.
 
+---
+
+## Product Vision & Direction
+
+Kriko-M is the website for a Belgian scouts group (Scouts & Gidsen Vlaanderen,
+Sint-Niklaas). It has two halves: a **public marketing site** and a small
+**operational tool** for leiding and parents.
+
+**Guiding principle — keep it minimal.** The site exists to do the few things
+email can't, *without* re-inventing things that already work. Email (sent from the
+S&G Groepsadmin site, which already holds every parent's address) remains the
+group's communication channel. WhatsApp is the leiding's last-minute push channel.
+The site should **not** try to replace either — it should remove specific recurring
+email burdens by turning them into structured, self-service flows.
+
+**What the site is for (the only real jobs):**
+1. Let parents say **yes/no** to a camp/weekend.
+2. Let parents see a **private** uitnodiging + practical info (not public, not
+   indexed).
+3. Let parents **order** webshop items and receive payment instructions.
+4. Give leiding a place to manage camps, echos, the calendar, and a per-werkjaar
+   archive.
+
+**Deliberate architectural decisions (target state — see `IMPLEMENTATION.md`):**
+- **No parent accounts.** Camp RSVP works via an unguessable per-camp link that
+  leiding paste into their S&G-composed email; parents self-declare child + tak +
+  ja/nee. The webshop is accountless (name + email at checkout).
+- **No S&G API integration.** Medical fiches stay in S&G where leiding read them
+  directly — the site never stores medical or other S&G-sourced personal data.
+- **Login is leiding-only** (Supabase email/password).
+- **Site-sent email is limited to the webshop order confirmation** (Resend).
+- **Server-side price validation** on all orders; never trust client prices.
+- Data is scoped by **werkjaar**; a once-a-year groepsleiding "rollover" snapshots
+  the year into a leiding-only archive (draft → publish, never an accidental
+  click).
+
+> NOTE: The current codebase still contains the older account-based portal and a
+> half-built S&G integration. `IMPLEMENTATION.md` (repo root) is the authoritative
+> plan for migrating to the target state above — it lists what to **build**, what
+> to **delete**, and the order to do it in. Consult it before extending the portal.
+
+---
+
 ## Commands Reference
 
 Always run commands inside the `./website/` directory unless working on Supabase configurations.

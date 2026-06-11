@@ -93,6 +93,7 @@ export interface OrderItem {
 
 export interface Kamp {
   id: string
+  slug: string
   naam: string
   tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' | 'alle'
   datum_van: string
@@ -117,6 +118,17 @@ export interface KampBestand {
   naam: string
   file_name: string
   uploaded_at?: string
+}
+
+export interface KampRsvp {
+  id: string
+  kamp_id: string
+  kind_naam: string
+  tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
+  status: 'ja' | 'nee'
+  opmerking: string
+  created_at?: string
+  updated_at?: string
 }
 
 export interface KampInschrijving {
