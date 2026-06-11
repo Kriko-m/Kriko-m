@@ -1,6 +1,22 @@
+export interface WerkjaarLeiding {
+  id: string
+  werkjaar: string
+  tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
+  naam: string
+  rol: string
+}
+
+// Concept (draft) voor het volgende werkjaar — leeft in settings.concept.
+export interface WerkjaarConcept {
+  werkjaar: string
+  // leiding→tak toewijzing als { tak: [{ naam, rol }] }
+  leiding: Record<string, { naam: string; rol: string }[]>
+}
+
 export interface Settings {
   id: number
   scouts_year: string
+  concept?: WerkjaarConcept | Record<string, never>
   bank_iban: string
   bank_bic: string
   bank_holder: string
@@ -39,6 +55,7 @@ export interface CalendarEvent {
   location: string
   description: string
   tak: 'groep' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
+  werkjaar?: string
   created_at?: string
 }
 
@@ -50,6 +67,7 @@ export interface Echo {
   tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
   file_name: string
   approved: boolean
+  werkjaar?: string
   uploaded_at?: string
 }
 
@@ -106,6 +124,7 @@ export interface Kamp {
   paklijst: any // JSON
   briefadres: string
   contact_info: string
+  werkjaar?: string
   aangemaakt_op?: string
   aangemaakt_door?: string
   kamp_bestanden?: KampBestand[]
@@ -127,6 +146,7 @@ export interface KampRsvp {
   tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
   status: 'ja' | 'nee'
   opmerking: string
+  werkjaar?: string
   created_at?: string
   updated_at?: string
 }

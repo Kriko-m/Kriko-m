@@ -96,6 +96,7 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
     { href: '/portaal/dashboard', label: '🏠 Dashboard' },
     { href: '/portaal/leiding', label: '🛡️ Leiding' },
     { href: '/portaal/verslagen', label: '📋 Verslagen' },
+    { href: '/portaal/archief', label: '📚 Archief' },
     ...(isAdmin ? [{ href: '/portaal/admin', label: '⚙️ Beheer' }] : []),
   ]
 

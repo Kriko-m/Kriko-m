@@ -37,6 +37,14 @@ export default async function DashboardPage() {
       stat: 'Leiding documenten',
       kleur: '#8A9A8A',
     },
+    {
+      href: '/portaal/archief',
+      icon: '📚',
+      titel: 'Archief',
+      desc: 'Blader per werkjaar door kampen, echo\'s en wie welke tak had.',
+      stat: 'Per werkjaar',
+      kleur: '#4A7BBF',
+    },
     ...(isAdmin ? [{
       href: '/portaal/admin',
       icon: '⚙️',
@@ -44,6 +52,13 @@ export default async function DashboardPage() {
       desc: 'Bestellingen beheren, instellingen en contactberichten.',
       stat: 'Groepsleiding',
       kleur: '#1A3D2A',
+    }, {
+      href: '/portaal/admin/werkjaar',
+      icon: '🗓️',
+      titel: 'Nieuw werkjaar',
+      desc: 'Leiding→tak klaarzetten en het nieuwe werkjaar publiceren.',
+      stat: 'Groepsleiding',
+      kleur: '#2A5C3F',
     }] : []),
     {
       href: '/shop',

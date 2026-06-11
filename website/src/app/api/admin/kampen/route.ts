@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
 import { requireLeiding } from '@/lib/auth'
+import { getActiveWerkjaar } from '@/lib/db'
 import { revalidateTag } from 'next/cache'
 
 export async function POST(req: NextRequest) {
@@ -8,10 +9,11 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const body = await req.json()
+  const werkjaar = await getActiveWerkjaar()
   const admin = createAdminClient()
   const { data, error } = await admin
     .from('kampen')
-    .insert({ ...body, aangemaakt_door: user.id })
+    .insert({ ...body, aangemaakt_door: user.id, werkjaar })
     .select()
     .single()
 

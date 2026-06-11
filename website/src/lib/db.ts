@@ -11,6 +11,14 @@ export const getSettings = unstable_cache(
   { revalidate: 300, tags: ['settings'] }
 )
 
+// Actief werkjaar = settings.scouts_year. Direct (ongecachet) gelezen omdat dit
+// bij schrijfacties gebruikt wordt om nieuwe records te taggen.
+export async function getActiveWerkjaar(): Promise<string> {
+  const supabase = createAdminClient()
+  const { data } = await supabase.from('settings').select('scouts_year').eq('id', 1).single()
+  return data?.scouts_year ?? ''
+}
+
 export const getCalendarEvents = unstable_cache(
   async () => {
     const supabase = createAdminClient()

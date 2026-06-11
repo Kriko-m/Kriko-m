@@ -43,7 +43,7 @@ export async function POST(
     // Slug → kamp. (slug is de enige toegangspoort, dus lang & ongokbaar.)
     const { data: kamp } = await admin
       .from('kampen')
-      .select('id')
+      .select('id, werkjaar')
       .eq('slug', slug)
       .single()
 
@@ -51,7 +51,7 @@ export async function POST(
       return NextResponse.json({ error: 'Kamp niet gevonden.' }, { status: 404 })
     }
 
-    const rows: Array<{ kamp_id: string; kind_naam: string; tak: string; status: string; opmerking: string; updated_at: string }> = []
+    const rows: Array<{ kamp_id: string; kind_naam: string; tak: string; status: string; opmerking: string; werkjaar: string; updated_at: string }> = []
     for (const a of antwoorden) {
       const naam = cleanNaam(String(a.kind_naam ?? ''))
       const tak = String(a.tak ?? '')
@@ -63,7 +63,7 @@ export async function POST(
       if (!VALID_TAKKEN.has(tak)) return NextResponse.json({ error: 'Selecteer een geldige tak.' }, { status: 400 })
       if (!VALID_STATUS.has(status)) return NextResponse.json({ error: 'Geef ja of nee op.' }, { status: 400 })
 
-      rows.push({ kamp_id: kamp.id, kind_naam: naam, tak, status, opmerking, updated_at: new Date().toISOString() })
+      rows.push({ kamp_id: kamp.id, kind_naam: naam, tak, status, opmerking, werkjaar: kamp.werkjaar ?? '', updated_at: new Date().toISOString() })
     }
 
     // Upsert — laatste antwoord per (kamp, genormaliseerde naam, tak) wint.

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
 import { requireLeiding } from '@/lib/auth'
+import { getActiveWerkjaar } from '@/lib/db'
 import { revalidateTag } from 'next/cache'
 
 const MAX_BYTES = 10 * 1024 * 1024 // 10 MB
@@ -140,6 +141,7 @@ export async function POST(req: NextRequest) {
           tak: echoTak,
           file_name: filename,
           approved: true,
+          werkjaar: await getActiveWerkjaar(),
         })
         .select()
         .single()
