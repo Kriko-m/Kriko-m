@@ -24,23 +24,28 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit}>
+      {/* Honeypot — verborgen voor mensen, bots vullen het in. */}
+      <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}>
+        <label htmlFor="website">Laat dit veld leeg</label>
+        <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" />
+      </div>
       <div className="form-row">
         <div className="form-group">
           <label className="form-label">Naam *</label>
-          <input name="name" required className="form-control" placeholder="Jouw naam" />
+          <input name="name" required maxLength={120} className="form-control" placeholder="Jouw naam" />
         </div>
         <div className="form-group">
           <label className="form-label">E-mail *</label>
-          <input name="email" type="email" required className="form-control" placeholder="jouw@email.be" />
+          <input name="email" type="email" required maxLength={160} className="form-control" placeholder="jouw@email.be" />
         </div>
       </div>
       <div className="form-group">
         <label className="form-label">Onderwerp</label>
-        <input name="subject" className="form-control" placeholder="Waarover gaat je vraag?" />
+        <input name="subject" maxLength={200} className="form-control" placeholder="Waarover gaat je vraag?" />
       </div>
       <div className="form-group">
         <label className="form-label">Bericht *</label>
-        <textarea name="message" required className="form-control" rows={6} placeholder="Stel hier je vraag…" style={{ resize: 'vertical' }} />
+        <textarea name="message" required maxLength={5000} className="form-control" rows={6} placeholder="Stel hier je vraag…" style={{ resize: 'vertical' }} />
       </div>
       {status === 'error' && (
         <p style={{ color: 'var(--color-error)', marginBottom: 16 }}>Er ging iets mis. Probeer het opnieuw of stuur een e-mail.</p>

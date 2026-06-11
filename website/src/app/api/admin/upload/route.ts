@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { createAdminClient } from '@/lib/supabase'
+import { requireLeiding } from '@/lib/auth'
 import { revalidateTag } from 'next/cache'
 
-async function requireLeiding() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  const role = user.app_metadata?.role
-  if (role !== 'admin' && role !== 'groepsleiding' && role !== 'leiding') return null
-  return user
+const MAX_BYTES = 10 * 1024 * 1024 // 10 MB
+// Toegestane MIME-types → extensie. Extensie wordt afgeleid van het
+// gevalideerde MIME-type, niet van file.name (dat is door de client te spoofen).
+const ALLOWED_MIME: Record<string, string> = {
+  'application/pdf': 'pdf',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
 }
+// Omslagfoto's: enkel afbeeldingen.
+const IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp'])
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,9 +30,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Bestand en type zijn verplicht' }, { status: 400 })
     }
 
+    if (file.size > MAX_BYTES) {
+      return NextResponse.json({ error: 'Bestand is te groot (max. 10 MB).' }, { status: 400 })
+    }
+
+    const ext = ALLOWED_MIME[file.type]
+    if (!ext) {
+      return NextResponse.json({ error: 'Bestandstype niet toegestaan. Enkel PDF, JPG, PNG of WebP.' }, { status: 400 })
+    }
+    if (uploadType === 'kamp-foto' && !IMAGE_MIME.has(file.type)) {
+      return NextResponse.json({ error: 'Omslagfoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
+    }
+
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
-    const ext = file.name.split('.').pop() || ''
 
     const admin = createAdminClient()
 

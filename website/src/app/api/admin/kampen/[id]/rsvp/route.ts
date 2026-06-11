@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { createAdminClient } from '@/lib/supabase'
+import { requireLeiding } from '@/lib/auth'
 import { TAKKEN } from '@/lib/constants'
 
 const VALID_TAKKEN = new Set<string>(TAKKEN)
 const VALID_STATUS = new Set(['ja', 'nee'])
-
-async function requireLeiding() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  const role = user.app_metadata?.role
-  if (role !== 'admin' && role !== 'groepsleiding' && role !== 'leiding') return null
-  return user
-}
 
 // Lijst van antwoorden voor een kamp.
 export async function GET(

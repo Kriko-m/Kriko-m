@@ -707,7 +707,7 @@ export default function LeidingPanel({ initialKampen, initialEchos, initialCalen
                                     </select>
                                   </div>
                                 </div>
-                                <input type="file" name="bestand" accept=".pdf,image/jpeg,image/png,.docx" required style={{ fontSize: '.8rem', margin: '4px 0' }} />
+                                <input type="file" name="bestand" accept="application/pdf,image/jpeg,image/png,image/webp" required style={{ fontSize: '.8rem', margin: '4px 0' }} />
                                 <button type="submit" disabled={loading} style={{ alignSelf: 'flex-start', padding: '6px 14px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 700, cursor: 'pointer', fontSize: '.8rem' }}>Uploaden</button>
                               </form>
                             </div>

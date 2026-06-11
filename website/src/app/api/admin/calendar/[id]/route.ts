@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { createAdminClient } from '@/lib/supabase'
+import { requireLeiding } from '@/lib/auth'
 import { revalidateTag } from 'next/cache'
-
-async function requireLeiding() {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-  const role = user.app_metadata?.role
-  if (role !== 'admin' && role !== 'groepsleiding' && role !== 'leiding') return null
-  return user
-}
 
 export async function PATCH(
   req: NextRequest,

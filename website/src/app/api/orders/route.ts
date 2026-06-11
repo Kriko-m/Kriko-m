@@ -91,7 +91,6 @@ export async function POST(req: NextRequest) {
         items: validatedCart,
         total,
         communication: '', // wordt hieronder bijgewerkt
-        parent_id: null,
       })
       .select('id, order_number, order_ref')
       .single()
