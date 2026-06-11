@@ -22,32 +22,62 @@ function toUtcIcsString(date: Date): string {
   return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
 }
 
+// VTIMEZONE voor Europe/Brussels (CET/CEST). Zo interpreteren agenda's de
+// lokale wandkloktijd correct, ongeacht de tijdzone van de server.
+const VTIMEZONE = [
+  'BEGIN:VTIMEZONE',
+  'TZID:Europe/Brussels',
+  'BEGIN:DAYLIGHT',
+  'TZOFFSETFROM:+0100',
+  'TZOFFSETTO:+0200',
+  'TZNAME:CEST',
+  'DTSTART:19700329T020000',
+  'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU',
+  'END:DAYLIGHT',
+  'BEGIN:STANDARD',
+  'TZOFFSETFROM:+0200',
+  'TZOFFSETTO:+0100',
+  'TZNAME:CET',
+  'DTSTART:19701025T030000',
+  'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU',
+  'END:STANDARD',
+  'END:VTIMEZONE',
+]
+
+// Lokale wandkloktijd → ICS-string (geen tijdzone-conversie).
+function toLocalIcsString(dateStr: string, hh: number, mm: number): string {
+  const ymd = dateStr.replace(/-/g, '')
+  return `${ymd}T${String(hh).padStart(2, '0')}${String(mm).padStart(2, '0')}00`
+}
+
 function parseEventDates(event: DatabaseEvent) {
   const dateStr = event.date // YYYY-MM-DD
   const timeStr = event.time?.trim() ?? ''
-  
-  let start: Date
-  let end: Date
-  let allDay = true
 
   const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/g)
   if (timeMatch && timeMatch.length >= 1) {
-    allDay = false
-    const startTimeParts = timeMatch[0].split(':')
-    start = new Date(`${dateStr}T${startTimeParts[0].padStart(2, '0')}:${startTimeParts[1].padStart(2, '0')}:00`)
+    const [sh, sm] = timeMatch[0].split(':').map(Number)
+    let eh: number, em: number
     if (timeMatch.length >= 2) {
-      const endTimeParts = timeMatch[1].split(':')
-      end = new Date(`${dateStr}T${endTimeParts[0].padStart(2, '0')}:${endTimeParts[1].padStart(2, '0')}:00`)
+      ;[eh, em] = timeMatch[1].split(':').map(Number)
     } else {
-      end = new Date(start.getTime() + 60 * 60 * 1000) // +1 hour
+      eh = (sh + 1) % 24
+      em = sm
     }
-  } else {
-    // All day event
-    start = new Date(`${dateStr}T00:00:00`)
-    end = new Date(start.getTime() + 24 * 60 * 60 * 1000) // +1 day (exclusive DTEND)
+    return {
+      allDay: false,
+      startLocal: toLocalIcsString(dateStr, sh, sm),
+      endLocal: toLocalIcsString(dateStr, eh, em),
+    }
   }
-
-  return { start, end, allDay }
+  // Hele dag (DTEND is exclusief → +1 dag).
+  const start = new Date(`${dateStr}T00:00:00Z`)
+  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000)
+  return {
+    allDay: true,
+    startYmd: start.toISOString().slice(0, 10).replace(/-/g, ''),
+    endYmd: end.toISOString().slice(0, 10).replace(/-/g, ''),
+  }
 }
 
 export async function GET(request: NextRequest) {
@@ -86,27 +116,26 @@ export async function GET(request: NextRequest) {
       'METHOD:PUBLISH',
       'X-WR-CALNAME:Scouts Kriko-M',
       'X-WR-TIMEZONE:' + CAL_TZ,
+      ...VTIMEZONE,
     ]
 
     const nowStr = toUtcIcsString(new Date())
 
     // 1. Process regular calendar events
     for (const event of calendarEvents) {
-      const { start, end, allDay } = parseEventDates(event)
+      const ev = parseEventDates(event)
       const uid = `${event.id}@kriko-m.be`
 
       lines.push('BEGIN:VEVENT')
       lines.push(`UID:${escapeIcsText(uid)}`)
       lines.push(`DTSTAMP:${nowStr}`)
 
-      if (allDay) {
-        const startYmd = start.toISOString().slice(0, 10).replace(/-/g, '')
-        const endYmd = end.toISOString().slice(0, 10).replace(/-/g, '')
-        lines.push(`DTSTART;VALUE=DATE:${startYmd}`)
-        lines.push(`DTEND;VALUE=DATE:${endYmd}`)
+      if (ev.allDay) {
+        lines.push(`DTSTART;VALUE=DATE:${ev.startYmd}`)
+        lines.push(`DTEND;VALUE=DATE:${ev.endYmd}`)
       } else {
-        lines.push(`DTSTART:${toUtcIcsString(start)}`)
-        lines.push(`DTEND:${toUtcIcsString(end)}`)
+        lines.push(`DTSTART;TZID=${CAL_TZ}:${ev.startLocal}`)
+        lines.push(`DTEND;TZID=${CAL_TZ}:${ev.endLocal}`)
       }
 
       // Add tak prefix for better readability in parents' calendar feed (if it's not a group event)

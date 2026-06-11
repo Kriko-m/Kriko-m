@@ -11,20 +11,34 @@ interface HeaderProps {
   alertMessage?: string
 }
 
+// Korte stabiele hash van de bannertekst, zodat een nieuwe melding opnieuw
+// verschijnt ook al heeft de bezoeker de vorige weggeklikt.
+function hashMessage(s: string): string {
+  let h = 0
+  for (let i = 0; i < s.length; i++) {
+    h = (h << 5) - h + s.charCodeAt(i)
+    h |= 0
+  }
+  return String(h)
+}
+
 export default function Header({ alertActive, alertMessage }: HeaderProps) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [takkenOpen, setTakkenOpen] = useState(false)
   const [alertDismissed, setAlertDismissed] = useState(true) // start verborgen, toon pas na check
 
+  const alertHash = alertMessage ? hashMessage(alertMessage) : ''
+
   useEffect(() => {
     setMenuOpen(false)
   }, [pathname])
 
   useEffect(() => {
-    const dismissed = localStorage.getItem('kriko_alert_dismissed')
-    if (!dismissed) setAlertDismissed(false)
-  }, [])
+    // Toon de banner tenzij exact deze tekst al is weggeklikt.
+    const dismissedHash = localStorage.getItem('kriko_alert_dismissed')
+    setAlertDismissed(dismissedHash === alertHash && alertHash !== '')
+  }, [alertHash])
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
@@ -42,7 +56,7 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
               </svg>
               <span>{alertMessage}</span>
             </div>
-            <button className="alert-close" onClick={() => { localStorage.setItem('kriko_alert_dismissed', '1'); setAlertDismissed(true) }} aria-label="Melding sluiten">&times;</button>
+            <button className="alert-close" onClick={() => { localStorage.setItem('kriko_alert_dismissed', alertHash); setAlertDismissed(true) }} aria-label="Melding sluiten">&times;</button>
           </div>
         </div>
       )}
@@ -115,15 +129,12 @@ function CookieBanner() {
       <span className="cookie-icon">🍪</span>
       <div className="cookie-text">
         <p>
-          Scouts Kriko-M gebruikt <strong>functionele cookies</strong> om je winkelmandje, voorkeuren en instellingen te onthouden. Meer in onze{' '}
+          Scouts Kriko-M gebruikt enkel <strong>functionele cookies</strong> om je winkelmandje, voorkeuren en instellingen te onthouden — geen tracking of advertenties. Meer in onze{' '}
           <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'underline' }}>privacyverklaring</Link>.
         </p>
         <div className="cookie-actions">
           <button className="cookie-btn-accept" onClick={() => { localStorage.setItem('kriko_cookies', 'yes'); setVisible(false) }}>
-            Begrepen, akkoord!
-          </button>
-          <button className="cookie-btn-decline" onClick={() => { localStorage.setItem('kriko_cookies', 'essential'); setVisible(false) }}>
-            Enkel essentieel
+            Begrepen
           </button>
         </div>
       </div>

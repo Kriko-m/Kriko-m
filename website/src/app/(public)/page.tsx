@@ -10,7 +10,14 @@ const MONTHS_NL: Record<number, string> = {
 }
 
 export default async function HomePage() {
-  const events = (await getCalendarEvents()) as CalendarEvent[]
+  const allEvents = (await getCalendarEvents()) as CalendarEvent[]
+  // Toon enkel aankomende activiteiten (vanaf vandaag), max. 5.
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const events = allEvents
+    .filter(e => new Date(e.date) >= today)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 5)
 
   return (
     <>
