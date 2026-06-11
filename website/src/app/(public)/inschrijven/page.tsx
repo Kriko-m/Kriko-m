@@ -98,7 +98,7 @@ export default async function InschrijvenPage() {
                       <strong style={{ display: 'block', fontSize: '0.95rem' }}>{label}:</strong>
                       <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>{sub}</span>
                     </div>
-                    <span style={{ fontSize: '1.6rem', fontWeight: 800, fontFamily: 'Outfit, sans-serif', color: 'var(--color-accent-light)' }}>€{price}</span>
+                    <span style={{ fontSize: '1.6rem', fontWeight: 800, fontFamily: 'var(--font-outfit), sans-serif', color: 'var(--color-accent-light)' }}>€{price}</span>
                   </div>
                 ))}
               </div>

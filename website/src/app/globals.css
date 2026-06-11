@@ -10,6 +10,11 @@
    ========================================================================== */
 
 :root {
+    /* Lettertypes (zelf-gehost via next/font; zie layout.tsx). De fallback-
+       namen blijven werken voor inline var(--font-heading, Nunito, ...). */
+    --font-heading: var(--font-nunito), Arial, sans-serif;
+    --font-body: var(--font-outfit), sans-serif;
+
     /* â”€â”€ Kleurenpallet Kriko-M v3 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
     /* Bordeaux â€” navigatiebalk Â· knoppen Â· accenten */
@@ -91,7 +96,7 @@ html {
 }
 
 body {
-    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-outfit), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     line-height: 1.6;
     overflow-x: hidden;
     display: flex;
@@ -105,7 +110,7 @@ body {
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     color: var(--color-primary-dark);
     line-height: 1.25;
@@ -169,7 +174,7 @@ a {
     gap: 8px;
     padding: 12px 28px;
     border-radius: var(--border-radius-md);
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
@@ -282,7 +287,7 @@ a {
 .nav-links > li > a {
     color: #fff;
     text-decoration: none;
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.88rem;
     font-weight: 700;
     letter-spacing: 0.07em;
@@ -344,7 +349,7 @@ a {
     color: #fff;
     text-decoration: none;
     padding: 11px 18px;
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -365,7 +370,7 @@ a {
     background-color: var(--color-accent);
     color: var(--color-bg-white) !important;
     text-decoration: none;
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.82rem;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -390,7 +395,7 @@ a {
     background-color: transparent;
     color: rgba(255,255,255,0.8) !important;
     text-decoration: none;
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.82rem;
     font-weight: 700;
     letter-spacing: 0.07em;
@@ -597,7 +602,7 @@ a {
 }
 
 .hero-title {
-    font-family: 'Londrina Solid', 'Nunito', Arial, sans-serif;
+    font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: 7.2rem;
     font-weight: 900;
     color: var(--color-bg-white);
@@ -609,7 +614,7 @@ a {
 }
 
 .hero-sub {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 1.6rem;
     font-weight: 600;
     color: var(--color-accent-light); /* tussentint goud op donkere achtergrond */
@@ -627,7 +632,7 @@ a {
     border: 2px solid rgba(255,255,255,0.65);
     background: rgba(255,255,255,0.08);
     color: #fff;
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.85rem;
     font-weight: 800;
     letter-spacing: 0.1em;
@@ -715,7 +720,7 @@ a {
 .vic-tak-age { position: relative; z-index: 1; }
 
 .vic-tak-name {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 1.1rem;
     font-weight: 900;
     color: #fff;
@@ -725,7 +730,7 @@ a {
 }
 
 .vic-tak-age {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.78rem;
     font-weight: 600;
     color: var(--color-accent-light);
@@ -736,7 +741,7 @@ a {
 
 /* â”€â”€ "Bestel onze groepsdas"-link op de tak-detailpagina â”€â”€ */
 .tak-card-link {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -802,7 +807,7 @@ a {
 
 .calendar-day {
     font-size: 1.6rem;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     line-height: 1;
 }
@@ -898,7 +903,7 @@ a {
 .hero-eyebrow {
     display: inline-block;
     color: var(--tak-color, var(--color-accent-light));
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -955,7 +960,7 @@ body.portal-theme .tak-hero.primair {
 /* Banners worden nu via Next.js <Image> component en WebP ingeladen in takken/[slug]/page.tsx voor snellere laadtijden */
 
 .tak-hero-title {
-    font-family: 'Londrina Solid', 'Nunito', Arial, sans-serif;
+    font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: 3.4rem;
     font-weight: 900;
     color: var(--color-bg-white);
@@ -1000,7 +1005,7 @@ body.portal-theme .tak-hero.primair {
     border-radius: 50%;
     background-color: var(--tak-color, var(--color-primary-light));
     color: var(--color-bg-white);
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 1.5rem;
     display: flex;
@@ -1148,7 +1153,7 @@ body.portal-theme .tak-hero.primair {
 
 .shop-card-price {
     font-size: 1.4rem;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     color: var(--color-secondary);
     font-weight: 700;
     margin-bottom: 12px;
@@ -1332,7 +1337,7 @@ body.portal-theme .tak-hero.primair {
     align-items: center;
     gap: 12px;
     box-shadow: -5px 6px 18px rgba(0, 0, 0, 0.20);
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     transition: background 0.15s;
 }
@@ -1519,7 +1524,7 @@ body.portal-theme .tak-hero.primair {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 1.25rem;
     flex-shrink: 0;
@@ -1557,7 +1562,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 .footer-brand-name {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 2.2rem;
     font-weight: 900;
     color: #fff;
@@ -1567,7 +1572,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 .footer-brand-sub {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.75rem;
     font-weight: 700;
     color: var(--color-accent);
@@ -1618,7 +1623,7 @@ body.portal-theme .tak-hero.primair {
 
 .footer-col-title {
     display: block;
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.12em;
@@ -1669,7 +1674,7 @@ body.portal-theme .tak-hero.primair {
 /* "Volg ons" label boven de social-iconen */
 .footer-social-label {
     display: block;
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.12em;
@@ -1682,7 +1687,7 @@ body.portal-theme .tak-hero.primair {
 .calendar-view-all {
     display: inline-block;
     margin-top: 24px;
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-weight: 800;
     font-size: 0.95rem;
     color: var(--color-secondary);
@@ -1702,7 +1707,7 @@ body.portal-theme .tak-hero.primair {
     gap: 8px;
     background-color: var(--color-accent);
     color: var(--color-primary-dark);
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-weight: 800;
     font-size: 0.9rem;
     text-decoration: none;
@@ -1964,7 +1969,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 .echo-card-naam {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 1.25rem;
     font-weight: 900;
     color: #fff;
@@ -1975,7 +1980,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 .echo-card-leeftijd {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.78rem;
     font-weight: 600;
     color: var(--color-accent-light);
@@ -2207,7 +2212,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 .cal-cal-title {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 1.25rem;
     font-weight: 800;
     color: var(--color-primary-dark);
@@ -2223,7 +2228,7 @@ body.portal-theme .tak-hero.primair {
     border: 1px solid var(--color-border);
     background-color: var(--color-bg-linen);
     color: var(--color-primary-dark);
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-weight: 700;
     font-size: 0.8rem;
     padding: 8px 14px;
@@ -2294,7 +2299,7 @@ body.portal-theme .tak-hero.primair {
     border: none;
     background: transparent;
     border-radius: 10px;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--color-text-dark);
@@ -2379,7 +2384,7 @@ body.portal-theme .tak-hero.primair {
 
 /* ---- Upcoming list (right) ---- */
 .cal-upcoming-title {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 1.4rem;
     font-weight: 800;
     color: var(--color-primary-dark);
@@ -2429,7 +2434,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 .cal-event-day {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-size: 1.7rem;
     font-weight: 700;
     line-height: 1;
@@ -2560,7 +2565,7 @@ body.portal-theme .tak-hero.primair {
 
 /* Titel in merk-bordeaux i.p.v. wit */
 .tak-hero.algemeen .tak-hero-title {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: clamp(1.6rem, 3vw, 2.4rem);
     font-weight: 900;
     color: var(--color-primary);
@@ -2645,7 +2650,7 @@ body.portal-theme .tak-hero.primair {
     transform: translateX(-50%);
     color: rgba(255,255,255,0.6);
     font-size: 0.85rem;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-nunito), sans-serif;
 }
 
 /* ==========================================================================
@@ -2663,7 +2668,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 .page-header-title {
-    font-family: 'Londrina Solid', 'Nunito', Arial, sans-serif;
+    font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: clamp(2.2rem, 4.5vw, 3.4rem);
     font-weight: 900;
     color: var(--color-primary);
@@ -2783,7 +2788,7 @@ body.portal-theme .tak-hero.primair {
     color: var(--color-primary-dark);
     border: none;
     border-radius: var(--border-radius-sm);
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 0.85rem;
     cursor: pointer;
@@ -2796,7 +2801,7 @@ body.portal-theme .tak-hero.primair {
     color: rgba(255,255,255,0.55);
     border: 1px solid rgba(255,255,255,0.18);
     border-radius: var(--border-radius-sm);
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-size: 0.85rem;
     cursor: pointer;
     transition: color 0.2s, border-color 0.2s;
@@ -2817,7 +2822,7 @@ body.portal-theme .tak-hero.primair {
     min-height: 65vh;
 }
 .error-404-number {
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-nunito), sans-serif;
     font-size: clamp(5rem, 18vw, 9rem);
     font-weight: 900;
     color: var(--color-primary-dark);
@@ -2852,7 +2857,7 @@ body.portal-theme .tak-hero.primair {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
 }
 .paklijst-item {
@@ -2930,7 +2935,7 @@ body.portal-theme .tak-hero.primair {
 /* â”€â”€ Archief pagina â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .archief-year { margin-bottom: 44px; }
 .archief-year-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-nunito), sans-serif;
     font-size: 1.4rem;
     font-weight: 900;
     color: var(--color-primary);
@@ -2989,7 +2994,7 @@ body.portal-theme .tak-hero.primair {
 .verhuur-hero-title {
     margin: 0;
     color: #fff;
-    font-family: 'Londrina Solid', 'Nunito', Arial, sans-serif;
+    font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: 3.4rem;
     font-weight: 900;
     line-height: 1;
@@ -3051,7 +3056,7 @@ body.portal-theme .tak-hero.primair {
 
 .vh-eyebrow {
     display: inline-block;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -3061,7 +3066,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 .vh-intro-title {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 2.4rem;
     font-weight: 900;
     line-height: 1.12;
@@ -3078,7 +3083,7 @@ body.portal-theme .tak-hero.primair {
 .vh-block { margin-bottom: 64px; }
 
 .vh-block-title {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 1.6rem;
     font-weight: 800;
     color: var(--color-primary-dark);
@@ -3147,7 +3152,7 @@ body.portal-theme .tak-hero.primair {
 .verhuur-photo-placeholder i { font-size: 2rem; color: var(--color-accent); }
 
 .verhuur-photo-placeholder span {
-    font-family: 'Nunito', Arial, sans-serif;
+    font-family: var(--font-nunito), Arial, sans-serif;
     font-weight: 700;
     font-size: 0.95rem;
 }
@@ -3170,7 +3175,7 @@ body.portal-theme .tak-hero.primair {
     border-radius: var(--border-radius-md);
     background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
     color: #fff;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 0.92rem;
     box-shadow: var(--shadow-sm);
@@ -3217,7 +3222,7 @@ body.portal-theme .tak-hero.primair {
     font-weight: 800;
     font-size: 1.05rem;
     flex-shrink: 0;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
 }
 .kind-chip-info { display: flex; flex-direction: column; line-height: 1.2; text-align: left; }
 .kind-chip-naam { font-weight: 700; color: var(--color-primary-dark); font-size: 0.98rem; }
@@ -3249,12 +3254,12 @@ body.portal-theme .tak-hero.primair {
 .portaal-hero-content { position: relative; z-index: 1; }
 .portaal-hero-kicker {
     display: inline-block;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-nunito), sans-serif;
     font-size: 0.72rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
     color: var(--color-accent-light);
     margin-bottom: 10px;
 }
-.portaal-hero h1 { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 2rem; margin: 0 0 6px; line-height: 1.1; }
+.portaal-hero h1 { font-family: var(--font-nunito), sans-serif; font-weight: 900; font-size: 2rem; margin: 0 0 6px; line-height: 1.1; }
 .portaal-hero-content p { color: rgba(255,255,255,0.84); font-size: 1rem; margin: 0 0 22px; max-width: 540px; }
 .portaal-hero-stats { display: flex; flex-wrap: wrap; gap: 10px; }
 .portaal-hero-stats span {
@@ -3264,10 +3269,10 @@ body.portal-theme .tak-hero.primair {
     padding: 7px 15px; border-radius: 50px;
     font-size: 0.82rem; color: rgba(255,255,255,0.9);
 }
-.portaal-hero-stats strong { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.02rem; color: #fff; }
+.portaal-hero-stats strong { font-family: var(--font-nunito), sans-serif; font-weight: 900; font-size: 1.02rem; color: #fff; }
 
 .portaal-menu-label {
-    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.05rem;
+    font-family: var(--font-nunito), sans-serif; font-weight: 800; font-size: 1.05rem;
     color: var(--color-primary-dark); margin: 0 0 18px;
 }
 .portaal-menu {
@@ -3314,7 +3319,7 @@ body.portal-theme .tak-hero.primair {
 }
 .portaal-menu-card:hover .portaal-menu-icon { transform: scale(1.06) rotate(-4deg); }
 .portaal-menu-body { display: flex; flex-direction: column; gap: 5px; flex: 1; }
-.portaal-menu-titel { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--color-primary-dark); }
+.portaal-menu-titel { font-family: var(--font-nunito), sans-serif; font-weight: 900; font-size: 1.2rem; color: var(--color-primary-dark); }
 .portaal-menu-desc { font-size: 0.86rem; color: var(--color-text-muted); line-height: 1.5; }
 .portaal-menu-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
 .portaal-menu-stat {
@@ -3362,7 +3367,7 @@ body.portal-theme .tak-hero.primair {
     transition: background 0.18s, color 0.18s, transform 0.18s;
 }
 .portaal-back:hover { background: var(--kleur); color: #fff; transform: translateX(-3px); }
-.portaal-sectie-titel { font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1.6rem; color: var(--color-primary-dark); margin: 0; }
+.portaal-sectie-titel { font-family: var(--font-nunito), sans-serif; font-weight: 900; font-size: 1.6rem; color: var(--color-primary-dark); margin: 0; }
 .portaal-sectie-wrap { max-width: 560px; }
 
 /* Panelen */
@@ -3376,7 +3381,7 @@ body.portal-theme .tak-hero.primair {
     align-items: center;
     gap: 12px;
     margin: 28px 0 16px;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 1.15rem;
     color: var(--color-primary-dark);
@@ -3533,7 +3538,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
     display: flex;
     flex-direction: column;
     line-height: 1;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-nunito), sans-serif;
     font-weight: 900;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -3555,7 +3560,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
     gap: 7px;
     padding: 8px 14px;
     border-radius: 10px;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 600;
     font-size: 0.9rem;
     color: rgba(255,255,255,0.88);
@@ -3634,11 +3639,11 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
     background: var(--kleur, var(--color-accent));
     color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.4rem;
+    font-family: var(--font-outfit), sans-serif; font-weight: 800; font-size: 1.4rem;
     flex-shrink: 0;
     box-shadow: 0 4px 10px color-mix(in srgb, var(--kleur, var(--color-accent)) 40%, transparent);
 }
-.portaal-lid-naam { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--color-primary-dark); line-height: 1.1; }
+.portaal-lid-naam { font-family: var(--font-outfit), sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--color-primary-dark); line-height: 1.1; }
 .portaal-lid-meta { font-size: 0.82rem; color: var(--color-text-muted); margin-top: 4px; text-transform: capitalize; }
 
 /* Items binnen de witte kaart laten opvallen (linnen i.p.v. wit-op-wit) */
@@ -3680,7 +3685,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
     padding: 22px 22px 24px;
 }
 .portaal-shop-head {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 1.15rem;
     color: var(--color-primary-dark);
@@ -3702,7 +3707,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
     margin: 20px 0 16px;
 }
 .portaal-shop-subtitle {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 0.95rem;
     color: var(--color-primary-dark);
@@ -3754,7 +3759,7 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
 /* Kolom 1: leden-selector, verticaal links */
 .portaal-leden { position: sticky; top: 84px; }
 .portaal-leden-title {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 0.78rem;
     text-transform: uppercase;
@@ -3843,7 +3848,7 @@ body.portal-theme .portaal-nav {
 }
 
 .dashboard-menu-card .menu-titel {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 1.15rem;
     color: var(--color-primary-dark);
@@ -3857,7 +3862,7 @@ body.portal-theme .portaal-nav {
 }
 
 .dashboard-menu-card .menu-stat {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--kleur);
@@ -3918,7 +3923,7 @@ body.portal-theme .portaal-nav {
     border: none;
     background: none;
     border-radius: 50px;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 0.95rem;
     color: var(--color-text-muted);
@@ -3952,7 +3957,7 @@ body.portal-theme .portaal-nav {
     padding: 10px 16px;
     border: none;
     background: none;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 0.92rem;
     color: var(--color-text-muted);
@@ -4038,7 +4043,7 @@ body.portal-theme .portaal-nav {
     border-radius: 50px;
     padding: 6px 14px;
     color: #fff;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 600;
     font-size: 0.82rem;
     letter-spacing: 0.04em;
@@ -4094,7 +4099,7 @@ body.portal-theme .portaal-nav {
 
 .portaal-dropdown-header .user-name {
     display: block;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 0.92rem;
     color: var(--color-primary-dark);
@@ -4123,7 +4128,7 @@ body.portal-theme .portaal-nav {
     border: none;
     background: none;
     text-align: left;
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-size: 0.86rem;
     font-weight: 600;
     color: var(--color-text-dark);
@@ -4203,7 +4208,7 @@ body.portal-theme .portaal-nav {
 }
 
 .portaal-modal-title {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), sans-serif;
     font-weight: 700;
     font-size: 1.1rem;
     color: var(--color-primary-dark);

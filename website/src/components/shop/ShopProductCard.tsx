@@ -52,7 +52,7 @@ export default function ShopProductCard({ product }: { product: Product }) {
         ) : (
           <div style={{ display: 'flex', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center', background: 'var(--color-primary-light)', color: 'var(--color-bg-white)', position: 'relative' }}>
             <i className="fa-solid fa-shirt" style={{ fontSize: '3rem', opacity: 0.35 }} />
-            <span style={{ position: 'absolute', bottom: 12, fontSize: '0.8rem', letterSpacing: '0.5px', opacity: 0.8, fontFamily: 'Outfit, sans-serif', fontWeight: 700, textTransform: 'uppercase' }}>Scouts Kriko-M</span>
+            <span style={{ position: 'absolute', bottom: 12, fontSize: '0.8rem', letterSpacing: '0.5px', opacity: 0.8, fontFamily: 'var(--font-outfit), sans-serif', fontWeight: 700, textTransform: 'uppercase' }}>Scouts Kriko-M</span>
           </div>
         )}
         <span className="shop-badge">{categoryLabels[product.category] ?? product.category}</span>

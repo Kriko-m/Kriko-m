@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
+import { Outfit, Nunito, Londrina_Solid } from "next/font/google";
 import "./globals.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ThemeSynchronizer from "@/components/ThemeSynchronizer";
+
+// Zelf-gehoste fonts (next/font) i.p.v. de Google Fonts CDN — sneller en
+// GDPR-vriendelijk (geen verbinding met Google bij paginabezoek).
+const outfit = Outfit({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-outfit", display: "swap" });
+const nunito = Nunito({ subsets: ["latin"], weight: ["600", "700", "800", "900"], variable: "--font-nunito", display: "swap" });
+const londrina = Londrina_Solid({ subsets: ["latin"], weight: ["300", "400", "900"], variable: "--font-londrina", display: "swap" });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.kriko-m.be";
 
@@ -35,12 +42,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="nl" suppressHydrationWarning>
+    <html lang="nl" className={`${outfit.variable} ${nunito.variable} ${londrina.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/png" href="/images/logo-finaal.png" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Londrina+Solid:wght@300;400;900&family=Nunito:wght@600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
       </head>
       <body>
         <script dangerouslySetInnerHTML={{ __html: `

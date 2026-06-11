@@ -18,7 +18,7 @@ export default function PortaalLoading() {
       paddingBottom: 80
     }}>
       <img src="/images/logo-finaal.png" alt="Kriko-M laden…" style={{ width: 80, height: 80, objectFit: 'contain', animation: 'pulse 1.5s infinite ease-in-out' }} />
-      <div style={{ fontSize: '1rem', fontWeight: 600, color: '#1A3D2A', letterSpacing: '0.5px', fontFamily: 'Outfit, sans-serif' }}>
+      <div style={{ fontSize: '1rem', fontWeight: 600, color: '#1A3D2A', letterSpacing: '0.5px', fontFamily: 'var(--font-outfit), sans-serif' }}>
         Laden...
       </div>
       <div style={{ width: 120, height: 4, background: '#C2D9C9', borderRadius: 2, overflow: 'hidden', position: 'relative' }}>

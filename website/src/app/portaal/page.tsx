@@ -10,7 +10,7 @@ export default function PortaalPage() {
     <Suspense fallback={
       <div style={{ minHeight: '100vh', background: '#EEF5F1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
         <img src="/images/logo-finaal.png" alt="Kriko-M laden…" style={{ width: 80, height: 80, objectFit: 'contain' }} />
-        <div style={{ fontSize: '1rem', fontWeight: 600, color: '#1A3D2A', fontFamily: 'Outfit, sans-serif' }}>Laden...</div>
+        <div style={{ fontSize: '1rem', fontWeight: 600, color: '#1A3D2A', fontFamily: 'var(--font-outfit), sans-serif' }}>Laden...</div>
       </div>
     }>
       <PortaalContent />
