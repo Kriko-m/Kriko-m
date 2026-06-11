@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { Kamp, Echo, KampBestand, CalendarEvent } from '@/lib/types'
+import { CopyLinkButton, RsvpPanel } from '../_components/CampRsvpPanel'
 
 const TAKKEN = ['groep', 'kapoenen', 'welpen', 'jonggivers', 'givers']
 const TAK_NAMEN: Record<string, string> = {
@@ -623,6 +624,7 @@ export default function LeidingPanel({ initialKampen, initialEchos, initialCalen
                               <span style={{ fontSize: '.82rem', color: '#6A8A75' }}>📅 {periode} · 📍 {kamp.locatie}</span>
                             </div>
                             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                              <CopyLinkButton slug={kamp.slug} />
                               <button onClick={() => handleTogglePubliek(kamp.id, kamp.open_voor_inschrijving)}
                                 style={{ padding: '6px 12px', border: `1.5px solid ${kamp.open_voor_inschrijving ? '#B23A4D' : '#3F7D5A'}`, borderRadius: 8, background: 'none', color: kamp.open_voor_inschrijving ? '#B23A4D' : '#3F7D5A', fontSize: '.75rem', fontWeight: 700, cursor: 'pointer' }}>
                                 {kamp.open_voor_inschrijving ? 'Verbergen' : 'Publiceren'}
@@ -708,6 +710,14 @@ export default function LeidingPanel({ initialKampen, initialEchos, initialCalen
                                 <input type="file" name="bestand" accept=".pdf,image/jpeg,image/png,.docx" required style={{ fontSize: '.8rem', margin: '4px 0' }} />
                                 <button type="submit" disabled={loading} style={{ alignSelf: 'flex-start', padding: '6px 14px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 700, cursor: 'pointer', fontSize: '.8rem' }}>Uploaden</button>
                               </form>
+                            </div>
+                          </details>
+
+                          {/* Expandable RSVP-antwoorden */}
+                          <details style={{ marginTop: 6, borderTop: '1px solid #EEF5F1', paddingTop: 8 }}>
+                            <summary style={{ cursor: 'pointer', fontSize: '.82rem', color: '#1A3D2A', fontWeight: 700 }}>📋 Antwoorden (wie komt mee?)</summary>
+                            <div style={{ marginTop: 10 }}>
+                              <RsvpPanel kampId={kamp.id} />
                             </div>
                           </details>
                         </div>

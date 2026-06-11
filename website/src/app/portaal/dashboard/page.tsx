@@ -1,8 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase'
-import { createAdminClient } from '@/lib/supabase'
 import Link from 'next/link'
-import TourBanner from './TourBanner'
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
@@ -10,114 +8,52 @@ export default async function DashboardPage() {
   if (!session?.user) redirect('/portaal')
   const user = session.user
 
-  const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker'
-  const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding'
-
-  // Bestellingen tellen
-  const admin = createAdminClient()
-  const [authRes, ordersRes, parentChildrenRes, inschrijvingenRes] = await Promise.all([
-    supabase.auth.getUser(),
-    admin.from('orders').select('id, status').eq('email', user.email!),
-    admin.from('parent_children').select('id').eq('parent_id', user.id),
-    admin.from('kampinschrijvingen').select('id').eq('door', user.id),
-  ])
-
-  if (authRes.error || !authRes.data.user) redirect('/portaal')
-
-  const orders = ordersRes.data
-  const aantalBestellingen = orders?.length ?? 0
-  const openBestellingen = orders?.filter(o => o.status === 'pending').length ?? 0
-  const aantalKinderen = parentChildrenRes.data?.length ?? 0
-  const aantalInschrijvingen = inschrijvingenRes.data?.length ?? 0
-
-  const voornaam = naam.split(' ')[0]
+  const { data: { user: verified }, error } = await supabase.auth.getUser()
+  if (error || !verified) redirect('/portaal')
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
+  // Portaal is leiding-only sinds de ouderaccounts verdwenen.
+  if (!isLeiding) redirect('/portaal')
 
-  const menu = isLeiding
-    ? [
-        {
-          href: '/portaal/leiding',
-          icon: '🛡️',
-          titel: 'Leidersportaal',
-          desc: 'Kampen beheren en maandelijkse planningen (Echo\'s) uploaden.',
-          stat: role === 'groepsleiding' ? 'Groepsleiding' : 'Takleiding',
-          kleur: '#2A5C3F',
-        },
-        {
-          href: '/portaal/verslagen',
-          icon: '📋',
-          titel: 'Verslagen & Notulen',
-          desc: 'Bekijk notulen en documenten van vergaderingen.',
-          stat: 'Leiding documenten',
-          kleur: '#8A9A8A',
-        },
-        ...(isAdmin ? [{
-          href: '/portaal/admin',
-          icon: '⚙️',
-          titel: 'Beheer',
-          desc: 'Bestellingen beheren, instellingen and contactberichten.',
-          stat: 'Groepsleiding',
-          kleur: '#1A3D2A',
-        }] : []),
-        {
-          href: '/shop',
-          icon: '🛒',
-          titel: 'Naar de webshop',
-          desc: 'Bestel kledij, uniform en accessoires.',
-          stat: 'Kriko-M merchandise',
-          kleur: '#C9963A',
-        },
-      ]
-    : [
-        {
-          href: '/portaal/kinderen',
-          icon: '👧',
-          titel: 'Gekoppelde leden',
-          desc: 'Beheer de kinderen gekoppeld aan jouw account.',
-          stat: aantalKinderen > 0
-            ? `${aantalKinderen} ${aantalKinderen === 1 ? 'kind' : 'kinderen'} gekoppeld`
-            : 'Geen kinderen gekoppeld',
-          kleur: '#F4C842',
-        },
-        {
-          href: '/portaal/kampen',
-          icon: '🏕️',
-          titel: 'Kampen & Weekenden',
-          desc: 'Schrijf je kinderen in voor weekenden en kampen.',
-          stat: aantalInschrijvingen > 0
-            ? `${aantalInschrijvingen} actieve ${aantalInschrijvingen === 1 ? 'inschrijving' : 'inschrijvingen'}`
-            : 'Schrijf in voor een kamp',
-          kleur: '#4A7BBF',
-        },
-        {
-          href: '/portaal/echos',
-          icon: '📰',
-          titel: 'Kriko Echo\'s',
-          desc: 'Bekijk en download de maandelijkse planningen per tak.',
-          stat: 'Tak bulletins',
-          kleur: '#8A9A8A',
-        },
-        {
-          href: '/portaal/bestellingen',
-          icon: '🛍️',
-          titel: 'Mijn bestellingen',
-          desc: 'Bekijk je bestellingen en meld betalingen.',
-          stat: aantalBestellingen > 0
-            ? `${openBestellingen > 0 ? openBestellingen + ' wachten op betaling · ' : ''}${aantalBestellingen} totaal`
-            : 'Nog geen bestellingen',
-          kleur: '#C9963A',
-        },
-        {
-          href: '/shop',
-          icon: '🛒',
-          titel: 'Naar de webshop',
-          desc: 'Bestel kledij, uniform en accessoires.',
-          stat: 'Kriko-M merchandise',
-          kleur: '#2A5C3F',
-        },
-      ]
+  const isAdmin = role === 'admin' || role === 'groepsleiding'
+  const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'leiding'
+  const voornaam = naam.split(' ')[0]
+
+  const menu = [
+    {
+      href: '/portaal/leiding',
+      icon: '🛡️',
+      titel: 'Leidersportaal',
+      desc: 'Kampen beheren, antwoorden bekijken en maandelijkse planningen (Echo\'s) uploaden.',
+      stat: role === 'groepsleiding' ? 'Groepsleiding' : 'Takleiding',
+      kleur: '#2A5C3F',
+    },
+    {
+      href: '/portaal/verslagen',
+      icon: '📋',
+      titel: 'Verslagen & Notulen',
+      desc: 'Bekijk notulen en documenten van vergaderingen.',
+      stat: 'Leiding documenten',
+      kleur: '#8A9A8A',
+    },
+    ...(isAdmin ? [{
+      href: '/portaal/admin',
+      icon: '⚙️',
+      titel: 'Beheer',
+      desc: 'Bestellingen beheren, instellingen en contactberichten.',
+      stat: 'Groepsleiding',
+      kleur: '#1A3D2A',
+    }] : []),
+    {
+      href: '/shop',
+      icon: '🛒',
+      titel: 'Naar de webshop',
+      desc: 'Bestel kledij, uniform en accessoires.',
+      stat: 'Kriko-M merchandise',
+      kleur: '#C9963A',
+    },
+  ]
 
   return (
     <>
@@ -126,36 +62,19 @@ export default async function DashboardPage() {
         {/* Hero */}
         <div style={{ background: 'linear-gradient(120deg,#1A3D2A 0%,#2A5C3F 60%,#C9963A 160%)', borderRadius: 20, padding: '32px 36px', color: '#fff', marginBottom: 36, position: 'relative', overflow: 'hidden' }}>
           <span style={{ position: 'absolute', right: 16, bottom: -24, fontSize: '7rem', opacity: .1, lineHeight: 1, pointerEvents: 'none' }}>⛺</span>
-          <div style={{ fontSize: '.7rem', fontWeight: 800, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(226,197,141,.85)', marginBottom: 8 }}>Ouderportaal</div>
+          <div style={{ fontSize: '.7rem', fontWeight: 800, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(226,197,141,.85)', marginBottom: 8 }}>Leidingsportaal</div>
           <h1 style={{ color: '#fff', fontSize: '1.6rem', margin: '0 0 6px', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}>
             Hallo, {voornaam}! 👋
           </h1>
           <p style={{ color: 'rgba(255,255,255,.82)', fontSize: '.92rem', margin: 0, lineHeight: 1.5 }}>
-            {isLeiding
-              ? 'Beheer en bewerk scoutsgegevens in het leidersportaal.'
-              : 'Beheer alles voor jouw kinderen bij Scouts Kriko-M.'}
+            Beheer en bewerk scoutsgegevens in het leidersportaal.
           </p>
           <div style={{ display: 'flex', gap: 24, marginTop: 20, flexWrap: 'wrap' }}>
-            {isLeiding ? (
-              <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.85)' }}>
-                Ingelogd als <strong style={{ color: '#fff', textTransform: 'capitalize' }}>{role}</strong>
-              </span>
-            ) : (
-              <>
-                <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.7)' }}>
-                  <strong style={{ color: '#fff' }}>{aantalBestellingen}</strong> {aantalBestellingen === 1 ? 'bestelling' : 'bestellingen'}
-                </span>
-                {openBestellingen > 0 && (
-                  <span style={{ fontSize: '.85rem', color: '#f59e0b' }}>
-                    ⚠ <strong>{openBestellingen}</strong> wachten op betaling
-                  </span>
-                )}
-              </>
-            )}
+            <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.85)' }}>
+              Ingelogd als <strong style={{ color: '#fff', textTransform: 'capitalize' }}>{role}</strong>
+            </span>
           </div>
         </div>
-
-        {!isLeiding && <TourBanner />}
 
         {/* Menu kaarten */}
         <h2 style={{ fontSize: '1rem', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#6A8A75', marginBottom: 16 }}>Waar wil je naartoe?</h2>

@@ -48,7 +48,7 @@ export default async function InschrijvenPage() {
                     <strong>⚠️ Let op, twee verschillende platformen:</strong>
                     <ul style={{ paddingLeft: 16, marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
                       <li><strong>Scouts & Gidsen Vlaanderen (Groepsadmin):</strong> Hier vul je de officiële medische fiche in en word je lid voor de verzekering.</li>
-                      <li><strong>Kriko-M Ouderportaal (deze site):</strong> Hier log je in om je kind in te schrijven voor weekends/kampen en om webshop-bestellingen te doen.</li>
+                      <li><strong>Kriko-M website (deze site):</strong> Geen account nodig. Voor weekends/kampen krijg je een persoonlijke link in de mail van de leiding; de webshop bestel je rechtstreeks zonder in te loggen.</li>
                     </ul>
                   </div>
                   <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>

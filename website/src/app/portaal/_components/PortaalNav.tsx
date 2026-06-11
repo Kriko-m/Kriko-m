@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase-browser'
 import { useEffect, useState } from 'react'
-import PortalTourModal from './PortalTourModal'
 
 interface Props {
   naam: string
@@ -13,7 +12,7 @@ interface Props {
   role?: string
 }
 
-export default function PortaalNav({ naam, isAdmin, role }: Props) {
+export default function PortaalNav({ naam, isAdmin }: Props) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
@@ -21,7 +20,6 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
   // State elements for navigation dropdown & account settings modal
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [showSettingsModal, setShowSettingsModal] = useState(false)
-  const [showTourModal, setShowTourModal] = useState(false)
   const [userEmail, setUserEmail] = useState('')
   const [displayName, setDisplayName] = useState(naam)
   const [newName, setNewName] = useState(naam)
@@ -33,13 +31,6 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
   useEffect(() => {
     setDisplayName(naam)
   }, [naam])
-
-  // Listen for custom trigger to start tour
-  useEffect(() => {
-    const handleTrigger = () => setShowTourModal(true)
-    window.addEventListener('kriko_trigger_tour', handleTrigger)
-    return () => window.removeEventListener('kriko_trigger_tour', handleTrigger)
-  }, [])
 
   // Retrieve user email asynchronously
   useEffect(() => {
@@ -101,23 +92,12 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
     }
   }
 
-  const isLeiding = isAdmin || role === 'leiding'
-
-  const links = isLeiding
-    ? [
-        { href: '/portaal/dashboard', label: '🏠 Dashboard' },
-        { href: '/portaal/leiding', label: '🛡️ Leiding' },
-        { href: '/portaal/verslagen', label: '📋 Verslagen' },
-        ...(isAdmin ? [{ href: '/portaal/admin', label: '⚙️ Beheer' }] : []),
-      ]
-    : [
-        { href: '/portaal/dashboard', label: '🏠 Dashboard' },
-        { href: '/portaal/kinderen', label: '👧 Leden' },
-        { href: '/portaal/kalender', label: '📅 Kalender' },
-        { href: '/portaal/kampen', label: '🏕️ Kampen' },
-        { href: '/portaal/echos', label: '📰 Echo\'s' },
-        { href: '/portaal/bestellingen', label: '🛍️ Bestellingen' },
-      ]
+  const links = [
+    { href: '/portaal/dashboard', label: '🏠 Dashboard' },
+    { href: '/portaal/leiding', label: '🛡️ Leiding' },
+    { href: '/portaal/verslagen', label: '📋 Verslagen' },
+    ...(isAdmin ? [{ href: '/portaal/admin', label: '⚙️ Beheer' }] : []),
+  ]
 
   return (
     <>
@@ -174,30 +154,9 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
                     {userEmail && <span className="user-email">{userEmail}</span>}
                   </div>
                   <div className="portaal-dropdown-menu">
-                    {!isLeiding && (
-                      <>
-                        <Link href="/portaal/kinderen" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
-                          <span>👧 Mijn Kinderen</span>
-                        </Link>
-                        <Link href="/portaal/bestellingen" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
-                          <span>🛍️ Mijn Bestellingen</span>
-                        </Link>
-                        <button
-                          onClick={() => {
-                            setDropdownOpen(false)
-                            setShowTourModal(true)
-                          }}
-                          className="portaal-dropdown-item"
-                        >
-                          <span>💡 Rondleiding starten</span>
-                        </button>
-                      </>
-                    )}
-                    {isLeiding && (
-                      <Link href="/portaal/dashboard" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
-                        <span>🏠 Mijn Dashboard</span>
-                      </Link>
-                    )}
+                    <Link href="/portaal/dashboard" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
+                      <span>🏠 Mijn Dashboard</span>
+                    </Link>
                     <button
                       onClick={() => {
                         setDropdownOpen(false)
@@ -287,8 +246,6 @@ export default function PortaalNav({ naam, isAdmin, role }: Props) {
           </div>
         </div>
       )}
-      {/* Interactive Tour Walkthrough */}
-      <PortalTourModal isOpen={showTourModal} onClose={() => setShowTourModal(false)} />
     </>
   )
 }
