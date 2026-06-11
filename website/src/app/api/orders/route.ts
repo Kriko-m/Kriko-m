@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient, createServerSupabaseClient } from '@/lib/supabase'
+import { createAdminClient } from '@/lib/supabase'
 import { Product, OrderItem } from '@/lib/types'
+import { sendOrderConfirmation } from '@/lib/email'
 
 // Belgische gestructureerde mededeling (Modulo 97), identiek aan de PHP-versie.
 function generateCommunication(orderNumber: number): string {
@@ -16,11 +17,23 @@ const VALID_TAKKEN = new Set(['kapoenen', 'welpen', 'jonggivers', 'givers'])
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { customer_name, child_name, child_tak, email, cart } = body
+    const { customer_name, child_name, child_tak, email, cart, website } = body
+
+    // Honeypot — bots vullen dit verborgen veld in; mensen niet.
+    if (typeof website === 'string' && website.trim() !== '') {
+      return NextResponse.json({ ok: true }, { status: 200 })
+    }
 
     // Basis-validatie
     if (!customer_name?.trim() || !child_name?.trim() || !child_tak || !email?.trim()) {
       return NextResponse.json({ error: 'Vul alle verplichte velden in.' }, { status: 400 })
+    }
+    // Lengtelimieten — voorkomt misbruik / oversized payloads.
+    if (customer_name.length > 120 || child_name.length > 120 || email.length > 160) {
+      return NextResponse.json({ error: 'Een van de velden is te lang.' }, { status: 400 })
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
+      return NextResponse.json({ error: 'Vul een geldig e-mailadres in.' }, { status: 400 })
     }
     if (!VALID_TAKKEN.has(child_tak)) {
       return NextResponse.json({ error: 'Ongeldige tak geselecteerd.' }, { status: 400 })
@@ -28,13 +41,6 @@ export async function POST(req: NextRequest) {
     if (!Array.isArray(cart) || cart.length === 0) {
       return NextResponse.json({ error: 'Je winkelmandje is leeg.' }, { status: 400 })
     }
-
-    const clientSupabase = await createServerSupabaseClient()
-    const { data: { user } } = await clientSupabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Je moet ingelogd zijn om een bestelling te plaatsen.' }, { status: 401 })
-    }
-    const parentId = user.id
 
     const supabase = createAdminClient()
 
@@ -85,7 +91,7 @@ export async function POST(req: NextRequest) {
         items: validatedCart,
         total,
         communication: '', // wordt hieronder bijgewerkt
-        parent_id: parentId,
+        parent_id: null,
       })
       .select('id, order_number, order_ref')
       .single()
@@ -101,6 +107,24 @@ export async function POST(req: NextRequest) {
       .eq('id', inserted.id)
 
     if (updateError) throw updateError
+
+    // Bevestigingsmail versturen (Resend). Faalt dit, dan blijft de bestelling
+    // staan — de bevestigingspagina toont alle gegevens sowieso.
+    try {
+      await sendOrderConfirmation({
+        to: email.trim(),
+        orderRef: inserted.order_ref,
+        customerName: customer_name.trim(),
+        childName: child_name.trim(),
+        items: validatedCart,
+        total,
+        communication,
+        bankIban,
+        bankHolder,
+      })
+    } catch (mailErr) {
+      console.error('Bevestigingsmail mislukt:', mailErr)
+    }
 
     return NextResponse.json({
       order_ref: inserted.order_ref,

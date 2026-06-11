@@ -2,16 +2,24 @@
 import { useState } from 'react'
 import { Order, Message as DbMessage, Settings, OrderItem } from '@/lib/types'
 
-const STATUS_OPTIES = ['pending', 'waiting_approval', 'paid', 'completed', 'cancelled']
+// Selecteerbare statussen (waiting_approval is verwijderd met "betaling melden").
+const STATUS_OPTIES = ['pending', 'paid', 'completed', 'cancelled']
 const STATUS_LABELS: Record<string, string> = {
-  pending: 'Wachten op betaling',
-  waiting_approval: 'Betaling gemeld',
+  pending: 'Nieuw',
+  waiting_approval: 'Betaling gemeld', // legacy, enkel voor oude bestellingen
   paid: 'Betaald',
   completed: 'Geleverd',
   cancelled: 'Geannuleerd',
 }
 const STATUS_KLEUREN: Record<string, string> = {
   pending: '#BE8A2E', waiting_approval: '#C9963A', paid: '#3F7D5A', completed: '#8A9A8A', cancelled: '#B23A4D',
+}
+
+// Onbetaalde bestelling ouder dan dit aantal dagen → markeren als "blijft hangen".
+const STALE_DAGEN = 14
+function dagenGeleden(iso?: string): number | null {
+  if (!iso) return null
+  return Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000)
 }
 
 type Tab = 'bestellingen' | 'berichten' | 'instellingen'
@@ -27,8 +35,16 @@ export default function AdminTabs({ orders: initialOrders, messages: initialMess
   const [settings, setSettings] = useState<Settings>(initialSettings)
   const [saving, setSaving] = useState(false)
   const [flash, setFlash] = useState('')
+  const [orderFilter, setOrderFilter] = useState<'alle' | 'open' | 'pending' | 'paid' | 'completed' | 'cancelled'>('alle')
 
   const onreadMessages = messages.filter(m => !m.read).length
+
+  const openCount = orders.filter(o => o.status === 'pending' || o.status === 'waiting_approval').length
+  const filteredOrders = orders.filter(o => {
+    if (orderFilter === 'alle') return true
+    if (orderFilter === 'open') return o.status === 'pending' || o.status === 'waiting_approval'
+    return o.status === orderFilter
+  })
 
   function showFlash(msg: string) {
     setFlash(msg)
@@ -96,18 +112,42 @@ export default function AdminTabs({ orders: initialOrders, messages: initialMess
       {/* ── BESTELLINGEN ── */}
       {tab === 'bestellingen' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {orders.length === 0 && <p style={{ color: '#6A8A75' }}>Geen bestellingen.</p>}
-          {orders.map(order => {
+          {/* Filterbalk */}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 4 }}>
+            {([
+              ['alle', `Alle (${orders.length})`],
+              ['open', `Openstaand (${openCount})`],
+              ['paid', 'Betaald'],
+              ['completed', 'Geleverd'],
+              ['cancelled', 'Geannuleerd'],
+            ] as const).map(([val, label]) => (
+              <button key={val} onClick={() => setOrderFilter(val)}
+                style={{ padding: '6px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: '.8rem', fontWeight: 700,
+                  background: orderFilter === val ? '#1A3D2A' : '#EEF5F1', color: orderFilter === val ? '#fff' : '#3A5A42' }}>
+                {label}
+              </button>
+            ))}
+          </div>
+          {filteredOrders.length === 0 && <p style={{ color: '#6A8A75' }}>Geen bestellingen.</p>}
+          {filteredOrders.map(order => {
             const st = STATUS_LABELS[order.status] ?? order.status
             const kleur = STATUS_KLEUREN[order.status] ?? '#888'
             const date = order.created_at ? new Date(order.created_at).toLocaleDateString('nl-BE') : ''
             const items: OrderItem[] = order.items ?? []
+            const leeftijd = dagenGeleden(order.created_at)
+            const isOpen = order.status === 'pending' || order.status === 'waiting_approval'
+            const isStale = isOpen && leeftijd !== null && leeftijd >= STALE_DAGEN
             return (
-              <div key={order.id} style={{ background: '#fff', border: '1px solid #C2D9C9', borderRadius: 14, padding: '18px 20px' }}>
+              <div key={order.id} style={{ background: '#fff', border: isStale ? '1.5px solid #B23A4D' : '1px solid #C2D9C9', borderRadius: 14, padding: '18px 20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
                   <div>
                     <strong style={{ color: '#1A3D2A' }}>{order.order_ref}</strong>
                     <span style={{ marginLeft: 10, fontSize: '.8rem', color: '#6A8A75' }}>{date}</span>
+                    {isStale && (
+                      <span style={{ marginLeft: 8, padding: '2px 8px', background: '#B23A4D', color: '#fff', borderRadius: 20, fontSize: '.7rem', fontWeight: 700 }}>
+                        ⚠ {leeftijd} dagen open
+                      </span>
+                    )}
                     <div style={{ fontSize: '.85rem', color: '#3A5A42', marginTop: 4 }}>
                       {order.customer_name} — {order.child_name} ({order.child_tak})
                     </div>

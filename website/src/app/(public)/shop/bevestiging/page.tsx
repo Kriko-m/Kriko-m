@@ -118,9 +118,18 @@ export default function BevestigingPage() {
             Zodra we de betaling ontvangen, ligt de bestelling de <strong>eerstvolgende zondag</strong> na de meeting klaar aan de lokalen!
           </p>
 
-          <Link href="/" className="btn btn-outline" style={{ textAlign: 'center' }}>
-            ← Terug naar de website
-          </Link>
+          <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem' }} className="no-print">
+            Je ontvangt deze gegevens ook per e-mail. Bewaar de gestructureerde mededeling goed.
+          </p>
+
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }} className="no-print">
+            <button onClick={() => window.print()} className="btn btn-secondary">
+              🖨 Afdrukken / opslaan als PDF
+            </button>
+            <Link href="/" className="btn btn-outline" style={{ textAlign: 'center' }}>
+              ← Terug naar de website
+            </Link>
+          </div>
         </div>
       </section>
     </>

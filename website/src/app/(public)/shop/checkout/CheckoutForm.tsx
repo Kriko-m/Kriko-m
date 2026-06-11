@@ -10,51 +10,18 @@ const TAKKEN = [
   { value: 'givers', label: 'Givers (14–17j)' },
 ]
 
-interface Child {
-  id: string
-  voornaam: string
-  tak: string
-}
-
-interface Props {
-  parentName: string
-  parentEmail: string
-  kinderen: Child[]
-}
-
-export default function CheckoutForm({ parentName, parentEmail, kinderen }: Props) {
+export default function CheckoutForm() {
   const { items, totalPrice, clearCart } = useCart()
   const router = useRouter()
   const [status, setStatus] = useState<'idle' | 'sending'>('idle')
   const [error, setError] = useState('')
   const [hydrated, setHydrated] = useState(false)
 
-  // Local state for selecting linked children
-  const [selectedChildId, setSelectedChildId] = useState('')
-  const [childName, setChildName] = useState('')
-  const [childTak, setChildTak] = useState('')
-
   useEffect(() => { setHydrated(true) }, [])
 
   useEffect(() => {
     if (hydrated && items.length === 0) router.push('/shop')
   }, [hydrated, items.length, router])
-
-  // Automatically pre-fill child details when selecting from dropdown
-  function handleChildSelectChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const val = e.target.value
-    setSelectedChildId(val)
-    if (val === 'other' || val === '') {
-      setChildName('')
-      setChildTak('')
-    } else {
-      const selected = kinderen.find(k => k.id === val)
-      if (selected) {
-        setChildName(selected.voornaam)
-        setChildTak(selected.tak)
-      }
-    }
-  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -69,6 +36,7 @@ export default function CheckoutForm({ parentName, parentEmail, kinderen }: Prop
         child_name: fd.get('child_name'),
         child_tak: fd.get('child_tak'),
         email: fd.get('email'),
+        website: fd.get('website'), // honeypot
         cart: items,
       }),
     })
@@ -103,76 +71,59 @@ export default function CheckoutForm({ parentName, parentEmail, kinderen }: Prop
           )}
 
           <form onSubmit={handleSubmit}>
+            {/* Honeypot — verborgen voor mensen, bots vullen het in. */}
+            <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}>
+              <label htmlFor="website">Laat dit veld leeg</label>
+              <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" />
+            </div>
+
             <div className="form-group">
               <label className="form-label" htmlFor="customer_name">Naam Ouder / Voogd:</label>
-              <input 
-                type="text" 
-                id="customer_name" 
-                name="customer_name" 
-                className="form-control" 
-                placeholder="Voornaam + Achternaam" 
-                required 
-                defaultValue={parentName}
+              <input
+                type="text"
+                id="customer_name"
+                name="customer_name"
+                className="form-control"
+                placeholder="Voornaam + Achternaam"
+                maxLength={120}
+                required
               />
             </div>
 
             <div className="form-group">
               <label className="form-label" htmlFor="email">E-mailadres:</label>
-              <input 
-                type="email" 
-                id="email" 
-                name="email" 
-                className="form-control" 
-                placeholder="ouder@domein.be" 
-                required 
-                defaultValue={parentEmail}
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="form-control"
+                placeholder="ouder@domein.be"
+                maxLength={160}
+                required
               />
             </div>
-
-            {/* Registered children selector */}
-            {kinderen.length > 0 && (
-              <div className="form-group" style={{ borderTop: '1px solid var(--color-border)', paddingTop: 20, marginTop: 12 }}>
-                <label className="form-label" htmlFor="selected_child">Bestelling voor kind:</label>
-                <select
-                  id="selected_child"
-                  className="form-control"
-                  value={selectedChildId}
-                  onChange={handleChildSelectChange}
-                >
-                  <option value="">Selecteer lid uit account...</option>
-                  {kinderen.map(k => (
-                    <option key={k.id} value={k.id}>
-                      {k.voornaam} ({k.tak.charAt(0).toUpperCase() + k.tak.slice(1)})
-                    </option>
-                  ))}
-                  <option value="other">Een ander kind / Niet in lijst...</option>
-                </select>
-              </div>
-            )}
 
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label" htmlFor="child_name">Naam Lid (Kind):</label>
-                <input 
-                  type="text" 
-                  id="child_name" 
-                  name="child_name" 
-                  className="form-control" 
-                  placeholder="Voornaam + Achternaam" 
-                  required 
-                  value={childName}
-                  onChange={(e) => setChildName(e.target.value)}
+                <input
+                  type="text"
+                  id="child_name"
+                  name="child_name"
+                  className="form-control"
+                  placeholder="Voornaam + Achternaam"
+                  maxLength={120}
+                  required
                 />
               </div>
               <div className="form-group">
                 <label className="form-label" htmlFor="child_tak">Tak van Lid:</label>
-                <select 
-                  id="child_tak" 
-                  name="child_tak" 
-                  className="form-control" 
-                  required 
-                  value={childTak}
-                  onChange={(e) => setChildTak(e.target.value)}
+                <select
+                  id="child_tak"
+                  name="child_tak"
+                  className="form-control"
+                  required
+                  defaultValue=""
                 >
                   <option value="" disabled>Selecteer Tak</option>
                   {TAKKEN.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -186,7 +137,7 @@ export default function CheckoutForm({ parentName, parentEmail, kinderen }: Prop
                 Door op &apos;Bestelling plaatsen&apos; te klikken, stem je in met de{' '}
                 <a href="/voorwaarden" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>verkoopsvoorwaarden</a> en de{' '}
                 <a href="/privacy" style={{ color: 'var(--color-secondary)', fontWeight: 600 }}>privacyverklaring</a>.
-                Je ontvangt direct een unieke gestructureerde mededeling. Zodra we de overschrijving ontvangen, wordt je bestelling verwerkt!
+                Je ontvangt direct een unieke gestructureerde mededeling en een bevestigingsmail. Zodra we de overschrijving ontvangen, wordt je bestelling verwerkt!
               </span>
             </div>
 

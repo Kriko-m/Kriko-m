@@ -4259,3 +4259,22 @@ body.portal-theme .portaal-nav {
     color: var(--color-success);
 }
 
+/* ── Afdrukken (bv. bestelbevestiging) ───────────────────────── */
+@media print {
+    .no-print,
+    header,
+    footer,
+    .site-header,
+    .site-footer {
+        display: none !important;
+    }
+    .tak-hero {
+        background: none !important;
+        color: #000 !important;
+        padding: 0 !important;
+    }
+    body {
+        background: #fff !important;
+    }
+}
+
