@@ -93,20 +93,25 @@ Always use these colors and fonts to keep the UI consistent and professional.
 
 1. **Beige Flashing Prevention:** 
    * On `/portaal` routes, the body default top-padding and beige background are disabled.
-   * Do not put padding-top on the global `body` selector. Instead, wrap public pages in `.public-layout-content` (defined with `padding-top: 70px`).
+   * Do not put padding-top on the global `body` selector.
    * The root `layout.tsx` contains an inline script tag at the top of `<body>` to synchronously inject the portal classes and styles based on the pathname before page load.
-2. **Hero Banner Preloading:**
+2. **Sticky Header (public site):**
+   * The public header (`.site-header`, which wraps the optional alert banner + `.mainnav`) is `position: sticky; top: 0` and lives in normal flow — do **not** make it `fixed`. This way an active alert banner pushes the page down instead of being hidden behind the nav (which used to leave a beige strip between nav and page).
+   * Because the header is in flow, `.public-layout-content` needs **no** `padding-top` offset — the page begins directly under the nav automatically.
+   * `body` uses `overflow-x: clip` (not `hidden`) so it doesn't become a scroll container that would break `position: sticky`.
+   * The mobile menu (`.nav-links` in the `max-width: 992px` query) is `position: absolute; top: 70px` anchored to the relatively-positioned `.mainnav`, so it stays flush under the nav regardless of the alert banner.
+3. **Hero Banner Preloading:**
    * Never use CSS `backgroundImage` for main hero banners.
    * Always use Next.js `<Image>` component with `priority`, `fill`, and `style={{ objectFit: 'cover' }}` to leverage WebP optimization and eliminate layout shifts.
    * Set matching background colors on hero sections (`.tak-hero`, `.verhuur-hero`) so they don't flash white while the image is loading.
-3. **Contact Details & Copying:**
+4. **Contact Details & Copying:**
    * Use the `<CopyButton>` component for email addresses rather than `mailto` links to make copying easy.
    * Always wrap physical addresses in Google Maps search links (`https://www.google.com/maps/search/?api=1&query=...`).
-4. **CSS Pictograms:**
+5. **CSS Pictograms:**
    * Always use hex-escaped Unicode characters in CSS `content` (e.g., `content: '\269C'`) for banner title pictograms. Avoid printing literal emojis/special characters directly in `.css` files to prevent Mojibake encoding corruption during compiles.
-5. **Horizontal Scrolling Nav (Portaal):**
+6. **Horizontal Scrolling Nav (Portaal):**
    * The navigation links in `PortaalNav` scroll horizontally on mobile screens using `flex-nowrap` and `overflow-x-auto`. Keep it this way; do not wrap them or hide them behind hamburgers.
-6. **Responsive Layouts:**
+7. **Responsive Layouts:**
    * Use `.portal-grid-layout` (which drops from 2-column `1fr 3fr` to 1-column layout on media query max-width 768px) instead of inline styles for main portal layouts like `LeidingPanel.tsx`.
 
 ---
