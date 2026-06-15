@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import { getSettings } from '@/lib/db'
 import PhotoGallery from '@/components/PhotoGallery'
 
@@ -15,15 +14,11 @@ export default async function VerhuurPage() {
   return (
     <>
       <section className="verhuur-hero" style={{ position: 'relative', overflow: 'hidden' }}>
-        <Image
+        <img
           src="/images/verhuur/lokaal-04.jpg"
           alt="Scouts Kriko-M Lokaal"
-          fill
-          unoptimized={true}
-          priority
-          sizes="100vw"
-          style={{ objectFit: 'cover', objectPosition: 'center 42%', zIndex: 1 }}
           className="verhuur-hero-img"
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 42%', zIndex: 1 }}
         />
         <div className="container verhuur-hero-inner" style={{ position: 'relative', zIndex: 2 }}>
           <h1 className="verhuur-hero-title">Ons lokaal</h1>
