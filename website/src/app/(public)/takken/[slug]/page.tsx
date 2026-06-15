@@ -64,6 +64,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
           src={`/images/banner_${slug}.webp`}
           alt={tak.name}
           fill
+          unoptimized={true}
           sizes="100vw"
           style={{ objectFit: 'cover', zIndex: 1 }}
           className="tak-hero-img"

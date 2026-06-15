@@ -40,18 +40,7 @@ export default async function ShopPage() {
       </section>
 
       <section className="section container">
-        {!ingelogd && (
-          <div style={{ backgroundColor: 'hsla(145, 33%, 36%, 0.08)', border: '2px solid var(--color-primary)', borderRadius: 'var(--border-radius-lg)', padding: '22px 24px', marginBottom: 28, display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-            <i className="fa-solid fa-info-circle" style={{ fontSize: '1.6rem', color: 'var(--color-primary)', flexShrink: 0 }}></i>
-            <div style={{ flex: 1, minWidth: 220 }}>
-              <strong style={{ display: 'block', color: 'var(--color-primary-dark)', fontSize: '1.1rem', marginBottom: 2 }}>Je bekijkt de webshop als gast</strong>
-              <span style={{ fontSize: '0.95rem', color: 'var(--color-text-dark)', lineHeight: 1.5 }}>Je kunt artikelen in je winkelmandje leggen en afrekenen als gast, of inloggen om je bestelling direct aan je ouder- of leidingsaccount te koppelen.</span>
-            </div>
-            <a href="/portaal?login_vereist=webshop&redirect=/shop/checkout" className="btn btn-secondary" style={{ flexShrink: 0, textDecoration: 'none' }}>
-              Inloggen met account
-            </a>
-          </div>
-        )}
+
 
         <div style={{ background: 'hsla(29,57%,46%,0.1)', border: '2px dashed var(--color-accent)', borderRadius: 'var(--border-radius-lg)', padding: 24, marginBottom: 40, display: 'flex', gap: 16, alignItems: 'flex-start' }}>
           <i className="fa-solid fa-circle-info" style={{ fontSize: '1.4rem', color: 'var(--color-secondary)', flexShrink: 0, marginTop: 2 }} />

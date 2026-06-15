@@ -151,29 +151,7 @@ export interface KampRsvp {
   updated_at?: string
 }
 
-export interface KampInschrijving {
-  id: string
-  kamp_id: string
-  ga_id: string
-  opmerking: string
-  ingeschreven_op?: string
-  door: string
-}
 
-export interface OuderProfile {
-  id: string
-  naam: string
-  created_at?: string
-}
-
-export interface ParentChild {
-  id: string
-  parent_id: string
-  ga_id: string
-  voornaam: string
-  tak: string
-  added_at?: string
-}
 
 export interface Message {
   id: string

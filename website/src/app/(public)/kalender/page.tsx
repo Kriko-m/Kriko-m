@@ -43,9 +43,7 @@ export default async function KalenderPage() {
               <i className="fa-solid fa-download"></i> Download (.ics)
             </a>
           </div>
-          <Link href="/portaal" className="btn btn-primary cal-actions-btn">
-            Inschrijven voor weekend/kamp <i className="fa-solid fa-arrow-right"></i>
-          </Link>
+
         </div>
         <p className="cal-actions-hint">
           <i className="fa-solid fa-circle-info"></i>
