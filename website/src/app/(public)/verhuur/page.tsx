@@ -19,6 +19,7 @@ export default async function VerhuurPage() {
           src="/images/verhuur/lokaal-04.jpg"
           alt="Scouts Kriko-M Lokaal"
           fill
+          unoptimized={true}
           priority
           sizes="100vw"
           style={{ objectFit: 'cover', objectPosition: 'center 42%', zIndex: 1 }}
