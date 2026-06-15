@@ -7,7 +7,12 @@ import { TAKKEN, TAK_KLEUREN } from '@/lib/constants'
 export function CopyLinkButton({ slug }: { slug: string }) {
   const [copied, setCopied] = useState(false)
   function copy() {
-    const url = `${typeof window !== 'undefined' ? window.location.origin : ''}/kamp/${slug}`
+    let origin = typeof window !== 'undefined' ? window.location.origin : ''
+    // Als we lokaal testen, kopieer de productie Vercel URL zodat leiding geen localhost links verstuurt.
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      origin = 'https://kriko-m-indol.vercel.app'
+    }
+    const url = `${origin}/kamp/${slug}`
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
