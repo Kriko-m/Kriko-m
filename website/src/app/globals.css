@@ -24,10 +24,10 @@
     --color-primary-dark: #3a0710;
     --color-primary-hover: #650B19;
 
-    /* Goud â€” inschrijven-knop Â· subtitels Â· decoratieve lijn */
-    --color-accent: #C9963A;
-    --color-accent-hover: #B8862F;
-    --color-accent-light: #E2C58D;
+    /* Beige â€” inschrijven-knop Â· subtitels Â· decoratieve lijn */
+    --color-accent: #fcebbe;
+    --color-accent-hover: #e8d4a0;
+    --color-accent-light: #fef5e4;
 
     /* Secondary = alias van het accent (backwards-compat met bestaande klassen) */
     --color-secondary: var(--color-accent);
@@ -290,7 +290,7 @@ a {
 }
 
 .nav-links > li > a {
-    color: #fff;
+    color: #fcebbe;
     text-decoration: none;
     font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.88rem;
@@ -372,8 +372,8 @@ a {
 
 /* CTA knop (inschrijven) */
 .nav-cta {
-    background-color: var(--color-accent);
-    color: var(--color-bg-white) !important;
+    background-color: #fcebbe;
+    color: var(--color-primary) !important;
     text-decoration: none;
     font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 0.82rem;
@@ -582,7 +582,7 @@ a {
     height: calc(100vh - 58px);
     overflow: hidden;
     margin-bottom: 0;
-    border-bottom: 4px solid var(--color-accent-light);
+    border-bottom: 4px solid #fcebbe;
 }
 
 .hero-img {
@@ -625,7 +625,7 @@ a {
     font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 1.6rem;
     font-weight: 600;
-    color: var(--color-accent-light); /* tussentint goud op donkere achtergrond */
+    color: var(--color-primary);
     letter-spacing: 0.22em;
     text-transform: uppercase;
     text-shadow: 0 1px 4px rgba(0,0,0,0.7), 0 0 14px rgba(0,0,0,0.45);
@@ -969,10 +969,10 @@ body.portal-theme .tak-hero.primair {
     font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: 3.4rem;
     font-weight: 900;
-    color: var(--color-primary);
+    color: #fcebbe;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 4px 24px rgba(0,0,0,0.3);
 }
 
 .tak-layout {
@@ -2083,8 +2083,8 @@ body.portal-theme .tak-hero.primair {
 .section-divider {
     width: 72%;
     height: 1px;
-    background-color: var(--color-accent);
-    opacity: 0.35;
+    background-color: var(--color-primary);
+    opacity: 0.2;
     margin: 0 auto;
     border: none;
 }
@@ -3004,14 +3004,14 @@ body.portal-theme .tak-hero.primair {
 
 .verhuur-hero-title {
     margin: 0;
-    color: var(--color-primary);
+    color: #fcebbe;
     font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: 3.4rem;
     font-weight: 900;
     line-height: 1;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5), 0 4px 24px rgba(0,0,0,0.3);
 }
 
 .verhuur-hero-btn {

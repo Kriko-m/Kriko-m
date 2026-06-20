@@ -30,8 +30,8 @@ export default async function HomePage() {
         />
         <div className="hero-overlay">
           <div className="hero-text">
-            <span className="hero-title">Kriko-M</span>
             <span className="hero-sub">Scouts &amp; Gidsen</span>
+            <span className="hero-title">Kriko-M</span>
             <HeroCTA />
           </div>
         </div>
