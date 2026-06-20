@@ -613,7 +613,7 @@ a {
     font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: 7.2rem;
     font-weight: 900;
-    color: var(--color-bg-white);
+    color: #fcebbe;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     text-shadow: 0 4px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.4);
@@ -969,7 +969,7 @@ body.portal-theme .tak-hero.primair {
     font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: 3.4rem;
     font-weight: 900;
-    color: var(--color-bg-white);
+    color: #fcebbe;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     text-shadow: 0 2px 10px rgba(0,0,0,0.4);
@@ -2681,7 +2681,7 @@ body.portal-theme .tak-hero.primair {
     font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: clamp(2.2rem, 4.5vw, 3.4rem);
     font-weight: 900;
-    color: var(--color-primary);
+    color: #fcebbe;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     margin: 0;
@@ -3004,7 +3004,7 @@ body.portal-theme .tak-hero.primair {
 
 .verhuur-hero-title {
     margin: 0;
-    color: #fff;
+    color: #fcebbe;
     font-family: var(--font-londrina), var(--font-nunito), Arial, sans-serif;
     font-size: 3.4rem;
     font-weight: 900;
