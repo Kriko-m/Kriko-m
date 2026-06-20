@@ -48,7 +48,7 @@
     --color-error: hsl(4, 75%, 48%);
 
     /* Takken kleuren */
-    --color-kapoenen: #CABD30;   /* geel-groen Â· 6â€“8 jaar */
+    --color-kapoenen: #F4C842;   /* geel-groen Â· 6â€“8 jaar */
     --color-welpen: #2E8B3A;     /* donkergroen Â· 8â€“11 jaar */
     --color-jonggivers: #E07B1A; /* oranje Â· 11â€“14 jaar */
     --color-givers: #1A3FB5;     /* kobaltblauw Â· 14â€“17 jaar */
@@ -860,9 +860,6 @@ a {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background-image: linear-gradient(color-mix(in srgb, var(--color-primary) 90%, transparent), color-mix(in srgb, var(--color-primary) 90%, transparent)), url('/images/hero-bg.webp');
-    background-size: cover;
-    background-position: center;
     justify-content: center;
 }
 
@@ -1953,7 +1950,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 /* Achtergrondafbeelding + gekleurde rand per tak */
-.echo-card-kapoenen   { background-image: url('/images/tak_kapoenen.jpg');   background-color: #9A9020; border-color: var(--color-kapoenen); }
+.echo-card-kapoenen   { background-image: url('/images/tak_kapoenen.jpg');   background-color: #A89010; border-color: var(--color-kapoenen); }
 .echo-card-welpen     { background-image: url('/images/tak_welpen.jpg');     background-color: #2E8B3A; border-color: var(--color-welpen); }
 .echo-card-jonggivers { background-image: url('/images/tak_jonggivers.jpg'); background-color: #C05A00; border-color: var(--color-jonggivers); }
 .echo-card-givers     { background-image: url('/images/tak_givers.jpg');     background-color: #1A3FB5; border-color: var(--color-givers); }
@@ -2158,7 +2155,7 @@ body.portal-theme .tak-hero.primair {
     justify-content: space-between;
     align-items: center;
     gap: 16px;
-    margin-bottom: 10px;
+    margin-top: 28px;
 }
 
 .cal-actions-group {
@@ -2179,7 +2176,7 @@ body.portal-theme .tak-hero.primair {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 36px;
+    margin-top: 10px;
 }
 
 .cal-actions-hint i { color: var(--color-accent); }
@@ -3535,6 +3532,88 @@ body.portaal::before { display: none; } /* geen perkament-laag in het portaal */
         gap: 12px;
     }
 }
+/* Portaal page layout: sidebar + main content */
+.portaal-page-layout {
+    display: flex;
+    min-height: calc(100vh - 64px);
+}
+
+.portaal-sidebar-nav {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--color-primary);
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    border-right: 1px solid rgba(201, 150, 58, 0.2);
+}
+
+.portaal-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-family: var(--font-heading, Nunito, sans-serif);
+    font-size: 0.88rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.75);
+    transition: background 0.15s, color 0.15s;
+}
+
+.portaal-sidebar-link i {
+    width: 18px;
+    text-align: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.portaal-sidebar-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.portaal-sidebar-link.active {
+    background: rgba(201, 150, 58, 0.15);
+    color: var(--color-accent);
+}
+
+.portaal-page-main {
+    flex: 1;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+    .portaal-page-layout {
+        flex-direction: column;
+    }
+    .portaal-sidebar-nav {
+        width: 100%;
+        height: auto;
+        position: static;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 10px 12px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        border-right: none;
+        border-bottom: 1px solid rgba(201, 150, 58, 0.2);
+    }
+    .portaal-sidebar-link {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+}
+
 .portaal-nav-brand {
     display: flex;
     align-items: center;

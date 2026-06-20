@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import PortaalNav from './_components/PortaalNav'
+import PortaalSidebar from './_components/PortaalSidebar'
 
 interface Props {
   children: React.ReactNode
@@ -17,7 +18,12 @@ export default function PortaalLayoutClient({ children, naam, isAdmin, role }: P
   return (
     <>
       {showNav && <PortaalNav naam={naam} isAdmin={isAdmin} role={role} />}
-      {children}
+      {showNav ? (
+        <div className="portaal-page-layout">
+          <PortaalSidebar isAdmin={isAdmin} />
+          <main className="portaal-page-main">{children}</main>
+        </div>
+      ) : children}
     </>
   )
 }

@@ -17,7 +17,7 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      <section className="section container">
+      <section className="section container section--no-top">
         <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 40 }}>
 
           <div style={{ background: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', padding: 40, border: '1px solid var(--color-border)' }}>

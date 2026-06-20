@@ -39,7 +39,7 @@ export default async function ShopPage() {
         </div>
       </section>
 
-      <section className="section container">
+      <section className="section container section--no-top">
 
 
         <div style={{ background: 'hsla(29,57%,46%,0.1)', border: '2px dashed var(--color-accent)', borderRadius: 'var(--border-radius-lg)', padding: 24, marginBottom: 40, display: 'flex', gap: 16, alignItems: 'flex-start' }}>

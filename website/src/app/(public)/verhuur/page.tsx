@@ -28,7 +28,7 @@ export default async function VerhuurPage() {
         </div>
       </section>
 
-      <section className="section container vh-page">
+      <section className="section container vh-page section--no-top">
 
         <div className="vh-intro">
           <span className="vh-eyebrow">Verhuur lokaal &amp; terrein</span>

@@ -34,22 +34,6 @@ export default async function KalenderPage() {
       </section>
 
       <section className="section container section--no-top">
-        <div className="cal-actions">
-          <div className="cal-actions-group">
-            <a href="/api/kalender/ics" className="btn btn-secondary cal-actions-btn">
-              <i className="fa-regular fa-calendar-plus"></i> Abonneer op onze agenda
-            </a>
-            <a href="/api/kalender/ics" download className="btn btn-outline cal-actions-btn">
-              <i className="fa-solid fa-download"></i> Download (.ics)
-            </a>
-          </div>
-
-        </div>
-        <p className="cal-actions-hint">
-          <i className="fa-solid fa-circle-info"></i>
-          &ldquo;Abonneren&rdquo; zet onze hele kalender in jouw agenda-app &mdash; nieuwe activiteiten verschijnen dan automatisch.
-        </p>
-
         {events.length === 0 ? (
           <div className="cal-empty">
             <p>Er staan momenteel geen activiteiten gepland. Kom snel eens terug kijken!</p>
@@ -104,6 +88,21 @@ export default async function KalenderPage() {
             </div>
           </div>
         )}
+
+        <div className="cal-actions">
+          <div className="cal-actions-group">
+            <a href="/api/kalender/ics" className="btn btn-secondary cal-actions-btn">
+              <i className="fa-regular fa-calendar-plus"></i> Abonneer op onze agenda
+            </a>
+            <a href="/api/kalender/ics" download className="btn btn-outline cal-actions-btn">
+              <i className="fa-solid fa-download"></i> Download (.ics)
+            </a>
+          </div>
+        </div>
+        <p className="cal-actions-hint">
+          <i className="fa-solid fa-circle-info"></i>
+          &ldquo;Abonneren&rdquo; zet onze hele kalender in jouw agenda-app &mdash; nieuwe activiteiten verschijnen dan automatisch.
+        </p>
       </section>
     </>
   )

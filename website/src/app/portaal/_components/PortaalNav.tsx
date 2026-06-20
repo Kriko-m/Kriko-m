@@ -109,30 +109,6 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
             <span style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '1.1rem', color: '#fff', letterSpacing: '.04em' }}>Portaal</span>
           </Link>
 
-          <nav className="portaal-nav-scroll">
-            {links.map(l => {
-              const active = pathname.startsWith(l.href)
-              return (
-                <Link key={l.href} href={l.href}
-                  style={{
-                    padding: '8px 16px',
-                    borderRadius: 50,
-                    fontSize: '0.8rem',
-                    fontWeight: 800,
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                    textDecoration: 'none',
-                    fontFamily: 'var(--font-heading, Nunito, sans-serif)',
-                    color: active ? '#C9963A' : 'rgba(255,255,255,.8)',
-                    background: active ? 'rgba(201,150,58,0.12)' : 'transparent',
-                    transition: 'all var(--transition-fast)'
-                  }}>
-                  {l.label}
-                </Link>
-              )
-            })}
-          </nav>
-
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
             {/* Profile Dropdown Container */}
             <div className="portaal-profile-container">
