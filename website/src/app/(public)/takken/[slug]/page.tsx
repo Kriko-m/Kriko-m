@@ -71,7 +71,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
         </div>
       </section>
 
-      <section className="section container">
+      <section className="section container section--no-top">
         <div className="tak-layout">
 
           {/* Linker kolom */}

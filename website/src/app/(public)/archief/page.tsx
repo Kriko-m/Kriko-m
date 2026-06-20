@@ -41,7 +41,7 @@ export default async function ArchiefPage() {
         </div>
       </section>
 
-      <section className="section container">
+      <section className="section container section--no-top">
         {items.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 24px', color: 'var(--color-text-muted)' }}>
             <div style={{ fontSize: '3rem', marginBottom: 16 }}>📦</div>

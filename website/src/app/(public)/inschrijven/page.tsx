@@ -23,7 +23,7 @@ export default async function InschrijvenPage() {
         </div>
       </section>
 
-      <section className="section container">
+      <section className="section container section--no-top">
         <div className="register-layout">
 
           {/* Stappen */}
