@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, Nunito, Londrina_Solid } from "next/font/google";
+import { Outfit, Nunito, Rubik_Dirt } from "next/font/google";
 import "./globals.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ThemeSynchronizer from "@/components/ThemeSynchronizer";
@@ -8,7 +8,7 @@ import ThemeSynchronizer from "@/components/ThemeSynchronizer";
 // GDPR-vriendelijk (geen verbinding met Google bij paginabezoek).
 const outfit = Outfit({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-outfit", display: "swap" });
 const nunito = Nunito({ subsets: ["latin"], weight: ["600", "700", "800", "900"], variable: "--font-nunito", display: "swap" });
-const londrina = Londrina_Solid({ subsets: ["latin"], weight: ["300", "400", "900"], variable: "--font-londrina", display: "swap" });
+const rubikDirt = Rubik_Dirt({ subsets: ["latin"], weight: ["400"], variable: "--font-londrina", display: "swap" });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.kriko-m.be";
 
@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="nl" className={`${outfit.variable} ${nunito.variable} ${londrina.variable}`} suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="nl" className={`${outfit.variable} ${nunito.variable} ${rubikDirt.variable}`} suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <link rel="icon" type="image/png" href="/images/logo-finaal.png" />
       </head>

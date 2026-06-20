@@ -239,7 +239,7 @@ a {
     position: relative;
     width: 100%;
     z-index: 100;
-    border-bottom: 4px solid var(--color-accent);
+    border-bottom: 4px solid #fcebbe;
 }
 
 .mainnav-inner {
