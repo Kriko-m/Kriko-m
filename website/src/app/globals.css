@@ -853,7 +853,7 @@ a {
 
 /* Info Banner Block */
 .info-banner {
-    background-color: var(--color-primary-dark);
+    background-color: var(--color-primary);
     color: var(--color-bg-white);
     border-radius: var(--border-radius-lg);
     padding: 30px;

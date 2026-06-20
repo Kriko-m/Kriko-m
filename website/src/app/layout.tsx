@@ -42,27 +42,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="nl" className={`${outfit.variable} ${nunito.variable} ${londrina.variable}`} suppressHydrationWarning>
+    <html lang="nl" className={`${outfit.variable} ${nunito.variable} ${londrina.variable}`} suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <link rel="icon" type="image/png" href="/images/logo-finaal.png" />
       </head>
-      <body>
-        <script dangerouslySetInnerHTML={{ __html: `
-          (function() {
-            try {
-              var path = window.location.pathname;
-              if (path === '/portaal' || path === '/portaal/') {
-                document.body.classList.add('portal-theme', 'portaal');
-                document.body.style.paddingTop = '0';
-                document.body.style.backgroundColor = '#EEF5F1';
-              } else if (path.startsWith('/portaal/')) {
-                document.body.classList.add('portal-theme', 'portaal');
-                document.body.style.paddingTop = '64px';
-                document.body.style.backgroundColor = '#EEF5F1';
-              }
-            } catch (e) {}
-          })();
-        ` }} />
+      <body suppressHydrationWarning>
         <ThemeSynchronizer />
         {children}
       </body>

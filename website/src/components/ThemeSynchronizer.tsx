@@ -1,22 +1,18 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 
 export default function ThemeSynchronizer() {
   const pathname = usePathname()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const isPortaal = pathname === '/portaal' || pathname.startsWith('/portaal/')
 
     if (isPortaal) {
       document.body.classList.add('portal-theme', 'portaal')
       document.body.style.backgroundColor = '#EEF5F1'
-      if (pathname === '/portaal' || pathname === '/portaal/') {
-        document.body.style.paddingTop = '0'
-      } else {
-        document.body.style.paddingTop = '64px'
-      }
+      document.body.style.paddingTop = (pathname === '/portaal' || pathname === '/portaal/') ? '0' : '64px'
     } else {
       document.body.classList.remove('portal-theme', 'portaal')
       document.body.style.backgroundColor = ''
