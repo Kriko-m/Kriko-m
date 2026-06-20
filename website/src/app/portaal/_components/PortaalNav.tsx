@@ -110,6 +110,16 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+            {/* Back to site */}
+            <a
+              href="/"
+              style={{ fontSize: '.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.75)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5, padding: '6px 10px', borderRadius: 8, transition: 'color .15s, background .15s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.1)' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.75)'; (e.currentTarget as HTMLAnchorElement).style.background = 'transparent' }}
+            >
+              <i className="fa-solid fa-arrow-left" style={{ fontSize: '.75rem' }}></i>
+              Terug naar site
+            </a>
             {/* Profile Dropdown Container */}
             <div className="portaal-profile-container">
               <button

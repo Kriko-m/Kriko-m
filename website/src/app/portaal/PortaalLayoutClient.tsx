@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { usePathname } from 'next/navigation'
 import PortaalNav from './_components/PortaalNav'
 import PortaalSidebar from './_components/PortaalSidebar'
@@ -20,7 +21,9 @@ export default function PortaalLayoutClient({ children, naam, isAdmin, role }: P
       {showNav && <PortaalNav naam={naam} isAdmin={isAdmin} role={role} />}
       {showNav ? (
         <div className="portaal-page-layout">
-          <PortaalSidebar isAdmin={isAdmin} />
+          <Suspense fallback={<aside className="portaal-sidebar-nav" />}>
+            <PortaalSidebar isAdmin={isAdmin} />
+          </Suspense>
           <main className="portaal-page-main">{children}</main>
         </div>
       ) : children}

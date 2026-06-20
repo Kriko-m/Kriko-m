@@ -4388,3 +4388,290 @@ body.portal-theme .portaal-nav {
     }
 }
 
+/* ==========================================================================
+   Portaal — Sidebar Tak Accordion
+   ========================================================================== */
+
+.portaal-sidebar-tak {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 11px 18px 11px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: inherit;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+    letter-spacing: 0.01em;
+}
+
+.portaal-sidebar-tak:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.portaal-sidebar-tak.active {
+    color: var(--color-accent);
+    background: rgba(201, 150, 58, 0.15);
+}
+
+.portaal-sidebar-tak i {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.portaal-sidebar-sub-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.portaal-sidebar-sub {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 9px 16px 9px 42px;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.81rem;
+    font-weight: 500;
+    border-left: 2px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.portaal-sidebar-sub i {
+    font-size: 0.75rem;
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.portaal-sidebar-sub:hover {
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.portaal-sidebar-sub.active {
+    color: var(--color-accent);
+    background: rgba(201, 150, 58, 0.1);
+    border-left-color: var(--color-accent);
+}
+
+/* Mobile: sidebar accordion stacks horizontally — hide sub-lists in scroll mode */
+@media (max-width: 768px) {
+    .portaal-sidebar-tak {
+        padding: 12px 16px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .portaal-sidebar-sub-list {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Portaal — Dashboard
+   ========================================================================== */
+
+.portaal-dashboard-bg-wrapper {
+    position: relative;
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    padding: 36px 24px 52px;
+}
+
+.portaal-dashboard-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(5px) grayscale(65%) brightness(0.5);
+    transform: scale(1.06);
+    pointer-events: none;
+    user-select: none;
+}
+
+.portaal-dashboard-card {
+    position: relative;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 24px;
+    padding: 28px 32px 32px;
+    width: 100%;
+    max-width: 980px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.38);
+}
+
+/* Quick links row */
+.portaal-quicklinks {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.portaal-quicklink-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 10px 14px;
+    background: #f4f1eb;
+    border: 1px solid #e5e0d6;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #1A3D2A;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.portaal-quicklink-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    background: #fff;
+    color: #1A3D2A;
+}
+
+.portaal-quicklink-card.placeholder {
+    opacity: 0.55;
+    border-style: dashed;
+}
+
+.portaal-quicklink-card i {
+    font-size: 1.45rem;
+    color: var(--color-accent);
+}
+
+.portaal-quicklink-card.placeholder i {
+    color: #8A9A8A;
+}
+
+/* Dashboard heading */
+.portaal-dashboard-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 900;
+    color: #1A3D2A;
+    margin: 0 0 20px;
+    letter-spacing: 0.02em;
+}
+
+/* Body grid */
+.portaal-dash-body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+.portaal-dash-right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Widget panels */
+.portaal-cal-widget,
+.portaal-events-widget,
+.portaal-msg-widget {
+    background: #f7f4ee;
+    border-radius: 14px;
+    padding: 18px 20px;
+    border: 1px solid #e5e0d6;
+}
+
+.portaal-cal-widget h3,
+.portaal-events-widget h3,
+.portaal-msg-widget h3 {
+    margin: 0 0 13px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6A8A75;
+    font-family: 'Nunito', sans-serif;
+}
+
+/* Calendar event rows */
+.portaal-cal-event-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #ece9e2;
+}
+
+.portaal-cal-event-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.portaal-cal-date {
+    flex-shrink: 0;
+    width: 40px;
+    text-align: center;
+    background: #1A3D2A;
+    color: #fff;
+    border-radius: 8px;
+    padding: 4px 2px;
+    line-height: 1.2;
+}
+
+.portaal-cal-event-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.portaal-cal-event-title {
+    font-weight: 700;
+    color: #1A3D2A;
+    font-size: 0.87rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.portaal-cal-event-sub {
+    font-size: 0.76rem;
+    color: #6A8A75;
+    margin-top: 2px;
+}
+
+.portaal-msg-widget p {
+    font-size: 0.88rem;
+    color: #5A7A65;
+    margin: 0;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+@media (max-width: 860px) {
+    .portaal-quicklinks {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 680px) {
+    .portaal-dash-body-grid {
+        grid-template-columns: 1fr;
+    }
+    .portaal-dashboard-card {
+        padding: 20px 18px 24px;
+        border-radius: 18px;
+    }
+    .portaal-dashboard-bg-wrapper {
+        padding: 16px 12px 32px;
+    }
+}
+

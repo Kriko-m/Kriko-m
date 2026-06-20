@@ -58,16 +58,22 @@ function formatPackingList(list: { categorie: string; items: string[] }[]): stri
   return list.map(item => `${item.categorie}: ${item.items.join(', ')}`).join('\n')
 }
 
+const TAB_MAP: Record<string, 'kampen' | 'echos' | 'kalender'> = {
+  kampen: 'kampen', echos: 'echos', kalender: 'kalender', deadlines: 'kalender',
+}
+
 interface LeidingPanelProps {
   initialKampen: Kamp[]
   initialEchos: Echo[]
   initialCalendar: CalendarEvent[]
   role: string
+  initialTak?: string
+  initialTab?: string
 }
 
-export default function LeidingPanel({ initialKampen, initialEchos, initialCalendar, role }: LeidingPanelProps) {
-  const [activeTak, setActiveTak] = useState('groep')
-  const [subTab, setSubTab] = useState<'kampen' | 'echos' | 'kalender'>('kalender')
+export default function LeidingPanel({ initialKampen, initialEchos, initialCalendar, role, initialTak, initialTab }: LeidingPanelProps) {
+  const [activeTak, setActiveTak] = useState(TAKKEN.includes(initialTak ?? '') ? (initialTak as string) : 'groep')
+  const [subTab, setSubTab] = useState<'kampen' | 'echos' | 'kalender'>(TAB_MAP[initialTab ?? ''] ?? 'kalender')
   const [kampen, setKampen] = useState<Kamp[]>(initialKampen)
   const [echos, setEchos] = useState<Echo[]>(initialEchos)
   const [calendar, setCalendar] = useState<CalendarEvent[]>(initialCalendar)

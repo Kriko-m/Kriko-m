@@ -3,7 +3,11 @@ import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import LeidingPanel from './LeidingPanel'
 import { Kamp, Echo, CalendarEvent } from '@/lib/types'
 
-export default async function LeidingPortaalPage() {
+export default async function LeidingPortaalPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tak?: string; tab?: string }>
+}) {
   const supabase = await createServerSupabaseClient()
   const { data: { session } } = await supabase.auth.getSession()
   if (!session?.user) redirect('/portaal')
@@ -13,8 +17,7 @@ export default async function LeidingPortaalPage() {
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
   if (!isLeiding) redirect('/portaal/dashboard')
 
-  const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker'
-  const isAdmin = role === 'admin' || role === 'groepsleiding'
+  const { tak, tab } = await searchParams
 
   const admin = createAdminClient()
   const [authRes, kampenRes, echosRes, calendarRes] = await Promise.all([
@@ -38,7 +41,14 @@ export default async function LeidingPortaalPage() {
           <h1 style={{ fontSize: '1.6rem', fontWeight: 900, fontFamily: 'var(--font-heading, Nunito, sans-serif)', color: '#1A3D2A', margin: 0 }}>🛡️ Leidersportaal</h1>
         </div>
 
-        <LeidingPanel initialKampen={kampen} initialEchos={echos} initialCalendar={calendarEvents} role={role} />
+        <LeidingPanel
+          initialKampen={kampen}
+          initialEchos={echos}
+          initialCalendar={calendarEvents}
+          role={role}
+          initialTak={tak}
+          initialTab={tab}
+        />
       </main>
     </>
   )

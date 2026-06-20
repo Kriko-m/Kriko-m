@@ -1,6 +1,31 @@
 import { redirect } from 'next/navigation'
-import { createServerSupabaseClient } from '@/lib/supabase'
-import Link from 'next/link'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
+import { CalendarEvent, Kamp } from '@/lib/types'
+
+const QUICK_LINKS = [
+  { icon: 'fa-brands fa-google-drive', label: 'Google Drive', href: 'https://drive.google.com' },
+  { icon: 'fa-solid fa-link', label: 'Belangrijke links', href: '#' },
+  { icon: 'fa-brands fa-facebook', label: 'Facebook', href: 'https://www.facebook.com/ScoutsKrikoM' },
+  { icon: 'fa-solid fa-plus', label: 'Binnenkort', href: '#', placeholder: true },
+]
+
+const TAK_KLEUREN: Record<string, string> = {
+  groep: '#1A3D2A', kapoenen: '#F4C842', welpen: '#5D9E6C', jonggivers: '#4A7BBF', givers: '#C9963A',
+}
+
+function formatDate(dateStr: string) {
+  const d = new Date(dateStr)
+  return {
+    day: d.toLocaleDateString('nl-BE', { day: '2-digit' }),
+    month: d.toLocaleDateString('nl-BE', { month: 'short' }),
+  }
+}
+
+function formatDateRange(van: string, tot: string) {
+  const from = new Date(van).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })
+  const to = new Date(tot).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })
+  return `${from} – ${to}`
+}
 
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
@@ -13,105 +38,108 @@ export default async function DashboardPage() {
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
-  // Portaal is leiding-only sinds de ouderaccounts verdwenen.
   if (!isLeiding) redirect('/portaal')
 
-  const isAdmin = role === 'admin' || role === 'groepsleiding'
-  const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'leiding'
-  const voornaam = naam.split(' ')[0]
+  const today = new Date().toISOString().split('T')[0]
+  const admin = createAdminClient()
+  const [calendarRes, kampenRes] = await Promise.all([
+    admin.from('calendar').select('*').gte('date', today).order('date', { ascending: true }).limit(6),
+    admin.from('kampen').select('id, naam, datum_van, datum_tot, tak, locatie').gte('datum_van', today).order('datum_van', { ascending: true }).limit(4),
+  ])
 
-  const menu = [
-    {
-      href: '/portaal/leiding',
-      icon: '🛡️',
-      titel: 'Leidersportaal',
-      desc: 'Kampen beheren, antwoorden bekijken en maandelijkse planningen (Echo\'s) uploaden.',
-      stat: role === 'groepsleiding' ? 'Groepsleiding' : 'Takleiding',
-      kleur: '#2A5C3F',
-    },
-    {
-      href: '/portaal/verslagen',
-      icon: '📋',
-      titel: 'Verslagen & Notulen',
-      desc: 'Bekijk notulen en documenten van vergaderingen.',
-      stat: 'Leiding documenten',
-      kleur: '#8A9A8A',
-    },
-    {
-      href: '/portaal/archief',
-      icon: '📚',
-      titel: 'Archief',
-      desc: 'Blader per werkjaar door kampen, echo\'s en wie welke tak had.',
-      stat: 'Per werkjaar',
-      kleur: '#4A7BBF',
-    },
-    ...(isAdmin ? [{
-      href: '/portaal/admin',
-      icon: '⚙️',
-      titel: 'Beheer',
-      desc: 'Bestellingen beheren, instellingen en contactberichten.',
-      stat: 'Groepsleiding',
-      kleur: '#1A3D2A',
-    }, {
-      href: '/portaal/admin/werkjaar',
-      icon: '🗓️',
-      titel: 'Nieuw werkjaar',
-      desc: 'Leiding→tak klaarzetten en het nieuwe werkjaar publiceren.',
-      stat: 'Groepsleiding',
-      kleur: '#2A5C3F',
-    }] : []),
-    {
-      href: '/shop',
-      icon: '🛒',
-      titel: 'Naar de webshop',
-      desc: 'Bestel kledij, uniform en accessoires.',
-      stat: 'Kriko-M merchandise',
-      kleur: '#C9963A',
-    },
-  ]
+  const calendarEvents = (calendarRes.data ?? []) as CalendarEvent[]
+  const kampen = (kampenRes.data ?? []) as Kamp[]
 
   return (
-    <>
-      <main style={{ maxWidth: 900, margin: '0 auto', padding: '40px 20px 80px' }}>
+    <div className="portaal-dashboard-bg-wrapper">
+      {/* Blurred background photo */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/kampvuur.jpg" className="portaal-dashboard-bg-img" alt="" aria-hidden="true" />
 
-        {/* Hero */}
-        <div style={{ background: 'linear-gradient(120deg,#1A3D2A 0%,#2A5C3F 60%,#C9963A 160%)', borderRadius: 20, padding: '32px 36px', color: '#fff', marginBottom: 36, position: 'relative', overflow: 'hidden' }}>
-          <span style={{ position: 'absolute', right: 16, bottom: -24, fontSize: '7rem', opacity: .1, lineHeight: 1, pointerEvents: 'none' }}>⛺</span>
-          <div style={{ fontSize: '.7rem', fontWeight: 800, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(226,197,141,.85)', marginBottom: 8 }}>Leidingsportaal</div>
-          <h1 style={{ color: '#fff', fontSize: '1.6rem', margin: '0 0 6px', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}>
-            Hallo, {voornaam}! 👋
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,.82)', fontSize: '.92rem', margin: 0, lineHeight: 1.5 }}>
-            Beheer en bewerk scoutsgegevens in het leidersportaal.
-          </p>
-          <div style={{ display: 'flex', gap: 24, marginTop: 20, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '.85rem', color: 'rgba(255,255,255,.85)' }}>
-              Ingelogd als <strong style={{ color: '#fff', textTransform: 'capitalize' }}>{role}</strong>
-            </span>
-          </div>
-        </div>
+      {/* Main card */}
+      <div className="portaal-dashboard-card">
 
-        {/* Menu kaarten */}
-        <h2 style={{ fontSize: '1rem', fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', color: '#6A8A75', marginBottom: 16 }}>Waar wil je naartoe?</h2>
-        <div className="portal-dashboard-grid">
-          {menu.map(item => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="dashboard-menu-card"
-              style={{ '--kleur': item.kleur, '--kleur-light': `${item.kleur}22` } as React.CSSProperties}
+        {/* Quick links */}
+        <div className="portaal-quicklinks">
+          {QUICK_LINKS.map(link => (
+            <a
+              key={link.label}
+              href={link.href}
+              target={link.href !== '#' ? '_blank' : undefined}
+              rel="noreferrer"
+              className={`portaal-quicklink-card${link.placeholder ? ' placeholder' : ''}`}
             >
-              <span className="menu-icon">{item.icon}</span>
-              <span className="menu-titel">{item.titel}</span>
-              <span className="menu-desc">{item.desc}</span>
-              <span className="menu-stat">
-                {item.stat} &raquo;
-              </span>
-            </Link>
+              <i className={link.icon}></i>
+              <span>{link.label}</span>
+            </a>
           ))}
         </div>
 
-      </main>
-    </>
+        {/* Title */}
+        <h1 className="portaal-dashboard-title">Leidingportaal</h1>
+
+        {/* Body grid: calendar left, events + message right */}
+        <div className="portaal-dash-body-grid">
+
+          {/* Calendar */}
+          <div className="portaal-cal-widget">
+            <h3>Kalender</h3>
+            {calendarEvents.length === 0 ? (
+              <p style={{ color: '#6A8A75', fontSize: '.85rem', margin: 0 }}>Geen activiteiten gepland.</p>
+            ) : (
+              calendarEvents.map(ev => {
+                const { day, month } = formatDate(ev.date)
+                return (
+                  <div key={ev.id} className="portaal-cal-event-row">
+                    <div className="portaal-cal-date">
+                      <div style={{ fontSize: '1rem', fontWeight: 800, lineHeight: 1 }}>{day}</div>
+                      <div style={{ fontSize: '.65rem', opacity: .85 }}>{month}</div>
+                    </div>
+                    <div className="portaal-cal-event-info">
+                      <div className="portaal-cal-event-title">{ev.title}</div>
+                      {ev.location && <div className="portaal-cal-event-sub"><i className="fa-solid fa-location-dot" style={{ marginRight: 4 }}></i>{ev.location}</div>}
+                      {ev.tak && ev.tak !== 'groep' && (
+                        <span style={{ display: 'inline-block', marginTop: 3, padding: '1px 7px', borderRadius: 20, fontSize: '.7rem', fontWeight: 700, background: TAK_KLEUREN[ev.tak] || '#1A3D2A', color: ev.tak === 'kapoenen' ? '#3a2a00' : '#fff' }}>
+                          {ev.tak}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
+
+          {/* Right column */}
+          <div className="portaal-dash-right-col">
+
+            {/* Upcoming camps */}
+            <div className="portaal-events-widget">
+              <h3>Kampen &amp; Weekenden</h3>
+              {kampen.length === 0 ? (
+                <p style={{ color: '#6A8A75', fontSize: '.85rem', margin: 0 }}>Geen aankomende kampen.</p>
+              ) : (
+                kampen.map(k => (
+                  <div key={k.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: '1px solid #ece9e3', fontSize: '.86rem' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: TAK_KLEUREN[k.tak] || '#1A3D2A', flexShrink: 0 }}></span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: '#1A3D2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{k.naam}</div>
+                      <div style={{ fontSize: '.76rem', color: '#6A8A75' }}>{formatDateRange(k.datum_van, k.datum_tot)}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Groepsleiding message */}
+            <div className="portaal-msg-widget">
+              <h3>Berichtje van de groepsleiding</h3>
+              <p>Geen bericht momenteel.</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
