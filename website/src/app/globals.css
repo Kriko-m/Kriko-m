@@ -625,7 +625,7 @@ a {
     font-family: var(--font-nunito), Arial, sans-serif;
     font-size: 1.6rem;
     font-weight: 600;
-    color: var(--color-primary);
+    color: #fcebbe;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     text-shadow: 0 1px 4px rgba(0,0,0,0.7), 0 0 14px rgba(0,0,0,0.45);
