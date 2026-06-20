@@ -2205,8 +2205,12 @@ body.portal-theme .tak-hero.primair {
     box-shadow: var(--shadow-md);
     border: 1px solid var(--color-border);
     padding: 24px;
+}
+
+.cal-left-col {
     position: sticky;
     top: 90px;
+    align-self: start;
 }
 
 .cal-cal-header {

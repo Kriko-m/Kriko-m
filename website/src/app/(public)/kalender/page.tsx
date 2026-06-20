@@ -40,7 +40,7 @@ export default async function KalenderPage() {
           </div>
         ) : (
           <div className="cal-layout">
-            <div>
+            <div className="cal-left-col">
               <CalendarGrid events={gridEvents} />
               <div className="cal-actions">
                 <div className="cal-actions-group">
