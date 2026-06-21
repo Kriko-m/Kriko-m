@@ -351,7 +351,7 @@ a {
 
 .dropdown li a {
     display: block;
-    color: #fff;
+    color: #fcebbe;
     text-decoration: none;
     padding: 11px 18px;
     font-family: var(--font-nunito), Arial, sans-serif;
@@ -528,7 +528,8 @@ a {
     pointer-events: auto;
 }
 
-.scroll-top-btn:hover {
+.scroll-top-btn:hover,
+.scroll-top-btn.over-footer {
     background-color: var(--color-accent);
 }
 
@@ -2531,6 +2532,109 @@ body.portal-theme .tak-hero.primair {
     border-color: var(--color-primary-dark);
 }
 
+/* ─── Evenementen (uitgelichte grote activiteiten) ─── */
+.cal-event-evenement {
+    border-left: 4px solid var(--color-accent);
+    background: linear-gradient(180deg, var(--color-accent-light, #E2C58D) 0%, transparent 70%);
+    background-color: var(--color-bg-white);
+}
+.cal-event-evenement:hover {
+    box-shadow: 0 4px 18px rgba(101, 11, 25, 0.12);
+}
+.cal-event-cover-thumb {
+    width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 10px;
+    display: block;
+}
+.cal-day.has-event.has-evenement {
+    background-color: var(--color-accent);
+    color: var(--color-primary-dark);
+}
+.cal-day.has-event.has-evenement:hover {
+    background-color: var(--color-accent-hover);
+}
+
+/* ─── Evenement detail-modal ─── */
+.cal-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(58, 7, 16, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+    animation: cal-modal-fade 0.15s ease;
+}
+@keyframes cal-modal-fade { from { opacity: 0; } to { opacity: 1; } }
+.cal-modal {
+    position: relative;
+    background: var(--color-bg-white);
+    border-radius: 16px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+.cal-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-primary-dark);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+.cal-modal-close:hover { background: var(--color-bg-linen); }
+.cal-modal-cover {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 16px 16px 0 0;
+    display: block;
+}
+.cal-modal-body { padding: 24px; }
+.cal-modal-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-accent-hover);
+    margin-bottom: 6px;
+}
+.cal-modal-title {
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin: 0 0 12px;
+}
+.cal-modal-meta { margin-bottom: 14px; }
+.cal-modal-desc {
+    color: var(--color-text);
+    line-height: 1.6;
+    margin: 0 0 20px;
+    white-space: pre-line;
+}
+.cal-modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .cal-layout {
@@ -4491,7 +4595,7 @@ body.portal-theme .portaal-nav {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: blur(5px) grayscale(65%) brightness(0.5);
+    filter: blur(2px) brightness(0.72);
     transform: scale(1.06);
     pointer-events: none;
     user-select: none;
@@ -4504,7 +4608,6 @@ body.portal-theme .portaal-nav {
     border-radius: 24px;
     padding: 28px 32px 32px;
     width: 100%;
-    max-width: 980px;
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.38);
 }
 

@@ -47,6 +47,10 @@ export interface Leader {
   role: string
 }
 
+// Audience-tags bepalen de zichtbaarheid: een event met 'ouders' is publiek
+// (oudercalender); alle events zijn zichtbaar in de leidingcalender.
+export type AudienceTag = 'leiding' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' | 'ouders'
+
 export interface CalendarEvent {
   id: string
   title: string
@@ -54,9 +58,21 @@ export interface CalendarEvent {
   time: string
   location: string
   description: string
-  tak: 'groep' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
+  audience: AudienceTag[]
+  is_evenement: boolean
+  cover_image: string
+  document_url: string
   werkjaar?: string
   created_at?: string
+}
+
+// Een uit een kamp afgeleid (read-only) kalenderitem voor de leidingcalender.
+// `source` onderscheidt echte events van afgeleide kampen.
+export interface CalendarEntry extends Omit<CalendarEvent, 'audience'> {
+  source: 'event' | 'kamp'
+  audience: AudienceTag[]
+  datum_tot?: string // einddatum voor meerdaagse kampen
+  slug?: string      // voor doorklik naar het kamp
 }
 
 export interface Echo {
@@ -95,7 +111,6 @@ export interface Order {
   items: OrderItem[]
   total: number
   communication: string
-  parent_id?: string | null
   created_at?: string
   bank_iban?: string // Helper property for UI rendering
   bank_holder?: string // Helper property for UI rendering

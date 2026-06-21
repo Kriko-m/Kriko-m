@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Kamp, Echo, KampBestand, CalendarEvent } from '@/lib/types'
 import { CopyLinkButton, RsvpPanel } from '../_components/CampRsvpPanel'
+import LeidingCalendar from '../_components/LeidingCalendar'
 
 const TAKKEN = ['groep', 'kapoenen', 'welpen', 'jonggivers', 'givers']
 const TAK_NAMEN: Record<string, string> = {
@@ -67,28 +68,24 @@ interface LeidingPanelProps {
   initialEchos: Echo[]
   initialCalendar: CalendarEvent[]
   role: string
+  icsToken: string
   initialTak?: string
   initialTab?: string
 }
 
-export default function LeidingPanel({ initialKampen, initialEchos, initialCalendar, role, initialTak, initialTab }: LeidingPanelProps) {
+export default function LeidingPanel({ initialKampen, initialEchos, initialCalendar, role, icsToken, initialTak, initialTab }: LeidingPanelProps) {
   const [activeTak, setActiveTak] = useState(TAKKEN.includes(initialTak ?? '') ? (initialTak as string) : 'groep')
   const [subTab, setSubTab] = useState<'kampen' | 'echos' | 'kalender'>(TAB_MAP[initialTab ?? ''] ?? 'kalender')
   const [kampen, setKampen] = useState<Kamp[]>(initialKampen)
   const [echos, setEchos] = useState<Echo[]>(initialEchos)
-  const [calendar, setCalendar] = useState<CalendarEvent[]>(initialCalendar)
+
+  const canPublish = role === 'admin' || role === 'groepsleiding'
 
   // Camp Form States
   const [showNewCampForm, setShowNewCampForm] = useState(false)
   const [newCamp, setNewCamp] = useState({ naam: '', datum_van: '', datum_tot: '', locatie: '', beschrijving: '', prijs: '', briefadres: '', contact_info: '', paklijstText: '' })
   const [editCampId, setEditCampId] = useState<string | null>(null)
   const [editCampData, setEditCampData] = useState({ naam: '', datum_van: '', datum_tot: '', locatie: '', beschrijving: '', prijs: '', briefadres: '', contact_info: '', paklijstText: '' })
-
-  // Calendar Event Form States
-  const [showNewEventForm, setShowNewEventForm] = useState(false)
-  const [newEvent, setNewEvent] = useState({ title: '', date: '', time: '', location: '', description: '' })
-  const [editEventId, setEditEventId] = useState<string | null>(null)
-  const [editEventData, setEditEventData] = useState({ title: '', date: '', time: '', location: '', description: '' })
 
   // Upload status states
   const [loading, setLoading] = useState(false)
@@ -102,7 +99,6 @@ export default function LeidingPanel({ initialKampen, initialEchos, initialCalen
   // Filter lists
   const takKampen = kampen.filter(k => k.tak === activeTak || (activeTak === 'groep' && k.tak === 'alle'))
   const takEchos = echos.filter(e => e.tak === activeTak)
-  const takEvents = calendar.filter(e => e.tak === activeTak)
 
   // Load packing list template
   function applyCampTemplate(isEdit: boolean) {
@@ -204,73 +200,6 @@ export default function LeidingPanel({ initialKampen, initialEchos, initialCalen
     if (res.ok) {
       setKampen(prev => prev.filter(k => k.id !== id))
       showFlash('Kamp succesvol verwijderd.')
-    }
-  }
-
-  // Calendar API Handlers
-  async function handleCreateEvent(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-
-    const res = await fetch('/api/admin/calendar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...newEvent,
-        tak: activeTak
-      }),
-    })
-    if (res.ok) {
-      const created = await res.json()
-      setCalendar(prev => [...prev, created].sort((a, b) => a.date.localeCompare(b.date)))
-      setShowNewEventForm(false)
-      setNewEvent({ title: '', date: '', time: '', location: '', description: '' })
-      showFlash('Activiteit succesvol toegevoegd aan de kalender!')
-    } else {
-      showFlash('Fout bij het toevoegen van activiteit.')
-    }
-    setLoading(true)
-    // Dynamic revalidation tag might take a sec
-    setTimeout(async () => {
-      const reFetch = await fetch('/api/kalender/ics').then(r => r.ok) // Ping to trigger build
-      setLoading(false)
-    }, 500)
-  }
-
-  async function handleUpdateEvent(e: React.FormEvent, eventId: string, originalEvent: CalendarEvent) {
-    e.preventDefault()
-    setLoading(true)
-
-    const updatePayload = {
-      title: editEventData.title || originalEvent.title,
-      date: editEventData.date || originalEvent.date,
-      time: editEventData.time !== undefined ? editEventData.time : originalEvent.time,
-      location: editEventData.location !== undefined ? editEventData.location : originalEvent.location,
-      description: editEventData.description !== undefined ? editEventData.description : originalEvent.description,
-    }
-
-    const res = await fetch(`/api/admin/calendar/${eventId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatePayload),
-    })
-    if (res.ok) {
-      const updated = await res.json()
-      setCalendar(prev => prev.map(ev => ev.id === eventId ? updated : ev).sort((a, b) => a.date.localeCompare(b.date)))
-      setEditEventId(null)
-      showFlash('Activiteit succesvol bijgewerkt!')
-    } else {
-      showFlash('Fout bij het opslaan van wijzigingen.')
-    }
-    setLoading(false)
-  }
-
-  async function handleDeleteEvent(id: string, title: string) {
-    if (!confirm(`Weet je zeker dat je "${title}" wilt verwijderen uit de kalender?`)) return
-    const res = await fetch(`/api/admin/calendar/${id}`, { method: 'DELETE' })
-    if (res.ok) {
-      setCalendar(prev => prev.filter(ev => ev.id !== id))
-      showFlash('Activiteit verwijderd.')
     }
   }
 
@@ -405,43 +334,7 @@ export default function LeidingPanel({ initialKampen, initialEchos, initialCalen
         </div>
       )}
 
-      <div className="portal-grid-layout">
-        {/* Sidebar: Tak selection */}
-        <aside style={{ background: '#fff', border: '1px solid #C2D9C9', borderRadius: 18, padding: 18, boxShadow: 'var(--shadow-sm)' }}>
-          <div style={{ fontSize: '.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.08em', color: '#6A8A75', marginBottom: 12 }}>Tak selecteren</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {TAKKEN.map(t => (
-              <button
-                key={t}
-                onClick={() => { setActiveTak(t); setEditCampId(null); setShowNewCampForm(false); setEditEventId(null); setShowNewEventForm(false) }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  width: '100%',
-                  padding: '10px 14px',
-                  borderRadius: 10,
-                  border: '2px solid transparent',
-                  borderColor: activeTak === t ? TAK_KLEUREN[t] : 'transparent',
-                  background: activeTak === t ? `${TAK_KLEUREN[t]}11` : 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontWeight: activeTak === t ? 700 : 600,
-                  color: activeTak === t ? '#1A3D2A' : '#6A8A75',
-                  fontFamily: 'inherit',
-                }}
-              >
-                <span style={{ width: 24, height: 24, borderRadius: '50%', background: TAK_KLEUREN[t], color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.75rem', fontWeight: 'bold' }}>
-                  {t.charAt(0).toUpperCase()}
-                </span>
-                <span>{TAK_NAMEN[t]}</span>
-              </button>
-            ))}
-          </div>
-        </aside>
-
-        {/* Main Content Pane */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ background: '#fff', border: '1px solid #C2D9C9', borderRadius: 18, padding: 28, boxShadow: 'var(--shadow-sm)', borderTop: `6px solid ${kleur}` }}>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 900, color: '#1A3D2A', fontFamily: 'var(--font-heading, Nunito, sans-serif)', textTransform: 'capitalize', marginBottom: 20 }}>
               {TAK_NAMEN[activeTak]} beheer
@@ -482,77 +375,13 @@ export default function LeidingPanel({ initialKampen, initialEchos, initialCalen
 
             {/* ─── KALENDER TAB ─── */}
             {subTab === 'kalender' && (
-              <div>
-                {!showNewEventForm && (
-                  <button onClick={() => setShowNewEventForm(true)} style={{ marginBottom: 20, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
-                    + Kalender activiteit toevoegen
-                  </button>
-                )}
-
-                {showNewEventForm && (
-                  <form onSubmit={handleCreateEvent} style={{ background: '#EEF5F133', border: '1.5px dashed #2A5C3F', borderRadius: 14, padding: 20, marginBottom: 24 }}>
-                    <h4 style={{ margin: '0 0 16px', color: '#1A3D2A', fontWeight: 800 }}>Nieuwe Activiteit</h4>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
-                      <div><label style={labelStyle}>Titel</label><input style={inputStyle} value={newEvent.title} onChange={e => setNewEvent(p => ({ ...p, title: e.target.value }))} required placeholder="bijv. Groeps-BBQ of Filmavond" /></div>
-                      <div><label style={labelStyle}>Datum</label><input type="date" style={inputStyle} value={newEvent.date} onChange={e => setNewEvent(p => ({ ...p, date: e.target.value }))} required /></div>
-                      <div><label style={labelStyle}>Tijdstip</label><input style={inputStyle} value={newEvent.time} onChange={e => setNewEvent(p => ({ ...p, time: e.target.value }))} placeholder="bijv. 14:00 - 17:00" /></div>
-                      <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={newEvent.location} onChange={e => setNewEvent(p => ({ ...p, location: e.target.value }))} placeholder="bijv. Scoutslokalen" /></div>
-                    </div>
-                    <div style={{ marginBottom: 14 }}><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={3} value={newEvent.description} onChange={e => setNewEvent(p => ({ ...p, description: e.target.value }))} placeholder="Korte uitleg over de activiteit..." /></div>
-                    <div style={{ display: 'flex', gap: 10 }}>
-                      <button type="submit" disabled={loading} style={{ padding: '8px 16px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 700, cursor: 'pointer' }}>
-                        {loading ? 'Bezig…' : 'Toevoegen'}
-                      </button>
-                      <button type="button" onClick={() => setShowNewEventForm(false)} style={{ padding: '8px 16px', background: 'none', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, color: '#6A8A75', cursor: 'pointer' }}>
-                        Annuleren
-                      </button>
-                    </div>
-                  </form>
-                )}
-
-                {/* List calendar events */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {takEvents.length === 0 && <p style={{ color: '#6A8A75', fontSize: '.88rem' }}>Er zijn geen geplande activiteiten voor deze tak in de kalender.</p>}
-                  {takEvents.map(ev => {
-                    const isEditing = editEventId === ev.id
-                    const dateObj = new Date(ev.date)
-                    const dateStr = `${dateObj.getDate()} ${MAANDEN[dateObj.getMonth() + 1]} ${dateObj.getFullYear()}`
-
-                    return (
-                      <div key={ev.id} style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 12, padding: 18 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-                          <div>
-                            <strong style={{ fontSize: '1.05rem', color: '#1A3D2A', display: 'block' }}>{ev.title}</strong>
-                            <span style={{ fontSize: '.82rem', color: '#6A8A75', fontWeight: 600 }}>📅 {dateStr} {ev.time && `· 🕒 ${ev.time}`} {ev.location && `· 📍 ${ev.location}`}</span>
-                            {ev.description && <p style={{ fontSize: '.88rem', color: '#3A5A42', margin: '8px 0 0', lineHeight: 1.4 }}>{ev.description}</p>}
-                          </div>
-                          <div style={{ display: 'flex', gap: 6 }}>
-                            <button onClick={() => { setEditEventId(isEditing ? null : ev.id); setEditEventData({ title: ev.title, date: ev.date, time: ev.time, location: ev.location, description: ev.description }) }}
-                              style={{ padding: '6px 12px', border: '1.5px solid #C9963A', borderRadius: 8, background: 'none', color: '#C9963A', fontSize: '.75rem', fontWeight: 700, cursor: 'pointer' }}>
-                              {isEditing ? 'Sluiten' : 'Bewerken'}
-                            </button>
-                            <button onClick={() => handleDeleteEvent(ev.id, ev.title)}
-                              style={{ padding: '6px 12px', border: '1.5px solid #B23A4D', borderRadius: 8, background: 'none', color: '#B23A4D', fontSize: '.75rem', cursor: 'pointer' }}>
-                              ✕
-                            </button>
-                          </div>
-                        </div>
-
-                        {isEditing && (
-                          <form onSubmit={e => handleUpdateEvent(e, ev.id, ev)} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 14, borderTop: '1px solid #EEF5F1', paddingTop: 14 }}>
-                            <div><label style={labelStyle}>Titel</label><input style={inputStyle} defaultValue={ev.title} onChange={e => setEditEventData(p => ({ ...p, title: e.target.value }))} required /></div>
-                            <div><label style={labelStyle}>Datum</label><input type="date" style={inputStyle} defaultValue={ev.date} onChange={e => setEditEventData(p => ({ ...p, date: e.target.value }))} required /></div>
-                            <div><label style={labelStyle}>Tijdstip</label><input style={inputStyle} defaultValue={ev.time} onChange={e => setEditEventData(p => ({ ...p, time: e.target.value }))} /></div>
-                            <div><label style={labelStyle}>Locatie</label><input style={inputStyle} defaultValue={ev.location} onChange={e => setEditEventData(p => ({ ...p, location: e.target.value }))} /></div>
-                            <div style={{ gridColumn: '1 / -1' }}><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={2} defaultValue={ev.description} onChange={e => setEditEventData(p => ({ ...p, description: e.target.value }))} /></div>
-                            <button type="submit" disabled={loading} style={{ padding: '8px 16px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>Opslaan</button>
-                          </form>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
+              <LeidingCalendar
+                initialCalendar={initialCalendar}
+                kampen={kampen}
+                highlightTak={activeTak === 'groep' ? undefined : activeTak}
+                canPublish={canPublish}
+                icsToken={icsToken}
+              />
             )}
 
             {/* ─── KAMPEN TAB ─── */}
@@ -789,7 +618,6 @@ export default function LeidingPanel({ initialKampen, initialEchos, initialCalen
               </div>
             )}
           </div>
-        </div>
       </div>
     </div>
   )

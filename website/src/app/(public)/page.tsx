@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getCalendarEvents } from '@/lib/db'
+import { getPublicCalendarEvents } from '@/lib/db'
 import HeroCTA from '@/components/HeroCTA'
 import { CalendarEvent } from '@/lib/types'
 
@@ -9,7 +9,7 @@ const MONTHS_NL: Record<number, string> = {
 }
 
 export default async function HomePage() {
-  const allEvents = (await getCalendarEvents()) as CalendarEvent[]
+  const allEvents = (await getPublicCalendarEvents()) as CalendarEvent[]
   // Toon enkel aankomende activiteiten (vanaf vandaag), max. 5.
   const today = new Date()
   today.setHours(0, 0, 0, 0)

@@ -9,7 +9,7 @@ export default async function AdminPage() {
   const user = session.user
 
   const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding'
-  if (!isAdmin) redirect('/portaal/dashboard')
+  if (!isAdmin) redirect('/portaal')
 
   const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker'
   const admin = createAdminClient()
@@ -27,7 +27,6 @@ export default async function AdminPage() {
     <>
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 20px 80px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
-          <a href="/portaal/dashboard" style={{ color: '#6A8A75', textDecoration: 'none', fontSize: '.9rem', fontWeight: 600 }}>← Dashboard</a>
           <h1 style={{ fontSize: '1.6rem', fontWeight: 900, fontFamily: 'var(--font-heading, Nunito, sans-serif)', color: '#1A3D2A', margin: 0 }}>⚙️ Beheer</h1>
         </div>
 

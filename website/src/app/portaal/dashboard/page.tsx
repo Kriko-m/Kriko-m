@@ -1,12 +1,13 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import { CalendarEvent, Kamp } from '@/lib/types'
+import { AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
 
 const QUICK_LINKS = [
   { icon: 'fa-brands fa-google-drive', label: 'Google Drive', href: 'https://drive.google.com' },
   { icon: 'fa-solid fa-link', label: 'Belangrijke links', href: '#' },
   { icon: 'fa-brands fa-facebook', label: 'Facebook', href: 'https://www.facebook.com/ScoutsKrikoM' },
-  { icon: 'fa-solid fa-plus', label: 'Binnenkort', href: '#', placeholder: true },
+  { icon: 'fa-solid fa-users-gear', label: 'Groepsadmin', href: 'https://groepsadmin.scoutsengidsenvlaanderen.be/groepsadmin/client/' },
 ]
 
 const TAK_KLEUREN: Record<string, string> = {
@@ -52,11 +53,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="portaal-dashboard-bg-wrapper">
-      {/* Blurred background photo */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/kampvuur.jpg" className="portaal-dashboard-bg-img" alt="" aria-hidden="true" />
+      <img src="/images/leiding_25-26.jpg" className="portaal-dashboard-bg-img" alt="" aria-hidden="true" />
 
-      {/* Main card */}
       <div className="portaal-dashboard-card">
 
         {/* Quick links */}
@@ -67,16 +66,13 @@ export default async function DashboardPage() {
               href={link.href}
               target={link.href !== '#' ? '_blank' : undefined}
               rel="noreferrer"
-              className={`portaal-quicklink-card${link.placeholder ? ' placeholder' : ''}`}
+              className="portaal-quicklink-card"
             >
               <i className={link.icon}></i>
               <span>{link.label}</span>
             </a>
           ))}
         </div>
-
-        {/* Title */}
-        <h1 className="portaal-dashboard-title">Leidingportaal</h1>
 
         {/* Body grid: calendar left, events + message right */}
         <div className="portaal-dash-body-grid">
@@ -96,11 +92,15 @@ export default async function DashboardPage() {
                       <div style={{ fontSize: '.65rem', opacity: .85 }}>{month}</div>
                     </div>
                     <div className="portaal-cal-event-info">
-                      <div className="portaal-cal-event-title">{ev.title}</div>
+                      <div className="portaal-cal-event-title">{ev.is_evenement ? '⭐ ' : ''}{ev.title}</div>
                       {ev.location && <div className="portaal-cal-event-sub"><i className="fa-solid fa-location-dot" style={{ marginRight: 4 }}></i>{ev.location}</div>}
-                      {ev.tak && ev.tak !== 'groep' && (
-                        <span style={{ display: 'inline-block', marginTop: 3, padding: '1px 7px', borderRadius: 20, fontSize: '.7rem', fontWeight: 700, background: TAK_KLEUREN[ev.tak] || '#1A3D2A', color: ev.tak === 'kapoenen' ? '#3a2a00' : '#fff' }}>
-                          {ev.tak}
+                      {ev.audience && ev.audience.length > 0 && (
+                        <span style={{ display: 'inline-flex', gap: 4, flexWrap: 'wrap', marginTop: 3 }}>
+                          {ev.audience.map(a => (
+                            <span key={a} style={{ padding: '1px 7px', borderRadius: 20, fontSize: '.68rem', fontWeight: 700, background: AUDIENCE_KLEUREN[a] || '#1A3D2A', color: a === 'kapoenen' ? '#3a2a00' : '#fff' }}>
+                              {AUDIENCE_NAMEN[a]}
+                            </span>
+                          ))}
                         </span>
                       )}
                     </div>

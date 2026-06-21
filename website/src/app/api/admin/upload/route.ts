@@ -111,6 +111,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(data)
     }
 
+    if (uploadType === 'evenement-cover' || uploadType === 'evenement-document') {
+      // Evenement-media (enkel groepsleiding maakt evenementen aan; requireLeiding
+      // volstaat hier voor de upload zelf — koppeling gebeurt via de calendar-API).
+      if (uploadType === 'evenement-cover' && !IMAGE_MIME.has(file.type)) {
+        return NextResponse.json({ error: 'Coverfoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
+      }
+      // Cover → publieke kamp-fotos bucket; document → publieke kamp-bestanden bucket.
+      const bucket = uploadType === 'evenement-cover' ? 'kamp-fotos' : 'kamp-bestanden'
+      const prefix = uploadType === 'evenement-cover' ? 'ev-cover' : 'ev-doc'
+      const filename = `${prefix}-${Date.now()}.${ext}`
+
+      const { error: storageError } = await admin.storage
+        .from(bucket)
+        .upload(filename, buffer, { contentType: file.type, upsert: true })
+      if (storageError) throw storageError
+
+      const { data: pub } = admin.storage.from(bucket).getPublicUrl(filename)
+      return NextResponse.json({ url: pub.publicUrl })
+    }
+
     if (uploadType === 'echo') {
       const echoTak = formData.get('echoTak') as string | null
       const echoMonth = formData.get('echoMonth') as string | null

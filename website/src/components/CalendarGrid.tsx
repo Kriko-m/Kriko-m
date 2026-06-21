@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 const MONTHS = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
 
-interface Event { id: string; date: string; title: string; time?: string }
+interface Event { id: string; date: string; title: string; time?: string; evenement?: boolean }
 
 export default function CalendarGrid({ events }: { events: Event[] }) {
   const today = new Date(); today.setHours(0,0,0,0)
@@ -41,11 +41,12 @@ export default function CalendarGrid({ events }: { events: Event[] }) {
   for (let d = 1; d <= daysInMonth; d++) {
     const key = toKey(year, month, d)
     const dayEvents = byDate[key]
+    const hasEvenement = dayEvents?.some(e => e.evenement)
     cells.push(
       dayEvents ? (
         <button
           key={key} type="button"
-          className={`cal-day has-event${key===todayKey?' today':''}${key===selected?' selected':''}`}
+          className={`cal-day has-event${hasEvenement?' has-evenement':''}${key===todayKey?' today':''}${key===selected?' selected':''}`}
           title={dayEvents.map(e=>e.title).join(', ')}
           onClick={() => {
             setSelected(key)

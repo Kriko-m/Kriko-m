@@ -15,16 +15,17 @@ export default async function LeidingPortaalPage({
 
   const role = user.app_metadata?.role || ''
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
-  if (!isLeiding) redirect('/portaal/dashboard')
+  if (!isLeiding) redirect('/portaal')
 
   const { tak, tab } = await searchParams
 
   const admin = createAdminClient()
-  const [authRes, kampenRes, echosRes, calendarRes] = await Promise.all([
+  const [authRes, kampenRes, echosRes, calendarRes, settingsRes] = await Promise.all([
     supabase.auth.getUser(),
     admin.from('kampen').select('*, kamp_bestanden(*)').order('datum_van', { ascending: true }),
     admin.from('echos').select('*').order('year', { ascending: false }).order('month', { ascending: false }),
     admin.from('calendar').select('*').order('date', { ascending: true }),
+    admin.from('settings').select('leiding_ics_token').eq('id', 1).single(),
   ])
 
   if (authRes.error || !authRes.data.user) redirect('/portaal')
@@ -32,20 +33,18 @@ export default async function LeidingPortaalPage({
   const kampen = (kampenRes.data ?? []) as Kamp[]
   const echos = (echosRes.data ?? []) as Echo[]
   const calendarEvents = (calendarRes.data ?? []) as CalendarEvent[]
+  const icsToken = (settingsRes.data?.leiding_ics_token ?? '') as string
 
   return (
     <>
-      <main style={{ maxWidth: 1000, margin: '0 auto', padding: '40px 20px 80px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
-          <a href="/portaal/dashboard" style={{ color: '#6A8A75', textDecoration: 'none', fontSize: '.9rem', fontWeight: 600 }}>← Dashboard</a>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 900, fontFamily: 'var(--font-heading, Nunito, sans-serif)', color: '#1A3D2A', margin: 0 }}>🛡️ Leidersportaal</h1>
-        </div>
-
+      <main style={{ maxWidth: 1000, margin: '0 auto', padding: '32px 20px 80px' }}>
         <LeidingPanel
+          key={`${tak ?? 'groep'}-${tab ?? 'kalender'}`}
           initialKampen={kampen}
           initialEchos={echos}
           initialCalendar={calendarEvents}
           role={role}
+          icsToken={icsToken}
           initialTak={tak}
           initialTab={tab}
         />

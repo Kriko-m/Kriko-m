@@ -9,7 +9,7 @@ export default async function WerkjaarPage() {
   if (!user) redirect('/portaal')
   // Rollover is groepsleiding-only.
   const role = user.app_metadata?.role
-  if (role !== 'admin' && role !== 'groepsleiding') redirect('/portaal/dashboard')
+  if (role !== 'admin' && role !== 'groepsleiding') redirect('/portaal')
 
   const admin = createAdminClient()
   const { data: settings } = await admin.from('settings').select('*').eq('id', 1).single()

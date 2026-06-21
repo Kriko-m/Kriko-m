@@ -53,7 +53,6 @@ export default async function ArchiefPage() {
   return (
     <main style={{ maxWidth: 980, margin: '0 auto', padding: '40px 20px 80px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
-        <a href="/portaal/dashboard" style={{ color: '#6A8A75', textDecoration: 'none', fontSize: '.9rem', fontWeight: 600 }}>← Dashboard</a>
         <h1 style={{ fontSize: '1.6rem', fontWeight: 900, fontFamily: 'var(--font-heading, Nunito, sans-serif)', color: '#1A3D2A', margin: 0 }}>📚 Archief per werkjaar</h1>
       </div>
       <ArchiefBrowser jaren={data} storageUrl={process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''} />

@@ -9,7 +9,7 @@ export default async function AdminKampenPage() {
   const user = session.user
 
   const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding'
-  if (!isAdmin) redirect('/portaal/dashboard')
+  if (!isAdmin) redirect('/portaal')
 
   const naam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker'
   const admin = createAdminClient()

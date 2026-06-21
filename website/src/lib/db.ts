@@ -19,7 +19,9 @@ export async function getActiveWerkjaar(): Promise<string> {
   return data?.scouts_year ?? ''
 }
 
-export const getCalendarEvents = unstable_cache(
+// Alle kalender-events (oudercalender + interne leiding-events). Voor portaal /
+// leiding-views en de private ICS-feed.
+export const getAllCalendarEvents = unstable_cache(
   async () => {
     const supabase = createAdminClient()
     const { data } = await supabase
@@ -28,9 +30,32 @@ export const getCalendarEvents = unstable_cache(
       .order('date', { ascending: true })
     return data ?? []
   },
-  ['calendar-cache'],
+  ['calendar-all-cache'],
   { revalidate: 300, tags: ['calendar'] }
 )
+
+// Enkel publieke events (audience bevat 'ouders') — de oudercalender. Voor de
+// publieke site en de publieke ICS-feed.
+export const getPublicCalendarEvents = unstable_cache(
+  async () => {
+    const supabase = createAdminClient()
+    const { data } = await supabase
+      .from('calendar')
+      .select('*')
+      .contains('audience', ['ouders'])
+      .order('date', { ascending: true })
+    return data ?? []
+  },
+  ['calendar-public-cache'],
+  { revalidate: 300, tags: ['calendar'] }
+)
+
+// Geheim token voor de private leiding-ICS-feed (ongecachet — beveiligingswaarde).
+export async function getLeidingIcsToken(): Promise<string> {
+  const supabase = createAdminClient()
+  const { data } = await supabase.from('settings').select('leiding_ics_token').eq('id', 1).single()
+  return data?.leiding_ics_token ?? ''
+}
 
 export const getEchos = unstable_cache(
   async () => {

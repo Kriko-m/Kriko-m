@@ -41,8 +41,8 @@ export default function PortaalSidebar({ isAdmin: _isAdmin }: Props) {
     <aside className="portaal-sidebar-nav">
       {/* Algemeen */}
       <Link
-        href="/portaal/leiding?tak=groep"
-        className={`portaal-sidebar-link${onLeidingPage && activeTak === 'groep' ? ' active' : ''}`}
+        href="/portaal/dashboard"
+        className={`portaal-sidebar-link${pathname === '/portaal/dashboard' ? ' active' : ''}`}
       >
         <i className="fa-solid fa-users" style={{ width: 18, textAlign: 'center', fontSize: '0.9rem' }}></i>
         <span>Algemeen</span>

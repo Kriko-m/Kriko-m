@@ -15,7 +15,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/verhuur',
     '/inschrijven',
     '/shop',
-    '/archief',
     '/contact',
     '/privacy',
     '/voorwaarden',
