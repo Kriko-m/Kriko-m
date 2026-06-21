@@ -6,14 +6,17 @@ import { mergeCampsIntoCalendar } from '@/lib/calendar'
 import SubscribeCalendarButton from '@/components/SubscribeCalendarButton'
 
 const MAANDEN = ['', 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
+const MAANDEN_KORT = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
+const DAG_LETTERS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
 
 interface Props {
   initialCalendar: CalendarEvent[]
   kampen: Kamp[]
-  highlightTak?: string          // audience-tag die op deze pagina extra benadrukt wordt
-  canPublish: boolean            // groepsleiding mag publiceren naar 'ouders' + evenementen
+  highlightTak?: string
+  canPublish: boolean
   icsToken: string
-  readOnly?: boolean             // bv. dashboard-overzicht zonder bewerken
+  readOnly?: boolean
+  twoColumn?: boolean
 }
 
 type FormState = {
@@ -27,7 +30,13 @@ const emptyForm = (prefill?: string): FormState => ({
   is_evenement: false, cover_image: '', document_url: '',
 })
 
-export default function LeidingCalendar({ initialCalendar, kampen, highlightTak, canPublish, icsToken, readOnly }: Props) {
+// Monday-first: returns 0=Mon … 6=Sun
+function dayOfWeekMon(d: Date): number {
+  return (d.getDay() + 6) % 7
+}
+
+export default function LeidingCalendar({ initialCalendar, kampen, highlightTak, canPublish, icsToken, readOnly, twoColumn = false }: Props) {
+  const today = new Date()
   const [events, setEvents] = useState<CalendarEvent[]>(initialCalendar)
   const [filter, setFilter] = useState<Set<string>>(new Set())
   const [showForm, setShowForm] = useState(false)
@@ -36,19 +45,95 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
   const [loading, setLoading] = useState(false)
   const [flash, setFlash] = useState('')
 
-  // Welke audience-tags mag deze gebruiker toekennen?
+  // Calendar grid state
+  const [calYear, setCalYear] = useState(today.getFullYear())
+  const [calMonth, setCalMonth] = useState(today.getMonth()) // 0-indexed
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+
   const selectableTags: AudienceTag[] = canPublish
     ? [...AUDIENCE_TAGS]
     : AUDIENCE_TAGS.filter(t => t !== 'ouders')
 
   function showFlash(msg: string) { setFlash(msg); setTimeout(() => setFlash(''), 3000) }
 
-  // Events + kampen samenvoegen en filteren.
   const entries: CalendarEntry[] = useMemo(() => {
     const merged = mergeCampsIntoCalendar(events, kampen)
     if (filter.size === 0) return merged
     return merged.filter(e => e.audience.some(a => filter.has(a)))
   }, [events, kampen, filter])
+
+  // Map date string → entries for that day (for calendar dots)
+  const eventsByDate = useMemo(() => {
+    const map = new Map<string, CalendarEntry[]>()
+    for (const e of entries) {
+      const key = e.date
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)!.push(e)
+      // Also fill intermediate days for multi-day events
+      if (e.datum_tot && e.datum_tot !== e.date) {
+        const start = new Date(e.date)
+        const end = new Date(e.datum_tot)
+        const cur = new Date(start)
+        cur.setDate(cur.getDate() + 1)
+        while (cur <= end) {
+          const k = cur.toISOString().slice(0, 10)
+          if (!map.has(k)) map.set(k, [])
+          map.get(k)!.push(e)
+          cur.setDate(cur.getDate() + 1)
+        }
+      }
+    }
+    return map
+  }, [entries])
+
+  // Right column: filter by selected date if one is picked
+  const rightEntries = useMemo(() => {
+    if (!selectedDate) return entries
+    return entries.filter(e => {
+      if (e.date === selectedDate) return true
+      if (e.datum_tot && e.datum_tot >= selectedDate && e.date <= selectedDate) return true
+      return false
+    })
+  }, [entries, selectedDate])
+
+  // Calendar grid computation
+  const calGrid = useMemo(() => {
+    const firstDay = new Date(calYear, calMonth, 1)
+    const lastDay = new Date(calYear, calMonth + 1, 0)
+    const startOffset = dayOfWeekMon(firstDay)
+    const cells: Array<{ date: Date | null; key: string }> = []
+    // leading empty cells
+    for (let i = 0; i < startOffset; i++) {
+      const d = new Date(calYear, calMonth, 1 - (startOffset - i))
+      cells.push({ date: d, key: `prev-${i}` })
+    }
+    // days of month
+    for (let d = 1; d <= lastDay.getDate(); d++) {
+      cells.push({ date: new Date(calYear, calMonth, d), key: `${calYear}-${calMonth}-${d}` })
+    }
+    // trailing empty cells to complete the grid (always 6 rows)
+    const remaining = 42 - cells.length
+    for (let i = 1; i <= remaining; i++) {
+      cells.push({ date: new Date(calYear, calMonth + 1, i), key: `next-${i}` })
+    }
+    return cells
+  }, [calYear, calMonth])
+
+  function prevMonth() {
+    if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1) }
+    else setCalMonth(m => m - 1)
+    setSelectedDate(null)
+  }
+  function nextMonth() {
+    if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1) }
+    else setCalMonth(m => m + 1)
+    setSelectedDate(null)
+  }
+  function goToToday() {
+    setCalYear(today.getFullYear())
+    setCalMonth(today.getMonth())
+    setSelectedDate(null)
+  }
 
   function toggleFilter(tag: string) {
     setFilter(prev => {
@@ -152,24 +237,254 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     )
   }
 
+  // ─── Calendar Grid Component ───────────────────────────────────────────────
+  function CalendarGrid() {
+    const todayStr = today.toISOString().slice(0, 10)
+
+    return (
+      <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #C2D9C9', overflow: 'hidden' }}>
+        {/* Month navigation */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', background: '#1A3D2A', color: '#fff' }}>
+          <button onClick={prevMonth} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '1.2rem', cursor: 'pointer', padding: '2px 8px', borderRadius: 6, lineHeight: 1 }}>‹</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontWeight: 800, fontSize: '1.05rem', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+              {MAANDEN[calMonth + 1]} {calYear}
+            </span>
+            <button onClick={goToToday} style={{ background: 'rgba(255,255,255,.15)', border: '1px solid rgba(255,255,255,.3)', color: '#fff', fontSize: '.7rem', fontWeight: 700, cursor: 'pointer', padding: '3px 9px', borderRadius: 12 }}>
+              Vandaag
+            </button>
+          </div>
+          <button onClick={nextMonth} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '1.2rem', cursor: 'pointer', padding: '2px 8px', borderRadius: 6, lineHeight: 1 }}>›</button>
+        </div>
+
+        {/* Day-of-week headers */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #E8F0EA' }}>
+          {DAG_LETTERS.map(d => (
+            <div key={d} style={{ textAlign: 'center', padding: '8px 2px', fontSize: '.72rem', fontWeight: 800, color: '#6A8A75', textTransform: 'uppercase', letterSpacing: '.04em' }}>
+              {d}
+            </div>
+          ))}
+        </div>
+
+        {/* Day cells */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
+          {calGrid.map((cell) => {
+            const isCurrentMonth = cell.date!.getMonth() === calMonth
+            const dateStr = cell.date!.toISOString().slice(0, 10)
+            const isToday = dateStr === todayStr
+            const isSelected = dateStr === selectedDate
+            const dayEvents = eventsByDate.get(dateStr) || []
+            const hasEvents = dayEvents.length > 0
+
+            // Gather up to 3 distinct audience colors for dots
+            const dotColors = Array.from(new Set(dayEvents.flatMap(e => e.audience))).slice(0, 4).map(a => AUDIENCE_KLEUREN[a as AudienceTag]).filter(Boolean)
+
+            return (
+              <div
+                key={cell.key}
+                onClick={() => {
+                  if (!isCurrentMonth) return
+                  setSelectedDate(prev => prev === dateStr ? null : dateStr)
+                }}
+                style={{
+                  minHeight: 52,
+                  padding: '5px 4px 4px',
+                  borderRight: '1px solid #E8F0EA',
+                  borderBottom: '1px solid #E8F0EA',
+                  cursor: isCurrentMonth ? 'pointer' : 'default',
+                  background: isSelected ? '#1A3D2A' : isToday ? '#EEF5F1' : 'transparent',
+                  transition: 'background .15s',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 3,
+                  position: 'relative',
+                }}
+              >
+                <span style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 26, height: 26, borderRadius: '50%',
+                  fontSize: '.78rem', fontWeight: isToday || isSelected ? 800 : 500,
+                  color: isSelected ? '#fff' : isCurrentMonth ? (isToday ? '#1A3D2A' : '#2C3E35') : '#C2D9C9',
+                  background: isToday && !isSelected ? 'rgba(26,61,42,.1)' : 'transparent',
+                }}>
+                  {cell.date!.getDate()}
+                </span>
+                {hasEvents && isCurrentMonth && (
+                  <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
+                    {dotColors.map((color, i) => (
+                      <span key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: isSelected ? 'rgba(255,255,255,.7)' : color, flexShrink: 0 }} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Legend */}
+        {filter.size === 0 && (
+          <div style={{ padding: '10px 14px', borderTop: '1px solid #E8F0EA', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            {AUDIENCE_TAGS.map(tag => (
+              <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '.7rem', color: '#6A8A75', fontWeight: 600 }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: AUDIENCE_KLEUREN[tag], display: 'inline-block' }} />
+                {AUDIENCE_NAMEN[tag]}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ─── Activity list (right column or standalone) ───────────────────────────
+  function ActivityList({ listEntries }: { listEntries: CalendarEntry[] }) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {listEntries.length === 0 && (
+          <p style={{ color: '#6A8A75', fontSize: '.88rem', textAlign: 'center', padding: '24px 0' }}>
+            {selectedDate ? 'Geen activiteiten op deze dag.' : 'Geen activiteiten gevonden.'}
+          </p>
+        )}
+        {listEntries.map(ev => {
+          const dateObj = new Date(ev.date)
+          const dateStr = `${dateObj.getDate()} ${MAANDEN[dateObj.getMonth() + 1]}`
+          const isKamp = ev.source === 'kamp'
+          const highlighted = highlightTak ? ev.audience.includes(highlightTak as AudienceTag) : false
+          return (
+            <div key={`${ev.source}-${ev.id}`} style={{
+              background: '#fff', borderRadius: 12, padding: '12px 14px',
+              border: highlighted ? '2px solid #C9963A' : '1.5px solid #C2D9C9',
+              boxShadow: highlighted ? '0 2px 10px rgba(201,150,58,.18)' : 'none',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 3 }}>
+                    {ev.is_evenement && <span title="Evenement" style={{ color: '#C9963A', fontSize: '.85rem' }}>⭐</span>}
+                    {isKamp && <span style={{ padding: '1px 7px', borderRadius: 20, fontSize: '.65rem', fontWeight: 800, background: '#1A3D2A18', color: '#1A3D2A' }}>🏕️ KAMP</span>}
+                    <TagChips tags={ev.audience} />
+                  </div>
+                  <strong style={{ fontSize: '.95rem', color: '#1A3D2A', display: 'block' }}>{ev.title}</strong>
+                  <span style={{ fontSize: '.78rem', color: '#6A8A75', fontWeight: 600 }}>
+                    {dateStr}{ev.datum_tot && ev.datum_tot !== ev.date ? ` – ${new Date(ev.datum_tot).getDate()} ${MAANDEN[new Date(ev.datum_tot).getMonth() + 1]}` : ''}
+                    {ev.time && ` · ${ev.time}`}{ev.location && ` · ${ev.location}`}
+                  </span>
+                  {ev.description && <p style={{ fontSize: '.82rem', color: '#3A5A42', margin: '5px 0 0', lineHeight: 1.4 }}>{ev.description}</p>}
+                </div>
+                {!readOnly && (
+                  <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
+                    {isKamp ? (
+                      <span style={{ fontSize: '.7rem', color: '#9AB0A2', alignSelf: 'center' }}>via Kampen</span>
+                    ) : (
+                      <>
+                        <button onClick={() => startEdit(ev)} style={{ padding: '5px 10px', border: '1.5px solid #C9963A', borderRadius: 7, background: 'none', color: '#C9963A', fontSize: '.72rem', fontWeight: 700, cursor: 'pointer' }}>Bewerken</button>
+                        <button onClick={() => handleDelete(ev.id, ev.title)} style={{ padding: '5px 10px', border: '1.5px solid #B23A4D', borderRadius: 7, background: 'none', color: '#B23A4D', fontSize: '.72rem', cursor: 'pointer' }}>✕</button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
+  // ─── Add/Edit Form ────────────────────────────────────────────────────────
+  function AddEditForm() {
+    return (
+      <form onSubmit={handleSubmit} style={{ background: '#EEF5F133', border: '1.5px dashed #2A5C3F', borderRadius: 14, padding: 18, marginBottom: 16 }}>
+        <h4 style={{ margin: '0 0 14px', color: '#1A3D2A', fontWeight: 800, fontSize: '.95rem' }}>{editId ? 'Activiteit bewerken' : 'Nieuwe activiteit'}</h4>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+          <div><label style={labelStyle}>Titel</label><input style={inputStyle} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required placeholder="bijv. Groeps-BBQ" /></div>
+          <div><label style={labelStyle}>Datum</label><input type="date" style={inputStyle} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} required /></div>
+          <div><label style={labelStyle}>Tijdstip</label><input style={inputStyle} value={form.time} onChange={e => setForm(p => ({ ...p, time: e.target.value }))} placeholder="bijv. 14:00 - 17:00" /></div>
+          <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="bijv. Scoutslokalen" /></div>
+        </div>
+        <div style={{ marginBottom: 12 }}><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={2} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Korte uitleg..." /></div>
+
+        <div style={{ marginBottom: 12 }}>
+          <label style={labelStyle}>Voor wie? (tags)</label>
+          <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+            {selectableTags.map(tag => {
+              const on = form.audience.includes(tag)
+              return (
+                <button key={tag} type="button" onClick={() => toggleAudience(tag)}
+                  style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.75rem', fontWeight: 700,
+                    background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
+                  {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
+                </button>
+              )
+            })}
+          </div>
+          {form.audience.includes('ouders') && (
+            <span style={{ display: 'block', marginTop: 5, fontSize: '.73rem', color: '#9A6B12', fontWeight: 600 }}>
+              ⚠️ Met de tag &ldquo;Ouders&rdquo; wordt dit zichtbaar op de publieke website.
+            </span>
+          )}
+        </div>
+
+        {canPublish && (
+          <div style={{ marginBottom: 12, padding: 12, background: '#fff', border: '1.5px solid #E2C58D', borderRadius: 10 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#1A3D2A', fontSize: '.85rem' }}>
+              <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} />
+              ⭐ Uitlichten als evenement (met coverfoto &amp; uitnodiging)
+            </label>
+            {form.is_evenement && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+                <div>
+                  <label style={labelStyle}>Coverfoto</label>
+                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleCoverChange} style={{ fontSize: '.78rem' }} />
+                  {form.cover_image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={form.cover_image} alt="cover" style={{ width: '100%', height: 70, objectFit: 'cover', borderRadius: 7, marginTop: 5 }} />}
+                </div>
+                <div>
+                  <label style={labelStyle}>Uitnodiging (PDF)</label>
+                  <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocChange} style={{ fontSize: '.78rem' }} />
+                  {form.document_url && <span style={{ display: 'block', marginTop: 5, fontSize: '.74rem', color: '#3F7D5A', fontWeight: 600 }}>✓ Uitnodiging geüpload</span>}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button type="submit" disabled={loading} style={{ padding: '8px 14px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 700, cursor: 'pointer', fontSize: '.85rem' }}>
+            {loading ? 'Bezig…' : editId ? 'Opslaan' : 'Toevoegen'}
+          </button>
+          <button type="button" onClick={resetForm} style={{ padding: '8px 14px', background: 'none', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, color: '#6A8A75', cursor: 'pointer', fontSize: '.85rem' }}>
+            Annuleren
+          </button>
+        </div>
+      </form>
+    )
+  }
+
+  // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <div>
       {flash && (
-        <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 16px', borderRadius: 10, marginBottom: 16, fontWeight: 600 }}>
+        <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 16px', borderRadius: 10, marginBottom: 14, fontWeight: 600 }}>
           {flash}
         </div>
       )}
 
-      {/* Filter + abonneer + toevoegen */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+      {/* Top bar: tag filters + actions */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: '.75rem', fontWeight: 700, color: '#6A8A75', marginRight: 2 }}>Filter:</span>
           {AUDIENCE_TAGS.map(tag => (
             <button key={tag} type="button" onClick={() => toggleFilter(tag)}
-              style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.76rem', fontWeight: 700,
+              style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.75rem', fontWeight: 700,
                 background: filter.has(tag) ? AUDIENCE_KLEUREN[tag] : 'transparent', color: filter.has(tag) ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
               {AUDIENCE_NAMEN[tag]}
             </button>
           ))}
+          {filter.size > 0 && (
+            <button onClick={() => setFilter(new Set())} style={{ padding: '4px 10px', borderRadius: 20, border: '1.5px solid #C2D9C9', cursor: 'pointer', fontSize: '.73rem', fontWeight: 600, color: '#6A8A75', background: 'transparent' }}>
+              ✕ Wis
+            </button>
+          )}
         </div>
         <SubscribeCalendarButton
           feedPath={`/api/leiding/ics/${icsToken}`}
@@ -180,126 +495,53 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
         />
       </div>
 
-      {!readOnly && !showForm && (
-        <button onClick={() => { setForm(emptyForm(highlightTak)); setEditId(null); setShowForm(true) }}
-          style={{ marginBottom: 18, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
-          + Activiteit toevoegen
-        </button>
-      )}
-
-      {!readOnly && showForm && (
-        <form onSubmit={handleSubmit} style={{ background: '#EEF5F133', border: '1.5px dashed #2A5C3F', borderRadius: 14, padding: 20, marginBottom: 24 }}>
-          <h4 style={{ margin: '0 0 16px', color: '#1A3D2A', fontWeight: 800 }}>{editId ? 'Activiteit bewerken' : 'Nieuwe activiteit'}</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
-            <div><label style={labelStyle}>Titel</label><input style={inputStyle} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required placeholder="bijv. Groeps-BBQ" /></div>
-            <div><label style={labelStyle}>Datum</label><input type="date" style={inputStyle} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} required /></div>
-            <div><label style={labelStyle}>Tijdstip</label><input style={inputStyle} value={form.time} onChange={e => setForm(p => ({ ...p, time: e.target.value }))} placeholder="bijv. 14:00 - 17:00" /></div>
-            <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="bijv. Scoutslokalen" /></div>
-          </div>
-          <div style={{ marginBottom: 14 }}><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Korte uitleg..." /></div>
-
-          {/* Audience-tags (voor wie?) */}
-          <div style={{ marginBottom: 14 }}>
-            <label style={labelStyle}>Voor wie? (tags)</label>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {selectableTags.map(tag => {
-                const on = form.audience.includes(tag)
-                return (
-                  <button key={tag} type="button" onClick={() => toggleAudience(tag)}
-                    style={{ padding: '5px 14px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.78rem', fontWeight: 700,
-                      background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
-                    {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
-                  </button>
-                )
-              })}
-            </div>
-            {form.audience.includes('ouders') && (
-              <span style={{ display: 'block', marginTop: 6, fontSize: '.74rem', color: '#9A6B12', fontWeight: 600 }}>
-                ⚠️ Met de tag &ldquo;Ouders&rdquo; wordt dit zichtbaar op de publieke website.
-              </span>
+      {twoColumn ? (
+        // Two-column: calendar grid left, activity list right
+        <div className="portal-agenda-layout">
+          {/* Left: calendar grid */}
+          <div>
+            <CalendarGrid />
+            {selectedDate && (
+              <div style={{ marginTop: 10, padding: '6px 12px', background: '#EEF5F1', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <span style={{ fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A' }}>
+                  {(() => { const d = new Date(selectedDate); return `${d.getDate()} ${MAANDEN[d.getMonth() + 1]} ${d.getFullYear()}` })()}
+                </span>
+                <button onClick={() => setSelectedDate(null)} style={{ background: 'none', border: 'none', color: '#6A8A75', cursor: 'pointer', fontSize: '.75rem', fontWeight: 600 }}>× Alle tonen</button>
+              </div>
             )}
           </div>
 
-          {/* Evenement (enkel groepsleiding) */}
-          {canPublish && (
-            <div style={{ marginBottom: 14, padding: 14, background: '#fff', border: '1.5px solid #E2C58D', borderRadius: 10 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#1A3D2A', fontSize: '.88rem' }}>
-                <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} />
-                ⭐ Uitlichten als evenement (groot ding, met coverfoto &amp; uitnodiging)
-              </label>
-              {form.is_evenement && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
-                  <div>
-                    <label style={labelStyle}>Coverfoto</label>
-                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleCoverChange} style={{ fontSize: '.8rem' }} />
-                    {form.cover_image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={form.cover_image} alt="cover" style={{ width: '100%', height: 80, objectFit: 'cover', borderRadius: 8, marginTop: 6 }} />}
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Uitnodiging (PDF)</label>
-                    <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocChange} style={{ fontSize: '.8rem' }} />
-                    {form.document_url && <span style={{ display: 'block', marginTop: 6, fontSize: '.76rem', color: '#3F7D5A', fontWeight: 600 }}>✓ Uitnodiging geüpload</span>}
-                  </div>
-                </div>
+          {/* Right: activity list */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, gap: 8 }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#1A3D2A', margin: 0 }}>
+                {selectedDate ? 'Activiteiten op deze dag' : 'Alle activiteiten'}
+                {rightEntries.length > 0 && <span style={{ marginLeft: 6, fontSize: '.8rem', fontWeight: 600, color: '#6A8A75' }}>({rightEntries.length})</span>}
+              </h3>
+              {!readOnly && !showForm && (
+                <button onClick={() => { setForm(emptyForm(highlightTak)); setEditId(null); setShowForm(true) }}
+                  style={{ padding: '7px 14px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 9, fontFamily: 'inherit', fontWeight: 700, fontSize: '.82rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  + Toevoegen
+                </button>
               )}
             </div>
-          )}
-
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button type="submit" disabled={loading} style={{ padding: '8px 16px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 700, cursor: 'pointer' }}>
-              {loading ? 'Bezig…' : editId ? 'Opslaan' : 'Toevoegen'}
-            </button>
-            <button type="button" onClick={resetForm} style={{ padding: '8px 16px', background: 'none', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, color: '#6A8A75', cursor: 'pointer' }}>
-              Annuleren
-            </button>
+            {!readOnly && showForm && <AddEditForm />}
+            <ActivityList listEntries={rightEntries} />
           </div>
-        </form>
+        </div>
+      ) : (
+        // Single-column layout (dashboard widget etc.)
+        <div>
+          {!readOnly && !showForm && (
+            <button onClick={() => { setForm(emptyForm(highlightTak)); setEditId(null); setShowForm(true) }}
+              style={{ marginBottom: 16, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
+              + Activiteit toevoegen
+            </button>
+          )}
+          {!readOnly && showForm && <AddEditForm />}
+          <ActivityList listEntries={entries} />
+        </div>
       )}
-
-      {/* Lijst */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {entries.length === 0 && <p style={{ color: '#6A8A75', fontSize: '.88rem' }}>Geen activiteiten gevonden.</p>}
-        {entries.map(ev => {
-          const dateObj = new Date(ev.date)
-          const dateStr = `${dateObj.getDate()} ${MAANDEN[dateObj.getMonth() + 1]} ${dateObj.getFullYear()}`
-          const isKamp = ev.source === 'kamp'
-          const highlighted = highlightTak ? ev.audience.includes(highlightTak as AudienceTag) : false
-          return (
-            <div key={`${ev.source}-${ev.id}`} style={{
-              background: '#fff', borderRadius: 12, padding: 16,
-              border: highlighted ? '2px solid #C9963A' : '1.5px solid #C2D9C9',
-              boxShadow: highlighted ? '0 2px 10px rgba(201,150,58,.18)' : 'none',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
-                    {ev.is_evenement && <span title="Evenement" style={{ color: '#C9963A' }}>⭐</span>}
-                    {isKamp && <span style={{ padding: '1px 8px', borderRadius: 20, fontSize: '.68rem', fontWeight: 800, background: '#1A3D2A18', color: '#1A3D2A' }}>🏕️ KAMP</span>}
-                    <TagChips tags={ev.audience} />
-                  </div>
-                  <strong style={{ fontSize: '1.05rem', color: '#1A3D2A', display: 'block' }}>{ev.title}</strong>
-                  <span style={{ fontSize: '.82rem', color: '#6A8A75', fontWeight: 600 }}>
-                    📅 {dateStr}{ev.datum_tot && ev.datum_tot !== ev.date ? ` – ${new Date(ev.datum_tot).getDate()} ${MAANDEN[new Date(ev.datum_tot).getMonth() + 1]}` : ''}
-                    {ev.time && ` · 🕒 ${ev.time}`}{ev.location && ` · 📍 ${ev.location}`}
-                  </span>
-                  {ev.description && <p style={{ fontSize: '.86rem', color: '#3A5A42', margin: '8px 0 0', lineHeight: 1.4 }}>{ev.description}</p>}
-                </div>
-                {!readOnly && (
-                  <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                    {isKamp ? (
-                      <span style={{ fontSize: '.72rem', color: '#9AB0A2', alignSelf: 'center' }}>via Kampen-beheer</span>
-                    ) : (
-                      <>
-                        <button onClick={() => startEdit(ev)} style={{ padding: '6px 12px', border: '1.5px solid #C9963A', borderRadius: 8, background: 'none', color: '#C9963A', fontSize: '.75rem', fontWeight: 700, cursor: 'pointer' }}>Bewerken</button>
-                        <button onClick={() => handleDelete(ev.id, ev.title)} style={{ padding: '6px 12px', border: '1.5px solid #B23A4D', borderRadius: 8, background: 'none', color: '#B23A4D', fontSize: '.75rem', cursor: 'pointer' }}>✕</button>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        })}
-      </div>
     </div>
   )
 }

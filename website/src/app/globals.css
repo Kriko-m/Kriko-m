@@ -4200,6 +4200,21 @@ body.portal-theme .portaal-nav {
     }
 }
 
+/* Responsive Grid Layout for portal agenda view */
+.portal-agenda-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+@media (max-width: 992px) {
+    .portal-agenda-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+
 /* Portal Dashboard menu cards grid: forces 3 next to each other on desktop */
 .portal-dashboard-grid {
     display: grid;
