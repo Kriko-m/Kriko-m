@@ -531,8 +531,8 @@ export default function LeidingPanel({
 
   const kleur = TAK_KLEUREN[activeTak] ?? '#888'
   const bannerImg = bgStyle === 'custom' ? customBg :
-                    bgStyle === 'regular' ? (activeTak === 'groep' ? '/images/hero-bg.webp' : `/images/banner_${activeTak}.webp`) :
-                    bgStyle === 'reversed' ? (activeTak === 'groep' ? '/images/hero-bg.webp' : `/images/banner_${activeTak}_reversed.webp`) :
+                    bgStyle === 'regular' ? (activeTak === 'groep' ? '/images/leiding_25-26.jpg' : `/images/banner_${activeTak}.webp`) :
+                    bgStyle === 'reversed' ? (activeTak === 'groep' ? '/images/leiding_25-26.jpg' : `/images/banner_${activeTak}_reversed.webp`) :
                     null
 
   // Filter calendar events for upcoming widget
@@ -551,7 +551,10 @@ export default function LeidingPanel({
   const labelStyle = { display: 'block', fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 5 }
 
   return (
-    <div className="portaal-dashboard-bg-wrapper">
+    <div
+      className={`portaal-dashboard-bg-wrapper${bgStyle === 'white' ? ' portal-bg-white' : ''}`}
+      style={bannerImg ? { '--portal-bg': `url('${bannerImg}')` } as React.CSSProperties : undefined}
+    >
       <style>{`
         .action-card-hover {
           transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
@@ -569,19 +572,6 @@ export default function LeidingPanel({
           background-color: #fff !important;
         }
       `}</style>
-
-      {/* Background Banner Image */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      {bannerImg ? (
-        <img
-          src={bannerImg}
-          className="portaal-dashboard-bg-img"
-          alt=""
-          aria-hidden="true"
-        />
-      ) : (
-        <div style={{ position: 'absolute', inset: 0, background: '#fff', zIndex: 0 }} />
-      )}
 
       {/* Main card */}
       <div className="portaal-dashboard-card">
@@ -1173,7 +1163,7 @@ export default function LeidingPanel({
 
             </div>
           </div>
-
+
       </div>
 
       {/* Settings Button */}
