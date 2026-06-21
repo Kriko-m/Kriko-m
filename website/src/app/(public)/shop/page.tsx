@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { getShopProducts } from '@/lib/db'
-import { createServerSupabaseClient } from '@/lib/supabase'
 import ShopProductCard from '@/components/shop/ShopProductCard'
 import CartDrawer from '@/components/shop/CartDrawer'
 import { Product } from '@/lib/types'
@@ -15,10 +14,6 @@ const CATEGORIES: Record<string, string> = {
 
 export default async function ShopPage() {
   const products = (await getShopProducts()) as Product[]
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const ingelogd = !!user
-
   const grouped = Object.entries(CATEGORIES)
     .map(([key, label]) => ({
       key,

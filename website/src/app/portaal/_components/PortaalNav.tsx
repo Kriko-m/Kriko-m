@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase-browser'
 import { useEffect, useState } from 'react'
 
@@ -13,7 +13,6 @@ interface Props {
 }
 
 export default function PortaalNav({ naam, isAdmin }: Props) {
-  const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
 
@@ -92,14 +91,6 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
     }
   }
 
-  const links = [
-    { href: '/portaal/dashboard', label: '🏠 Dashboard' },
-    { href: '/portaal/leiding', label: '🛡️ Leiding' },
-    { href: '/portaal/verslagen', label: '📋 Verslagen' },
-    { href: '/portaal/archief', label: '📚 Archief' },
-    ...(isAdmin ? [{ href: '/portaal/admin', label: '⚙️ Beheer' }] : []),
-  ]
-
   return (
     <>
       <header className="portaal-nav">
@@ -109,17 +100,11 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
             <span style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '1.1rem', color: '#fff', letterSpacing: '.04em' }}>Portaal</span>
           </Link>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-            {/* Back to site */}
-            <a
-              href="/"
-              style={{ fontSize: '.82rem', fontWeight: 600, color: 'rgba(255,255,255,0.75)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 5, padding: '6px 10px', borderRadius: 8, transition: 'color .15s, background .15s' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#fff'; (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.1)' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'rgba(255,255,255,0.75)'; (e.currentTarget as HTMLAnchorElement).style.background = 'transparent' }}
-            >
-              <i className="fa-solid fa-arrow-left" style={{ fontSize: '.75rem' }}></i>
-              Terug naar site
-            </a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            {/* Back to homepage */}
+            <Link href="/" className="portaal-logout-icon-btn" title="Terug naar site" aria-label="Terug naar site">
+              <i className="fa-solid fa-house"></i>
+            </Link>
             {/* Profile Dropdown Container */}
             <div className="portaal-profile-container">
               <button
@@ -142,7 +127,7 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
                   </div>
                   <div className="portaal-dropdown-menu">
                     <Link href="/portaal/dashboard" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
-                      <span>🏠 Mijn Dashboard</span>
+                      <span>🏠 Startpagina</span>
                     </Link>
                     <button
                       onClick={() => {
@@ -163,15 +148,6 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
               )}
             </div>
 
-            {/* Quick Logout Button */}
-            <button
-              onClick={handleLogout}
-              className="portaal-logout-icon-btn"
-              title="Uitloggen"
-              aria-label="Uitloggen"
-            >
-              <i className="fa-solid fa-right-from-bracket"></i>
-            </button>
           </div>
         </div>
       </header>

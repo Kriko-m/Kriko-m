@@ -30,8 +30,8 @@ export async function DELETE(
 
     revalidateTag('echos', 'max')
     return NextResponse.json({ ok: true })
-  } catch (err: any) {
+  } catch (err) {
     console.error('Delete Echo error:', err)
-    return NextResponse.json({ error: err.message || 'Serverfout bij verwijderen' }, { status: 500 })
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Serverfout bij verwijderen' }, { status: 500 })
   }
 }

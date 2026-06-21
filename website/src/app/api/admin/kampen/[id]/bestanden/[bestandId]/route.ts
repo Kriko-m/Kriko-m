@@ -29,8 +29,8 @@ export async function DELETE(
     if (error) throw error
 
     return NextResponse.json({ ok: true })
-  } catch (err: any) {
+  } catch (err) {
     console.error('Delete camp file error:', err)
-    return NextResponse.json({ error: err.message || 'Serverfout bij verwijderen' }, { status: 500 })
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Serverfout bij verwijderen' }, { status: 500 })
   }
 }

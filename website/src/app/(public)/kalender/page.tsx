@@ -1,7 +1,6 @@
 import { getCalendarEvents } from '@/lib/db'
 import type { Metadata } from 'next'
 import CalendarGrid from '@/components/CalendarGrid'
-import Link from 'next/link'
 import { CalendarEvent } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Kalender | Scouts Kriko-M' }
