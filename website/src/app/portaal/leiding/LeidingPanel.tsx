@@ -114,6 +114,9 @@ export default function LeidingPanel({
   const canPublish = role === 'admin' || role === 'groepsleiding'
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const echoFileInputRef = useRef<HTMLInputElement>(null)
+  const [echoDroppedFile, setEchoDroppedFile] = useState<File | null>(null)
+  const [echoDragOver, setEchoDragOver] = useState(false)
   const [showMonthDropdown, setShowMonthDropdown] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   
@@ -491,7 +494,7 @@ export default function LeidingPanel({
     e.preventDefault()
     setLoading(true)
     const fd = new FormData(e.currentTarget)
-    const file = fd.get('echoFile') as File
+    const file = echoDroppedFile ?? (fd.get('echoFile') as File)
     const month = fd.get('echoMonth') as string
     const year = fd.get('echoYear') as string
 
@@ -513,6 +516,7 @@ export default function LeidingPanel({
       const newEcho = await res.json()
       setEchos(prev => [newEcho, ...prev])
       e.currentTarget.reset()
+      setEchoDroppedFile(null)
       showFlash('Kriko Echo geüpload!')
     } else {
       showFlash('Fout bij het uploaden van Echo.')
@@ -857,10 +861,54 @@ export default function LeidingPanel({
                         </div>
                       </div>
                       <div style={{ marginBottom: 14 }}>
-                        <label style={labelStyle}>Selecteer PDF bestand</label>
-                        <input type="file" name="echoFile" accept=".pdf" required style={{ fontSize: '.82rem' }} />
+                        <label style={labelStyle}>PDF bestand</label>
+                        <div
+                          onDragOver={e => { e.preventDefault(); setEchoDragOver(true) }}
+                          onDragLeave={() => setEchoDragOver(false)}
+                          onDrop={e => {
+                            e.preventDefault()
+                            setEchoDragOver(false)
+                            const f = e.dataTransfer.files[0]
+                            if (f && f.type === 'application/pdf') setEchoDroppedFile(f)
+                            else showFlash('Enkel PDF bestanden zijn toegestaan.')
+                          }}
+                          onClick={() => echoFileInputRef.current?.click()}
+                          style={{
+                            border: `2px dashed ${echoDragOver ? '#1A3D2A' : '#C2D9C9'}`,
+                            borderRadius: 10,
+                            background: echoDragOver ? '#EEF5F1' : '#FAFCFA',
+                            padding: '20px 16px',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            transition: 'background 0.15s, border-color 0.15s',
+                          }}
+                        >
+                          <input
+                            ref={echoFileInputRef}
+                            type="file"
+                            name="echoFile"
+                            accept=".pdf"
+                            style={{ display: 'none' }}
+                            onChange={e => {
+                              const f = e.target.files?.[0]
+                              if (f) setEchoDroppedFile(f)
+                            }}
+                          />
+                          {echoDroppedFile ? (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                              <i className="fa-solid fa-file-pdf" style={{ color: '#B23A4D', fontSize: '1.2rem' }}></i>
+                              <span style={{ fontSize: '.85rem', fontWeight: 700, color: '#1A3D2A' }}>{echoDroppedFile.name}</span>
+                              <button type="button" onClick={e => { e.stopPropagation(); setEchoDroppedFile(null) }} style={{ background: 'none', border: 'none', color: '#B23A4D', cursor: 'pointer', fontSize: '.8rem', padding: 2 }}>✕</button>
+                            </div>
+                          ) : (
+                            <>
+                              <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: '1.5rem', color: '#6A8A75', marginBottom: 6, display: 'block' }}></i>
+                              <span style={{ fontSize: '.82rem', color: '#6A8A75' }}>Sleep een PDF hierheen of <strong style={{ color: '#1A3D2A' }}>klik om te bladeren</strong></span>
+                            </>
+                          )}
+                        </div>
                       </div>
-                      <button type="submit" disabled={loading} style={{ padding: '8px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>
+                      <button type="submit" disabled={loading || !echoDroppedFile} style={{ padding: '8px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: echoDroppedFile ? 'pointer' : 'not-allowed', opacity: echoDroppedFile ? 1 : 0.5 }}>
                         {loading ? 'Bezig…' : 'Kriko Echo Uploaden'}
                       </button>
                     </form>
