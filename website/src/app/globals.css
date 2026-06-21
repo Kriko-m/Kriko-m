@@ -4513,9 +4513,10 @@ body.portal-theme .portaal-nav {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 11px 18px 11px 24px;
+    padding: 10px 14px;
     background: none;
     border: none;
+    border-radius: 10px;
     cursor: pointer;
     color: rgba(255, 255, 255, 0.75);
     font-size: 0.88rem;
