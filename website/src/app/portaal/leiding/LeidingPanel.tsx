@@ -263,6 +263,16 @@ export default function LeidingPanel({
   const takEchos = echos.filter(e => e.tak === activeTak)
   const filteredTodos = todos.filter(t => t.month === selectedMonth)
 
+  // KE warning: past the 20th and next month's echo not yet uploaded for this tak
+  const echoWarnActive = (() => {
+    if (activeTak === 'groep') return false
+    const now = new Date()
+    if (now.getDate() < 20) return false
+    const nextM = now.getMonth() === 11 ? 1 : now.getMonth() + 2
+    const nextY = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear()
+    return !takEchos.some(e => e.month === nextM && e.year === nextY)
+  })()
+
   // Load packing list template
   function applyCampTemplate(isEdit: boolean) {
     const template = PAKLIJST_TEMPLATES[activeTak] || ''
@@ -622,13 +632,14 @@ export default function LeidingPanel({
                     <div
                       onClick={() => setInlineView(inlineView === 'echos' ? null : 'echos')}
                       style={{
+                        position: 'relative',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: 12,
                         padding: '32px 20px',
-                        border: `2px solid ${inlineView === 'echos' ? '#1A3D2A' : '#C2D9C9'}`,
+                        border: `2px solid ${inlineView === 'echos' ? '#1A3D2A' : echoWarnActive ? '#C9963A' : '#C2D9C9'}`,
                         borderRadius: 16,
                         background: inlineView === 'echos' ? '#EEF5F1' : '#fff',
                         cursor: 'pointer',
@@ -636,8 +647,23 @@ export default function LeidingPanel({
                       }}
                       className="action-card-hover"
                     >
-                      <i className="fa-solid fa-newspaper" style={{ fontSize: '2.2rem', color: '#1A3D2A' }}></i>
-                      <strong style={{ fontSize: '.92rem', color: '#1A3D2A' }}>kriko-echo uploaden</strong>
+                      {echoWarnActive && (
+                        <span style={{
+                          position: 'absolute',
+                          top: 10,
+                          right: 12,
+                          background: '#C9963A',
+                          color: '#fff',
+                          borderRadius: 20,
+                          fontSize: '.68rem',
+                          fontWeight: 800,
+                          padding: '2px 8px',
+                          letterSpacing: '0.03em',
+                          lineHeight: 1.4,
+                        }}>! nog niet geüpload</span>
+                      )}
+                      <i className="fa-solid fa-newspaper" style={{ fontSize: '2.2rem', color: echoWarnActive ? '#C9963A' : '#1A3D2A' }}></i>
+                      <strong style={{ fontSize: '.92rem', color: echoWarnActive ? '#C9963A' : '#1A3D2A' }}>kriko-echo uploaden</strong>
                     </div>
                   )}
 
