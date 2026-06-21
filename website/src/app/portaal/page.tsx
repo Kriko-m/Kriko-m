@@ -58,7 +58,7 @@ function PortaalContent() {
         <div style={{ padding: '36px 40px 38px' }}>
           <div style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontSize: '1.25rem', fontWeight: 900, color: '#1A3D2A', marginBottom: 6 }}>Inloggen — Leiding</div>
           <div style={{ fontSize: '.88rem', color: '#6A8A75', marginBottom: 24, lineHeight: 1.55 }}>
-            Dit portaal is enkel voor leiding. Ouders hoeven niet in te loggen: kampinschrijvingen verlopen via de privélink in de e-mail, en de webshop werkt zonder account.
+            Deze login is enkel voor leiding. Ouders hoeven niet in te loggen: kampinschrijvingen verlopen via de privélink in de e-mail, en de webshop werkt zonder account.
           </div>
 
           {error && <div style={{ padding: '10px 14px', borderRadius: 10, fontSize: '.85rem', fontWeight: 600, textAlign: 'center', marginBottom: 18, background: 'hsla(349,51%,47%,.1)', border: '1.5px solid #B23A4D', color: '#B23A4D' }}>{error}</div>}

@@ -45,8 +45,7 @@ export default function Footer({
             <li><Link href="/verhuur">Verhuur lokaal</Link></li>
             <li><Link href="/shop">Webshop</Link></li>
             <li><Link href="/inschrijven">Inschrijven</Link></li>
-            <li><Link href="/archief">Archief</Link></li>
-            <li><Link href="/portaal">Leidingsportaal</Link></li>
+            <li><Link href="/portaal">Leiding login</Link></li>
           </ul>
         </div>
 

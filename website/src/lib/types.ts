@@ -188,3 +188,13 @@ export interface Verslag {
   published: boolean
   created_at?: string
 }
+
+export interface TodoItem {
+  id: string
+  title: string
+  month: number
+  completed: boolean
+  tak: 'groep' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
+  werkjaar: string
+  created_at?: string
+}

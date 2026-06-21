@@ -5,8 +5,8 @@ import { Verslag } from '@/lib/types'
 const TAK_KLEUREN: Record<string, string> = {
   kapoenen: '#F4C842',
   welpen: '#5D9E6C',
-  jonggivers: '#4A7BBF',
-  givers: '#C9963A',
+  jonggivers: '#E07B1A',
+  givers: '#1A3FB5',
   alle: '#1A3D2A',
 }
 

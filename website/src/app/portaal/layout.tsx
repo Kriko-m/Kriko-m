@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { createServerSupabaseClient } from '@/lib/supabase'
 import PortaalLayoutClient from './PortaalLayoutClient'
 
-export const metadata: Metadata = { title: 'Portaal – Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Leiding login – Scouts Kriko-M' }
 
 export default async function PortaalLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createServerSupabaseClient()

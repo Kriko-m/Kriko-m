@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
-import { CalendarEvent, Kamp } from '@/lib/types'
+import { CalendarEvent } from '@/lib/types'
 import { AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
 
 const QUICK_LINKS = [
@@ -11,7 +12,7 @@ const QUICK_LINKS = [
 ]
 
 const TAK_KLEUREN: Record<string, string> = {
-  groep: '#1A3D2A', kapoenen: '#F4C842', welpen: '#5D9E6C', jonggivers: '#4A7BBF', givers: '#C9963A',
+  groep: '#1A3D2A', kapoenen: '#F4C842', welpen: '#5D9E6C', jonggivers: '#E07B1A', givers: '#1A3FB5',
 }
 
 function formatDate(dateStr: string) {
@@ -20,12 +21,6 @@ function formatDate(dateStr: string) {
     day: d.toLocaleDateString('nl-BE', { day: '2-digit' }),
     month: d.toLocaleDateString('nl-BE', { month: 'short' }),
   }
-}
-
-function formatDateRange(van: string, tot: string) {
-  const from = new Date(van).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })
-  const to = new Date(tot).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })
-  return `${from} – ${to}`
 }
 
 export default async function DashboardPage() {
@@ -43,13 +38,11 @@ export default async function DashboardPage() {
 
   const today = new Date().toISOString().split('T')[0]
   const admin = createAdminClient()
-  const [calendarRes, kampenRes] = await Promise.all([
+  const [calendarRes] = await Promise.all([
     admin.from('calendar').select('*').gte('date', today).order('date', { ascending: true }).limit(6),
-    admin.from('kampen').select('id, naam, datum_van, datum_tot, tak, locatie').gte('datum_van', today).order('datum_van', { ascending: true }).limit(4),
   ])
 
   const calendarEvents = (calendarRes.data ?? []) as CalendarEvent[]
-  const kampen = (kampenRes.data ?? []) as Kamp[]
 
   return (
     <div className="portaal-dashboard-bg-wrapper">
@@ -108,28 +101,26 @@ export default async function DashboardPage() {
                 )
               })
             )}
+            <div style={{ marginTop: 16, borderTop: '1px solid #ece9e3', paddingTop: 12, display: 'flex', justifyContent: 'flex-end' }}>
+              <Link
+                href="/portaal/leiding/agenda"
+                style={{
+                  fontSize: '.82rem',
+                  fontWeight: 700,
+                  color: '#C9963A',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4
+                }}
+              >
+                Volledige agenda <i className="fa-solid fa-arrow-right-long" style={{ fontSize: '.75rem' }}></i>
+              </Link>
+            </div>
           </div>
 
           {/* Right column */}
           <div className="portaal-dash-right-col">
-
-            {/* Upcoming camps */}
-            <div className="portaal-events-widget">
-              <h3>Kampen &amp; Weekenden</h3>
-              {kampen.length === 0 ? (
-                <p style={{ color: '#6A8A75', fontSize: '.85rem', margin: 0 }}>Geen aankomende kampen.</p>
-              ) : (
-                kampen.map(k => (
-                  <div key={k.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: '1px solid #ece9e3', fontSize: '.86rem' }}>
-                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: TAK_KLEUREN[k.tak] || '#1A3D2A', flexShrink: 0 }}></span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, color: '#1A3D2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{k.naam}</div>
-                      <div style={{ fontSize: '.76rem', color: '#6A8A75' }}>{formatDateRange(k.datum_van, k.datum_tot)}</div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
 
             {/* Groepsleiding message */}
             <div className="portaal-msg-widget">

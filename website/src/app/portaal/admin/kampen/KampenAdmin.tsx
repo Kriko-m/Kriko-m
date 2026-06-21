@@ -5,7 +5,7 @@ import { CopyLinkButton, RsvpPanel } from '../../_components/CampRsvpPanel'
 
 const TAKKEN = ['kapoenen', 'welpen', 'jonggivers', 'givers', 'alle']
 const TAK_KLEUREN: Record<string, string> = {
-  kapoenen: '#F4C842', welpen: '#5D9E6C', jonggivers: '#4A7BBF', givers: '#C9963A', alle: '#1A3D2A',
+  kapoenen: '#F4C842', welpen: '#5D9E6C', jonggivers: '#E07B1A', givers: '#1A3FB5', alle: '#1A3D2A',
 }
 
 interface KampFormState {

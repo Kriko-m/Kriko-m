@@ -172,6 +172,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(data)
     }
 
+    if (uploadType === 'portal-background') {
+      if (!IMAGE_MIME.has(file.type)) {
+        return NextResponse.json({ error: 'Achtergrond moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
+      }
+      
+      const tak = formData.get('tak') as string | null
+      if (!tak) return NextResponse.json({ error: 'tak is verplicht' }, { status: 400 })
+
+      const filename = `portal-bg-${tak}-${Date.now()}.${ext}`
+
+      const { error: storageError } = await admin.storage
+        .from('kamp-fotos')
+        .upload(filename, buffer, { contentType: file.type, upsert: true })
+
+      if (storageError) throw storageError
+
+      const { data: pub } = admin.storage.from('kamp-fotos').getPublicUrl(filename)
+      return NextResponse.json({ url: pub.publicUrl })
+    }
+
     return NextResponse.json({ error: 'Ongeldig uploadtype' }, { status: 400 })
   } catch (err) {
     console.error('Upload API error:', err)
