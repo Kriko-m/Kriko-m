@@ -6,10 +6,13 @@ import { IcsEvent, icsHeader, buildEventVevent, buildKampVevent, toUtcIcsString 
 
 // Private leiding-feed: ALLE events + ALLE kampen. Beveiligd met een geheim
 // token in de URL (agenda-apps pollen anoniem, dus geen login-cookie mogelijk).
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  props: { params: Promise<{ token: string }> }
+) {
   try {
+    const { token } = await props.params
     const { searchParams } = new URL(request.url)
-    const token = searchParams.get('token') ?? ''
     const download = searchParams.get('download') === '1' || searchParams.get('download') === 'true'
 
     const validToken = await getLeidingIcsToken()
@@ -24,7 +27,7 @@ export async function GET(request: NextRequest) {
     const nowStr = toUtcIcsString(new Date())
 
     for (const event of events) {
-      // Prefix met de audience-tags zodat leiding in their agenda meteen ziet
+      // Prefix met de audience-tags zodat leiding in hun agenda meteen ziet
       // voor wie het bedoeld is.
       const tags = (event.audience ?? []).map(a => AUDIENCE_NAMEN[a] ?? a)
       const prefix = tags.length ? `[${tags.join(', ')}] ` : ''

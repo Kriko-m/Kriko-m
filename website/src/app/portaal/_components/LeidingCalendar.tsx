@@ -172,7 +172,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
           ))}
         </div>
         <SubscribeCalendarButton
-          feedPath={`/api/leiding/ics?token=${icsToken}`}
+          feedPath={`/api/leiding/ics/${icsToken}`}
           calendarName="Scouts Kriko-M — Leiding"
           buttonText="Abonneer (in agenda)"
           buttonClassName=""
