@@ -38,10 +38,10 @@ email burdens by turning them into structured, self-service flows.
   the year into a leiding-only archive (draft → publish, never an accidental
   click).
 
-> NOTE: The current codebase still contains the older account-based portal and a
-> half-built S&G integration. `IMPLEMENTATION.md` (repo root) is the authoritative
-> plan for migrating to the target state above — it lists what to **build**, what
-> to **delete**, and the order to do it in. Consult it before extending the portal.
+> NOTE: `IMPLEMENTATION.md` (repo root) is the authoritative plan for the target
+> state — consult it before extending the portal. The older account-based portal
+> tables (`ouder_profiles`, `parent_children`, `kampinschrijvingen`) have been
+> dropped; `orders.parent_id` is gone. Do not re-introduce parent accounts.
 
 ---
 
@@ -52,7 +52,7 @@ Always run commands inside the `./website/` directory unless working on Supabase
 * **Start Dev Server:** `cmd /c "npm run dev"`
 * **Build App:** `cmd /c "npm run build"`
 * **Supabase Local Dev:** `npx supabase start` (requires Docker)
-* **Supabase Push Migrations:** `npx supabase db push`
+* **Supabase Migrations:** Paste `supabase/*.sql` files into **Supabase → SQL Editor → New query** and run them manually. `npx supabase db push` does NOT apply these files.
 
 ---
 
@@ -113,6 +113,13 @@ Always use these colors and fonts to keep the UI consistent and professional.
    * The navigation links in `PortaalNav` scroll horizontally on mobile screens using `flex-nowrap` and `overflow-x-auto`. Keep it this way; do not wrap them or hide them behind hamburgers.
 7. **Responsive Layouts:**
    * Use `.portal-grid-layout` (which drops from 2-column `1fr 3fr` to 1-column layout on media query max-width 768px) instead of inline styles for main portal layouts like `LeidingPanel.tsx`.
+8. **Calendar system — audience tags:**
+   * One `calendar` table; visibility is derived from the `audience TEXT[]` column. An event is **public** (oudercalender) iff it carries the `'ouders'` tag. All events are visible to logged-in leiding.
+   * Valid audience tags: `leiding | kapoenen | welpen | jonggivers | givers | ouders` — enforced by a DB CHECK constraint and the `AudienceTag` TypeScript type.
+   * Publishing to `ouders` or creating `is_evenement = true` requires `requireGroepsleiding()` — guarded in both the API (`/api/admin/calendar`) and the `LeidingCalendar` UI.
+   * The private leiding ICS feed (`/api/leiding/ics?token=<token>`) is token-gated via `settings.leiding_ics_token`; calendar apps subscribe anonymously so no login cookie is available — do not change this to cookie auth.
+   * Kampen/weekenden appear in the leiding calendar as auto-derived read-only entries (source `'kamp'`) merged in `website/src/lib/calendar.ts`. Edit them via the kampen admin, not the calendar form.
+   * Shared ICS helpers live in `website/src/lib/ics.ts` — both the public feed and the leiding feed import from there.
 
 ---
 
