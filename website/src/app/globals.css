@@ -4775,3 +4775,84 @@ body.portal-theme .portaal-nav {
     }
 }
 
+/* ==========================================================================
+   Z. Calendar Subscription Modal & buttons
+   ========================================================================== */
+.cal-sub-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 480px) {
+    .cal-sub-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cal-sub-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.cal-sub-divider {
+    border-top: 1px solid var(--color-accent-light, #E2C58D);
+    padding-top: 20px;
+    margin-top: 10px;
+}
+
+.cal-sub-copy-title {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cal-sub-copy-box {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+@media (max-width: 400px) {
+    .cal-sub-copy-box {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.cal-sub-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid #C2D9C9;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-family: monospace;
+    background-color: #F9F8F6;
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.cal-sub-input:focus {
+    border-color: var(--color-accent);
+}
+
+.cal-sub-info-text {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin: 8px 0 0;
+}
+
+

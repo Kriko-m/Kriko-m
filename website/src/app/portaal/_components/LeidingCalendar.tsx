@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { CalendarEvent, CalendarEntry, Kamp, AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
 import { mergeCampsIntoCalendar } from '@/lib/calendar'
+import SubscribeCalendarButton from '@/components/SubscribeCalendarButton'
 
 const MAANDEN = ['', 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
 
@@ -170,9 +171,13 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
             </button>
           ))}
         </div>
-        <a href={`/api/leiding/ics?token=${icsToken}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#fff', border: '1.5px solid #1A3D2A', borderRadius: 8, color: '#1A3D2A', fontSize: '.8rem', fontWeight: 700, textDecoration: 'none' }}>
-          📅 Abonneer (in agenda)
-        </a>
+        <SubscribeCalendarButton
+          feedPath={`/api/leiding/ics?token=${icsToken}`}
+          calendarName="Scouts Kriko-M — Leiding"
+          buttonText="Abonneer (in agenda)"
+          buttonClassName=""
+          buttonStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#fff', border: '1.5px solid #1A3D2A', borderRadius: 8, color: '#1A3D2A', fontSize: '.8rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+        />
       </div>
 
       {!readOnly && !showForm && (

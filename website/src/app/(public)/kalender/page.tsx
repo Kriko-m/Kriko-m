@@ -2,6 +2,7 @@ import { getPublicCalendarEvents } from '@/lib/db'
 import type { Metadata } from 'next'
 import CalendarGrid from '@/components/CalendarGrid'
 import UpcomingEvent from '@/components/EventDetailModal'
+import SubscribeCalendarButton from '@/components/SubscribeCalendarButton'
 import { CalendarEvent } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Kalender | Scouts Kriko-M' }
@@ -32,10 +33,8 @@ export default async function KalenderPage() {
               <CalendarGrid events={gridEvents} />
               <div className="cal-actions">
                 <div className="cal-actions-group">
-                  <a href="/api/kalender/ics" className="btn btn-secondary cal-actions-btn">
-                    <i className="fa-regular fa-calendar-plus"></i> Abonneer op onze agenda
-                  </a>
-                  <a href="/api/kalender/ics" download className="btn btn-outline cal-actions-btn">
+                  <SubscribeCalendarButton />
+                  <a href="/api/kalender/ics?download=true" className="btn btn-outline cal-actions-btn">
                     <i className="fa-solid fa-download"></i> Download (.ics)
                   </a>
                 </div>

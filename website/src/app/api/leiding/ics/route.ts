@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token') ?? ''
+    const download = searchParams.get('download') === '1' || searchParams.get('download') === 'true'
 
     const validToken = await getLeidingIcsToken()
     if (!validToken || token !== validToken) {
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     const nowStr = toUtcIcsString(new Date())
 
     for (const event of events) {
-      // Prefix met de audience-tags zodat leiding in hun agenda meteen ziet
+      // Prefix met de audience-tags zodat leiding in their agenda meteen ziet
       // voor wie het bedoeld is.
       const tags = (event.audience ?? []).map(a => AUDIENCE_NAMEN[a] ?? a)
       const prefix = tags.length ? `[${tags.join(', ')}] ` : ''
@@ -38,13 +39,18 @@ export async function GET(request: NextRequest) {
 
     const icsContent = lines.join('\r\n') + '\r\n'
 
-    return new Response(icsContent, {
-      headers: {
-        'Content-Type': 'text/calendar; charset=utf-8',
-        'Content-Disposition': 'attachment; filename="kriko-m-leiding-kalender.ics"',
-        'Cache-Control': 'no-cache, must-revalidate',
-      },
-    })
+    const headers: Record<string, string> = {
+      'Content-Type': 'text/calendar; charset=utf-8',
+      'Cache-Control': 'no-cache, must-revalidate',
+    }
+
+    if (download) {
+      headers['Content-Disposition'] = 'attachment; filename="kriko-m-leiding-kalender.ics"'
+    } else {
+      headers['Content-Disposition'] = 'inline'
+    }
+
+    return new Response(icsContent, { headers })
   } catch (error) {
     console.error('Leiding ICS export error:', error)
     return new Response('Server Error', { status: 500 })
