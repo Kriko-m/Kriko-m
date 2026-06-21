@@ -17,9 +17,6 @@ export default async function InschrijvenPage() {
         <div className="container">
           <span className="hero-eyebrow">Word lid</span>
           <h1 className="tak-hero-title">Inschrijven &amp; Lidgeld</h1>
-          <p style={{ color: 'rgba(255,255,255,.85)', marginTop: 8, fontSize: '1.1rem' }}>
-            Sluit je aan bij de tofste scoutsgroep van Sint-Niklaas voor het scoutsjaar {year}!
-          </p>
         </div>
       </section>
 

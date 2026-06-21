@@ -17,9 +17,6 @@ export default function TakkenOverzicht() {
         <div className="container">
           <span className="hero-eyebrow">Scouts Kriko-M</span>
           <h1 className="tak-hero-title">Onze Takken</h1>
-          <p style={{ color: 'rgba(255,255,255,.85)', marginTop: 8, fontSize: '1.1rem' }}>
-            Klik op een tak voor alle info, de leiding en de laatste Kriko Echo.
-          </p>
         </div>
       </section>
 

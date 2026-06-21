@@ -27,9 +27,6 @@ export default async function KalenderPage() {
         <div className="container">
           <span className="hero-eyebrow">Activiteiten &amp; evenementen</span>
           <h1 className="tak-hero-title">Kalender</h1>
-          <p style={{ color: 'rgba(255,255,255,.85)', marginTop: 8, fontSize: '1.1rem' }}>
-            Alle groepsactiviteiten van Scouts Kriko-M — in één klik in jouw agenda.
-          </p>
         </div>
       </section>
 

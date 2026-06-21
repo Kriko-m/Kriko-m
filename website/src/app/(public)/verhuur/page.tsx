@@ -22,7 +22,7 @@ export default async function VerhuurPage() {
         />
         <div className="container verhuur-hero-inner" style={{ position: 'relative', zIndex: 2 }}>
           <h1 className="verhuur-hero-title">Ons lokaal</h1>
-          <a href={KAMPAS_URL} target="_blank" rel="noopener" className="btn btn-primary verhuur-hero-btn">
+          <a href={KAMPAS_URL} target="_blank" rel="noopener" className="btn btn-secondary verhuur-hero-btn">
             <i className="fas fa-calendar-check" style={{ marginRight: 8 }}></i>Reserveer via KAMPAS
           </a>
         </div>
