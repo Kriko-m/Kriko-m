@@ -23,7 +23,7 @@ function formatDate(dateStr: string) {
   }
 }
 
-export default async function DashboardPage() {
+export default async function HomePage() {
   const supabase = await createServerSupabaseClient()
   const { data: { session } } = await supabase.auth.getSession()
   if (!session?.user) redirect('/portaal')
@@ -45,9 +45,7 @@ export default async function DashboardPage() {
   const calendarEvents = (calendarRes.data ?? []) as CalendarEvent[]
 
   return (
-    <div className="portaal-dashboard-bg-wrapper">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/leiding_25-26.jpg" className="portaal-dashboard-bg-img" alt="" aria-hidden="true" />
+    <div className="portaal-dashboard-bg-wrapper" style={{ '--portal-bg': "url('/images/leiding_25-26.jpg')" } as React.CSSProperties}>
 
       <div className="portaal-dashboard-card">
 

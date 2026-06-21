@@ -21,7 +21,7 @@ export default function PortaalPage() {
 function PortaalContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/portaal/dashboard'
+  const redirectTo = searchParams.get('redirect') || '/portaal/home'
 
   const [status, setStatus] = useState<'idle' | 'loading'>('idle')
   const [error, setError] = useState('')

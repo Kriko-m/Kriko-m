@@ -25,8 +25,8 @@ export default function PortaalSidebar({ isAdmin: _isAdmin }: Props) {
     <aside className="portaal-sidebar-nav">
       {/* Home */}
       <Link
-        href="/portaal/dashboard"
-        className={`portaal-sidebar-link${pathname === '/portaal/dashboard' ? ' active' : ''}`}
+        href="/portaal/home"
+        className={`portaal-sidebar-link${pathname === '/portaal/home' ? ' active' : ''}`}
       >
         <i className="fa-solid fa-house" style={{ width: 18, textAlign: 'center', fontSize: '0.9rem' }}></i>
         <span>Home</span>
@@ -53,7 +53,6 @@ export default function PortaalSidebar({ isAdmin: _isAdmin }: Props) {
             style={{ textDecoration: 'none' }}
           >
             <span>{tak.label}</span>
-            <i className={`fa-solid fa-chevron-${isTakActive ? 'down' : 'right'}`}></i>
           </Link>
         )
       })}

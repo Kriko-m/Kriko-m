@@ -40,7 +40,7 @@ export const AUDIENCE_NAMEN: Record<string, string> = {
   welpen: 'Welpen',
   jonggivers: 'Jonggivers',
   givers: 'Givers',
-  ouders: 'Ouders',
+  ouders: 'Groep',
 }
 
 // Kleuren per audience-tag (hergebruikt TAK_KLEUREN + leiding/ouders).

@@ -29,14 +29,7 @@ export default async function FullAgendaPage() {
   const canPublish = role === 'admin' || role === 'groepsleiding'
 
   return (
-    <div className="portaal-dashboard-bg-wrapper">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/images/hero-bg.webp"
-        className="portaal-dashboard-bg-img"
-        alt=""
-        aria-hidden="true"
-      />
+    <div className="portaal-dashboard-bg-wrapper" style={{ '--portal-bg': "url('/images/hero-bg.webp')" } as React.CSSProperties}>
 
       <div className="portaal-dashboard-card">
         <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#1A3D2A', fontFamily: 'var(--font-heading, Nunito, sans-serif)', marginBottom: 20 }}>
@@ -47,6 +40,7 @@ export default async function FullAgendaPage() {
           kampen={kampen}
           canPublish={canPublish}
           icsToken={icsToken}
+          twoColumn={true}
         />
       </div>
     </div>

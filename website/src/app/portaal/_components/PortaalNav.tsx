@@ -95,7 +95,7 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
     <>
       <header className="portaal-nav">
         <div className="portaal-nav-container">
-          <Link href="/portaal/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
+          <Link href="/portaal/home" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
             <Image src="/images/logo-finaal.png" alt="Kriko-M" width={36} height={36} style={{ objectFit: 'contain' }} />
             <span style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '1.1rem', color: '#fff', letterSpacing: '.04em' }}>Portaal</span>
           </Link>
@@ -126,7 +126,7 @@ export default function PortaalNav({ naam, isAdmin }: Props) {
                     {userEmail && <span className="user-email">{userEmail}</span>}
                   </div>
                   <div className="portaal-dropdown-menu">
-                    <Link href="/portaal/dashboard" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
+                    <Link href="/portaal/home" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
                       <span>🏠 Startpagina</span>
                     </Link>
                     <button

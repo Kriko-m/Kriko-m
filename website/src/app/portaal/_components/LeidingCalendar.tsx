@@ -1,5 +1,6 @@
 'use client'
 import { useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { CalendarEvent, CalendarEntry, Kamp, AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
 import { mergeCampsIntoCalendar } from '@/lib/calendar'
@@ -20,15 +21,20 @@ interface Props {
 }
 
 type FormState = {
-  title: string; date: string; time: string; location: string; description: string
+  title: string; date: string; timeStart: string; timeEnd: string; location: string; description: string
   audience: AudienceTag[]; is_evenement: boolean; cover_image: string; document_url: string
 }
 
 const emptyForm = (prefill?: string): FormState => ({
-  title: '', date: '', time: '', location: '', description: '',
+  title: '', date: '', timeStart: '', timeEnd: '', location: '', description: '',
   audience: prefill && AUDIENCE_TAGS.includes(prefill as AudienceTag) ? [prefill as AudienceTag] : [],
   is_evenement: false, cover_image: '', document_url: '',
 })
+
+function parseTime(time: string): { timeStart: string; timeEnd: string } {
+  const parts = time.split(/\s*[-–]\s*/)
+  return { timeStart: parts[0]?.trim() ?? '', timeEnd: parts[1]?.trim() ?? '' }
+}
 
 // Monday-first: returns 0=Mon … 6=Sun
 function dayOfWeekMon(d: Date): number {
@@ -37,8 +43,12 @@ function dayOfWeekMon(d: Date): number {
 
 export default function LeidingCalendar({ initialCalendar, kampen, highlightTak, canPublish, icsToken, readOnly, twoColumn = false }: Props) {
   const today = new Date()
+  const searchParams = useSearchParams()
   const [events, setEvents] = useState<CalendarEvent[]>(initialCalendar)
-  const [filter, setFilter] = useState<Set<string>>(new Set())
+  const [filter, setFilter] = useState<Set<string>>(() => {
+    const tag = searchParams.get('filter')
+    return tag && AUDIENCE_TAGS.includes(tag as AudienceTag) ? new Set([tag]) : new Set()
+  })
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState<FormState>(emptyForm(highlightTak))
   const [editId, setEditId] = useState<string | null>(null)
@@ -86,15 +96,19 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     return map
   }, [entries])
 
-  // Right column: filter by selected date if one is picked
+  const todayDate = new Date().toISOString().slice(0, 10)
+
+  // Right column: only upcoming when no day selected; all entries for a selected day
   const rightEntries = useMemo(() => {
-    if (!selectedDate) return entries
-    return entries.filter(e => {
-      if (e.date === selectedDate) return true
-      if (e.datum_tot && e.datum_tot >= selectedDate && e.date <= selectedDate) return true
-      return false
-    })
-  }, [entries, selectedDate])
+    if (selectedDate) {
+      return entries.filter(e => {
+        if (e.date === selectedDate) return true
+        if (e.datum_tot && e.datum_tot >= selectedDate && e.date <= selectedDate) return true
+        return false
+      })
+    }
+    return entries.filter(e => (e.datum_tot ?? e.date) >= todayDate)
+  }, [entries, selectedDate, todayDate])
 
   // Calendar grid computation
   const calGrid = useMemo(() => {
@@ -178,7 +192,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
   function startEdit(ev: CalendarEntry) {
     setEditId(ev.id)
     setForm({
-      title: ev.title, date: ev.date, time: ev.time, location: ev.location, description: ev.description,
+      title: ev.title, date: ev.date, ...parseTime(ev.time), location: ev.location, description: ev.description,
       audience: ev.audience, is_evenement: ev.is_evenement, cover_image: ev.cover_image, document_url: ev.document_url,
     })
     setShowForm(true)
@@ -192,7 +206,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     e.preventDefault()
     setLoading(true)
     const payload = {
-      title: form.title, date: form.date, time: form.time, location: form.location, description: form.description,
+      title: form.title, date: form.date, time: [form.timeStart, form.timeEnd].filter(Boolean).join(' - '), location: form.location, description: form.description,
       audience: form.audience, is_evenement: form.is_evenement,
       cover_image: form.cover_image, document_url: form.document_url,
     }
@@ -375,6 +389,8 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                   <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
                     {isKamp ? (
                       <span style={{ fontSize: '.7rem', color: '#9AB0A2', alignSelf: 'center' }}>via Kampen</span>
+                    ) : !canPublish && ev.audience.includes('ouders') ? (
+                      <span style={{ fontSize: '.7rem', color: '#9AB0A2', alignSelf: 'center' }}>via Groepsleiding</span>
                     ) : (
                       <>
                         <button onClick={() => startEdit(ev)} style={{ padding: '5px 10px', border: '1.5px solid #C9963A', borderRadius: 7, background: 'none', color: '#C9963A', fontSize: '.72rem', fontWeight: 700, cursor: 'pointer' }}>Bewerken</button>
@@ -399,7 +415,14 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
           <div><label style={labelStyle}>Titel</label><input style={inputStyle} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required placeholder="bijv. Groeps-BBQ" /></div>
           <div><label style={labelStyle}>Datum</label><input type="date" style={inputStyle} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} required /></div>
-          <div><label style={labelStyle}>Tijdstip</label><input style={inputStyle} value={form.time} onChange={e => setForm(p => ({ ...p, time: e.target.value }))} placeholder="bijv. 14:00 - 17:00" /></div>
+          <div>
+            <label style={labelStyle}>Tijdstip</label>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <input type="time" style={{ ...inputStyle, flex: 1 }} value={form.timeStart} onChange={e => setForm(p => ({ ...p, timeStart: e.target.value }))} />
+              <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
+              <input type="time" style={{ ...inputStyle, flex: 1 }} value={form.timeEnd} onChange={e => setForm(p => ({ ...p, timeEnd: e.target.value }))} />
+            </div>
+          </div>
           <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="bijv. Scoutslokalen" /></div>
         </div>
         <div style={{ marginBottom: 12 }}><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={2} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Korte uitleg..." /></div>
@@ -473,7 +496,15 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: '.75rem', fontWeight: 700, color: '#6A8A75', marginRight: 2 }}>Filter:</span>
-          {AUDIENCE_TAGS.map(tag => (
+          {(['ouders', 'leiding'] as const).map(tag => (
+            <button key={tag} type="button" onClick={() => toggleFilter(tag)}
+              style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.75rem', fontWeight: 700,
+                background: filter.has(tag) ? AUDIENCE_KLEUREN[tag] : 'transparent', color: filter.has(tag) ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
+              {AUDIENCE_NAMEN[tag]}
+            </button>
+          ))}
+          <span style={{ width: 1, height: 18, background: '#C2D9C9', alignSelf: 'center', margin: '0 2px', flexShrink: 0 }} />
+          {(['kapoenen', 'welpen', 'jonggivers', 'givers'] as const).map(tag => (
             <button key={tag} type="button" onClick={() => toggleFilter(tag)}
               style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.75rem', fontWeight: 700,
                 background: filter.has(tag) ? AUDIENCE_KLEUREN[tag] : 'transparent', color: filter.has(tag) ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
@@ -525,7 +556,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                 </button>
               )}
             </div>
-            {!readOnly && showForm && <AddEditForm />}
+            {!readOnly && showForm && AddEditForm()}
             <ActivityList listEntries={rightEntries} />
           </div>
         </div>
@@ -538,7 +569,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
               + Activiteit toevoegen
             </button>
           )}
-          {!readOnly && showForm && <AddEditForm />}
+          {!readOnly && showForm && AddEditForm()}
           <ActivityList listEntries={entries} />
         </div>
       )}

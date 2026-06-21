@@ -38,7 +38,7 @@ export async function proxy(request: NextRequest) {
   // Ingelogd → login pagina overslaan
   if (pathname === '/portaal' && user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/portaal/dashboard'
+    url.pathname = '/portaal/home'
     return NextResponse.redirect(url)
   }
 
