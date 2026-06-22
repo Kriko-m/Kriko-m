@@ -4974,7 +4974,7 @@ body.portal-theme .portaal-nav {
 /* ── Hero ── */
 .kamp-hero {
     position: relative;
-    height: 320px;
+    height: 380px;
     background: linear-gradient(
         155deg,
         color-mix(in srgb, var(--tak-kleur, var(--color-primary)) 38%, #3a0710) 0%,
@@ -5001,9 +5001,9 @@ body.portal-theme .portaal-nav {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 960px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 28px max(24px, 4vw);
+    padding: 32px max(32px, 4vw);
 }
 
 .kamp-tak-badge {
@@ -5058,17 +5058,27 @@ body.portal-theme .portaal-nav {
 /* ── Body: two-column layout ── */
 .kamp-body {
     display: grid;
-    grid-template-columns: 1fr 360px;
-    gap: 28px;
-    max-width: 960px;
+    grid-template-columns: 420px 1fr;
+    grid-template-areas: "rsvp info";
+    gap: 40px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 32px max(24px, 4vw);
+    padding: 40px max(32px, 4vw);
     align-items: start;
+}
+
+/* RSVP on the left — primary action */
+.kamp-sidebar {
+    grid-area: rsvp;
+}
+
+.kamp-main {
+    grid-area: info;
 }
 
 .kamp-sidebar-sticky {
     position: sticky;
-    top: calc(56px + 20px);
+    top: calc(56px + 24px);
 }
 
 /* ── Content cards ── */
@@ -5076,8 +5086,8 @@ body.portal-theme .portaal-nav {
     background: var(--color-bg-white);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-md);
-    padding: 22px 24px;
-    margin-bottom: 20px;
+    padding: 28px 30px;
+    margin-bottom: 24px;
 }
 
 .kamp-card:last-child {
@@ -5241,14 +5251,9 @@ body.portal-theme .portaal-nav {
 
     .kamp-body {
         grid-template-columns: 1fr;
+        grid-template-areas: "rsvp" "info";
         padding: 20px 16px;
-        gap: 0;
-    }
-
-    /* RSVP form first on mobile */
-    .kamp-sidebar {
-        order: -1;
-        margin-bottom: 20px;
+        gap: 20px;
     }
 
     .kamp-sidebar-sticky {
