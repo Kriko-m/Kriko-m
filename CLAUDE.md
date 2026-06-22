@@ -123,6 +123,7 @@ Always use these colors and fonts to keep the UI consistent and professional.
 
 ---
 
-## Git Workflow & Automated Push
+## Git Workflow
 
-* **Automated Git Push:** After completing and verifying a major change, bug fix, or feature update, the AI assistant should automatically stage, commit, and push the changes to GitHub without waiting for an explicit push request from the user. Use semantic commit messages (e.g. `feat:`, `fix:`, `docs:`, `style:`).
+* **Automated Commit:** After completing and verifying a major change, bug fix, or feature update, the AI assistant should automatically stage and commit the changes locally. Use semantic commit messages (e.g. `feat:`, `fix:`, `docs:`, `style:`).
+* **No auto-push:** Never push to GitHub unless the user explicitly asks. Always wait for an explicit push request.

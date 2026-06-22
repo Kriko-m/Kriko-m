@@ -1,9 +1,10 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Kamp, Echo, KampBestand, CalendarEvent, TodoItem } from '@/lib/types'
-import { CopyLinkButton, RsvpPanel } from '../_components/CampRsvpPanel'
+import { Kamp, Echo, CalendarEvent, TodoItem } from '@/lib/types'
+import { CopyLinkButton } from '../_components/CampRsvpPanel'
 import { mergeCampsIntoCalendar } from '@/lib/calendar'
+import { parsePackingList, PAKLIJST_TEMPLATES } from '@/lib/kamp'
 
 const TAKKEN = ['groep', 'kapoenen', 'welpen', 'jonggivers', 'givers']
 const TAK_KLEUREN: Record<string, string> = {
@@ -25,48 +26,6 @@ const MONTH_OPTIONS = [
   { value: 7, label: 'Juli' },
   { value: 8, label: 'Augustus' },
 ]
-
-const PAKLIJST_TEMPLATES: Record<string, string> = {
-  kapoenen: `Slapen: Slaapzak, Laken, Matrashoes, Pyjama, Knuffel (onmisbaar!)
-Kleding: Speelkleren (vuil worden mag), Dikke trui, Regenjas, Ondergoed, Kousen, Stevige stapschoenen, Reserve schoenen
-Toilet: Handdoek, Washandje, Tandenborstel, Tandpasta, Zeep, Kam/Borstel
-Diversen: Drinkbus (vooraf gevuld), Kleine rugzak (voor dagtocht), Groepsdas`,
-  welpen: `Slapen: Slaapzak, Luchtbed of veldbed, Pyjama, Knuffel
-Kleding: Scoutshemd & das, T-shirts (voldoende), Korte & lange broeken, Warme truien, Regenjas, Ondergoed, Kousen, Stevige wandelschoenen, Speelschoenen
-Toilet: Handdoeken, Washandjes, Tandenborstel, Tandpasta, Biologisch afbreekbare zeep & shampoo
-Diversen: Drinkbus, Zaklamp, Kleine rugzak, Gamelle (eetgerei in stoffen zak)`,
-  jonggivers: `Slapen: Slaapzak (warm), Matje of luchtbed, Pyjama
-Kleding: Scoutshemd & das, T-shirts, Korte & lange broeken, Warme trui, Regenjas & regenbroek, Ondergoed, Kousen (voldoende), Stevige wandelschoenen (ingelopen)
-Toilet: Handdoek, Tandenborstel, Tandpasta, Biologisch afbreekbare zeep
-Diversen: Drinkbus (min. 1L), Zaklamp/Hoofdlamp, Kleine rugzak (20-30L), Gamelle (eetgerei in stoffen zak), Zakmes`,
-  givers: `Slapen: Slaapzak (warm), Matje of luchtbed, Pyjama
-Kleding: Scoutshemd & das, T-shirts, Korte & lange broeken, Warme trui, Regenjas & regenbroek, Ondergoed, Kousen (voldoende), Stevige wandelschoenen (ingelopen)
-Toilet: Handdoek, Tandenborstel, Tandpasta, Biologisch afbreekbare zeep
-Diversen: Drinkbus (min. 1L), Zaklamp/Hoofdlamp, Kleine rugzak (20-30L), Gamelle (eetgerei in stoffen zak), Zakmes`,
-  groep: `Slapen: Slaapzak, Luchtbed, Pyjama
-Kleding: Scoutshemd & das, T-shirts, Broek, Regenjas, Warme trui, Sokken, Ondergoed, Wandelschoenen
-Toilet: Handdoek, Washandje, Tandenborstel, Tandpasta, Zeep
-Diversen: Drinkbus, Zaklamp, Bord/Beker/Bestek`
-}
-
-function parsePackingList(text: string): { categorie: string; items: string[] }[] {
-  if (!text) return []
-  return text.split('\n')
-    .map(line => {
-      const parts = line.split(':')
-      if (parts.length < 2) return null
-      const category = parts[0].trim()
-      const items = parts[1].split(',').map(i => i.trim()).filter(Boolean)
-      if (!category || items.length === 0) return null
-      return { categorie: category, items }
-    })
-    .filter(Boolean) as { categorie: string; items: string[] }[]
-}
-
-function formatPackingList(list: { categorie: string; items: string[] }[]): string {
-  if (!Array.isArray(list)) return ''
-  return list.map(item => `${item.categorie}: ${item.items.join(', ')}`).join('\n')
-}
 
 interface LeidingPanelProps {
   initialKampen: Kamp[]
@@ -235,11 +194,9 @@ export default function LeidingPanel({
     }
   }
 
-  // Camp Form States
+  // Camp Form States (aanmaken; bewerken gebeurt op de kampbeheerpagina)
   const [showNewCampForm, setShowNewCampForm] = useState(false)
   const [newCamp, setNewCamp] = useState({ naam: '', datum_van: '', datum_tot: '', locatie: '', beschrijving: '', prijs: '', briefadres: '', contact_info: '', paklijstText: '' })
-  const [editCampId, setEditCampId] = useState<string | null>(null)
-  const [editCampData, setEditCampData] = useState({ naam: '', datum_van: '', datum_tot: '', locatie: '', beschrijving: '', prijs: '', briefadres: '', contact_info: '', paklijstText: '' })
 
   // Upload status states
   const [loading, setLoading] = useState(false)
@@ -266,13 +223,8 @@ export default function LeidingPanel({
   })()
 
   // Load packing list template
-  function applyCampTemplate(isEdit: boolean) {
-    const template = PAKLIJST_TEMPLATES[activeTak] || ''
-    if (isEdit) {
-      setEditCampData(p => ({ ...p, paklijstText: template }))
-    } else {
-      setNewCamp(p => ({ ...p, paklijstText: template }))
-    }
+  function applyCampTemplate() {
+    setNewCamp(p => ({ ...p, paklijstText: PAKLIJST_TEMPLATES[activeTak] || '' }))
   }
 
   // Todo Mutators
@@ -359,42 +311,6 @@ export default function LeidingPanel({
     setLoading(false)
   }
 
-  async function handleUpdateCamp(e: React.FormEvent, kampId: string, originalCamp: Kamp) {
-    e.preventDefault()
-    setLoading(true)
-
-    const parsedPaklijst = editCampData.paklijstText !== undefined 
-      ? parsePackingList(editCampData.paklijstText) 
-      : originalCamp.paklijst
-
-    const updatePayload = {
-      naam: editCampData.naam || originalCamp.naam,
-      datum_van: editCampData.datum_van || originalCamp.datum_van,
-      datum_tot: editCampData.datum_tot || originalCamp.datum_tot,
-      locatie: editCampData.locatie || originalCamp.locatie,
-      beschrijving: editCampData.beschrijving || originalCamp.beschrijving,
-      briefadres: editCampData.briefadres !== undefined ? editCampData.briefadres : originalCamp.briefadres,
-      contact_info: editCampData.contact_info !== undefined ? editCampData.contact_info : originalCamp.contact_info,
-      prijs: editCampData.prijs !== undefined ? Number(editCampData.prijs) : originalCamp.prijs,
-      paklijst: parsedPaklijst
-    }
-
-    const res = await fetch(`/api/admin/kampen/${kampId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatePayload),
-    })
-    if (res.ok) {
-      const updated = await res.json()
-      setKampen(prev => prev.map(k => k.id === kampId ? updated : k))
-      setEditCampId(null)
-      showFlash('Kamp succesvol bijgewerkt!')
-    } else {
-      showFlash('Fout bij het opslaan van wijzigingen.')
-    }
-    setLoading(false)
-  }
-
   async function handleTogglePubliek(id: string, current: boolean) {
     const res = await fetch(`/api/admin/kampen/${id}`, {
       method: 'PATCH',
@@ -413,81 +329,6 @@ export default function LeidingPanel({
     if (res.ok) {
       setKampen(prev => prev.filter(k => k.id !== id))
       showFlash('Kamp succesvol verwijderd.')
-    }
-  }
-
-  // Upload handlers
-  async function handleUploadPhoto(e: React.ChangeEvent<HTMLInputElement>, kampId: string) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setLoading(true)
-    const fd = new FormData()
-    fd.append('file', file)
-    fd.append('type', 'kamp-foto')
-    fd.append('kampId', kampId)
-
-    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-    if (res.ok) {
-      const updatedCamp = await res.json()
-      setKampen(prev => prev.map(k => k.id === kampId ? updatedCamp : k))
-      showFlash('Coverfoto geüpload!')
-    } else {
-      showFlash('Fout bij het uploaden van foto.')
-    }
-    setLoading(false)
-  }
-
-  async function handleUploadBestand(e: React.FormEvent<HTMLFormElement>, kampId: string) {
-    e.preventDefault()
-    setLoading(true)
-    const fd = new FormData(e.currentTarget)
-    const file = fd.get('bestand') as File
-    const bType = fd.get('bestandType') as string
-    const bNaam = fd.get('bestandNaam') as string
-
-    if (!file || !file.size) {
-      showFlash('Selecteer eerst een bestand.')
-      setLoading(false)
-      return
-    }
-
-    const uploadFd = new FormData()
-    uploadFd.append('file', file)
-    uploadFd.append('type', 'kamp-bestand')
-    uploadFd.append('kampId', kampId)
-    uploadFd.append('bestandType', bType)
-    uploadFd.append('bestandNaam', bNaam)
-
-    const res = await fetch('/api/admin/upload', { method: 'POST', body: uploadFd })
-    if (res.ok) {
-      const newBestand = await res.json()
-      setKampen(prev => prev.map(k => {
-        if (k.id !== kampId) return k
-        return {
-          ...k,
-          kamp_bestanden: [...(k.kamp_bestanden || []), newBestand]
-        }
-      }))
-      e.currentTarget.reset()
-      showFlash('Bestand geüpload!')
-    } else {
-      showFlash('Fout bij het uploaden van bestand.')
-    }
-    setLoading(false)
-  }
-
-  async function handleDeleteBestand(kampId: string, bestandId: string) {
-    if (!confirm('Dit bestand verwijderen?')) return
-    const res = await fetch(`/api/admin/kampen/${kampId}/bestanden/${bestandId}`, { method: 'DELETE' })
-    if (res.ok) {
-      setKampen(prev => prev.map(k => {
-        if (k.id !== kampId) return k
-        return {
-          ...k,
-          kamp_bestanden: (k.kamp_bestanden || []).filter(b => b.id !== bestandId)
-        }
-      }))
-      showFlash('Bestand verwijderd.')
     }
   }
 
@@ -709,7 +550,7 @@ export default function LeidingPanel({
                         <div style={{ marginBottom: 14 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
                             <label style={{ ...labelStyle, marginBottom: 0 }}>Interactieve Inpaklijst</label>
-                            <button type="button" onClick={() => applyCampTemplate(false)} style={{ border: '1px solid #C9963A', color: '#C9963A', background: 'none', borderRadius: 6, padding: '3px 8px', fontSize: '.75rem', cursor: 'pointer', fontWeight: 700 }}>
+                            <button type="button" onClick={applyCampTemplate} style={{ border: '1px solid #C9963A', color: '#C9963A', background: 'none', borderRadius: 6, padding: '3px 8px', fontSize: '.75rem', cursor: 'pointer', fontWeight: 700 }}>
                               Standaard sjabloon laden
                             </button>
                           </div>
@@ -731,11 +572,9 @@ export default function LeidingPanel({
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                       {takKampen.length === 0 && <p style={{ color: '#6A8A75', fontSize: '.88rem' }}>Er zijn nog geen kampen voor deze tak aangemaakt.</p>}
                       {takKampen.map(kamp => {
-                        const isEditing = editCampId === kamp.id
                         const van = new Date(kamp.datum_van)
                         const tot = new Date(kamp.datum_tot)
                         const periode = `${van.getDate()}/${van.getMonth() + 1} – ${tot.getDate()}/${tot.getMonth() + 1}/${tot.getFullYear()}`
-                        const bestanden = kamp.kamp_bestanden ?? []
 
                         return (
                           <div key={kamp.id} style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 14, overflow: 'hidden' }}>
@@ -773,82 +612,10 @@ export default function LeidingPanel({
                                 </div>
                               </div>
 
-                              <details style={{ marginTop: 10, borderTop: '1px solid #EEF5F1', paddingTop: 8 }} open={isEditing}>
-                                <summary onClick={(e) => { e.preventDefault(); setEditCampId(isEditing ? null : kamp.id); setEditCampData({ naam: kamp.naam, datum_van: kamp.datum_van, datum_tot: kamp.datum_tot, locatie: kamp.locatie, beschrijving: kamp.beschrijving, prijs: String(kamp.prijs), briefadres: kamp.briefadres, contact_info: kamp.contact_info, paklijstText: formatPackingList(kamp.paklijst) }) }} style={{ cursor: 'pointer', fontSize: '.82rem', color: '#1A3D2A', fontWeight: 700 }}>✏️ Gegevens bewerken</summary>
-                                {isEditing && (
-                                  <form onSubmit={e => handleUpdateCamp(e, kamp.id, kamp)} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 12 }}>
-                                    <div><label style={labelStyle}>Naam</label><input style={inputStyle} value={editCampData.naam} onChange={e => setEditCampData(p => ({ ...p, naam: e.target.value }))} /></div>
-                                    <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={editCampData.locatie} onChange={e => setEditCampData(p => ({ ...p, locatie: e.target.value }))} /></div>
-                                    <div><label style={labelStyle}>Startdatum</label><input type="date" style={inputStyle} value={editCampData.datum_van} onChange={e => setEditCampData(p => ({ ...p, datum_van: e.target.value }))} /></div>
-                                    <div><label style={labelStyle}>Einddatum</label><input type="date" style={inputStyle} value={editCampData.datum_tot} onChange={e => setEditCampData(p => ({ ...p, datum_tot: e.target.value }))} /></div>
-                                    <div><label style={labelStyle}>Prijs (€)</label><input type="number" step="0.01" style={inputStyle} value={editCampData.prijs} onChange={e => setEditCampData(p => ({ ...p, prijs: e.target.value }))} /></div>
-                                    <div><label style={labelStyle}>Contact info (Telefoon Leiding)</label><input style={inputStyle} value={editCampData.contact_info} onChange={e => setEditCampData(p => ({ ...p, contact_info: e.target.value }))} /></div>
-                                    <div style={{ gridColumn: '1 / -1' }}><label style={labelStyle}>Briefadres (voor post op kamp)</label><input style={inputStyle} value={editCampData.briefadres} onChange={e => setEditCampData(p => ({ ...p, briefadres: e.target.value }))} /></div>
-                                    <div style={{ gridColumn: '1 / -1' }}><label style={labelStyle}>Beschrijving</label><textarea style={inputStyle} rows={2} value={editCampData.beschrijving} onChange={e => setEditCampData(p => ({ ...p, beschrijving: e.target.value }))} /></div>
-
-                                    <div style={{ gridColumn: '1 / -1' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                                        <label style={{ ...labelStyle, marginBottom: 0 }}>Interactieve Inpaklijst</label>
-                                        <button type="button" onClick={() => applyCampTemplate(true)} style={{ border: '1px solid #C9963A', color: '#C9963A', background: 'none', borderRadius: 6, padding: '3px 8px', fontSize: '.75rem', cursor: 'pointer', fontWeight: 700 }}>
-                                          Standaard sjabloon laden
-                                        </button>
-                                      </div>
-                                      <textarea style={{ ...inputStyle, fontFamily: 'monospace', fontSize: '.8rem' }} rows={5} value={editCampData.paklijstText} onChange={e => setEditCampData(p => ({ ...p, paklijstText: e.target.value }))} />
-                                    </div>
-
-                                    <button type="submit" disabled={loading} style={{ padding: '8px 16px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>Opslaan</button>
-                                  </form>
-                                )}
-                              </details>
-
-                              <details style={{ marginTop: 6, borderTop: '1px solid #EEF5F1', paddingTop: 8 }}>
-                                <summary style={{ cursor: 'pointer', fontSize: '.82rem', color: '#1A3D2A', fontWeight: 700 }}>🖼️ Omslagfoto wijzigen</summary>
-                                <div style={{ marginTop: 10 }}>
-                                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={e => handleUploadPhoto(e, kamp.id)} style={{ fontSize: '.8rem' }} />
-                                </div>
-                              </details>
-
-                              <details style={{ marginTop: 6, borderTop: '1px solid #EEF5F1', paddingTop: 8 }}>
-                                <summary style={{ cursor: 'pointer', fontSize: '.82rem', color: '#1A3D2A', fontWeight: 700 }}>📎 Bestanden beheren ({bestanden.length})</summary>
-                                <div style={{ marginTop: 12 }}>
-                                  {bestanden.length > 0 && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
-                                      {bestanden.map((b: KampBestand) => (
-                                        <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F8FAF9', padding: '8px 12px', borderRadius: 8, border: '1px solid #C2D9C9' }}>
-                                          <span style={{ fontSize: '.82rem', fontWeight: 600 }}>{b.naam} ({b.type})</span>
-                                          <button onClick={() => handleDeleteBestand(kamp.id, b.id)} style={{ background: 'none', border: 'none', color: '#B23A4D', fontWeight: 'bold', cursor: 'pointer' }}>✕</button>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                  <form onSubmit={e => handleUploadBestand(e, kamp.id)} style={{ display: 'flex', gap: 8, flexDirection: 'column', background: '#EEF5F122', padding: 12, borderRadius: 10, border: '1px dashed #C2D9C9' }}>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                                      <div>
-                                        <label style={labelStyle}>Bestand label</label>
-                                        <input name="bestandNaam" required placeholder="bijv. Medische Fiche" style={inputStyle} />
-                                      </div>
-                                      <div>
-                                        <label style={labelStyle}>Type</label>
-                                        <select name="bestandType" required defaultValue="overige" style={inputStyle}>
-                                          <option value="paklijst_pdf">🎒 Paklijst</option>
-                                          <option value="uitnodiging">📬 Uitnodiging</option>
-                                          <option value="infobrief">📋 Infobrief</option>
-                                          <option value="overige">📎 Overige</option>
-                                        </select>
-                                      </div>
-                                    </div>
-                                    <input type="file" name="bestand" accept="application/pdf,image/jpeg,image/png,image/webp" required style={{ fontSize: '.8rem', margin: '4px 0' }} />
-                                    <button type="submit" disabled={loading} style={{ alignSelf: 'flex-start', padding: '6px 14px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 700, cursor: 'pointer', fontSize: '.8rem' }}>Uploaden</button>
-                                  </form>
-                                </div>
-                              </details>
-
-                              <details style={{ marginTop: 6, borderTop: '1px solid #EEF5F1', paddingTop: 8 }}>
-                                <summary style={{ cursor: 'pointer', fontSize: '.82rem', color: '#1A3D2A', fontWeight: 700 }}>📋 Antwoorden (wie komt mee?)</summary>
-                                <div style={{ marginTop: 10 }}>
-                                  <RsvpPanel kampId={kamp.id} />
-                                </div>
-                              </details>
+                              <Link href={`/portaal/leiding/kampen/${kamp.id}`}
+                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 12, padding: '8px 16px', background: '#1A3D2A', color: '#fff', borderRadius: 8, fontSize: '.82rem', fontWeight: 700, textDecoration: 'none' }}>
+                                ⚙️ Beheren — bewerken, bijlagen &amp; antwoorden →
+                              </Link>
                             </div>
                           </div>
                         )

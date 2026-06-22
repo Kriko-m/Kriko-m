@@ -150,9 +150,10 @@ export interface Kamp {
 export interface KampBestand {
   id: string
   kamp_id: string
-  type: 'paklijst_pdf' | 'uitnodiging' | 'infobrief' | 'overige'
+  type: 'paklijst_pdf' | 'uitnodiging' | 'infobrief' | 'presentatie' | 'overige'
   naam: string
-  file_name: string
+  file_name: string // leeg voor link-bijlagen (zie url)
+  url?: string // externe link (bv. Google Slides); leeg voor geüploade bestanden
   uploaded_at?: string
 }
 

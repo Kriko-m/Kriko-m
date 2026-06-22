@@ -12,6 +12,8 @@ const ALLOWED_MIME: Record<string, string> = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
   'image/webp': 'webp',
+  // Presentaties (enkel zinvol voor kamp-bijlagen, type 'presentatie').
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
 }
 // Omslagfoto's: enkel afbeeldingen.
 const IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp'])
@@ -41,6 +43,10 @@ export async function POST(req: NextRequest) {
     }
     if (uploadType === 'kamp-foto' && !IMAGE_MIME.has(file.type)) {
       return NextResponse.json({ error: 'Omslagfoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
+    }
+    // PPTX is enkel zinvol als kamp-bijlage (presentatie), nergens anders.
+    if (ext === 'pptx' && uploadType !== 'kamp-bestand') {
+      return NextResponse.json({ error: 'PowerPoint-bestanden kunnen enkel als kampbijlage worden geüpload.' }, { status: 400 })
     }
 
     const arrayBuffer = await file.arrayBuffer()
