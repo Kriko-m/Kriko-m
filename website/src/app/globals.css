@@ -4971,41 +4971,7 @@ body.portal-theme .portaal-nav {
     text-decoration: none;
 }
 
-/* ── Hero ── */
-.kamp-hero {
-    position: relative;
-    height: 380px;
-    background: linear-gradient(
-        155deg,
-        color-mix(in srgb, var(--tak-kleur, var(--color-primary)) 38%, #3a0710) 0%,
-        #3a0710 100%
-    );
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
-}
-
-.kamp-hero-overlay {
-    position: absolute;
-    inset: 0;
-    /* Stronger at bottom for text legibility over photo */
-    background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.08) 0%,
-        rgba(0,0,0,0.28) 40%,
-        rgba(0,0,0,0.72) 100%
-    );
-}
-
-.kamp-hero-content {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 32px max(32px, 4vw);
-}
-
+/* ── Tak badge (reused across hero card top) ── */
 .kamp-tak-badge {
     display: inline-block;
     padding: 4px 14px;
@@ -5013,97 +4979,119 @@ body.portal-theme .portaal-nav {
     font-size: .75rem;
     font-weight: 800;
     letter-spacing: .03em;
-    margin-bottom: 10px;
-}
-
-.kamp-hero-titel {
-    font-family: var(--font-londrina);
-    font-size: clamp(1.9rem, 5vw, 2.9rem);
-    color: #fff;
-    margin: 0 0 16px;
-    line-height: 1.05;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
-}
-
-.kamp-hero-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.kamp-meta-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    background: rgba(255,255,255,0.14);
-    border: 1px solid rgba(255,255,255,0.22);
-    border-radius: 20px;
-    color: #fff;
-    font-size: .85rem;
-    font-weight: 600;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
-
-.kamp-meta-link {
-    text-decoration: none;
-    transition: background var(--transition-fast);
-}
-
-.kamp-meta-link:hover {
-    background: rgba(255,255,255,0.26);
+    position: relative;
+    z-index: 1;
 }
 
 /* ── Body: two-column layout ── */
 .kamp-body {
     display: grid;
-    grid-template-columns: 420px 1fr;
-    grid-template-areas: "rsvp info";
-    gap: 40px;
-    max-width: 1200px;
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    max-width: 1220px;
     margin: 0 auto;
-    padding: 40px max(32px, 4vw);
+    padding: 32px max(24px, 3vw);
     align-items: start;
 }
 
-/* RSVP on the left — primary action */
-.kamp-sidebar {
-    grid-area: rsvp;
-}
-
-.kamp-main {
-    grid-area: info;
-}
-
-.kamp-sidebar-sticky {
-    position: sticky;
-    top: calc(56px + 24px);
-}
-
-/* ── Content cards ── */
-.kamp-card {
+/* ── Hero card (left column) ── */
+.kamp-hero-card {
     background: var(--color-bg-white);
     border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-md);
-    padding: 28px 30px;
-    margin-bottom: 24px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
 }
 
-.kamp-card:last-child {
-    margin-bottom: 0;
+.kamp-hero-card-top {
+    position: relative;
+    height: 260px;
+    background: linear-gradient(
+        155deg,
+        color-mix(in srgb, var(--tak-kleur, var(--color-primary)) 40%, #3a0710) 0%,
+        #3a0710 100%
+    );
+    display: flex;
+    align-items: flex-end;
+    padding: 20px 28px;
 }
 
-.kamp-section-title {
-    font-family: var(--font-heading);
-    font-size: .92rem;
-    font-weight: 800;
+.kamp-hero-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.05) 0%,
+        rgba(0,0,0,0.25) 45%,
+        rgba(0,0,0,0.65) 100%
+    );
+}
+
+.kamp-hero-card-body {
+    padding: 30px 32px 36px;
+}
+
+.kamp-hero-card-titel {
+    font-family: var(--font-londrina);
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
     color: var(--color-primary-dark);
-    margin: 0 0 14px;
-    padding-bottom: 10px;
+    margin: 10px 0 20px;
+    line-height: 1.0;
+}
+
+/* Info rows (date, location, price) */
+.kamp-hero-card-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 26px;
+    padding-bottom: 26px;
     border-bottom: 1.5px solid var(--color-border);
-    text-transform: uppercase;
-    letter-spacing: .04em;
+}
+
+.kamp-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+.kamp-meta-row-link {
+    text-decoration: none;
+    color: var(--color-primary);
+    transition: opacity var(--transition-fast);
+}
+
+.kamp-meta-row-link:hover {
+    opacity: .75;
+}
+
+.kamp-meta-row-icon {
+    font-size: 1.05rem;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.kamp-meta-row-arrow {
+    font-size: .8rem;
+    margin-left: 2px;
+    opacity: .6;
+}
+
+/* Sections inside the hero card body */
+.kamp-hero-card-section {
+    padding-top: 24px;
+    margin-top: 24px;
+    border-top: 1.5px solid var(--color-border);
+}
+
+.kamp-hero-card-section:first-of-type {
+    padding-top: 0;
+    margin-top: 0;
+    border-top: none;
 }
 
 .kamp-beschrijving {
@@ -5112,6 +5100,44 @@ body.portal-theme .portaal-nav {
     margin: 0;
     white-space: pre-wrap;
     font-size: .95rem;
+}
+
+/* ── Right sidebar ── */
+.kamp-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: calc(56px + 20px);
+    max-height: calc(100vh - 56px - 40px);
+    overflow-y: auto;
+    /* hide scrollbar */
+    scrollbar-width: none;
+}
+
+.kamp-sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* ── Right column cards ── */
+.kamp-card {
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 24px;
+    flex-shrink: 0;
+}
+
+.kamp-section-title {
+    font-family: var(--font-heading);
+    font-size: .88rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    margin: 0 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--color-border);
+    text-transform: uppercase;
+    letter-spacing: .04em;
 }
 
 /* ── Bijlagen ── */
@@ -5235,29 +5261,30 @@ body.portal-theme .portaal-nav {
 }
 
 /* ── Mobile ── */
-@media (max-width: 720px) {
-    .kamp-hero {
-        height: 250px;
-    }
-
-    .kamp-hero-titel {
-        font-size: 1.7rem;
-    }
-
-    .kamp-meta-pill {
-        font-size: .78rem;
-        padding: 5px 12px;
-    }
-
+@media (max-width: 760px) {
     .kamp-body {
         grid-template-columns: 1fr;
-        grid-template-areas: "rsvp" "info";
-        padding: 20px 16px;
-        gap: 20px;
+        padding: 16px;
+        gap: 16px;
     }
 
-    .kamp-sidebar-sticky {
+    /* Sidebar becomes normal flow, no sticky/scroll on mobile */
+    .kamp-sidebar {
         position: static;
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .kamp-hero-card-top {
+        height: 200px;
+    }
+
+    .kamp-hero-card-body {
+        padding: 22px 20px 28px;
+    }
+
+    .kamp-hero-card-titel {
+        font-size: 2rem;
     }
 
     .kamp-praktisch-grid {
