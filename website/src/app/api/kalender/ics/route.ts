@@ -27,10 +27,9 @@ export async function GET(request: NextRequest) {
       lines.push(...buildEventVevent(event, nowStr))
     }
 
-    // 2. Kampen/weekenden die openstaan voor inschrijving (ouder-relevant)
+    // 2. Kampen/weekenden (altijd zichtbaar via privélink)
     if (!singleId) {
-      const activeCamps = camps.filter(c => c.open_voor_inschrijving)
-      for (const camp of activeCamps) {
+      for (const camp of camps) {
         lines.push(...buildKampVevent(camp, nowStr))
       }
     }

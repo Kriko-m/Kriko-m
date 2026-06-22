@@ -2,9 +2,13 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Kamp, Echo, CalendarEvent, TodoItem } from '@/lib/types'
-import { CopyLinkButton } from '../_components/CampRsvpPanel'
+import KampBeheerModal from '../_components/KampBeheerModal'
+import KampAanmakenModal from '../_components/KampAanmakenModal'
+import KalenderActiviteitModal from '../_components/KalenderActiviteitModal'
+import { AudienceTag } from '@/lib/types'
+import { AUDIENCE_TAGS } from '@/lib/constants'
 import { mergeCampsIntoCalendar } from '@/lib/calendar'
-import { parsePackingList, PAKLIJST_TEMPLATES } from '@/lib/kamp'
+import ConfirmDialog from '../_components/ConfirmDialog'
 
 const TAKKEN = ['groep', 'kapoenen', 'welpen', 'jonggivers', 'givers']
 const TAK_KLEUREN: Record<string, string> = {
@@ -57,6 +61,10 @@ export default function LeidingPanel({
   const [kampen, setKampen] = useState<Kamp[]>(initialKampen)
   const [echos, setEchos] = useState<Echo[]>(initialEchos)
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
+  const [showKampModal, setShowKampModal] = useState(false)
+  const [editKampId, setEditKampId] = useState<string | null>(null)
+  const [showKampAanmaken, setShowKampAanmaken] = useState(false)
+  const [showKalenderModal, setShowKalenderModal] = useState(false)
 
   const [selectedMonth, setSelectedMonth] = useState(initialMonth ?? (new Date().getMonth() + 1))
   const [newTodoTitle, setNewTodoTitle] = useState('')
@@ -70,6 +78,7 @@ export default function LeidingPanel({
   const [echoDragOver, setEchoDragOver] = useState(false)
   const [showMonthDropdown, setShowMonthDropdown] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => void } | null>(null)
   
   const takBgConfig = portalBackgrounds[activeTak] || {}
   const [customBg, setCustomBg] = useState<string | null>(takBgConfig.custom_url || null)
@@ -194,10 +203,6 @@ export default function LeidingPanel({
     }
   }
 
-  // Camp Form States (aanmaken; bewerken gebeurt op de kampbeheerpagina)
-  const [showNewCampForm, setShowNewCampForm] = useState(false)
-  const [newCamp, setNewCamp] = useState({ naam: '', datum_van: '', datum_tot: '', locatie: '', beschrijving: '', prijs: '', briefadres: '', contact_info: '', paklijstText: '' })
-
   // Upload status states
   const [loading, setLoading] = useState(false)
   const [flash, setFlash] = useState('')
@@ -221,11 +226,6 @@ export default function LeidingPanel({
     const nextY = now.getMonth() === 11 ? now.getFullYear() + 1 : now.getFullYear()
     return !takEchos.some(e => e.month === nextM && e.year === nextY)
   })()
-
-  // Load packing list template
-  function applyCampTemplate() {
-    setNewCamp(p => ({ ...p, paklijstText: PAKLIJST_TEMPLATES[activeTak] || '' }))
-  }
 
   // Todo Mutators
   async function handleToggleTodo(id: string, currentCompleted: boolean) {
@@ -275,61 +275,18 @@ export default function LeidingPanel({
     }
   }
 
-  // Camp API Handlers
-  async function handleCreateCamp(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    
-    const parsedPaklijst = parsePackingList(newCamp.paklijstText)
-
-    const res = await fetch('/api/admin/kampen', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        naam: newCamp.naam,
-        datum_van: newCamp.datum_van,
-        datum_tot: newCamp.datum_tot,
-        locatie: newCamp.locatie,
-        beschrijving: newCamp.beschrijving,
-        briefadres: newCamp.briefadres,
-        contact_info: newCamp.contact_info,
-        paklijst: parsedPaklijst,
-        tak: activeTak === 'groep' ? 'alle' : activeTak,
-        prijs: newCamp.prijs ? Number(newCamp.prijs) : 0,
-        open_voor_inschrijving: false,
-      }),
+  function handleDeleteCamp(id: string, naam: string) {
+    setConfirmDialog({
+      message: `Weet je zeker dat je "${naam}" en alle inschrijvingen wilt verwijderen?`,
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        const res = await fetch(`/api/admin/kampen/${id}`, { method: 'DELETE' })
+        if (res.ok) {
+          setKampen(prev => prev.filter(k => k.id !== id))
+          showFlash('Kamp succesvol verwijderd.')
+        }
+      },
     })
-    if (res.ok) {
-      const created = await res.json()
-      setKampen(prev => [...prev, created])
-      setShowNewCampForm(false)
-      setNewCamp({ naam: '', datum_van: '', datum_tot: '', locatie: '', beschrijving: '', prijs: '', briefadres: '', contact_info: '', paklijstText: '' })
-      showFlash('Kamp/Weekend succesvol aangemaakt!')
-    } else {
-      showFlash('Fout bij het aanmaken van kamp.')
-    }
-    setLoading(false)
-  }
-
-  async function handleTogglePubliek(id: string, current: boolean) {
-    const res = await fetch(`/api/admin/kampen/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ open_voor_inschrijving: !current }),
-    })
-    if (res.ok) {
-      setKampen(prev => prev.map(k => k.id === id ? { ...k, open_voor_inschrijving: !current } : k))
-      showFlash(!current ? 'Kamp gepubliceerd!' : 'Kamp op privé gezet.')
-    }
-  }
-
-  async function handleDeleteCamp(id: string, naam: string) {
-    if (!confirm(`Weet je zeker dat je "${naam}" en alle inschrijvingen wilt verwijderen?`)) return
-    const res = await fetch(`/api/admin/kampen/${id}`, { method: 'DELETE' })
-    if (res.ok) {
-      setKampen(prev => prev.filter(k => k.id !== id))
-      showFlash('Kamp succesvol verwijderd.')
-    }
   }
 
   // Echo Handlers
@@ -367,13 +324,18 @@ export default function LeidingPanel({
     setLoading(false)
   }
 
-  async function handleDeleteEcho(id: string) {
-    if (!confirm('Wil je deze Kriko Echo definitief verwijderen?')) return
-    const res = await fetch(`/api/admin/echos/${id}`, { method: 'DELETE' })
-    if (res.ok) {
-      setEchos(prev => prev.filter(e => e.id !== id))
-      showFlash('Echo verwijderd.')
-    }
+  function handleDeleteEcho(id: string) {
+    setConfirmDialog({
+      message: 'Wil je deze Kriko Echo definitief verwijderen?',
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        const res = await fetch(`/api/admin/echos/${id}`, { method: 'DELETE' })
+        if (res.ok) {
+          setEchos(prev => prev.filter(e => e.id !== id))
+          showFlash('Echo verwijderd.')
+        }
+      },
+    })
   }
 
   const kleur = TAK_KLEUREN[activeTak] ?? '#888'
@@ -438,29 +400,7 @@ export default function LeidingPanel({
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-                  {/* Action 1: Kamp / Weekend aanmaken */}
-                  <div
-                    onClick={() => setInlineView(inlineView === 'kampen' ? null : 'kampen')}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 12,
-                      padding: '32px 20px',
-                      border: `2px solid ${inlineView === 'kampen' ? '#1A3D2A' : '#C2D9C9'}`,
-                      borderRadius: 16,
-                      background: inlineView === 'kampen' ? '#EEF5F1' : '#fff',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                    }}
-                    className="action-card-hover"
-                  >
-                    <i className="fa-solid fa-tent" style={{ fontSize: '2.2rem', color: '#1A3D2A' }}></i>
-                    <strong style={{ fontSize: '.92rem', color: '#1A3D2A' }}>kamp/weekend aanmaken</strong>
-                  </div>
-
-                  {/* Action 2: Kriko Echo uploaden */}
+                  {/* Action 1: Kriko Echo uploaden */}
                   {activeTak !== 'groep' && (
                     <div
                       onClick={() => setInlineView(inlineView === 'echos' ? null : 'echos')}
@@ -500,9 +440,31 @@ export default function LeidingPanel({
                     </div>
                   )}
 
+                  {/* Action 2: Kampen en weekendjes */}
+                  <div
+                    onClick={() => setInlineView(inlineView === 'kampen' ? null : 'kampen')}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 12,
+                      padding: '32px 20px',
+                      border: `2px solid ${inlineView === 'kampen' ? '#1A3D2A' : '#C2D9C9'}`,
+                      borderRadius: 16,
+                      background: inlineView === 'kampen' ? '#EEF5F1' : '#fff',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                    }}
+                    className="action-card-hover"
+                  >
+                    <i className="fa-solid fa-tent" style={{ fontSize: '2.2rem', color: '#1A3D2A' }}></i>
+                    <strong style={{ fontSize: '.92rem', color: '#1A3D2A' }}>kampen en weekendjes</strong>
+                  </div>
+
                   {/* Action 3: Tak activiteit toevoegen */}
-                  <Link
-                    href={`/portaal/leiding/agenda?filter=${activeTak === 'groep' ? 'leiding' : activeTak}`}
+                  <button
+                    onClick={() => setShowKalenderModal(true)}
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
@@ -515,59 +477,21 @@ export default function LeidingPanel({
                       background: '#fff',
                       cursor: 'pointer',
                       textAlign: 'center',
-                      textDecoration: 'none',
+                      fontFamily: 'inherit',
                     }}
                     className="action-card-hover"
                   >
                     <i className="fa-solid fa-calendar-plus" style={{ fontSize: '2.2rem', color: '#1A3D2A' }}></i>
                     <strong style={{ fontSize: '.92rem', color: '#1A3D2A' }}>tak activiteit toevoegen aan kalender</strong>
-                  </Link>
+                  </button>
                 </div>
 
                 {/* Inline Kamp Panel */}
                 {inlineView === 'kampen' && (
                   <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 16, padding: 20 }}>
-                    {!showNewCampForm && (
-                      <button onClick={() => setShowNewCampForm(true)} style={{ marginBottom: 20, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
-                        + Weekend/Kamp toevoegen
-                      </button>
-                    )}
-
-                    {showNewCampForm && (
-                      <form onSubmit={handleCreateCamp} style={{ background: '#EEF5F133', border: '1.5px dashed #2A5C3F', borderRadius: 14, padding: 20, marginBottom: 24 }}>
-                        <h4 style={{ margin: '0 0 16px', color: '#1A3D2A', fontWeight: 800 }}>Nieuw Weekend of Kamp</h4>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
-                          <div><label style={labelStyle}>Naam</label><input style={inputStyle} value={newCamp.naam} onChange={e => setNewCamp(p => ({ ...p, naam: e.target.value }))} required placeholder="bijv. Groepsweekend of Zomerkamp" /></div>
-                          <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={newCamp.locatie} onChange={e => setNewCamp(p => ({ ...p, locatie: e.target.value }))} required placeholder="bijv. Zandhoven" /></div>
-                          <div><label style={labelStyle}>Startdatum</label><input type="date" style={inputStyle} value={newCamp.datum_van} onChange={e => setNewCamp(p => ({ ...p, datum_van: e.target.value }))} required /></div>
-                          <div><label style={labelStyle}>Einddatum</label><input type="date" style={inputStyle} value={newCamp.datum_tot} onChange={e => setNewCamp(p => ({ ...p, datum_tot: e.target.value }))} required /></div>
-                          <div><label style={labelStyle}>Prijs (€)</label><input type="number" min="0" step="0.01" style={inputStyle} value={newCamp.prijs} onChange={e => setNewCamp(p => ({ ...p, prijs: e.target.value }))} placeholder="0" /></div>
-                          <div><label style={labelStyle}>Contact info (Telefoon Leiding)</label><input style={inputStyle} value={newCamp.contact_info} onChange={e => setNewCamp(p => ({ ...p, contact_info: e.target.value }))} placeholder="bijv. Takleiding: +32 470 12 34 56" /></div>
-                        </div>
-                        <div style={{ marginBottom: 14 }}><label style={labelStyle}>Briefadres (voor post op kamp)</label><input style={inputStyle} value={newCamp.briefadres} onChange={e => setNewCamp(p => ({ ...p, briefadres: e.target.value }))} placeholder="bijv. t.a.v. [Naam Kind], Kampplaats De Kluis, Kluisweg 1, 3050 Oud-Heverlee" /></div>
-                        <div style={{ marginBottom: 14 }}><label style={labelStyle}>Beschrijving</label><textarea style={inputStyle} rows={3} value={newCamp.beschrijving} onChange={e => setNewCamp(p => ({ ...p, beschrijving: e.target.value }))} placeholder="Korte toelichting over het kamp/weekend..." /></div>
-
-                        <div style={{ marginBottom: 14 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5 }}>
-                            <label style={{ ...labelStyle, marginBottom: 0 }}>Interactieve Inpaklijst</label>
-                            <button type="button" onClick={applyCampTemplate} style={{ border: '1px solid #C9963A', color: '#C9963A', background: 'none', borderRadius: 6, padding: '3px 8px', fontSize: '.75rem', cursor: 'pointer', fontWeight: 700 }}>
-                              Standaard sjabloon laden
-                            </button>
-                          </div>
-                          <textarea style={{ ...inputStyle, fontFamily: 'monospace', fontSize: '.8rem' }} rows={5} value={newCamp.paklijstText} onChange={e => setNewCamp(p => ({ ...p, paklijstText: e.target.value }))} placeholder="Slapen: Slaapzak, Matje, Pyjama&#10;Kleding: Hemd, T-shirts, Sokken" />
-                          <span style={{ fontSize: '.72rem', color: '#6A8A75' }}>Formaat: Categorie: Item1, Item2, Item3 (1 categorie per regel)</span>
-                        </div>
-
-                        <div style={{ display: 'flex', gap: 10 }}>
-                          <button type="submit" disabled={loading} style={{ padding: '8px 16px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 700, cursor: 'pointer' }}>
-                            {loading ? 'Bezig…' : 'Aanmaken'}
-                          </button>
-                          <button type="button" onClick={() => setShowNewCampForm(false)} style={{ padding: '8px 16px', background: 'none', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, color: '#6A8A75', cursor: 'pointer' }}>
-                            Annuleren
-                          </button>
-                        </div>
-                      </form>
-                    )}
+                    <button onClick={() => setShowKampAanmaken(true)} style={{ marginBottom: 20, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
+                      + Weekend/Kamp toevoegen
+                    </button>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                       {takKampen.length === 0 && <p style={{ color: '#6A8A75', fontSize: '.88rem' }}>Er zijn nog geen kampen voor deze tak aangemaakt.</p>}
@@ -579,43 +503,24 @@ export default function LeidingPanel({
                         return (
                           <div key={kamp.id} style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 14, overflow: 'hidden' }}>
                             {kamp.foto && (
-                              <div style={{ width: '100%', height: 130 }}>
+                              <div style={{ width: '100%', height: 260 }}>
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kamp-fotos/${kamp.foto}`} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                               </div>
                             )}
 
                             <div style={{ padding: 20 }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 0 }}>
                                 <div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                                    <span style={{ padding: '2px 8px', background: `${kleur}22`, color: kleur, borderRadius: 20, fontSize: '.7rem', fontWeight: 800, textTransform: 'uppercase' }}>{kamp.tak}</span>
-                                    {kamp.open_voor_inschrijving && <span style={{ padding: '2px 8px', background: 'hsla(145,33%,36%,.1)', color: '#3F7D5A', borderRadius: 20, fontSize: '.7rem', fontWeight: 700 }}>✓ Gepubliceerd</span>}
-                                  </div>
-                                  <strong style={{ fontSize: '1.1rem', color: '#1A3D2A', display: 'block' }}>{kamp.naam}</strong>
+                                  <strong style={{ fontSize: '2rem', color: '#1A3D2A', display: 'block' }}>{kamp.naam}</strong>
                                   <span style={{ fontSize: '.82rem', color: '#6A8A75' }}>📅 {periode} · 📍 {kamp.locatie}</span>
                                 </div>
-                                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                                  <CopyLinkButton slug={kamp.slug} />
-                                  <button onClick={() => handleTogglePubliek(kamp.id, kamp.open_voor_inschrijving)}
-                                    style={{ padding: '6px 12px', border: `1.5px solid ${kamp.open_voor_inschrijving ? '#B23A4D' : '#3F7D5A'}`, borderRadius: 8, background: 'none', color: kamp.open_voor_inschrijving ? '#B23A4D' : '#3F7D5A', fontSize: '.75rem', fontWeight: 700, cursor: 'pointer' }}>
-                                    {kamp.open_voor_inschrijving ? 'Verbergen' : 'Publiceren'}
-                                  </button>
-                                  <a href={`/api/admin/kampen/${kamp.id}/export`} download
-                                    style={{ padding: '6px 12px', border: '1.5px solid #C9963A', borderRadius: 8, background: '#C9963A', color: '#fff', fontSize: '.75rem', fontWeight: 700, cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
-                                    Exporteren (CSV)
-                                  </a>
-                                  <button onClick={() => handleDeleteCamp(kamp.id, kamp.naam)}
-                                    style={{ padding: '6px 12px', border: '1.5px solid #B23A4D', borderRadius: 8, background: 'none', color: '#B23A4D', fontSize: '.75rem', cursor: 'pointer' }}>
-                                    ✕
-                                  </button>
-                                </div>
+                                <button
+                                  onClick={() => { setEditKampId(kamp.id); setShowKampModal(true) }}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#1A3D2A', color: '#fff', borderRadius: 8, fontSize: '.82rem', fontWeight: 700, border: 'none', cursor: 'pointer', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                                  ⚙️ Beheer
+                                </button>
                               </div>
-
-                              <Link href={`/portaal/leiding/kampen/${kamp.id}`}
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 12, padding: '8px 16px', background: '#1A3D2A', color: '#fff', borderRadius: 8, fontSize: '.82rem', fontWeight: 700, textDecoration: 'none' }}>
-                                ⚙️ Beheren — bewerken, bijlagen &amp; antwoorden →
-                              </Link>
                             </div>
                           </div>
                         )
@@ -1226,6 +1131,42 @@ export default function LeidingPanel({
           </div>
         )}
       </div>
+      {confirmDialog && (
+        <ConfirmDialog
+          message={confirmDialog.message}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(null)}
+        />
+      )}
+      {showKampModal && editKampId && (
+        <KampBeheerModal
+          kamp={kampen.find(k => k.id === editKampId)!}
+          onClose={() => { setShowKampModal(false); setEditKampId(null) }}
+          onKampUpdated={(updated) => setKampen(prev => prev.map(k => k.id === updated.id ? updated : k))}
+        />
+      )}
+      {showKampAanmaken && (
+        <KampAanmakenModal
+          tak={activeTak}
+          onClose={() => setShowKampAanmaken(false)}
+          onCreated={(created) => {
+            setKampen(prev => [...prev, created as Kamp])
+            setShowKampAanmaken(false)
+            showFlash('Kamp/Weekend aangemaakt!')
+          }}
+        />
+      )}
+      {showKalenderModal && (
+        <KalenderActiviteitModal
+          canPublish={false}
+          initialAudience={AUDIENCE_TAGS.includes(activeTak as AudienceTag) ? [activeTak as AudienceTag] : []}
+          onClose={() => setShowKalenderModal(false)}
+          onSaved={() => {
+            setShowKalenderModal(false)
+            showFlash('Activiteit toegevoegd aan kalender!')
+          }}
+        />
+      )}
     </div>
   )
 }

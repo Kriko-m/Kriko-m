@@ -5,6 +5,8 @@ import { CalendarEvent, CalendarEntry, Kamp, AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
 import { mergeCampsIntoCalendar } from '@/lib/calendar'
 import SubscribeCalendarButton from '@/components/SubscribeCalendarButton'
+import ConfirmDialog from './ConfirmDialog'
+import KalenderActiviteitModal from './KalenderActiviteitModal'
 
 const MAANDEN = ['', 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
 const MAANDEN_KORT = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
@@ -18,22 +20,6 @@ interface Props {
   icsToken: string
   readOnly?: boolean
   twoColumn?: boolean
-}
-
-type FormState = {
-  title: string; date: string; datum_tot: string; timeStart: string; timeEnd: string; location: string; description: string
-  audience: AudienceTag[]; is_evenement: boolean; cover_image: string; document_url: string; facebook_event_url: string; external_link_url: string
-}
-
-const emptyForm = (prefill?: string): FormState => ({
-  title: '', date: '', datum_tot: '', timeStart: '', timeEnd: '', location: '', description: '',
-  audience: prefill && AUDIENCE_TAGS.includes(prefill as AudienceTag) ? [prefill as AudienceTag] : [],
-  is_evenement: false, cover_image: '', document_url: '', facebook_event_url: '', external_link_url: '',
-})
-
-function parseTime(time: string): { timeStart: string; timeEnd: string } {
-  const parts = time.split(/\s*[-–]\s*/)
-  return { timeStart: parts[0]?.trim() ?? '', timeEnd: parts[1]?.trim() ?? '' }
 }
 
 // Monday-first: returns 0=Mon … 6=Sun
@@ -50,23 +36,15 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     return tag && AUDIENCE_TAGS.includes(tag as AudienceTag) ? new Set([tag]) : new Set()
   })
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState<FormState>(emptyForm(highlightTak))
   const [editId, setEditId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
   const [flash, setFlash] = useState('')
-  const [validationErrors, setValidationErrors] = useState<Set<string>>(new Set())
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
-  const [facebookLinkOpen, setFacebookLinkOpen] = useState(false)
-  const [externalLinkOpen, setExternalLinkOpen] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => void } | null>(null)
 
   // Calendar grid state
   const [calYear, setCalYear] = useState(today.getFullYear())
   const [calMonth, setCalMonth] = useState(today.getMonth()) // 0-indexed
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
-
-  const selectableTags: AudienceTag[] = canPublish
-    ? [...AUDIENCE_TAGS]
-    : AUDIENCE_TAGS.filter(t => t !== 'ouders')
 
   function showFlash(msg: string) { setFlash(msg); setTimeout(() => setFlash(''), 3000) }
 
@@ -161,120 +139,19 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     })
   }
 
-  function toggleAudience(tag: AudienceTag) {
-    setForm(p => {
-      const has = p.audience.includes(tag)
-      return { ...p, audience: has ? p.audience.filter(a => a !== tag) : [...p.audience, tag] }
+  function closeModal() { setEditId(null); setShowForm(false) }
+
+  function handleDelete(id: string, title: string) {
+    setConfirmDialog({
+      message: `Weet je zeker dat je "${title}" wilt verwijderen uit de kalender?`,
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        const res = await fetch(`/api/admin/calendar/${id}`, { method: 'DELETE' })
+        if (res.ok) { setEvents(prev => prev.filter(ev => ev.id !== id)); showFlash('Activiteit verwijderd.') }
+        else showFlash('Fout bij verwijderen.')
+      },
     })
   }
-
-  async function uploadMedia(file: File, type: 'evenement-cover' | 'evenement-document'): Promise<string | null> {
-    const fd = new FormData()
-    fd.append('file', file)
-    fd.append('type', type)
-    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-    if (!res.ok) { showFlash('Fout bij uploaden van bestand.'); return null }
-    const data = await res.json()
-    return data.url as string
-  }
-
-  async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; if (!file) return
-    setLoading(true)
-    const url = await uploadMedia(file, 'evenement-cover')
-    if (url) setForm(p => ({ ...p, cover_image: url }))
-    setLoading(false)
-  }
-  async function handleDocChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; if (!file) return
-    setLoading(true)
-    const url = await uploadMedia(file, 'evenement-document')
-    if (url) setForm(p => ({ ...p, document_url: url }))
-    setLoading(false)
-  }
-
-  function startEdit(ev: CalendarEntry) {
-    setEditId(ev.id)
-    const fbUrl = ev.facebook_event_url ?? ''
-    const extUrl = ev.external_link_url ?? ''
-    setForm({
-      title: ev.title, date: ev.date, datum_tot: ev.datum_tot ?? '', ...parseTime(ev.time),
-      location: ev.location, description: ev.description,
-      audience: ev.audience, is_evenement: ev.is_evenement, cover_image: ev.cover_image, document_url: ev.document_url,
-      facebook_event_url: fbUrl,
-      external_link_url: extUrl,
-    })
-    setFacebookLinkOpen(fbUrl !== '')
-    setExternalLinkOpen(extUrl !== '')
-    setShowForm(true)
-  }
-
-  function resetForm() {
-    setForm(emptyForm(highlightTak)); setEditId(null); setShowForm(false); setFacebookLinkOpen(false); setExternalLinkOpen(false)
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const errors = new Set<string>()
-    if (!form.title.trim()) errors.add('title')
-    if (!form.date) errors.add('date')
-    if (!form.timeStart && !form.timeEnd) errors.add('time')
-    if (form.audience.length === 0) errors.add('audience')
-
-    if (errors.size > 0) {
-      setValidationErrors(errors)
-      setTimeout(() => setValidationErrors(new Set()), 3000)
-      return
-    }
-    setValidationErrors(new Set())
-    setLoading(true)
-    const payload = {
-      title: form.title, date: form.date, datum_tot: form.datum_tot || null,
-      time: [form.timeStart, form.timeEnd].filter(Boolean).join(' - '), location: form.location, description: form.description,
-      audience: form.audience, is_evenement: form.is_evenement,
-      cover_image: form.cover_image, document_url: form.document_url,
-      facebook_event_url: form.facebook_event_url || null,
-      external_link_url: form.external_link_url || null,
-    }
-    const url = editId ? `/api/admin/calendar/${editId}` : '/api/admin/calendar'
-    const method = editId ? 'PATCH' : 'POST'
-    const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-    if (res.ok) {
-      const saved = await res.json()
-      setEvents(prev => {
-        const next = editId ? prev.map(ev => ev.id === editId ? saved : ev) : [...prev, saved]
-        return next.sort((a, b) => a.date.localeCompare(b.date))
-      })
-      showFlash(editId ? 'Activiteit bijgewerkt!' : 'Activiteit toegevoegd!')
-      resetForm()
-    } else {
-      const err = await res.json().catch(() => ({}))
-      showFlash(err.error || 'Fout bij het opslaan.')
-    }
-    setLoading(false)
-  }
-
-  async function handleDelete(id: string, title: string) {
-    if (!confirm(`Weet je zeker dat je "${title}" wilt verwijderen uit de kalender?`)) return
-    const res = await fetch(`/api/admin/calendar/${id}`, { method: 'DELETE' })
-    if (res.ok) { setEvents(prev => prev.filter(ev => ev.id !== id)); showFlash('Activiteit verwijderd.') }
-    else showFlash('Fout bij verwijderen.')
-  }
-
-  function formatTimeInput(value: string): string {
-    if (!value) return ''
-    const num = value.replace(/\D/g, '')
-    if (num.length === 1 || num.length === 2) return num.padStart(2, '0') + ':00'
-    if (num.length === 3) return num[0] + num.slice(1, 3).padStart(2, '0') + ':' + '00'
-    if (num.length >= 4) return num.slice(0, 2) + ':' + num.slice(2, 4)
-    return value
-  }
-
-  const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' as const }
-  const labelStyle = { display: 'block', fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 5 }
-  const errorOutline = (fieldName: string): React.CSSProperties => validationErrors.has(fieldName)
-    ? { boxShadow: '0 0 0 2px #e74c3c, 0 0 10px rgba(231, 76, 60, 0.35)', borderRadius: 8, transition: 'box-shadow 0.2s ease' }
-    : { boxShadow: 'none', transition: 'box-shadow 0.2s ease' }
 
   function TagChips({ tags }: { tags: AudienceTag[] }) {
     return (
@@ -329,7 +206,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
             const hasEvents = dayEvents.length > 0
 
             // Gather up to 3 distinct audience colors for dots
-            const dotColors = Array.from(new Set(dayEvents.flatMap(e => e.audience))).slice(0, 4).map(a => AUDIENCE_KLEUREN[a as AudienceTag]).filter(Boolean)
+            const dotColors = dayEvents.slice(0, 6).map(e => AUDIENCE_KLEUREN[e.audience[0] as AudienceTag] || '#1A3D2A')
 
             return (
               <div
@@ -363,9 +240,9 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                   {cell.date!.getDate()}
                 </span>
                 {hasEvents && isCurrentMonth && (
-                  <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center' }}>
                     {dotColors.map((color, i) => (
-                      <span key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: isSelected ? 'rgba(255,255,255,.7)' : color, flexShrink: 0 }} />
+                      <span key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: isSelected ? 'rgba(255,255,255,.7)' : color, flexShrink: 0 }} />
                     ))}
                   </div>
                 )}
@@ -477,6 +354,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                     <div style={{ marginTop: 6 }}>
                       <p style={{
                         fontSize: '.82rem', color: '#888', fontStyle: 'italic', margin: 0, lineHeight: 1.4,
+                        whiteSpace: 'pre-wrap',
                         display: '-webkit-box',
                         WebkitLineClamp: expandedDescriptions.has(`${ev.source}-${ev.id}`) ? 'unset' : 3,
                         WebkitBoxOrient: 'vertical',
@@ -509,14 +387,9 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0, alignItems: 'center' }}>
                   {!readOnly && !isKamp && !(!canPublish && ev.audience.includes('ouders')) && (
-                    <>
-                      <button onClick={() => startEdit(ev)} title="Bewerken" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#999', fontSize: '.9rem', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
-                        <i className="fas fa-pen"></i>
-                      </button>
-                      <button onClick={() => handleDelete(ev.id, ev.title)} title="Verwijderen" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#c0392b', fontSize: '.9rem', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </>
+                    <button onClick={() => { setEditId(ev.id); setShowForm(true) }} title="Bewerken" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#999', fontSize: '.9rem', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+                      <i className="fas fa-pen"></i>
+                    </button>
                   )}
                   {ev.facebook_event_url && (
                     <a href={ev.facebook_event_url} target="_blank" rel="noopener noreferrer" title="Facebook evenement" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#1877F2', fontSize: '1rem', textDecoration: 'none', flexShrink: 0 }}>
@@ -528,8 +401,8 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                       <i className="fas fa-link"></i>
                     </a>
                   )}
-                  {isKamp && (
-                    <a href={`/portaal/leiding/kampen/${ev.id}`} style={{ fontSize: '.7rem', color: '#1A3D2A', fontWeight: 600, textDecoration: 'none', padding: '4px 10px', background: '#EEF5F1', border: '1.5px solid #C2D9C9', borderRadius: 7, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  {isKamp && ev.slug && (
+                    <a href={`/kamp/${ev.slug}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.7rem', color: '#1A3D2A', fontWeight: 600, textDecoration: 'none', padding: '4px 10px', background: '#EEF5F1', border: '1.5px solid #C2D9C9', borderRadius: 7, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                       Bekijk kamp →
                     </a>
                   )}
@@ -539,157 +412,6 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
           )
         })}
       </div>
-    )
-  }
-
-  // ─── Add/Edit Form Modal ──────────────────────────────────────────────────
-  function AddEditForm() {
-    if (!showForm) return null
-    return (
-      <>
-        {/* Backdrop */}
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.4)', zIndex: 999 }} onClick={resetForm} />
-        {/* Modal */}
-        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, pointerEvents: 'none' }}>
-          <div style={{ pointerEvents: 'auto', width: '95%', maxWidth: 800, maxHeight: '92vh', overflow: 'auto', background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 800, fontSize: '1.3rem' }}>{editId ? 'Activiteit bewerken' : 'Nieuwe activiteit'}</h3>
-              <button type="button" onClick={resetForm} style={{ background: 'none', border: 'none', color: '#999', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
-            </div>
-            {flash && (
-              <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 14px', borderRadius: 8, marginBottom: 14, fontWeight: 600, fontSize: '.9rem' }}>
-                {flash}
-              </div>
-            )}
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* Tags */}
-              <div style={{ ...errorOutline('audience'), borderRadius: 8, padding: validationErrors.has('audience') ? 12 : 0 }}>
-                <label style={labelStyle}>Voor wie? (tags)</label>
-                <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
-                  {selectableTags.map(tag => {
-                    const on = form.audience.includes(tag)
-                    return (
-                      <button key={tag} type="button" onClick={() => toggleAudience(tag)}
-                        style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.75rem', fontWeight: 700,
-                          background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
-                        {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
-                      </button>
-                    )
-                  })}
-                </div>
-                {form.audience.includes('ouders') && (
-                  <span style={{ display: 'block', marginTop: 5, fontSize: '.73rem', color: '#9A6B12', fontWeight: 600 }}>
-                    ⚠️ Met de tag &ldquo;Ouders&rdquo; wordt dit zichtbaar op de publieke website.
-                  </span>
-                )}
-              </div>
-
-              {/* Titel */}
-              <div><label style={labelStyle}>Titel</label><input style={{ ...inputStyle, ...errorOutline('title') }} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} onBlur={() => setForm(p => ({ ...p, title: p.title.trim() }))} placeholder="bijv. Groeps-BBQ" /></div>
-
-              {/* Time & Dates */}
-              <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.5fr', gap: 16 }}>
-                <div>
-                  <label style={labelStyle}>Tijdstip</label>
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', ...errorOutline('time') }}>
-                    <input type="time" style={{ ...inputStyle, flex: 1, border: 'none' }} value={form.timeStart} onChange={e => setForm(p => ({ ...p, timeStart: e.target.value }))} onBlur={e => setForm(p => ({ ...p, timeStart: formatTimeInput(e.target.value) }))} />
-                    <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
-                    <input type="time" style={{ ...inputStyle, flex: 1, border: 'none' }} value={form.timeEnd} onChange={e => setForm(p => ({ ...p, timeEnd: e.target.value }))} onBlur={e => setForm(p => ({ ...p, timeEnd: formatTimeInput(e.target.value) }))} />
-                  </div>
-                </div>
-                <div>
-                  <label style={labelStyle}>Datum</label>
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                    <div style={{ flex: 1 }}>
-                      <input type="date" style={{ ...inputStyle, width: '100%', ...errorOutline('date') }} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
-                    </div>
-                    {form.datum_tot ? (
-                      <>
-                        <span style={{ color: '#c9c9c9', fontWeight: 400, fontSize: '.75rem', flexShrink: 0 }}>–</span>
-                        <div style={{ flex: 1 }}>
-                          <input type="date" style={{ ...inputStyle, width: '100%', background: '#fafaf8', color: '#999', fontSize: '.85rem' }} value={form.datum_tot}
-                            onChange={e => setForm(p => ({ ...p, datum_tot: e.target.value }))} />
-                        </div>
-                        <button type="button" title="Einddatum verwijderen"
-                          onClick={() => setForm(p => ({ ...p, datum_tot: '' }))}
-                          style={{ flexShrink: 0, background: 'none', border: 'none', color: '#ddd', cursor: 'pointer', fontSize: '.9rem', lineHeight: 1, padding: '0 2px' }}>×</button>
-                      </>
-                    ) : (
-                      <button type="button" title="Meerdaagse activiteit"
-                        onClick={() => {
-                          const defaultDate = new Date().toISOString().split('T')[0]
-                          setForm(p => ({ ...p, datum_tot: p.date || defaultDate }))
-                        }}
-                        style={{ flexShrink: 0, background: 'none', border: 'none', color: '#ccc', cursor: 'pointer', fontSize: '.7rem', fontWeight: 500, padding: '5px 6px', whiteSpace: 'nowrap', textDecoration: 'underline' }}>
-                        + einddatum
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Location & Description */}
-              <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} onBlur={() => setForm(p => ({ ...p, location: p.location.trim() }))} placeholder="bijv. Scoutslokalen" /></div>
-              <div><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} onBlur={() => setForm(p => ({ ...p, description: p.description.trim() }))} placeholder="Korte uitleg..." /></div>
-
-              {/* Facebook & External Link & Document toggles */}
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem', flex: '0 1 auto' }}>
-                  <input type="checkbox" checked={facebookLinkOpen} onChange={e => setFacebookLinkOpen(e.target.checked)} style={{ cursor: 'pointer' }} />
-                  Facebook evenement?
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem', flex: '0 1 auto' }}>
-                  <input type="checkbox" checked={externalLinkOpen} onChange={e => setExternalLinkOpen(e.target.checked)} style={{ cursor: 'pointer' }} />
-                  Externe link?
-                </label>
-                {canPublish && (
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem', flex: '0 1 auto' }}>
-                    <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} style={{ cursor: 'pointer' }} />
-                    Bestand aan toevoegen?
-                  </label>
-                )}
-              </div>
-
-              {/* Facebook URL input */}
-              {facebookLinkOpen && (
-                <div><label style={labelStyle}>Facebook evenement link</label><input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} onBlur={() => setForm(p => ({ ...p, facebook_event_url: p.facebook_event_url.trim() }))} placeholder="https://facebook.com/events/..." /></div>
-              )}
-
-              {/* External link input */}
-              {externalLinkOpen && (
-                <div><label style={labelStyle}>Externe link</label><input style={inputStyle} value={form.external_link_url} onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))} onBlur={() => setForm(p => ({ ...p, external_link_url: p.external_link_url.trim() }))} placeholder="https://example.com/form" /></div>
-              )}
-
-              {/* Document upload (only for canPublish) */}
-              {canPublish && form.is_evenement && (
-                <div style={{ padding: 12, background: '#f9f9f9', border: '1.5px solid #E2C58D', borderRadius: 10 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    <div>
-                      <label style={labelStyle}>Coverfoto</label>
-                      <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleCoverChange} style={{ fontSize: '.78rem' }} />
-                      {form.cover_image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={form.cover_image} alt="cover" style={{ width: '100%', height: 70, objectFit: 'cover', borderRadius: 7, marginTop: 8 }} />}
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Uitnodiging (PDF)</label>
-                      <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocChange} style={{ fontSize: '.78rem' }} />
-                      {form.document_url && <span style={{ display: 'block', marginTop: 5, fontSize: '.74rem', color: '#3F7D5A', fontWeight: 600 }}>✓ Uitnodiging geüpload</span>}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-              <button type="submit" disabled={loading} style={{ padding: '10px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 700, cursor: 'pointer', fontSize: '.9rem', flex: 1 }}>
-                {loading ? 'Bezig…' : editId ? 'Opslaan' : 'Toevoegen'}
-              </button>
-              <button type="button" onClick={resetForm} style={{ padding: '10px 18px', background: '#f5f5f5', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, color: '#6A8A75', cursor: 'pointer', fontSize: '.9rem' }}>
-                Annuleren
-              </button>
-            </div>
-            </form>
-          </div>
-        </div>
-      </>
     )
   }
 
@@ -760,7 +482,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                 {rightEntries.length > 0 && <span style={{ marginLeft: 6, fontSize: '.8rem', fontWeight: 600, color: '#6A8A75' }}>({rightEntries.length})</span>}
               </h3>
               {!readOnly && !showForm && (
-                <button onClick={() => { setForm(emptyForm(highlightTak)); setEditId(null); setShowForm(true) }}
+                <button onClick={() => { setEditId(null); setShowForm(true) }}
                   style={{ padding: '7px 14px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 9, fontFamily: 'inherit', fontWeight: 700, fontSize: '.82rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                   + Toevoegen
                 </button>
@@ -773,7 +495,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
         // Single-column layout (dashboard widget etc.)
         <div>
           {!readOnly && (
-            <button onClick={() => { setForm(emptyForm(highlightTak)); setEditId(null); setShowForm(true) }}
+            <button onClick={() => { setEditId(null); setShowForm(true) }}
               style={{ marginBottom: 16, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
               + Activiteit toevoegen
             </button>
@@ -782,7 +504,34 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
         </div>
       )}
 
-      {!readOnly && AddEditForm()}
+      {!readOnly && showForm && (
+        <KalenderActiviteitModal
+          canPublish={canPublish}
+          initialAudience={!editId && highlightTak && AUDIENCE_TAGS.includes(highlightTak as AudienceTag) ? [highlightTak as AudienceTag] : []}
+          editEvent={editId ? events.find(e => e.id === editId) : undefined}
+          onClose={closeModal}
+          onSaved={(saved, isNew) => {
+            setEvents(prev => {
+              const next = isNew ? [...prev, saved] : prev.map(e => e.id === editId ? saved : e)
+              return next.sort((a, b) => a.date.localeCompare(b.date))
+            })
+            showFlash(isNew ? 'Activiteit toegevoegd!' : 'Activiteit bijgewerkt!')
+            closeModal()
+          }}
+          onDeleted={(id) => {
+            setEvents(prev => prev.filter(e => e.id !== id))
+            showFlash('Activiteit verwijderd.')
+            closeModal()
+          }}
+        />
+      )}
+      {confirmDialog && (
+        <ConfirmDialog
+          message={confirmDialog.message}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(null)}
+        />
+      )}
     </div>
   )
 }

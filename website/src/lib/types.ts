@@ -135,7 +135,6 @@ export interface Kamp {
   datum_tot: string
   locatie: string
   beschrijving: string
-  open_voor_inschrijving: boolean
   prijs: number
   foto: string
   paklijst: any // JSON
@@ -190,6 +189,14 @@ export interface Verslag {
   author: string
   published: boolean
   created_at?: string
+}
+
+export interface LeidingBericht {
+  id: string
+  content: string
+  author_naam: string
+  author_email: string
+  created_at: string
 }
 
 export interface TodoItem {

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { KampRsvp } from '@/lib/types'
 import { TAKKEN, TAK_KLEUREN } from '@/lib/constants'
+import ConfirmDialog from './ConfirmDialog'
 
 // Kopieerknop voor de privélink (plak in de S&G-mail).
 export function CopyLinkButton({ slug }: { slug: string }) {
@@ -19,9 +20,9 @@ export function CopyLinkButton({ slug }: { slug: string }) {
     })
   }
   return (
-    <button onClick={copy} title="Kopieer de privélink om in je S&G-mail te plakken"
+    <button onClick={copy} title="Kopieer de uitnodigingslink om in je S&G-mail te plakken"
       style={{ padding: '6px 12px', border: '1.5px solid #4A7BBF', borderRadius: 8, background: copied ? '#4A7BBF' : 'none', color: copied ? '#fff' : '#4A7BBF', fontSize: '.75rem', fontWeight: 700, cursor: 'pointer' }}>
-      {copied ? '✓ Gekopieerd' : '🔗 Privélink kopiëren'}
+      {copied ? '✓ Gekopieerd' : '🔗 Uitnodigingslink kopiëren'}
     </button>
   )
 }
@@ -32,6 +33,7 @@ export function RsvpPanel({ kampId }: { kampId: string }) {
   const [loading, setLoading] = useState(true)
   const [editId, setEditId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<{ kind_naam: string; tak: string; status: string; opmerking: string }>({ kind_naam: '', tak: '', status: 'ja', opmerking: '' })
+  const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => void } | null>(null)
 
   useEffect(() => {
     let active = true
@@ -54,13 +56,18 @@ export function RsvpPanel({ kampId }: { kampId: string }) {
       setEditId(null)
     }
   }
-  async function del(id: string) {
-    if (!confirm('Dit antwoord verwijderen?')) return
-    const res = await fetch(`/api/admin/kampen/${kampId}/rsvp`, {
-      method: 'DELETE', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rsvp_id: id }),
+  function del(id: string) {
+    setConfirmDialog({
+      message: 'Dit antwoord verwijderen?',
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        const res = await fetch(`/api/admin/kampen/${kampId}/rsvp`, {
+          method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rsvp_id: id }),
+        })
+        if (res.ok) setRsvps(prev => (prev ?? []).filter(r => r.id !== id))
+      },
     })
-    if (res.ok) setRsvps(prev => (prev ?? []).filter(r => r.id !== id))
   }
 
   if (loading || rsvps === null) return <div style={{ padding: 16, color: '#6A8A75', fontSize: '.85rem' }}>Antwoorden laden…</div>
@@ -125,6 +132,13 @@ export function RsvpPanel({ kampId }: { kampId: string }) {
           </div>
         )
       })}
+      {confirmDialog && (
+        <ConfirmDialog
+          message={confirmDialog.message}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(null)}
+        />
+      )}
     </div>
   )
 }

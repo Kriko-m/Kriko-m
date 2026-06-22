@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
-import { CalendarEvent } from '@/lib/types'
+import { CalendarEvent, LeidingBericht } from '@/lib/types'
 import { AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
+import BerichtenFeed from '../_components/BerichtenFeed'
 
 const QUICK_LINKS = [
   { icon: 'fa-brands fa-google-drive', label: 'Google Drive', href: 'https://drive.google.com' },
@@ -32,13 +33,18 @@ export default async function HomePage() {
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
   if (!isLeiding) redirect('/portaal')
 
+  const canPost = role === 'admin' || role === 'groepsleiding'
+  const authorNaam = (user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'Groepsleiding'
+
   const today = new Date().toISOString().split('T')[0]
   const admin = createAdminClient()
-  const [calendarRes] = await Promise.all([
-    admin.from('calendar').select('*').gte('date', today).order('date', { ascending: true }).limit(6),
+  const [calendarRes, berichtenRes] = await Promise.all([
+    admin.from('calendar').select('*').gte('date', today).order('date', { ascending: true }).limit(5),
+    admin.from('leiding_berichten').select('*').order('created_at', { ascending: false }).limit(20),
   ])
 
   const calendarEvents = (calendarRes.data ?? []) as CalendarEvent[]
+  const berichten = (berichtenRes.data ?? []) as LeidingBericht[]
 
   return (
     <div className="portaal-dashboard-bg-wrapper" style={{ '--portal-bg': "url('/images/leiding_25-26.jpg')" } as React.CSSProperties}>
@@ -61,7 +67,7 @@ export default async function HomePage() {
           ))}
         </div>
 
-        {/* Body grid: calendar left, events + message right */}
+        {/* Body grid: calendar left, berichten right */}
         <div className="portaal-dash-body-grid">
 
           {/* Calendar */}
@@ -98,15 +104,7 @@ export default async function HomePage() {
             <div style={{ marginTop: 16, borderTop: '1px solid #ece9e3', paddingTop: 12, display: 'flex', justifyContent: 'flex-end' }}>
               <Link
                 href="/portaal/leiding/agenda"
-                style={{
-                  fontSize: '.82rem',
-                  fontWeight: 700,
-                  color: '#C9963A',
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4
-                }}
+                style={{ fontSize: '.82rem', fontWeight: 700, color: '#C9963A', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
               >
                 Volledige agenda <i className="fa-solid fa-arrow-right-long" style={{ fontSize: '.75rem' }}></i>
               </Link>
@@ -115,13 +113,14 @@ export default async function HomePage() {
 
           {/* Right column */}
           <div className="portaal-dash-right-col">
-
-            {/* Groepsleiding message */}
             <div className="portaal-msg-widget">
               <h3>Berichtje van de groepsleiding</h3>
-              <p>Geen bericht momenteel.</p>
+              <BerichtenFeed
+                initialBerichten={berichten}
+                canPost={canPost}
+                authorNaam={authorNaam}
+              />
             </div>
-
           </div>
         </div>
       </div>
