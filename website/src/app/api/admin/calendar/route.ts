@@ -50,6 +50,8 @@ export async function POST(req: NextRequest) {
       time: body.time || '',
       location: body.location || '',
       description: body.description || '',
+      facebook_event_url: body.facebook_event_url || null,
+      external_link_url: body.external_link_url || null,
       audience,
       is_evenement: evenement,
       cover_image: evenement ? (body.cover_image || '') : '',

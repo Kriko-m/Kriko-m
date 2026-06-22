@@ -22,13 +22,13 @@ interface Props {
 
 type FormState = {
   title: string; date: string; datum_tot: string; timeStart: string; timeEnd: string; location: string; description: string
-  audience: AudienceTag[]; is_evenement: boolean; cover_image: string; document_url: string
+  audience: AudienceTag[]; is_evenement: boolean; cover_image: string; document_url: string; facebook_event_url: string; external_link_url: string
 }
 
 const emptyForm = (prefill?: string): FormState => ({
   title: '', date: '', datum_tot: '', timeStart: '', timeEnd: '', location: '', description: '',
   audience: prefill && AUDIENCE_TAGS.includes(prefill as AudienceTag) ? [prefill as AudienceTag] : [],
-  is_evenement: false, cover_image: '', document_url: '',
+  is_evenement: false, cover_image: '', document_url: '', facebook_event_url: '', external_link_url: '',
 })
 
 function parseTime(time: string): { timeStart: string; timeEnd: string } {
@@ -54,6 +54,10 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
   const [editId, setEditId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [flash, setFlash] = useState('')
+  const [validationErrors, setValidationErrors] = useState<Set<string>>(new Set())
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
+  const [facebookLinkOpen, setFacebookLinkOpen] = useState(false)
+  const [externalLinkOpen, setExternalLinkOpen] = useState(false)
 
   // Calendar grid state
   const [calYear, setCalYear] = useState(today.getFullYear())
@@ -191,26 +195,46 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
 
   function startEdit(ev: CalendarEntry) {
     setEditId(ev.id)
+    const fbUrl = (ev as any).facebook_event_url ?? ''
+    const extUrl = (ev as any).external_link_url ?? ''
     setForm({
       title: ev.title, date: ev.date, datum_tot: ev.datum_tot ?? '', ...parseTime(ev.time),
       location: ev.location, description: ev.description,
       audience: ev.audience, is_evenement: ev.is_evenement, cover_image: ev.cover_image, document_url: ev.document_url,
+      facebook_event_url: fbUrl,
+      external_link_url: extUrl,
     })
+    setFacebookLinkOpen(fbUrl !== '')
+    setExternalLinkOpen(extUrl !== '')
     setShowForm(true)
   }
 
   function resetForm() {
-    setForm(emptyForm(highlightTak)); setEditId(null); setShowForm(false)
+    setForm(emptyForm(highlightTak)); setEditId(null); setShowForm(false); setFacebookLinkOpen(false); setExternalLinkOpen(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const errors = new Set<string>()
+    if (!form.title.trim()) errors.add('title')
+    if (!form.date) errors.add('date')
+    if (!form.timeStart && !form.timeEnd) errors.add('time')
+    if (form.audience.length === 0) errors.add('audience')
+
+    if (errors.size > 0) {
+      setValidationErrors(errors)
+      setTimeout(() => setValidationErrors(new Set()), 3000)
+      return
+    }
+    setValidationErrors(new Set())
     setLoading(true)
     const payload = {
       title: form.title, date: form.date, datum_tot: form.datum_tot || null,
       time: [form.timeStart, form.timeEnd].filter(Boolean).join(' - '), location: form.location, description: form.description,
       audience: form.audience, is_evenement: form.is_evenement,
       cover_image: form.cover_image, document_url: form.document_url,
+      facebook_event_url: form.facebook_event_url || null,
+      external_link_url: form.external_link_url || null,
     }
     const url = editId ? `/api/admin/calendar/${editId}` : '/api/admin/calendar'
     const method = editId ? 'PATCH' : 'POST'
@@ -237,8 +261,20 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     else showFlash('Fout bij verwijderen.')
   }
 
+  function formatTimeInput(value: string): string {
+    if (!value) return ''
+    const num = value.replace(/\D/g, '')
+    if (num.length === 1 || num.length === 2) return num.padStart(2, '0') + ':00'
+    if (num.length === 3) return num[0] + num.slice(1, 3).padStart(2, '0') + ':' + '00'
+    if (num.length >= 4) return num.slice(0, 2) + ':' + num.slice(2, 4)
+    return value
+  }
+
   const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' as const }
   const labelStyle = { display: 'block', fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 5 }
+  const errorOutline = (fieldName: string): React.CSSProperties => validationErrors.has(fieldName)
+    ? { boxShadow: '0 0 0 2px #e74c3c, 0 0 10px rgba(231, 76, 60, 0.35)', borderRadius: 8, transition: 'box-shadow 0.2s ease' }
+    : { boxShadow: 'none', transition: 'box-shadow 0.2s ease' }
 
   function TagChips({ tags }: { tags: AudienceTag[] }) {
     return (
@@ -303,8 +339,8 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                   setSelectedDate(prev => prev === dateStr ? null : dateStr)
                 }}
                 style={{
-                  minHeight: 52,
-                  padding: '5px 4px 4px',
+                  minHeight: 80,
+                  padding: '8px 4px 6px',
                   borderRight: '1px solid #E8F0EA',
                   borderBottom: '1px solid #E8F0EA',
                   cursor: isCurrentMonth ? 'pointer' : 'default',
@@ -329,7 +365,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                 {hasEvents && isCurrentMonth && (
                   <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
                     {dotColors.map((color, i) => (
-                      <span key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: isSelected ? 'rgba(255,255,255,.7)' : color, flexShrink: 0 }} />
+                      <span key={i} style={{ width: 8, height: 8, borderRadius: '50%', background: isSelected ? 'rgba(255,255,255,.7)' : color, flexShrink: 0 }} />
                     ))}
                   </div>
                 )}
@@ -437,22 +473,62 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                       {[ev.time, ev.location].filter(Boolean).join(' · ')}
                     </span>
                   )}
-                  {ev.description && <p style={{ fontSize: '.82rem', color: '#888', fontStyle: 'italic', margin: '4px 0 0', lineHeight: 1.4 }}>{ev.description}</p>}
+                  {ev.description && (
+                    <div style={{ marginTop: 6 }}>
+                      <p style={{
+                        fontSize: '.82rem', color: '#888', fontStyle: 'italic', margin: 0, lineHeight: 1.4,
+                        display: '-webkit-box',
+                        WebkitLineClamp: expandedDescriptions.has(`${ev.source}-${ev.id}`) ? 'unset' : 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: expandedDescriptions.has(`${ev.source}-${ev.id}`) ? 'visible' : 'hidden',
+                        textOverflow: 'ellipsis',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        {ev.description}
+                      </p>
+                      {ev.description.split('\n').length > 3 || ev.description.length > 200 ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const key = `${ev.source}-${ev.id}`
+                            setExpandedDescriptions(prev => {
+                              const next = new Set(prev)
+                              if (next.has(key)) next.delete(key); else next.add(key)
+                              return next
+                            })
+                          }}
+                          style={{
+                            background: 'none', border: 'none', color: '#1A3D2A', cursor: 'pointer',
+                            fontSize: '.78rem', fontWeight: 600, padding: 0, marginTop: 4, textDecoration: 'underline'
+                          }}>
+                          {expandedDescriptions.has(`${ev.source}-${ev.id}`) ? 'Toon minder' : 'Toon meer'}
+                        </button>
+                      ) : null}
+                    </div>
+                  )}
                 </div>
-                {!readOnly && (
-                  <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
-                    {isKamp ? (
-                      <span style={{ fontSize: '.7rem', color: '#9AB0A2', alignSelf: 'center' }}>via Kampen</span>
-                    ) : !canPublish && ev.audience.includes('ouders') ? (
-                      <span style={{ fontSize: '.7rem', color: '#9AB0A2', alignSelf: 'center' }}>via Groepsleiding</span>
-                    ) : (
-                      <>
-                        <button onClick={() => startEdit(ev)} className="cal-card-edit-btn">Bewerken</button>
-                        <button onClick={() => handleDelete(ev.id, ev.title)} className="cal-card-delete-btn">✕</button>
-                      </>
-                    )}
-                  </div>
-                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0, alignItems: 'center' }}>
+                  {!readOnly && !isKamp && !(!canPublish && ev.audience.includes('ouders')) && (
+                    <button onClick={() => startEdit(ev)} title="Bewerken" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#999', fontSize: '.9rem', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+                      <i className="fas fa-pen"></i>
+                    </button>
+                  )}
+                  {(ev as any).facebook_event_url && (
+                    <a href={(ev as any).facebook_event_url} target="_blank" rel="noopener noreferrer" title="Facebook evenement" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#1877F2', fontSize: '1rem', textDecoration: 'none', flexShrink: 0 }}>
+                      <i className="fab fa-facebook-f"></i>
+                    </a>
+                  )}
+                  {(ev as any).external_link_url && (
+                    <a href={(ev as any).external_link_url} target="_blank" rel="noopener noreferrer" title="Externe link" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#666', fontSize: '.9rem', textDecoration: 'none', flexShrink: 0 }}>
+                      <i className="fas fa-link"></i>
+                    </a>
+                  )}
+                  {isKamp && (
+                    <a href={`/portaal/leiding/kampen/${ev.id}`} style={{ fontSize: '.7rem', color: '#1A3D2A', fontWeight: 600, textDecoration: 'none', padding: '4px 10px', background: '#EEF5F1', border: '1.5px solid #C2D9C9', borderRadius: 7, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      Bekijk kamp →
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           )
@@ -461,108 +537,161 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     )
   }
 
-  // ─── Add/Edit Form ────────────────────────────────────────────────────────
+  // ─── Add/Edit Form Modal ──────────────────────────────────────────────────
   function AddEditForm() {
+    if (!showForm) return null
     return (
-      <form onSubmit={handleSubmit} style={{ background: '#EEF5F133', border: '1.5px dashed #2A5C3F', borderRadius: 14, padding: 18, marginBottom: 16 }}>
-        <h4 style={{ margin: '0 0 14px', color: '#1A3D2A', fontWeight: 800, fontSize: '.95rem' }}>{editId ? 'Activiteit bewerken' : 'Nieuwe activiteit'}</h4>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
-          <div><label style={labelStyle}>Titel</label><input style={inputStyle} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required placeholder="bijv. Groeps-BBQ" /></div>
-          <div>
-            <label style={labelStyle}>Datum</label>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              <input type="date" style={{ ...inputStyle, flex: 1 }} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} required />
-              {form.datum_tot ? (
-                <>
-                  <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
-                  <input type="date" style={{ ...inputStyle, flex: 1 }} value={form.datum_tot}
-                    min={form.date || undefined}
-                    onChange={e => setForm(p => ({ ...p, datum_tot: e.target.value }))} />
-                  <button type="button" title="Einddatum verwijderen"
-                    onClick={() => setForm(p => ({ ...p, datum_tot: '' }))}
-                    style={{ flexShrink: 0, background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: '1rem', lineHeight: 1, padding: '0 2px' }}>×</button>
-                </>
-              ) : (
-                <button type="button" title="Meerdaagse activiteit"
-                  onClick={() => setForm(p => ({ ...p, datum_tot: p.date }))}
-                  style={{ flexShrink: 0, background: '#EEF5F1', border: '1.5px solid #C2D9C9', borderRadius: 7, color: '#1A3D2A', cursor: 'pointer', fontSize: '.72rem', fontWeight: 700, padding: '5px 9px', whiteSpace: 'nowrap' }}>
-                  + einddatum
-                </button>
-              )}
+      <>
+        {/* Backdrop */}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.4)', zIndex: 999 }} onClick={resetForm} />
+        {/* Modal */}
+        <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, pointerEvents: 'none' }}>
+          <div style={{ pointerEvents: 'auto', width: '95%', maxWidth: 800, maxHeight: '92vh', overflow: 'auto', background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 800, fontSize: '1.3rem' }}>{editId ? 'Activiteit bewerken' : 'Nieuwe activiteit'}</h3>
+              <button type="button" onClick={resetForm} style={{ background: 'none', border: 'none', color: '#999', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
             </div>
-          </div>
-          <div>
-            <label style={labelStyle}>Tijdstip</label>
-            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              <input type="time" style={{ ...inputStyle, flex: 1 }} value={form.timeStart} onChange={e => setForm(p => ({ ...p, timeStart: e.target.value }))} />
-              <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
-              <input type="time" style={{ ...inputStyle, flex: 1 }} value={form.timeEnd} onChange={e => setForm(p => ({ ...p, timeEnd: e.target.value }))} />
-            </div>
-          </div>
-          <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="bijv. Scoutslokalen" /></div>
-        </div>
-        <div style={{ marginBottom: 12 }}><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={2} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} placeholder="Korte uitleg..." /></div>
-
-        <div style={{ marginBottom: 12 }}>
-          <label style={labelStyle}>Voor wie? (tags)</label>
-          <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
-            {selectableTags.map(tag => {
-              const on = form.audience.includes(tag)
-              return (
-                <button key={tag} type="button" onClick={() => toggleAudience(tag)}
-                  style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.75rem', fontWeight: 700,
-                    background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
-                  {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
-                </button>
-              )
-            })}
-          </div>
-          {form.audience.includes('ouders') && (
-            <span style={{ display: 'block', marginTop: 5, fontSize: '.73rem', color: '#9A6B12', fontWeight: 600 }}>
-              ⚠️ Met de tag &ldquo;Ouders&rdquo; wordt dit zichtbaar op de publieke website.
-            </span>
-          )}
-        </div>
-
-        {canPublish && (
-          <div style={{ marginBottom: 12, padding: 12, background: '#fff', border: '1.5px solid #E2C58D', borderRadius: 10 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#1A3D2A', fontSize: '.85rem' }}>
-              <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} />
-              ⭐ Uitlichten als evenement (met coverfoto &amp; uitnodiging)
-            </label>
-            {form.is_evenement && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
-                <div>
-                  <label style={labelStyle}>Coverfoto</label>
-                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleCoverChange} style={{ fontSize: '.78rem' }} />
-                  {form.cover_image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={form.cover_image} alt="cover" style={{ width: '100%', height: 70, objectFit: 'cover', borderRadius: 7, marginTop: 5 }} />}
-                </div>
-                <div>
-                  <label style={labelStyle}>Uitnodiging (PDF)</label>
-                  <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocChange} style={{ fontSize: '.78rem' }} />
-                  {form.document_url && <span style={{ display: 'block', marginTop: 5, fontSize: '.74rem', color: '#3F7D5A', fontWeight: 600 }}>✓ Uitnodiging geüpload</span>}
-                </div>
+            {flash && (
+              <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 14px', borderRadius: 8, marginBottom: 14, fontWeight: 600, fontSize: '.9rem' }}>
+                {flash}
               </div>
             )}
-          </div>
-        )}
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Tags */}
+              <div style={{ ...errorOutline('audience'), borderRadius: 8, padding: validationErrors.has('audience') ? 12 : 0 }}>
+                <label style={labelStyle}>Voor wie? (tags)</label>
+                <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+                  {selectableTags.map(tag => {
+                    const on = form.audience.includes(tag)
+                    return (
+                      <button key={tag} type="button" onClick={() => toggleAudience(tag)}
+                        style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.75rem', fontWeight: 700,
+                          background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
+                        {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
+                      </button>
+                    )
+                  })}
+                </div>
+                {form.audience.includes('ouders') && (
+                  <span style={{ display: 'block', marginTop: 5, fontSize: '.73rem', color: '#9A6B12', fontWeight: 600 }}>
+                    ⚠️ Met de tag &ldquo;Ouders&rdquo; wordt dit zichtbaar op de publieke website.
+                  </span>
+                )}
+              </div>
 
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="submit" disabled={loading} style={{ padding: '8px 14px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 700, cursor: 'pointer', fontSize: '.85rem' }}>
-            {loading ? 'Bezig…' : editId ? 'Opslaan' : 'Toevoegen'}
-          </button>
-          <button type="button" onClick={resetForm} style={{ padding: '8px 14px', background: 'none', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, color: '#6A8A75', cursor: 'pointer', fontSize: '.85rem' }}>
-            Annuleren
-          </button>
+              {/* Titel */}
+              <div><label style={labelStyle}>Titel</label><input style={{ ...inputStyle, ...errorOutline('title') }} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} onBlur={e => setForm(p => ({ ...p, title: p.title.trim() }))} placeholder="bijv. Groeps-BBQ" /></div>
+
+              {/* Time & Dates */}
+              <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.5fr', gap: 16 }}>
+                <div>
+                  <label style={labelStyle}>Tijdstip</label>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center', ...errorOutline('time') }}>
+                    <input type="time" style={{ ...inputStyle, flex: 1, border: 'none' }} value={form.timeStart} onChange={e => setForm(p => ({ ...p, timeStart: e.target.value }))} onBlur={e => setForm(p => ({ ...p, timeStart: formatTimeInput(e.target.value) }))} />
+                    <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
+                    <input type="time" style={{ ...inputStyle, flex: 1, border: 'none' }} value={form.timeEnd} onChange={e => setForm(p => ({ ...p, timeEnd: e.target.value }))} onBlur={e => setForm(p => ({ ...p, timeEnd: formatTimeInput(e.target.value) }))} />
+                  </div>
+                </div>
+                <div>
+                  <label style={labelStyle}>Datum</label>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <div style={{ flex: 1 }}>
+                      <input type="date" style={{ ...inputStyle, width: '100%', ...errorOutline('date') }} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
+                    </div>
+                    {form.datum_tot ? (
+                      <>
+                        <span style={{ color: '#c9c9c9', fontWeight: 400, fontSize: '.75rem', flexShrink: 0 }}>–</span>
+                        <div style={{ flex: 1 }}>
+                          <input type="date" style={{ ...inputStyle, width: '100%', background: '#fafaf8', color: '#999', fontSize: '.85rem' }} value={form.datum_tot}
+                            onChange={e => setForm(p => ({ ...p, datum_tot: e.target.value }))} />
+                        </div>
+                        <button type="button" title="Einddatum verwijderen"
+                          onClick={() => setForm(p => ({ ...p, datum_tot: '' }))}
+                          style={{ flexShrink: 0, background: 'none', border: 'none', color: '#ddd', cursor: 'pointer', fontSize: '.9rem', lineHeight: 1, padding: '0 2px' }}>×</button>
+                      </>
+                    ) : (
+                      <button type="button" title="Meerdaagse activiteit"
+                        onClick={() => {
+                          const defaultDate = new Date().toISOString().split('T')[0]
+                          setForm(p => ({ ...p, datum_tot: p.date || defaultDate }))
+                        }}
+                        style={{ flexShrink: 0, background: 'none', border: 'none', color: '#ccc', cursor: 'pointer', fontSize: '.7rem', fontWeight: 500, padding: '5px 6px', whiteSpace: 'nowrap', textDecoration: 'underline' }}>
+                        + einddatum
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Location & Description */}
+              <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} onBlur={e => setForm(p => ({ ...p, location: p.location.trim() }))} placeholder="bijv. Scoutslokalen" /></div>
+              <div><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} onBlur={e => setForm(p => ({ ...p, description: p.description.trim() }))} placeholder="Korte uitleg..." /></div>
+
+              {/* Facebook & External Link & Document toggles */}
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem', flex: '0 1 auto' }}>
+                  <input type="checkbox" checked={facebookLinkOpen} onChange={e => setFacebookLinkOpen(e.target.checked)} style={{ cursor: 'pointer' }} />
+                  Facebook evenement?
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem', flex: '0 1 auto' }}>
+                  <input type="checkbox" checked={externalLinkOpen} onChange={e => setExternalLinkOpen(e.target.checked)} style={{ cursor: 'pointer' }} />
+                  Externe link?
+                </label>
+                {canPublish && (
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem', flex: '0 1 auto' }}>
+                    <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} style={{ cursor: 'pointer' }} />
+                    Bestand aan toevoegen?
+                  </label>
+                )}
+              </div>
+
+              {/* Facebook URL input */}
+              {facebookLinkOpen && (
+                <div><label style={labelStyle}>Facebook evenement link</label><input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} onBlur={e => setForm(p => ({ ...p, facebook_event_url: p.facebook_event_url.trim() }))} placeholder="https://facebook.com/events/..." /></div>
+              )}
+
+              {/* External link input */}
+              {externalLinkOpen && (
+                <div><label style={labelStyle}>Externe link</label><input style={inputStyle} value={form.external_link_url} onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))} onBlur={e => setForm(p => ({ ...p, external_link_url: p.external_link_url.trim() }))} placeholder="https://example.com/form" /></div>
+              )}
+
+              {/* Document upload (only for canPublish) */}
+              {canPublish && form.is_evenement && (
+                <div style={{ padding: 12, background: '#f9f9f9', border: '1.5px solid #E2C58D', borderRadius: 10 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={labelStyle}>Coverfoto</label>
+                      <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleCoverChange} style={{ fontSize: '.78rem' }} />
+                      {form.cover_image && /* eslint-disable-next-line @next/next/no-img-element */ <img src={form.cover_image} alt="cover" style={{ width: '100%', height: 70, objectFit: 'cover', borderRadius: 7, marginTop: 8 }} />}
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Uitnodiging (PDF)</label>
+                      <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocChange} style={{ fontSize: '.78rem' }} />
+                      {form.document_url && <span style={{ display: 'block', marginTop: 5, fontSize: '.74rem', color: '#3F7D5A', fontWeight: 600 }}>✓ Uitnodiging geüpload</span>}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+              <button type="submit" disabled={loading} style={{ padding: '10px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 700, cursor: 'pointer', fontSize: '.9rem', flex: 1 }}>
+                {loading ? 'Bezig…' : editId ? 'Opslaan' : 'Toevoegen'}
+              </button>
+              <button type="button" onClick={resetForm} style={{ padding: '10px 18px', background: '#f5f5f5', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, color: '#6A8A75', cursor: 'pointer', fontSize: '.9rem' }}>
+                Annuleren
+              </button>
+            </div>
+            </form>
+          </div>
         </div>
-      </form>
+      </>
     )
   }
 
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <div>
-      {flash && (
+      {flash && !showForm && (
         <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 16px', borderRadius: 10, marginBottom: 14, fontWeight: 600 }}>
           {flash}
         </div>
@@ -632,23 +761,23 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                 </button>
               )}
             </div>
-            {!readOnly && showForm && AddEditForm()}
             <ActivityList listEntries={rightEntries} />
           </div>
         </div>
       ) : (
         // Single-column layout (dashboard widget etc.)
         <div>
-          {!readOnly && !showForm && (
+          {!readOnly && (
             <button onClick={() => { setForm(emptyForm(highlightTak)); setEditId(null); setShowForm(true) }}
               style={{ marginBottom: 16, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
               + Activiteit toevoegen
             </button>
           )}
-          {!readOnly && showForm && AddEditForm()}
           <ActivityList listEntries={entries} />
         </div>
       )}
+
+      {!readOnly && AddEditForm()}
     </div>
   )
 }
