@@ -4203,7 +4203,7 @@ body.portal-theme .portaal-nav {
 /* Responsive Grid Layout for portal agenda view */
 .portal-agenda-layout {
     display: grid;
-    grid-template-columns: 1.1fr 1fr;
+    grid-template-columns: 1.6fr 1fr;
     gap: 24px;
     align-items: flex-start;
 }
