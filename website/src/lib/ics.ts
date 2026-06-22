@@ -14,6 +14,17 @@ export interface IcsEvent {
   description: string
 }
 
+export function foldIcsLine(line: string): string {
+  if (line.length <= 75) return line
+  const out: string[] = [line.slice(0, 75)]
+  let pos = 75
+  while (pos < line.length) {
+    out.push(line.slice(pos, pos + 74))
+    pos += 74
+  }
+  return out.join('\r\n ')
+}
+
 export function escapeIcsText(str: string): string {
   return (str ?? '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n').replace(/\r/g, '\\n')
 }

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { getPublicCalendarEvents, getKampen } from '@/lib/db'
 import { Kamp } from '@/lib/types'
-import { IcsEvent, icsHeader, buildEventVevent, buildKampVevent, toUtcIcsString } from '@/lib/ics'
+import { IcsEvent, icsHeader, buildEventVevent, buildKampVevent, toUtcIcsString, foldIcsLine } from '@/lib/ics'
 
 // Publieke oudercalender-feed: enkel events met de 'ouders'-tag, plus open
 // kampen/weekenden. Interne leiding-events verschijnen hier nooit.
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
     lines.push('END:VCALENDAR')
 
-    const icsContent = lines.join('\r\n') + '\r\n'
+    const icsContent = lines.map(foldIcsLine).join('\r\n') + '\r\n'
     const filename = singleId ? `kriko-m-event-${singleId}.ics` : 'kriko-m-kalender.ics'
 
     const headers: Record<string, string> = {

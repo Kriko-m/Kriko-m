@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import { getAllCalendarEvents, getKampen, getLeidingIcsToken } from '@/lib/db'
 import { CalendarEvent, Kamp } from '@/lib/types'
 import { AUDIENCE_NAMEN } from '@/lib/constants'
-import { IcsEvent, icsHeader, buildEventVevent, buildKampVevent, toUtcIcsString } from '@/lib/ics'
+import { IcsEvent, icsHeader, buildEventVevent, buildKampVevent, toUtcIcsString, foldIcsLine } from '@/lib/ics'
 
 // Private leiding-feed: ALLE events + ALLE kampen. Beveiligd met een geheim
 // token in de URL (agenda-apps pollen anoniem, dus geen login-cookie mogelijk).
@@ -40,7 +40,7 @@ export async function GET(
 
     lines.push('END:VCALENDAR')
 
-    const icsContent = lines.join('\r\n') + '\r\n'
+    const icsContent = lines.map(foldIcsLine).join('\r\n') + '\r\n'
 
     const headers: Record<string, string> = {
       'Content-Type': 'text/calendar; charset=utf-8',
