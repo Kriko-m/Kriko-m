@@ -41,7 +41,7 @@ export default function KalenderActiviteitModal({
 }) {
   const [form, setForm] = useState<FormState>(() =>
     editEvent
-      ? { title: editEvent.title, date: editEvent.date, datum_tot: '', timeStart: '', timeEnd: '',
+      ? { title: editEvent.title, date: editEvent.date, datum_tot: '',
           location: editEvent.location, description: editEvent.description, audience: editEvent.audience,
           is_evenement: editEvent.is_evenement, cover_image: editEvent.cover_image, document_url: editEvent.document_url,
           facebook_event_url: editEvent.facebook_event_url ?? '', external_link_url: editEvent.external_link_url ?? '',
