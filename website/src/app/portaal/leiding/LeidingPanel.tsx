@@ -82,7 +82,7 @@ export default function LeidingPanel({
   
   const takBgConfig = portalBackgrounds[activeTak] || {}
   const [customBg, setCustomBg] = useState<string | null>(takBgConfig.custom_url || null)
-  const [bgStyle, setBgStyle] = useState<'white' | 'regular' | 'reversed' | 'custom'>((takBgConfig.style as any) || 'reversed')
+  const [bgStyle, setBgStyle] = useState<'white' | 'regular' | 'reversed' | 'custom'>((takBgConfig.style as 'white' | 'regular' | 'reversed' | 'custom') || 'reversed')
 
   const handleBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -338,7 +338,7 @@ export default function LeidingPanel({
       if (ev.date < todayStr) return false
       return ev.audience.includes('leiding') || 
              ev.audience.includes('ouders') || 
-             ev.audience.includes(activeTak as any)
+             ev.audience.includes(activeTak as AudienceTag)
     })
     .slice(0, 5)
 
