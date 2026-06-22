@@ -4885,4 +4885,29 @@ body.portal-theme .portaal-nav {
     margin: 8px 0 0;
 }
 
+/* Activity card action buttons — muted by default, colored on hover */
+.cal-card-edit-btn,
+.cal-card-delete-btn {
+    padding: 5px 10px;
+    border-radius: 7px;
+    background: none;
+    font-family: inherit;
+    font-size: .72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+    border: 1.5px solid #d0d0d0;
+    color: #aaa;
+}
+
+.cal-card-edit-btn:hover {
+    border-color: #C9963A;
+    color: #C9963A;
+}
+
+.cal-card-delete-btn:hover {
+    border-color: #B23A4D;
+    color: #B23A4D;
+}
+
 

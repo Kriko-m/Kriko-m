@@ -242,8 +242,8 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     return (
       <span style={{ display: 'inline-flex', gap: 5, flexWrap: 'wrap' }}>
         {tags.map(t => (
-          <span key={t} style={{ padding: '1px 8px', borderRadius: 20, fontSize: '.68rem', fontWeight: 800, textTransform: 'uppercase',
-            background: `${AUDIENCE_KLEUREN[t]}22`, color: AUDIENCE_KLEUREN[t] }}>
+          <span key={t} style={{ padding: '1px 8px', borderRadius: 20, fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px',
+            background: `${AUDIENCE_KLEUREN[t]}18`, color: AUDIENCE_KLEUREN[t] }}>
             {AUDIENCE_NAMEN[t]}
           </span>
         ))}
@@ -373,17 +373,17 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 3 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
                     {ev.is_evenement && <span title="Evenement" style={{ color: '#C9963A', fontSize: '.85rem' }}>⭐</span>}
-                    {isKamp && <span style={{ padding: '1px 7px', borderRadius: 20, fontSize: '.65rem', fontWeight: 800, background: '#1A3D2A18', color: '#1A3D2A' }}>🏕️ KAMP</span>}
+                    {isKamp && <span style={{ padding: '1px 7px', borderRadius: 20, fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px', background: '#1A3D2A15', color: '#1A3D2A' }}>🏕️ KAMP</span>}
                     <TagChips tags={ev.audience} />
                   </div>
-                  <strong style={{ fontSize: '.95rem', color: '#1A3D2A', display: 'block' }}>{ev.title}</strong>
-                  <span style={{ fontSize: '.78rem', color: '#6A8A75', fontWeight: 600 }}>
+                  <strong style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1a1a1a', display: 'block', marginBottom: 8 }}>{ev.title}</strong>
+                  <span style={{ fontSize: '.82rem', color: '#6b6b6b', fontWeight: 400 }}>
                     {dateStr}{ev.datum_tot && ev.datum_tot !== ev.date ? ` – ${new Date(ev.datum_tot).getDate()} ${MAANDEN[new Date(ev.datum_tot).getMonth() + 1]}` : ''}
                     {ev.time && ` · ${ev.time}`}{ev.location && ` · ${ev.location}`}
                   </span>
-                  {ev.description && <p style={{ fontSize: '.82rem', color: '#3A5A42', margin: '5px 0 0', lineHeight: 1.4 }}>{ev.description}</p>}
+                  {ev.description && <p style={{ fontSize: '.82rem', color: '#888', fontStyle: 'italic', margin: '4px 0 0', lineHeight: 1.4 }}>{ev.description}</p>}
                 </div>
                 {!readOnly && (
                   <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
@@ -393,8 +393,8 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                       <span style={{ fontSize: '.7rem', color: '#9AB0A2', alignSelf: 'center' }}>via Groepsleiding</span>
                     ) : (
                       <>
-                        <button onClick={() => startEdit(ev)} style={{ padding: '5px 10px', border: '1.5px solid #C9963A', borderRadius: 7, background: 'none', color: '#C9963A', fontSize: '.72rem', fontWeight: 700, cursor: 'pointer' }}>Bewerken</button>
-                        <button onClick={() => handleDelete(ev.id, ev.title)} style={{ padding: '5px 10px', border: '1.5px solid #B23A4D', borderRadius: 7, background: 'none', color: '#B23A4D', fontSize: '.72rem', cursor: 'pointer' }}>✕</button>
+                        <button onClick={() => startEdit(ev)} className="cal-card-edit-btn">Bewerken</button>
+                        <button onClick={() => handleDelete(ev.id, ev.title)} className="cal-card-delete-btn">✕</button>
                       </>
                     )}
                   </div>
