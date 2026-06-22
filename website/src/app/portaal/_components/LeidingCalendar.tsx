@@ -195,8 +195,8 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
 
   function startEdit(ev: CalendarEntry) {
     setEditId(ev.id)
-    const fbUrl = (ev as any).facebook_event_url ?? ''
-    const extUrl = (ev as any).external_link_url ?? ''
+    const fbUrl = ev.facebook_event_url ?? ''
+    const extUrl = ev.external_link_url ?? ''
     setForm({
       title: ev.title, date: ev.date, datum_tot: ev.datum_tot ?? '', ...parseTime(ev.time),
       location: ev.location, description: ev.description,
@@ -509,17 +509,22 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0, alignItems: 'center' }}>
                   {!readOnly && !isKamp && !(!canPublish && ev.audience.includes('ouders')) && (
-                    <button onClick={() => startEdit(ev)} title="Bewerken" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#999', fontSize: '.9rem', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
-                      <i className="fas fa-pen"></i>
-                    </button>
+                    <>
+                      <button onClick={() => startEdit(ev)} title="Bewerken" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#999', fontSize: '.9rem', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+                        <i className="fas fa-pen"></i>
+                      </button>
+                      <button onClick={() => handleDelete(ev.id, ev.title)} title="Verwijderen" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#c0392b', fontSize: '.9rem', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </>
                   )}
-                  {(ev as any).facebook_event_url && (
-                    <a href={(ev as any).facebook_event_url} target="_blank" rel="noopener noreferrer" title="Facebook evenement" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#1877F2', fontSize: '1rem', textDecoration: 'none', flexShrink: 0 }}>
+                  {ev.facebook_event_url && (
+                    <a href={ev.facebook_event_url} target="_blank" rel="noopener noreferrer" title="Facebook evenement" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#1877F2', fontSize: '1rem', textDecoration: 'none', flexShrink: 0 }}>
                       <i className="fab fa-facebook-f"></i>
                     </a>
                   )}
-                  {(ev as any).external_link_url && (
-                    <a href={(ev as any).external_link_url} target="_blank" rel="noopener noreferrer" title="Externe link" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#666', fontSize: '.9rem', textDecoration: 'none', flexShrink: 0 }}>
+                  {ev.external_link_url && (
+                    <a href={ev.external_link_url} target="_blank" rel="noopener noreferrer" title="Externe link" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#666', fontSize: '.9rem', textDecoration: 'none', flexShrink: 0 }}>
                       <i className="fas fa-link"></i>
                     </a>
                   )}

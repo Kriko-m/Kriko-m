@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { getPublicCalendarEvents } from '@/lib/db'
 import HeroCTA from '@/components/HeroCTA'
 import { CalendarEvent } from '@/lib/types'
@@ -22,11 +23,13 @@ export default async function HomePage() {
     <>
       {/* 1. Hero */}
       <section className="hero">
-        <img
+        <Image
           src="/images/hero-nieuw.webp"
           alt="Scouts Kriko-M"
           className="hero-img"
-          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          fill
+          priority
+          style={{ objectFit: 'cover' }}
         />
         <div className="hero-overlay">
           <div className="hero-text">

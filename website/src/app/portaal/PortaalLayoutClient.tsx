@@ -1,7 +1,7 @@
 'use client'
 
-import { Suspense, useState, useEffect, useTransition } from 'react'
-import { usePathname, useSearchParams, useRouter } from 'next/navigation'
+import { Suspense, useEffect, useTransition } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import PortaalNav from './_components/PortaalNav'
 import PortaalSidebar from './_components/PortaalSidebar'
 import PortaalLoading from './loading'
@@ -15,7 +15,6 @@ interface Props {
 
 export default function PortaalLayoutClient({ children, naam, isAdmin, role }: Props) {
   const pathname = usePathname()
-  const searchParams = useSearchParams()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
@@ -56,7 +55,7 @@ export default function PortaalLayoutClient({ children, naam, isAdmin, role }: P
             })
           }
         }
-      } catch (err) {
+      } catch {
         // ignore
       }
     }
