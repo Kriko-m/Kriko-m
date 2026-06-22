@@ -141,18 +141,6 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
 
   function closeModal() { setEditId(null); setShowForm(false) }
 
-  function handleDelete(id: string, title: string) {
-    setConfirmDialog({
-      message: `Weet je zeker dat je "${title}" wilt verwijderen uit de kalender?`,
-      onConfirm: async () => {
-        setConfirmDialog(null)
-        const res = await fetch(`/api/admin/calendar/${id}`, { method: 'DELETE' })
-        if (res.ok) { setEvents(prev => prev.filter(ev => ev.id !== id)); showFlash('Activiteit verwijderd.') }
-        else showFlash('Fout bij verwijderen.')
-      },
-    })
-  }
-
   function TagChips({ tags }: { tags: AudienceTag[] }) {
     return (
       <span style={{ display: 'inline-flex', gap: 5, flexWrap: 'wrap' }}>

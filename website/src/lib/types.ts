@@ -137,7 +137,7 @@ export interface Kamp {
   beschrijving: string
   prijs: number
   foto: string
-  paklijst: any // JSON
+  paklijst: { categorie: string; items: string[] }[] | null
   briefadres: string
   contact_info: string
   werkjaar?: string

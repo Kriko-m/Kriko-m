@@ -275,20 +275,6 @@ export default function LeidingPanel({
     }
   }
 
-  function handleDeleteCamp(id: string, naam: string) {
-    setConfirmDialog({
-      message: `Weet je zeker dat je "${naam}" en alle inschrijvingen wilt verwijderen?`,
-      onConfirm: async () => {
-        setConfirmDialog(null)
-        const res = await fetch(`/api/admin/kampen/${id}`, { method: 'DELETE' })
-        if (res.ok) {
-          setKampen(prev => prev.filter(k => k.id !== id))
-          showFlash('Kamp succesvol verwijderd.')
-        }
-      },
-    })
-  }
-
   // Echo Handlers
   async function handleUploadEcho(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
