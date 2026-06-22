@@ -4912,3 +4912,367 @@ body.portal-theme .portaal-nav {
 }
 
 
+/* ==========================================================================
+   Kamp standalone page — parent-facing private link (/kamp/[slug])
+   Separate (kamp) route group: no marketing header/footer
+   ========================================================================== */
+
+/* ── Minimal nav ── */
+.kamp-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    padding: 0 24px;
+    background: var(--color-bg-white);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+
+.kamp-nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--color-primary-dark);
+    font-weight: 800;
+    font-size: .95rem;
+    font-family: var(--font-heading);
+    letter-spacing: -.01em;
+}
+
+/* ── Leiding banner ── */
+.kamp-leiding-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    background: #EEF5F1;
+    border-bottom: 1.5px solid #C2D9C9;
+    padding: 10px 24px;
+}
+
+.kamp-leiding-banner span {
+    font-size: .85rem;
+    font-weight: 700;
+    color: #1A3D2A;
+}
+
+.kamp-leiding-btn {
+    margin-left: auto;
+    padding: 6px 14px;
+    background: #1A3D2A;
+    color: #fff;
+    border-radius: 8px;
+    font-size: .8rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* ── Hero ── */
+.kamp-hero {
+    position: relative;
+    height: 320px;
+    background: linear-gradient(
+        155deg,
+        color-mix(in srgb, var(--tak-kleur, var(--color-primary)) 38%, #3a0710) 0%,
+        #3a0710 100%
+    );
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+}
+
+.kamp-hero-overlay {
+    position: absolute;
+    inset: 0;
+    /* Stronger at bottom for text legibility over photo */
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.08) 0%,
+        rgba(0,0,0,0.28) 40%,
+        rgba(0,0,0,0.72) 100%
+    );
+}
+
+.kamp-hero-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 28px max(24px, 4vw);
+}
+
+.kamp-tak-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 800;
+    letter-spacing: .03em;
+    margin-bottom: 10px;
+}
+
+.kamp-hero-titel {
+    font-family: var(--font-londrina);
+    font-size: clamp(1.9rem, 5vw, 2.9rem);
+    color: #fff;
+    margin: 0 0 16px;
+    line-height: 1.05;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+}
+
+.kamp-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.kamp-meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    color: #fff;
+    font-size: .85rem;
+    font-weight: 600;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.kamp-meta-link {
+    text-decoration: none;
+    transition: background var(--transition-fast);
+}
+
+.kamp-meta-link:hover {
+    background: rgba(255,255,255,0.26);
+}
+
+/* ── Body: two-column layout ── */
+.kamp-body {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 28px;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px max(24px, 4vw);
+    align-items: start;
+}
+
+.kamp-sidebar-sticky {
+    position: sticky;
+    top: calc(56px + 20px);
+}
+
+/* ── Content cards ── */
+.kamp-card {
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+}
+
+.kamp-card:last-child {
+    margin-bottom: 0;
+}
+
+.kamp-section-title {
+    font-family: var(--font-heading);
+    font-size: .92rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    margin: 0 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--color-border);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.kamp-beschrijving {
+    line-height: 1.75;
+    color: var(--color-text-dark);
+    margin: 0;
+    white-space: pre-wrap;
+    font-size: .95rem;
+}
+
+/* ── Bijlagen ── */
+.kamp-bijlagen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.kamp-bijlage-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    background: var(--color-bg-linen);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.kamp-bijlage-card:hover {
+    border-color: var(--color-primary);
+    background: var(--color-bg-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.kamp-bijlage-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.kamp-bijlage-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.kamp-bijlage-info strong {
+    font-size: .83rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kamp-bijlage-type {
+    font-size: .72rem;
+    color: var(--color-text-muted);
+}
+
+/* ── Google Slides embed ── */
+.kamp-slides-wrap {
+    margin-top: 18px;
+}
+
+.kamp-slides-titel {
+    display: block;
+    font-size: .85rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    margin-bottom: 8px;
+}
+
+.kamp-slides-frame {
+    position: relative;
+    width: 100%;
+    padding-bottom: 58%;
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+}
+
+/* ── Praktische info ── */
+.kamp-praktisch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.kamp-praktisch-label {
+    font-size: .75rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 8px;
+}
+
+.kamp-briefadres {
+    font-family: monospace;
+    font-size: .82rem;
+    color: var(--color-text-dark);
+    margin: 0;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    background: var(--color-bg-linen);
+    padding: 10px 12px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+}
+
+.kamp-contact {
+    font-size: .9rem;
+    color: var(--color-text-dark);
+    margin: 0;
+    line-height: 1.55;
+}
+
+/* ── Paklijst ── */
+.kamp-paklijst-hint {
+    font-size: .83rem;
+    color: var(--color-text-muted);
+    margin: -6px 0 16px;
+    line-height: 1.5;
+}
+
+/* ── Mobile ── */
+@media (max-width: 720px) {
+    .kamp-hero {
+        height: 250px;
+    }
+
+    .kamp-hero-titel {
+        font-size: 1.7rem;
+    }
+
+    .kamp-meta-pill {
+        font-size: .78rem;
+        padding: 5px 12px;
+    }
+
+    .kamp-body {
+        grid-template-columns: 1fr;
+        padding: 20px 16px;
+        gap: 0;
+    }
+
+    /* RSVP form first on mobile */
+    .kamp-sidebar {
+        order: -1;
+        margin-bottom: 20px;
+    }
+
+    .kamp-sidebar-sticky {
+        position: static;
+    }
+
+    .kamp-praktisch-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .kamp-bijlagen-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .kamp-leiding-banner {
+        padding: 10px 16px;
+    }
+}
+
+@media (max-width: 400px) {
+    .kamp-bijlagen-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
