@@ -351,6 +351,58 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     )
   }
 
+  // ─── Date box widget (left column of each activity card) ─────────────────
+  function DateBox({ date, datumTot }: { date: string; datumTot?: string }) {
+    const start = new Date(date)
+    const startDay = start.getDate()
+    const startMaand = MAANDEN_KORT[start.getMonth()].toLowerCase()
+    const isMultiDay = !!datumTot && datumTot !== date
+
+    const boxStyle: React.CSSProperties = {
+      flexShrink: 0, width: 54, background: '#EEF5F1', borderRadius: 10,
+      border: '1.5px solid #C2D9C9', padding: '10px 6px 8px',
+      textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+    }
+
+    if (!isMultiDay) {
+      return (
+        <div style={boxStyle}>
+          <span style={{ fontSize: 22, fontWeight: 800, color: '#1A3D2A', lineHeight: 1 }}>
+            {String(startDay).padStart(2, '0')}
+          </span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#6A8A75', lineHeight: 1 }}>{startMaand}</span>
+        </div>
+      )
+    }
+
+    const end = new Date(datumTot!)
+    const endDay = end.getDate()
+    const endMaand = MAANDEN_KORT[end.getMonth()].toLowerCase()
+    const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()
+
+    return (
+      <div style={boxStyle}>
+        {sameMonth ? (
+          <>
+            <span style={{ fontSize: 15, fontWeight: 800, color: '#1A3D2A', lineHeight: 1.1, letterSpacing: '-0.5px' }}>
+              {startDay}–{endDay}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#6A8A75', lineHeight: 1 }}>{startMaand}</span>
+          </>
+        ) : (
+          <>
+            <span style={{ fontSize: 13, fontWeight: 800, color: '#1A3D2A', lineHeight: 1.25 }}>
+              {startDay} {startMaand}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 500, color: '#6A8A75', lineHeight: 1.25 }}>
+              – {endDay} {endMaand}
+            </span>
+          </>
+        )}
+      </div>
+    )
+  }
+
   // ─── Activity list (right column or standalone) ───────────────────────────
   function ActivityList({ listEntries }: { listEntries: CalendarEntry[] }) {
     return (
@@ -361,8 +413,6 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
           </p>
         )}
         {listEntries.map(ev => {
-          const dateObj = new Date(ev.date)
-          const dateStr = `${dateObj.getDate()} ${MAANDEN[dateObj.getMonth() + 1]}`
           const isKamp = ev.source === 'kamp'
           const highlighted = highlightTak ? ev.audience.includes(highlightTak as AudienceTag) : false
           return (
@@ -371,18 +421,20 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
               border: highlighted ? '2px solid #C9963A' : '1.5px solid #C2D9C9',
               boxShadow: highlighted ? '0 2px 10px rgba(201,150,58,.18)' : 'none',
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <DateBox date={ev.date} datumTot={ev.datum_tot || undefined} />
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
                     {ev.is_evenement && <span title="Evenement" style={{ color: '#C9963A', fontSize: '.85rem' }}>⭐</span>}
                     {isKamp && <span style={{ padding: '1px 7px', borderRadius: 20, fontSize: '11px', fontWeight: 600, letterSpacing: '0.5px', background: '#1A3D2A15', color: '#1A3D2A' }}>🏕️ KAMP</span>}
                     <TagChips tags={ev.audience} />
                   </div>
                   <strong style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1a1a1a', display: 'block', marginBottom: 8 }}>{ev.title}</strong>
-                  <span style={{ fontSize: '.82rem', color: '#6b6b6b', fontWeight: 400 }}>
-                    {dateStr}{ev.datum_tot && ev.datum_tot !== ev.date ? ` – ${new Date(ev.datum_tot).getDate()} ${MAANDEN[new Date(ev.datum_tot).getMonth() + 1]}` : ''}
-                    {ev.time && ` · ${ev.time}`}{ev.location && ` · ${ev.location}`}
-                  </span>
+                  {(ev.time || ev.location) && (
+                    <span style={{ fontSize: '.82rem', color: '#6b6b6b', fontWeight: 400 }}>
+                      {[ev.time, ev.location].filter(Boolean).join(' · ')}
+                    </span>
+                  )}
                   {ev.description && <p style={{ fontSize: '.82rem', color: '#888', fontStyle: 'italic', margin: '4px 0 0', lineHeight: 1.4 }}>{ev.description}</p>}
                 </div>
                 {!readOnly && (
