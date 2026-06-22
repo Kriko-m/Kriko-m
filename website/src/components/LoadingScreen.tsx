@@ -21,6 +21,7 @@ export default function LoadingScreen() {
 
   return (
     <div ref={ref} id="loading-screen" aria-hidden="true" style={{ display: 'none' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/images/logo-finaal.png" alt="Kriko-M laden…" />
       <div className="loading-bar-wrap"><div className="loading-bar"></div></div>
     </div>

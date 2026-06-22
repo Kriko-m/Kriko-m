@@ -41,6 +41,7 @@ export default function PhotoGallery({ photos }: { photos: string[] }) {
             onClick={e => { e.stopPropagation(); setLightbox((lightbox - 1 + photos.length) % photos.length) }}>
             <i className="fa-solid fa-chevron-left"/>
           </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={photos[lightbox]}
             alt={`Foto ${lightbox+1}`}
