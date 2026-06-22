@@ -11,10 +11,6 @@ const QUICK_LINKS = [
   { icon: 'fa-solid fa-users-gear', label: 'Groepsadmin', href: 'https://groepsadmin.scoutsengidsenvlaanderen.be/groepsadmin/client/' },
 ]
 
-const TAK_KLEUREN: Record<string, string> = {
-  groep: '#1A3D2A', kapoenen: '#F4C842', welpen: '#5D9E6C', jonggivers: '#E07B1A', givers: '#1A3FB5',
-}
-
 function formatDate(dateStr: string) {
   const d = new Date(dateStr)
   return {

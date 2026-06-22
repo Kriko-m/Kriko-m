@@ -12,7 +12,7 @@ interface Props {
   role?: string
 }
 
-export default function PortaalNav({ naam, isAdmin }: Props) {
+export default function PortaalNav({ naam, isAdmin: _isAdmin }: Props) {
   const router = useRouter()
   const supabase = createClient()
 

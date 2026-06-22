@@ -585,7 +585,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
               </div>
 
               {/* Titel */}
-              <div><label style={labelStyle}>Titel</label><input style={{ ...inputStyle, ...errorOutline('title') }} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} onBlur={e => setForm(p => ({ ...p, title: p.title.trim() }))} placeholder="bijv. Groeps-BBQ" /></div>
+              <div><label style={labelStyle}>Titel</label><input style={{ ...inputStyle, ...errorOutline('title') }} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} onBlur={() => setForm(p => ({ ...p, title: p.title.trim() }))} placeholder="bijv. Groeps-BBQ" /></div>
 
               {/* Time & Dates */}
               <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.5fr', gap: 16 }}>
@@ -629,8 +629,8 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
               </div>
 
               {/* Location & Description */}
-              <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} onBlur={e => setForm(p => ({ ...p, location: p.location.trim() }))} placeholder="bijv. Scoutslokalen" /></div>
-              <div><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} onBlur={e => setForm(p => ({ ...p, description: p.description.trim() }))} placeholder="Korte uitleg..." /></div>
+              <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} onBlur={() => setForm(p => ({ ...p, location: p.location.trim() }))} placeholder="bijv. Scoutslokalen" /></div>
+              <div><label style={labelStyle}>Omschrijving</label><textarea style={inputStyle} rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} onBlur={() => setForm(p => ({ ...p, description: p.description.trim() }))} placeholder="Korte uitleg..." /></div>
 
               {/* Facebook & External Link & Document toggles */}
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
@@ -652,12 +652,12 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
 
               {/* Facebook URL input */}
               {facebookLinkOpen && (
-                <div><label style={labelStyle}>Facebook evenement link</label><input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} onBlur={e => setForm(p => ({ ...p, facebook_event_url: p.facebook_event_url.trim() }))} placeholder="https://facebook.com/events/..." /></div>
+                <div><label style={labelStyle}>Facebook evenement link</label><input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} onBlur={() => setForm(p => ({ ...p, facebook_event_url: p.facebook_event_url.trim() }))} placeholder="https://facebook.com/events/..." /></div>
               )}
 
               {/* External link input */}
               {externalLinkOpen && (
-                <div><label style={labelStyle}>Externe link</label><input style={inputStyle} value={form.external_link_url} onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))} onBlur={e => setForm(p => ({ ...p, external_link_url: p.external_link_url.trim() }))} placeholder="https://example.com/form" /></div>
+                <div><label style={labelStyle}>Externe link</label><input style={inputStyle} value={form.external_link_url} onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))} onBlur={() => setForm(p => ({ ...p, external_link_url: p.external_link_url.trim() }))} placeholder="https://example.com/form" /></div>
               )}
 
               {/* Document upload (only for canPublish) */}
@@ -741,7 +741,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
         <div className="portal-agenda-layout">
           {/* Left: calendar grid */}
           <div>
-            <CalendarGrid />
+            {CalendarGrid()}
             {selectedDate && (
               <div style={{ marginTop: 10, padding: '6px 12px', background: '#EEF5F1', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <span style={{ fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A' }}>
@@ -766,7 +766,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                 </button>
               )}
             </div>
-            <ActivityList listEntries={rightEntries} />
+            {ActivityList({ listEntries: rightEntries })}
           </div>
         </div>
       ) : (
@@ -778,7 +778,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
               + Activiteit toevoegen
             </button>
           )}
-          <ActivityList listEntries={entries} />
+          {ActivityList({ listEntries: entries })}
         </div>
       )}
 

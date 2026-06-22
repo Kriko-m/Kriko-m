@@ -3,17 +3,9 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Kamp, Echo, KampBestand, CalendarEvent, TodoItem } from '@/lib/types'
 import { CopyLinkButton, RsvpPanel } from '../_components/CampRsvpPanel'
-import LeidingCalendar from '../_components/LeidingCalendar'
 import { mergeCampsIntoCalendar } from '@/lib/calendar'
 
 const TAKKEN = ['groep', 'kapoenen', 'welpen', 'jonggivers', 'givers']
-const TAK_NAMEN: Record<string, string> = {
-  groep: 'Groep (Algemeen)',
-  kapoenen: 'Kapoenen (6-8j)',
-  welpen: 'Welpen (8-11j)',
-  jonggivers: 'Jonggivers (11-14j)',
-  givers: 'Givers (14-17j)',
-}
 const TAK_KLEUREN: Record<string, string> = {
   groep: '#1A3D2A', kapoenen: '#F4C842', welpen: '#5D9E6C', jonggivers: '#E07B1A', givers: '#1A3FB5', alle: '#1A3D2A',
 }
@@ -95,7 +87,7 @@ export default function LeidingPanel({
   initialCalendar,
   initialTodos,
   role,
-  icsToken,
+  icsToken: _icsToken,
   initialTak,
   initialMonth,
   portalBackgrounds = {},
@@ -111,7 +103,7 @@ export default function LeidingPanel({
   const [newTodoTitle, setNewTodoTitle] = useState('')
   const [showAddTodoPopover, setShowAddTodoPopover] = useState(false)
 
-  const canPublish = role === 'admin' || role === 'groepsleiding'
+  const _canPublish = role === 'admin' || role === 'groepsleiding'
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const echoFileInputRef = useRef<HTMLInputElement>(null)
@@ -164,7 +156,7 @@ export default function LeidingPanel({
       } else {
         showFlash("Fout bij uploaden achtergrond.")
       }
-    } catch (err) {
+    } catch {
       showFlash("Netwerkfout bij uploaden.")
     }
     setLoading(false)
@@ -191,7 +183,7 @@ export default function LeidingPanel({
         } else {
           showFlash("Fout bij opslaan achtergrondstijl.")
         }
-      } catch (err) {
+      } catch {
         showFlash("Netwerkfout bij bijwerken stijl.")
       }
     }
@@ -216,7 +208,7 @@ export default function LeidingPanel({
       } else {
         showFlash("Fout bij herstellen achtergrond.")
       }
-    } catch (err) {
+    } catch {
       showFlash("Netwerkfout bij herstellen achtergrond.")
     }
   }
