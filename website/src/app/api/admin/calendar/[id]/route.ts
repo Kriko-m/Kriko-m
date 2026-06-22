@@ -41,8 +41,8 @@ export async function PATCH(
   }
 
   const update: Record<string, unknown> = {}
-  for (const key of ['title', 'date', 'time', 'location', 'description']) {
-    if (key in body) update[key] = body[key]
+  for (const key of ['title', 'date', 'datum_tot', 'time', 'location', 'description']) {
+    if (key in body) update[key] = body[key] ?? null
   }
   if ('audience' in body) update.audience = [...new Set(resultingAudience)]
   if ('is_evenement' in body) update.is_evenement = resultingEvenement

@@ -21,12 +21,12 @@ interface Props {
 }
 
 type FormState = {
-  title: string; date: string; timeStart: string; timeEnd: string; location: string; description: string
+  title: string; date: string; datum_tot: string; timeStart: string; timeEnd: string; location: string; description: string
   audience: AudienceTag[]; is_evenement: boolean; cover_image: string; document_url: string
 }
 
 const emptyForm = (prefill?: string): FormState => ({
-  title: '', date: '', timeStart: '', timeEnd: '', location: '', description: '',
+  title: '', date: '', datum_tot: '', timeStart: '', timeEnd: '', location: '', description: '',
   audience: prefill && AUDIENCE_TAGS.includes(prefill as AudienceTag) ? [prefill as AudienceTag] : [],
   is_evenement: false, cover_image: '', document_url: '',
 })
@@ -192,7 +192,8 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
   function startEdit(ev: CalendarEntry) {
     setEditId(ev.id)
     setForm({
-      title: ev.title, date: ev.date, ...parseTime(ev.time), location: ev.location, description: ev.description,
+      title: ev.title, date: ev.date, datum_tot: ev.datum_tot ?? '', ...parseTime(ev.time),
+      location: ev.location, description: ev.description,
       audience: ev.audience, is_evenement: ev.is_evenement, cover_image: ev.cover_image, document_url: ev.document_url,
     })
     setShowForm(true)
@@ -206,7 +207,8 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     e.preventDefault()
     setLoading(true)
     const payload = {
-      title: form.title, date: form.date, time: [form.timeStart, form.timeEnd].filter(Boolean).join(' - '), location: form.location, description: form.description,
+      title: form.title, date: form.date, datum_tot: form.datum_tot || null,
+      time: [form.timeStart, form.timeEnd].filter(Boolean).join(' - '), location: form.location, description: form.description,
       audience: form.audience, is_evenement: form.is_evenement,
       cover_image: form.cover_image, document_url: form.document_url,
     }
@@ -466,7 +468,29 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
         <h4 style={{ margin: '0 0 14px', color: '#1A3D2A', fontWeight: 800, fontSize: '.95rem' }}>{editId ? 'Activiteit bewerken' : 'Nieuwe activiteit'}</h4>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
           <div><label style={labelStyle}>Titel</label><input style={inputStyle} value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))} required placeholder="bijv. Groeps-BBQ" /></div>
-          <div><label style={labelStyle}>Datum</label><input type="date" style={inputStyle} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} required /></div>
+          <div>
+            <label style={labelStyle}>Datum</label>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <input type="date" style={{ ...inputStyle, flex: 1 }} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} required />
+              {form.datum_tot ? (
+                <>
+                  <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
+                  <input type="date" style={{ ...inputStyle, flex: 1 }} value={form.datum_tot}
+                    min={form.date || undefined}
+                    onChange={e => setForm(p => ({ ...p, datum_tot: e.target.value }))} />
+                  <button type="button" title="Einddatum verwijderen"
+                    onClick={() => setForm(p => ({ ...p, datum_tot: '' }))}
+                    style={{ flexShrink: 0, background: 'none', border: 'none', color: '#aaa', cursor: 'pointer', fontSize: '1rem', lineHeight: 1, padding: '0 2px' }}>×</button>
+                </>
+              ) : (
+                <button type="button" title="Meerdaagse activiteit"
+                  onClick={() => setForm(p => ({ ...p, datum_tot: p.date }))}
+                  style={{ flexShrink: 0, background: '#EEF5F1', border: '1.5px solid #C2D9C9', borderRadius: 7, color: '#1A3D2A', cursor: 'pointer', fontSize: '.72rem', fontWeight: 700, padding: '5px 9px', whiteSpace: 'nowrap' }}>
+                  + einddatum
+                </button>
+              )}
+            </div>
+          </div>
           <div>
             <label style={labelStyle}>Tijdstip</label>
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>

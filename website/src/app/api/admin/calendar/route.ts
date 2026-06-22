@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
     .insert({
       title: body.title,
       date: body.date,
+      datum_tot: body.datum_tot || null,
       time: body.time || '',
       location: body.location || '',
       description: body.description || '',
