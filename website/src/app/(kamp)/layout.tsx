@@ -9,6 +9,7 @@ export default function KampLayout({ children }: { children: React.ReactNode }) 
           <Image src="/images/logo-finaal.png" alt="Scouts Kriko-M" width={34} height={34} />
           <span>Scouts Kriko-M</span>
         </Link>
+        <Link href="/" className="kamp-nav-back">← Website</Link>
       </nav>
       <main>{children}</main>
     </>

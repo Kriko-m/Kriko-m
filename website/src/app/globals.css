@@ -4917,18 +4917,18 @@ body.portal-theme .portaal-nav {
    Separate (kamp) route group: no marketing header/footer
    ========================================================================== */
 
-/* ── Minimal nav ── */
+/* ── Nav — bordeaux, matches site branding ── */
 .kamp-nav {
     position: sticky;
     top: 0;
     z-index: 100;
     display: flex;
     align-items: center;
-    height: 56px;
-    padding: 0 24px;
-    background: var(--color-bg-white);
-    border-bottom: 1px solid var(--color-border);
-    box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 28px;
+    background: var(--color-primary-dark);
+    border-bottom: 2px solid rgba(201,150,58,0.25);
 }
 
 .kamp-nav-logo {
@@ -4936,11 +4936,23 @@ body.portal-theme .portaal-nav {
     align-items: center;
     gap: 10px;
     text-decoration: none;
-    color: var(--color-primary-dark);
+    color: #fff;
     font-weight: 800;
     font-size: .95rem;
     font-family: var(--font-heading);
     letter-spacing: -.01em;
+}
+
+.kamp-nav-back {
+    font-size: .82rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.kamp-nav-back:hover {
+    color: rgba(255,255,255,0.9);
 }
 
 /* ── Leiding banner ── */
@@ -4971,129 +4983,102 @@ body.portal-theme .portaal-nav {
     text-decoration: none;
 }
 
-/* ── Tak badge (reused across hero card top) ── */
-.kamp-tak-badge {
-    display: inline-block;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: .75rem;
-    font-weight: 800;
-    letter-spacing: .03em;
+/* ── Hero — full width, matches .tak-hero style ── */
+.kamp-page-hero {
     position: relative;
+    overflow: hidden;
+    background-color: var(--tak-kleur, var(--color-primary-dark));
+    padding: 80px 0;
+    border-bottom: 4px solid var(--tak-kleur, var(--color-accent-light));
+    color: #fff;
+    /* Forward --tak-kleur so .hero-eyebrow can pick it up */
+    --tak-color: var(--tak-kleur);
+}
+
+.kamp-page-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+        155deg,
+        rgba(58,7,16,0.72) 0%,
+        rgba(0,0,0,0.38) 100%
+    );
+}
+
+.kamp-page-hero .tak-hero-img {
     z-index: 1;
 }
 
-/* ── Body: two-column layout ── */
-.kamp-body {
-    display: grid;
-    grid-template-columns: 1fr 380px;
-    gap: 28px;
-    max-width: 1220px;
-    margin: 0 auto;
-    padding: 32px max(24px, 3vw);
-    align-items: start;
-}
-
-/* ── Hero card (left column) ── */
-.kamp-hero-card {
-    background: var(--color-bg-white);
-    border: 1px solid var(--color-border);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
-}
-
-.kamp-hero-card-top {
+.kamp-page-hero-body {
     position: relative;
-    height: 260px;
-    background: linear-gradient(
-        155deg,
-        color-mix(in srgb, var(--tak-kleur, var(--color-primary)) 40%, #3a0710) 0%,
-        #3a0710 100%
-    );
+    z-index: 3;
+}
+
+.kamp-hero-naam {
+    margin: 14px 0 22px;
+}
+
+.kamp-hero-chips {
     display: flex;
-    align-items: flex-end;
-    padding: 20px 28px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.kamp-hero-card-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.05) 0%,
-        rgba(0,0,0,0.25) 45%,
-        rgba(0,0,0,0.65) 100%
-    );
+.kamp-hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(0,0,0,0.35);
+    color: #fff;
+    border-radius: 50px;
+    font-size: .85rem;
+    font-weight: 600;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.15);
+    line-height: 1.3;
 }
 
-.kamp-hero-card-body {
-    padding: 30px 32px 36px;
+.kamp-hero-chip-link {
+    text-decoration: none;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
-.kamp-hero-card-titel {
-    font-family: var(--font-londrina);
-    font-size: clamp(2.2rem, 4vw, 3.4rem);
+.kamp-hero-chip-link:hover {
+    background: rgba(0,0,0,0.55);
+    border-color: rgba(255,255,255,0.3);
+}
+
+/* ── Body layout ── */
+.kamp-body-section {
+    padding-top: 48px;
+    padding-bottom: 80px;
+}
+
+/* ── Left info column ── */
+.kamp-info-card {
+    margin-bottom: 24px;
+}
+
+.kamp-info-col h2 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 800;
     color: var(--color-primary-dark);
-    margin: 10px 0 20px;
-    line-height: 1.0;
-}
-
-/* Info rows (date, location, price) */
-.kamp-hero-card-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 26px;
-    padding-bottom: 26px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
     border-bottom: 1.5px solid var(--color-border);
 }
 
-.kamp-meta-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: .95rem;
-    font-weight: 600;
-    color: var(--color-text-dark);
+/* ── Right: sticky RSVP card ── */
+.kamp-rsvp-card {
+    position: sticky;
+    top: calc(60px + 20px);
+    margin-bottom: 0;
 }
 
-.kamp-meta-row-link {
-    text-decoration: none;
-    color: var(--color-primary);
-    transition: opacity var(--transition-fast);
-}
-
-.kamp-meta-row-link:hover {
-    opacity: .75;
-}
-
-.kamp-meta-row-icon {
-    font-size: 1.05rem;
-    width: 24px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.kamp-meta-row-arrow {
-    font-size: .8rem;
-    margin-left: 2px;
-    opacity: .6;
-}
-
-/* Sections inside the hero card body */
-.kamp-hero-card-section {
-    padding-top: 24px;
-    margin-top: 24px;
-    border-top: 1.5px solid var(--color-border);
-}
-
-.kamp-hero-card-section:first-of-type {
-    padding-top: 0;
-    margin-top: 0;
-    border-top: none;
-}
-
+/* ── Beschrijving ── */
 .kamp-beschrijving {
     line-height: 1.75;
     color: var(--color-text-dark);
@@ -5102,48 +5087,46 @@ body.portal-theme .portaal-nav {
     font-size: .95rem;
 }
 
-/* ── Right sidebar ── */
-.kamp-sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    position: sticky;
-    top: calc(56px + 20px);
-    max-height: calc(100vh - 56px - 40px);
-    overflow-y: auto;
-    /* hide scrollbar */
-    scrollbar-width: none;
+/* ── Praktische info ── */
+.kamp-praktisch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
 }
 
-.kamp-sidebar::-webkit-scrollbar {
-    display: none;
-}
-
-/* ── Right column cards ── */
-.kamp-card {
-    background: var(--color-bg-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-md);
-    padding: 24px;
-    flex-shrink: 0;
-}
-
-.kamp-section-title {
-    font-family: var(--font-heading);
-    font-size: .88rem;
-    font-weight: 800;
-    color: var(--color-primary-dark);
-    margin: 0 0 14px;
-    padding-bottom: 10px;
-    border-bottom: 1.5px solid var(--color-border);
+.kamp-praktisch-label {
+    font-size: .75rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
     text-transform: uppercase;
-    letter-spacing: .04em;
+    letter-spacing: .05em;
+    margin-bottom: 8px;
+}
+
+.kamp-briefadres {
+    font-family: monospace;
+    font-size: .82rem;
+    color: var(--color-text-dark);
+    margin: 0;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    background: var(--color-bg-linen);
+    padding: 10px 12px;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--color-border);
+}
+
+.kamp-contact {
+    font-size: .9rem;
+    color: var(--color-text-dark);
+    margin: 0;
+    line-height: 1.55;
 }
 
 /* ── Bijlagen ── */
 .kamp-bijlagen-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 10px;
     margin-bottom: 4px;
 }
@@ -5152,7 +5135,7 @@ body.portal-theme .portaal-nav {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 13px 14px;
+    padding: 13px 16px;
     background: var(--color-bg-linen);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-sm);
@@ -5216,42 +5199,6 @@ body.portal-theme .portaal-nav {
     border: 1px solid var(--color-border);
 }
 
-/* ── Praktische info ── */
-.kamp-praktisch-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 22px;
-}
-
-.kamp-praktisch-label {
-    font-size: .75rem;
-    font-weight: 700;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    margin-bottom: 8px;
-}
-
-.kamp-briefadres {
-    font-family: monospace;
-    font-size: .82rem;
-    color: var(--color-text-dark);
-    margin: 0;
-    line-height: 1.65;
-    white-space: pre-wrap;
-    background: var(--color-bg-linen);
-    padding: 10px 12px;
-    border-radius: var(--border-radius-sm);
-    border: 1px solid var(--color-border);
-}
-
-.kamp-contact {
-    font-size: .9rem;
-    color: var(--color-text-dark);
-    margin: 0;
-    line-height: 1.55;
-}
-
 /* ── Paklijst ── */
 .kamp-paklijst-hint {
     font-size: .83rem;
@@ -5262,29 +5209,21 @@ body.portal-theme .portaal-nav {
 
 /* ── Mobile ── */
 @media (max-width: 760px) {
-    .kamp-body {
-        grid-template-columns: 1fr;
-        padding: 16px;
-        gap: 16px;
+    .kamp-page-hero {
+        padding: 52px 0 44px;
     }
 
-    /* Sidebar becomes normal flow, no sticky/scroll on mobile */
-    .kamp-sidebar {
+    .kamp-hero-chips {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .kamp-hero-chip {
+        align-self: flex-start;
+    }
+
+    .kamp-rsvp-card {
         position: static;
-        max-height: none;
-        overflow-y: visible;
-    }
-
-    .kamp-hero-card-top {
-        height: 200px;
-    }
-
-    .kamp-hero-card-body {
-        padding: 22px 20px 28px;
-    }
-
-    .kamp-hero-card-titel {
-        font-size: 2rem;
     }
 
     .kamp-praktisch-grid {
@@ -5298,6 +5237,11 @@ body.portal-theme .portaal-nav {
 
     .kamp-leiding-banner {
         padding: 10px 16px;
+    }
+
+    .kamp-body-section {
+        padding-top: 32px;
+        padding-bottom: 48px;
     }
 }
 
