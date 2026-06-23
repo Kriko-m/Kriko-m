@@ -8,21 +8,27 @@
 -- en blijft de enige tag die een activiteit publiek op de website-kalender zet.
 --
 -- Idempotent: veilig om meermaals te draaien.
+--
+-- BELANGRIJK: eerst de oude CHECK droppen, anders blokkeert die (laat enkel
+-- 'ouders' toe, niet 'groep') de UPDATE hieronder.
 
 
--- ── 1. Bestaande data migreren: 'ouders' → 'groep' in audience-arrays ──
+-- ── 1. Oude audience-CHECK droppen ─────────────────────────
+ALTER TABLE calendar DROP CONSTRAINT IF EXISTS calendar_audience_valid;
+
+
+-- ── 2. Bestaande data migreren: 'ouders' → 'groep' in audience-arrays ──
 UPDATE calendar
 SET audience = array_replace(audience, 'ouders', 'groep')
 WHERE 'ouders' = ANY(audience);
 
 
--- ── 2. Audience-CHECK herzetten met 'groep' i.p.v. 'ouders' ──
-ALTER TABLE calendar DROP CONSTRAINT IF EXISTS calendar_audience_valid;
+-- ── 3. Nieuwe audience-CHECK met 'groep' i.p.v. 'ouders' ──
 ALTER TABLE calendar ADD CONSTRAINT calendar_audience_valid
   CHECK (audience <@ ARRAY['leiding','kapoenen','welpen','jonggivers','givers','groep']::text[]);
 
 
--- ── 3. RLS-policy: publiek mag enkel 'groep'-events lezen ──
+-- ── 4. RLS-policy: publiek mag enkel 'groep'-events lezen ──
 DROP POLICY IF EXISTS "Publiek: kalender lezen" ON calendar;
 CREATE POLICY "Publiek: kalender lezen" ON calendar
   FOR SELECT USING ('groep' = ANY(audience));

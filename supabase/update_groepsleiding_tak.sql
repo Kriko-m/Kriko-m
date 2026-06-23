@@ -11,10 +11,12 @@
 -- Idempotent: veilig om meermaals te draaien.
 
 
--- ── 1. todos.tak: data migreren + CHECK herzetten ───────────
+-- ── 1. todos.tak: CHECK eerst droppen, dan data migreren, dan herzetten ──
+-- (De oude CHECK laat 'groepsleiding' niet toe en zou de UPDATE blokkeren.)
+ALTER TABLE todos DROP CONSTRAINT IF EXISTS todos_tak_check;
+
 UPDATE todos SET tak = 'groepsleiding' WHERE tak = 'groep';
 
-ALTER TABLE todos DROP CONSTRAINT IF EXISTS todos_tak_check;
 ALTER TABLE todos ADD CONSTRAINT todos_tak_check
   CHECK (tak IN ('kapoenen','welpen','jonggivers','givers','groepsleiding'));
 
