@@ -8,7 +8,7 @@ type FormState = {
   location: string; description: string; audience: AudienceTag[]
   is_evenement: boolean; cover_image: string; document_url: string
   banner_image: string; header: string; body: string
-  facebook_event_url: string; external_link_url: string
+  facebook_event_url: string; facebook_post_url: string; external_link_url: string
 }
 
 function parseTime(time: string) {
@@ -22,7 +22,7 @@ function emptyForm(preAudience: AudienceTag[]): FormState {
     location: '', description: '', audience: preAudience,
     is_evenement: false, cover_image: '', document_url: '',
     banner_image: '', header: '', body: '',
-    facebook_event_url: '', external_link_url: '',
+    facebook_event_url: '', facebook_post_url: '', external_link_url: '',
   }
 }
 
@@ -47,14 +47,14 @@ export default function KalenderActiviteitModal({
           location: editEvent.location, description: editEvent.description, audience: editEvent.audience,
           is_evenement: editEvent.is_evenement, cover_image: editEvent.cover_image, document_url: editEvent.document_url,
           banner_image: editEvent.banner_image ?? '', header: editEvent.header ?? '', body: editEvent.body ?? '',
-          facebook_event_url: editEvent.facebook_event_url ?? '', external_link_url: editEvent.external_link_url ?? '',
+          facebook_event_url: editEvent.facebook_event_url ?? '', facebook_post_url: editEvent.facebook_post_url ?? '', external_link_url: editEvent.external_link_url ?? '',
           ...parseTime(editEvent.time) }
       : emptyForm(initialAudience)
   )
   const [loading, setLoading] = useState(false)
   const [flash, setFlash] = useState('')
   const [validationErrors, setValidationErrors] = useState<Set<string>>(new Set())
-  const [facebookLinkOpen, setFacebookLinkOpen] = useState(!!(editEvent?.facebook_event_url))
+  const [facebookLinkOpen, setFacebookLinkOpen] = useState(!!(editEvent?.facebook_event_url || editEvent?.facebook_post_url))
   const [externalLinkOpen, setExternalLinkOpen] = useState(!!(editEvent?.external_link_url))
 
   const selectableTags: AudienceTag[] = canPublish ? [...AUDIENCE_TAGS] : AUDIENCE_TAGS.filter(t => t !== 'groep')
@@ -111,6 +111,7 @@ export default function KalenderActiviteitModal({
       cover_image: form.cover_image, document_url: form.document_url,
       banner_image: form.banner_image, header: form.header, body: form.body,
       facebook_event_url: form.facebook_event_url || null,
+      facebook_post_url: form.facebook_post_url || null,
       external_link_url: form.external_link_url || null,
     }
     const isNew = !editEvent
@@ -270,9 +271,15 @@ export default function KalenderActiviteitModal({
             </div>
 
             {facebookLinkOpen && (
-              <div>
-                <label style={labelStyle}>Facebook evenement link</label>
-                <input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} placeholder="https://facebook.com/events/..." />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div>
+                  <label style={labelStyle}>Facebook evenement link</label>
+                  <input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} placeholder="https://facebook.com/events/..." />
+                </div>
+                <div>
+                  <label style={labelStyle}>Facebook post URL (voor embed)</label>
+                  <input style={inputStyle} value={form.facebook_post_url} onChange={e => setForm(p => ({ ...p, facebook_post_url: e.target.value }))} placeholder="https://www.facebook.com/ScoutsKrikoM/posts/..." />
+                </div>
               </div>
             )}
 

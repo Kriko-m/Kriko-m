@@ -2474,6 +2474,11 @@ body.portal-theme .tak-hero.primair {
     margin-bottom: 8px;
 }
 
+.cal-countdown--evenement {
+    color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
 .cal-event-title {
     font-size: 1.2rem;
     color: var(--color-primary-dark);

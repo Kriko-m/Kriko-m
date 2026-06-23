@@ -66,6 +66,7 @@ export interface CalendarEvent {
   header?: string
   body?: string
   facebook_event_url?: string | null
+  facebook_post_url?: string | null
   external_link_url?: string | null
   werkjaar?: string
   created_at?: string

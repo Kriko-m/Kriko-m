@@ -12,10 +12,7 @@ export default function CalendarGrid({ events }: { events: Event[] }) {
   const byDate: Record<string, Event[]> = {}
   events.forEach(e => { (byDate[e.date] = byDate[e.date] || []).push(e) })
 
-  const futureKeys = Object.keys(byDate).filter(k => k >= todayKey).sort()
-  const initMonth = futureKeys.length
-    ? new Date(+futureKeys[0].slice(0,4), +futureKeys[0].slice(5,7)-1, 1)
-    : new Date(today.getFullYear(), today.getMonth(), 1)
+  const initMonth = new Date(today.getFullYear(), today.getMonth(), 1)
 
   const [view, setView] = useState(initMonth)
   const [selected, setSelected] = useState<string|null>(null)
