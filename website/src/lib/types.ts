@@ -204,7 +204,7 @@ export interface TodoItem {
   title: string
   month: number
   completed: boolean
-  tak: 'groep' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
+  tak: 'evenementen' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' | 'groepsleiding'
   werkjaar: string
   created_at?: string
 }

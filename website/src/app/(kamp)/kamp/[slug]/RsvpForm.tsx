@@ -55,13 +55,14 @@ export default function RsvpForm({ slug, kampTak }: { slug: string; kampTak: str
 
   if (status === 'done') {
     return (
-      <div style={{ background: 'hsl(145,55%,95%)', border: '2px solid hsl(145,50%,72%)', borderRadius: 'var(--border-radius-md)', padding: '24px' }}>
-        <strong style={{ display: 'block', color: 'hsl(145,60%,26%)', fontSize: '1.1rem', marginBottom: 8 }}>✓ Bedankt!</strong>
-        <p style={{ color: 'hsl(145,45%,32%)', margin: '0 0 16px', lineHeight: 1.55, fontSize: '.9rem' }}>
+      <div className="rsvp-success">
+        <span className="rsvp-success-icon">🎒</span>
+        <h2 className="rsvp-success-title">Bedankt!</h2>
+        <p className="rsvp-success-text">
           Je antwoord is genoteerd. Wil je iets wijzigen? Open gewoon <strong>dezelfde link</strong> opnieuw — je laatste antwoord telt.
         </p>
         <button onClick={() => { setRijen([leegKind(defaultTak)]); setStatus('idle') }}
-          style={{ padding: '8px 16px', background: 'none', border: '1.5px solid hsl(145,45%,55%)', borderRadius: 8, color: 'hsl(145,55%,30%)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: '.83rem' }}>
+          className="rsvp-success-btn">
           Nog een kind doorgeven
         </button>
       </div>
@@ -69,17 +70,7 @@ export default function RsvpForm({ slug, kampTak }: { slug: string; kampTak: str
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ background: 'var(--color-bg-white)', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: '22px', boxShadow: 'var(--shadow-sm)' }}>
-      <h2 style={{ fontSize: '1.15rem', color: 'var(--color-primary-dark)', marginBottom: 4, fontFamily: 'var(--font-heading)', fontWeight: 800 }}>Komt je kind mee?</h2>
-      <p style={{ color: 'var(--color-text-muted)', fontSize: '.83rem', marginBottom: 18, lineHeight: 1.5 }}>
-        Meerdere kinderen? Gebruik &ldquo;+ nog een kind&rdquo;.
-      </p>
-
-      {error && (
-        <div style={{ background: 'hsla(4,75%,48%,0.08)', border: '1.5px solid var(--color-error)', color: 'var(--color-error)', padding: '11px 14px', borderRadius: 'var(--border-radius-sm)', marginBottom: 16, fontWeight: 600, fontSize: '.85rem' }}>
-          {error}
-        </div>
-      )}
+    <form onSubmit={handleSubmit}>
 
       {/* Honeypot */}
       <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}>
@@ -87,73 +78,70 @@ export default function RsvpForm({ slug, kampTak }: { slug: string; kampTak: str
         <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={e => setWebsite(e.target.value)} />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div className="rsvp-header">
+        <h2 className="rsvp-titel">Schrijf je in!</h2>
+        <p className="rsvp-sub">Meerdere kinderen? Voeg er meer toe onderaan.</p>
+      </div>
+
+      {error && <div className="rsvp-error">{error}</div>}
+
+      <div className="rsvp-rijen">
         {rijen.map((r, i) => (
-          <div key={i} style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-sm)', padding: '14px', position: 'relative', background: 'var(--color-bg-linen)' }}>
+          <div key={i} className={`rsvp-rij${r.status === 'ja' ? ' rsvp-rij--ja' : r.status === 'nee' ? ' rsvp-rij--nee' : ''}`}>
             {rijen.length > 1 && (
-              <button type="button" onClick={() => verwijder(i)} aria-label="Verwijder"
-                style={{ position: 'absolute', top: 8, right: 10, background: 'none', border: 'none', color: 'var(--color-error)', cursor: 'pointer', fontWeight: 700, fontSize: '1rem', lineHeight: 1 }}>×</button>
+              <button type="button" onClick={() => verwijder(i)} className="rsvp-verwijder" aria-label="Verwijder">×</button>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.04em' }}>Naam van het kind</label>
-                <input type="text" className="form-control" placeholder="Voornaam Achternaam" maxLength={120}
-                  value={r.kind_naam} onChange={e => update(i, { kind_naam: e.target.value })} required
-                  style={{ fontSize: '.9rem' }} />
+            <div className="rsvp-naam-row">
+              <div className="rsvp-field">
+                <label className="rsvp-label">Naam van het kind</label>
+                <input type="text" className="form-control" placeholder="Voornaam" maxLength={120}
+                  value={r.kind_naam} onChange={e => update(i, { kind_naam: e.target.value })} required />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.04em' }}>Tak</label>
-                <select className="form-control" value={r.tak} onChange={e => update(i, { tak: e.target.value })} required style={{ fontSize: '.85rem' }}>
+              <div className="rsvp-field">
+                <label className="rsvp-label">Tak</label>
+                <select className="form-control" value={r.tak} onChange={e => update(i, { tak: e.target.value })} required>
                   <option value="" disabled>Kies tak</option>
                   {TAKKEN.map(t => <option key={t} value={t}>{TAK_LABELS[t]}</option>)}
                 </select>
               </div>
             </div>
 
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '.04em' }}>Komt mee?</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                {(['ja', 'nee'] as const).map(opt => (
-                  <button key={opt} type="button" onClick={() => update(i, { status: opt })}
-                    style={{
-                      padding: '11px 8px', borderRadius: 'var(--border-radius-sm)', cursor: 'pointer',
-                      fontWeight: 700, fontFamily: 'inherit', fontSize: '.95rem',
-                      border: `2px solid ${r.status === opt ? (opt === 'ja' ? '#3F7D5A' : '#B23A4D') : 'var(--color-border)'}`,
-                      background: r.status === opt ? (opt === 'ja' ? 'hsl(145,42%,94%)' : 'hsl(350,55%,96%)') : 'var(--color-bg-white)',
-                      color: r.status === opt ? (opt === 'ja' ? '#2C5A40' : '#8A2433') : 'var(--color-text-muted)',
-                      transition: 'all .15s',
-                    }}>
-                    {opt === 'ja' ? '✓ Ja' : '✗ Nee'}
-                  </button>
-                ))}
+            <div className="rsvp-keuze">
+              <label className="rsvp-label">Komt mee op kamp?</label>
+              <div className="rsvp-keuze-btns">
+                <button type="button" onClick={() => update(i, { status: 'ja' })}
+                  className={`rsvp-keuze-btn rsvp-keuze-btn--ja${r.status === 'ja' ? ' is-active' : ''}`}>
+                  ✓ Ja!
+                </button>
+                <button type="button" onClick={() => update(i, { status: 'nee' })}
+                  className={`rsvp-keuze-btn rsvp-keuze-btn--nee${r.status === 'nee' ? ' is-active' : ''}`}>
+                  ✗ Nee
+                </button>
               </div>
             </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '.75rem', fontWeight: 700, color: 'var(--color-text-muted)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '.04em' }}>Opmerking (optioneel)</label>
+            <div className="rsvp-field rsvp-opmerking">
+              <label className="rsvp-label">Opmerking (optioneel)</label>
               <textarea className="form-control" rows={2} maxLength={500}
                 placeholder="Bv. allergie, komt later toe…"
                 value={r.opmerking} onChange={e => update(i, { opmerking: e.target.value })}
-                style={{ resize: 'vertical', fontSize: '.85rem' }} />
+                style={{ resize: 'vertical' }} />
             </div>
           </div>
         ))}
       </div>
 
-      <button type="button" onClick={voegToe}
-        style={{ marginTop: 12, padding: '8px 14px', background: 'none', border: '1.5px solid var(--color-border)', borderRadius: 8, color: 'var(--color-text-muted)', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 600, fontSize: '.83rem' }}>
-        + nog een kind
+      <button type="button" onClick={voegToe} className="rsvp-add-kind">
+        + nog een kind toevoegen
       </button>
 
-      <button type="submit" disabled={status === 'sending'}
-        style={{ display: 'block', width: '100%', padding: '13px', fontSize: '1rem', marginTop: 14, background: 'var(--color-primary)', color: '#fff', border: 'none', borderRadius: 'var(--border-radius-sm)', fontFamily: 'inherit', fontWeight: 700, cursor: status === 'sending' ? 'wait' : 'pointer', opacity: status === 'sending' ? .7 : 1, transition: 'opacity .15s' }}>
-        {status === 'sending' ? 'Bezig…' : 'Antwoord doorgeven'}
+      <button type="submit" disabled={status === 'sending'} className="rsvp-submit">
+        {status === 'sending' ? 'Bezig…' : 'Antwoord doorgeven →'}
       </button>
 
-      <p style={{ fontSize: '.75rem', color: 'var(--color-text-muted)', marginTop: 12, lineHeight: 1.5 }}>
+      <p className="rsvp-disclaimer">
         Dit is een opgave, geen definitieve inschrijving — leiding bevestigt via e-mail.
-        Wijzigen kan altijd via dezelfde link.
       </p>
     </form>
   )

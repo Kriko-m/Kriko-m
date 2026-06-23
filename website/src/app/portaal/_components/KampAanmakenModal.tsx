@@ -24,7 +24,7 @@ export default function KampAanmakenModal({ tak, defaultContactEmail = '', onClo
         prijs: form.prijs ? Number(form.prijs) : 0,
         contact_info: form.contact_info,
         beschrijving: form.beschrijving,
-        tak: tak === 'groep' ? 'alle' : tak,
+        tak: tak === 'evenementen' || tak === 'groepsleiding' ? 'alle' : tak,
       }),
     })
     if (res.ok) {

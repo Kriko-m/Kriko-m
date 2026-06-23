@@ -6,14 +6,11 @@ import KampBeheerModal from '../_components/KampBeheerModal'
 import KampAanmakenModal from '../_components/KampAanmakenModal'
 import KalenderActiviteitModal from '../_components/KalenderActiviteitModal'
 import { AudienceTag } from '@/lib/types'
-import { AUDIENCE_TAGS } from '@/lib/constants'
+import { AUDIENCE_TAGS, PORTAAL_TAKKEN, TAK_KLEUREN } from '@/lib/constants'
 import { mergeCampsIntoCalendar } from '@/lib/calendar'
 import ConfirmDialog from '../_components/ConfirmDialog'
 
-const TAKKEN = ['groep', 'kapoenen', 'welpen', 'jonggivers', 'givers']
-const TAK_KLEUREN: Record<string, string> = {
-  groep: '#1A3D2A', kapoenen: '#F4C842', welpen: '#5D9E6C', jonggivers: '#E07B1A', givers: '#1A3FB5', alle: '#1A3D2A',
-}
+const TAKKEN = PORTAAL_TAKKEN as readonly string[]
 const MAANDEN = ['', 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
 
 const MONTH_OPTIONS = [
@@ -57,7 +54,9 @@ export default function LeidingPanel({
   portalBackgrounds = {},
   takEmails = {},
 }: LeidingPanelProps) {
-  const [activeTak] = useState(TAKKEN.includes(initialTak ?? '') ? (initialTak as string) : 'groep')
+  const [activeTak] = useState(TAKKEN.includes(initialTak ?? '') ? (initialTak as string) : 'evenementen')
+  // Geen Kriko Echo voor overkoepelende tabs (evenementen / groepsleiding).
+  const isEchoTak = activeTak !== 'evenementen' && activeTak !== 'groepsleiding'
   const [inlineView, setInlineView] = useState<null | 'kampen' | 'echos'>(null)
   
   const [kampen, setKampen] = useState<Kamp[]>(initialKampen)
@@ -215,13 +214,13 @@ export default function LeidingPanel({
   }
 
   // Filter lists
-  const takKampen = kampen.filter(k => k.tak === activeTak || (activeTak === 'groep' && k.tak === 'alle'))
+  const takKampen = kampen.filter(k => k.tak === activeTak || ((activeTak === 'evenementen' || activeTak === 'groepsleiding') && k.tak === 'alle'))
   const takEchos = echos.filter(e => e.tak === activeTak)
   const filteredTodos = todos.filter(t => t.month === selectedMonth)
 
   // KE warning: past the 20th and next month's echo not yet uploaded for this tak
   const echoWarnActive = (() => {
-    if (activeTak === 'groep') return false
+    if (!isEchoTak) return false
     const now = new Date()
     if (now.getDate() < 20) return false
     const nextM = now.getMonth() === 11 ? 1 : now.getMonth() + 2
@@ -328,8 +327,8 @@ export default function LeidingPanel({
 
   const kleur = TAK_KLEUREN[activeTak] ?? '#888'
   const bannerImg = bgStyle === 'custom' ? customBg :
-                    bgStyle === 'regular' ? (activeTak === 'groep' ? '/images/leiding_25-26.jpg' : `/images/banner_${activeTak}.webp`) :
-                    bgStyle === 'reversed' ? (activeTak === 'groep' ? '/images/leiding_25-26.jpg' : `/images/banner_${activeTak}_reversed.webp`) :
+                    bgStyle === 'regular' ? (isEchoTak ? `/images/banner_${activeTak}.webp` : '/images/leiding_25-26.jpg') :
+                    bgStyle === 'reversed' ? (isEchoTak ? `/images/banner_${activeTak}_reversed.webp` : '/images/leiding_25-26.jpg') :
                     null
 
   // Filter calendar events for upcoming widget
@@ -389,7 +388,7 @@ export default function LeidingPanel({
                 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
                   {/* Action 1: Kriko Echo uploaden */}
-                  {activeTak !== 'groep' && (
+                  {isEchoTak && (
                     <div
                       onClick={() => setInlineView(inlineView === 'echos' ? null : 'echos')}
                       style={{
@@ -518,7 +517,7 @@ export default function LeidingPanel({
                 )}
 
                 {/* Inline Echo Panel */}
-                {inlineView === 'echos' && activeTak !== 'groep' && (
+                {inlineView === 'echos' && isEchoTak && (
                   <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 16, padding: 20 }}>
                     <form onSubmit={handleUploadEcho} style={{ background: '#EEF5F133', border: '1.5px dashed #2A5C3F', borderRadius: 14, padding: 20, marginBottom: 28 }}>
                       <h4 style={{ margin: '0 0 16px', color: '#1A3D2A', fontWeight: 800 }}>Nieuwe Kriko Echo uploaden</h4>

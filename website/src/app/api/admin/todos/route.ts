@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const { searchParams } = new URL(req.url)
-  const tak = searchParams.get('tak') || 'groep'
+  const tak = searchParams.get('tak') || 'evenementen'
 
   const werkjaar = await getActiveWerkjaar()
   const admin = createAdminClient()
