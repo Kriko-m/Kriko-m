@@ -6,8 +6,7 @@ import { AUDIENCE_TAGS, AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants
 type FormState = {
   title: string; date: string; datum_tot: string; timeStart: string; timeEnd: string
   location: string; description: string; audience: AudienceTag[]
-  is_evenement: boolean; cover_image: string; document_url: string
-  banner_image: string; header: string; body: string
+  is_evenement: boolean
   facebook_event_url: string; facebook_post_url: string; external_link_url: string
 }
 
@@ -20,8 +19,7 @@ function emptyForm(preAudience: AudienceTag[]): FormState {
   return {
     title: '', date: '', datum_tot: '', timeStart: '', timeEnd: '',
     location: '', description: '', audience: preAudience,
-    is_evenement: false, cover_image: '', document_url: '',
-    banner_image: '', header: '', body: '',
+    is_evenement: false,
     facebook_event_url: '', facebook_post_url: '', external_link_url: '',
   }
 }
@@ -45,8 +43,7 @@ export default function KalenderActiviteitModal({
     editEvent
       ? { title: editEvent.title, date: editEvent.date, datum_tot: '',
           location: editEvent.location, description: editEvent.description, audience: editEvent.audience,
-          is_evenement: editEvent.is_evenement, cover_image: editEvent.cover_image, document_url: editEvent.document_url,
-          banner_image: editEvent.banner_image ?? '', header: editEvent.header ?? '', body: editEvent.body ?? '',
+          is_evenement: editEvent.is_evenement,
           facebook_event_url: editEvent.facebook_event_url ?? '', facebook_post_url: editEvent.facebook_post_url ?? '', external_link_url: editEvent.external_link_url ?? '',
           ...parseTime(editEvent.time) }
       : emptyForm(initialAudience)
@@ -64,29 +61,6 @@ export default function KalenderActiviteitModal({
       const has = p.audience.includes(tag)
       return { ...p, audience: has ? p.audience.filter(a => a !== tag) : [...p.audience, tag] }
     })
-  }
-
-  async function uploadMedia(file: File, type: 'evenement-cover' | 'evenement-banner' | 'evenement-document'): Promise<string | null> {
-    const fd = new FormData(); fd.append('file', file); fd.append('type', type)
-    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-    if (!res.ok) { setFlash('Fout bij uploaden van bestand.'); return null }
-    return ((await res.json()).url) as string
-  }
-
-  async function handleCoverChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; if (!file) return
-    setLoading(true); const url = await uploadMedia(file, 'evenement-cover')
-    if (url) setForm(p => ({ ...p, cover_image: url })); setLoading(false)
-  }
-  async function handleBannerChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; if (!file) return
-    setLoading(true); const url = await uploadMedia(file, 'evenement-banner')
-    if (url) setForm(p => ({ ...p, banner_image: url })); setLoading(false)
-  }
-  async function handleDocChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; if (!file) return
-    setLoading(true); const url = await uploadMedia(file, 'evenement-document')
-    if (url) setForm(p => ({ ...p, document_url: url })); setLoading(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -108,8 +82,6 @@ export default function KalenderActiviteitModal({
       time: [form.timeStart, form.timeEnd].filter(Boolean).join(' - '),
       location: form.location, description: form.description,
       audience: form.audience, is_evenement: form.is_evenement,
-      cover_image: form.cover_image, document_url: form.document_url,
-      banner_image: form.banner_image, header: form.header, body: form.body,
       facebook_event_url: form.facebook_event_url || null,
       facebook_post_url: form.facebook_post_url || null,
       external_link_url: form.external_link_url || null,
@@ -287,44 +259,6 @@ export default function KalenderActiviteitModal({
               <div>
                 <label style={labelStyle}>Externe link</label>
                 <input style={inputStyle} value={form.external_link_url} onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))} placeholder="https://example.com/form" />
-              </div>
-            )}
-
-            {canPublish && form.audience.includes('groep') && (
-              <div style={{ padding: 14, background: '#f9f9f9', border: '1.5px solid #E2C58D', borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <span style={{ fontSize: '.78rem', fontWeight: 700, color: '#9A6B12' }}>
-                  ✨ Extra info voor de publieke kalender (klapt open bij klik)
-                </span>
-
-                <div>
-                  <label style={labelStyle}>Tussentitel / header</label>
-                  <input style={inputStyle} value={form.header} onChange={e => setForm(p => ({ ...p, header: e.target.value }))} placeholder="bijv. Iedereen welkom!" />
-                </div>
-
-                <div>
-                  <label style={labelStyle}>Uitnodigingstekst</label>
-                  <textarea style={inputStyle} rows={4} value={form.body} onChange={e => setForm(p => ({ ...p, body: e.target.value }))} placeholder="Volledige uitnodiging / alle details…" />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-                  <div>
-                    <label style={labelStyle}>Hero-foto</label>
-                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleCoverChange} style={{ fontSize: '.74rem' }} />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {form.cover_image && <img src={form.cover_image} alt="hero" style={{ width: '100%', height: 56, objectFit: 'cover', borderRadius: 7, marginTop: 8 }} />}
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Banner</label>
-                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleBannerChange} style={{ fontSize: '.74rem' }} />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {form.banner_image && <img src={form.banner_image} alt="banner" style={{ width: '100%', height: 56, objectFit: 'cover', borderRadius: 7, marginTop: 8 }} />}
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Uitnodiging (PDF)</label>
-                    <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocChange} style={{ fontSize: '.74rem' }} />
-                    {form.document_url && <span style={{ display: 'block', marginTop: 5, fontSize: '.74rem', color: '#3F7D5A', fontWeight: 600 }}>✓ Geüpload</span>}
-                  </div>
-                </div>
               </div>
             )}
 

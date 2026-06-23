@@ -55,11 +55,6 @@ export async function POST(req: NextRequest) {
       external_link_url: body.external_link_url || null,
       audience,
       is_evenement: evenement,
-      cover_image: body.cover_image || '',
-      document_url: body.document_url || '',
-      banner_image: body.banner_image || '',
-      header: body.header || '',
-      body: body.body || '',
       werkjaar,
     })
     .select()

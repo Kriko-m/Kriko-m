@@ -70,17 +70,11 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
               style={{ position: 'relative', pointerEvents: 'auto', background: '#fff', borderRadius: 22, boxShadow: '0 40px 100px rgba(58,7,16,0.26), 0 0 0 1px rgba(0,0,0,0.04)', width: '100%', maxWidth: 860, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Banner image */}
-              {event.banner_image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={event.banner_image} alt="" style={{ width: '100%', maxHeight: 260, objectFit: 'cover', borderRadius: '22px 22px 0 0', display: 'block' }} />
-              )}
-
-              {/* Close button — always top-right, floats over banner if present */}
+              {/* Close button */}
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                style={{ position: 'absolute', top: 16, right: 16, width: 36, height: 36, borderRadius: '50%', border: 'none', background: event.banner_image ? 'rgba(0,0,0,0.35)' : 'rgba(240,236,228,0.9)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', color: event.banner_image ? '#fff' : '#555', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}
+                style={{ position: 'absolute', top: 16, right: 16, width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'rgba(240,236,228,0.9)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', color: '#555', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}
                 aria-label="Sluiten"
               >
                 ✕
@@ -117,25 +111,7 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
                   )}
                 </div>
 
-                {/* Hero image */}
-                {event.cover_image && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={event.cover_image} alt={event.title} style={{ width: '100%', maxHeight: 240, objectFit: 'cover', borderRadius: 12, display: 'block' }} />
-                )}
-
-                {/* Sub-header */}
-                {event.header && (
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: '1.05rem', color: 'var(--color-primary-dark, #3a0710)', lineHeight: 1.4 }}>{event.header}</p>
-                )}
-
-                {/* Body / description */}
-                {(event.body || event.description) && (
-                  <p style={{ margin: 0, fontSize: '.92rem', color: '#444', lineHeight: 1.72, whiteSpace: 'pre-wrap' }}>
-                    {event.body || event.description}
-                  </p>
-                )}
-
-                {/* Facebook post embed */}
+                {/* Facebook post embed — main content */}
                 {event.facebook_post_url && (
                   <div style={{ display: 'flex', justifyContent: 'center', borderRadius: 12, border: '1px solid #ede9e1', overflow: 'hidden', background: '#f0f2f5' }}>
                     <iframe
@@ -150,13 +126,18 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
                   </div>
                 )}
 
-                {/* Action buttons */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 16, borderTop: '1px solid #ede9e1' }}>
-                  {event.document_url && (
-                    <a href={event.document_url} target="_blank" rel="noopener" className="cal-add-btn cal-add-btn--primary">
-                      <i className="fa-solid fa-file-arrow-down"></i> Uitnodiging
-                    </a>
-                  )}
+                {/* Description — fallback when no embed */}
+                {!event.facebook_post_url && event.description && (
+                  <p style={{ margin: 0, fontSize: '.92rem', color: '#444', lineHeight: 1.72, whiteSpace: 'pre-wrap' }}>
+                    {event.description}
+                  </p>
+                )}
+
+                {/* Action bar */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, paddingTop: 16, borderTop: '1px solid #ede9e1' }}>
+                  <span style={{ fontSize: '.72rem', fontWeight: 700, color: '#999', textTransform: 'uppercase' as const, letterSpacing: '0.06em', marginRight: 2, flexShrink: 0 }}>
+                    Zet in agenda
+                  </span>
                   <a href={googleCalUrl(event)} className="cal-add-btn" target="_blank" rel="noopener">
                     <i className="fa-brands fa-google"></i> Google
                   </a>
@@ -169,12 +150,12 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
                   </button>
                   {event.facebook_event_url && (
                     <a href={event.facebook_event_url} target="_blank" rel="noopener" className="cal-add-btn">
-                      <i className="fa-brands fa-facebook"></i> Facebook
+                      <i className="fa-brands fa-facebook"></i> Facebook evenement
                     </a>
                   )}
                   {event.external_link_url && (
-                    <a href={event.external_link_url} target="_blank" rel="noopener" className="cal-add-btn">
-                      <i className="fa-solid fa-arrow-up-right-from-square"></i> Meer info
+                    <a href={event.external_link_url} target="_blank" rel="noopener" className="cal-add-btn cal-add-btn--primary">
+                      <i className="fa-solid fa-arrow-up-right-from-square"></i> Inschrijven
                     </a>
                   )}
                 </div>
