@@ -62,56 +62,56 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
       {open && (
         <>
           <div
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 2000 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(10,0,5,0.5)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', zIndex: 2000 }}
             onClick={() => setOpen(false)}
           />
-          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2001, padding: 16, pointerEvents: 'none' }}>
+          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2001, padding: '16px', pointerEvents: 'none' }}>
             <div
-              style={{ pointerEvents: 'auto', background: '#fff', borderRadius: 18, boxShadow: '0 24px 72px rgba(0,0,0,0.28)', width: '100%', maxWidth: 560, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
+              style={{ position: 'relative', pointerEvents: 'auto', background: '#fff', borderRadius: 22, boxShadow: '0 40px 100px rgba(58,7,16,0.26), 0 0 0 1px rgba(0,0,0,0.04)', width: '100%', maxWidth: 700, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Banner image */}
               {event.banner_image && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={event.banner_image} alt="" style={{ width: '100%', maxHeight: 220, objectFit: 'cover', borderRadius: '18px 18px 0 0', display: 'block' }} />
+                <img src={event.banner_image} alt="" style={{ width: '100%', maxHeight: 260, objectFit: 'cover', borderRadius: '22px 22px 0 0', display: 'block' }} />
               )}
 
-              <div style={{ padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {/* Header row */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                  <div>
-                    {event.is_evenement && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '.72rem', fontWeight: 700, color: 'var(--color-accent)', marginBottom: 6 }}>
-                        <i className="fa-solid fa-star"></i> Uitgelicht evenement
-                      </span>
-                    )}
-                    <h3 style={{ margin: 0, color: 'var(--color-primary-dark, #3a0710)', fontSize: '1.4rem', fontWeight: 900, lineHeight: 1.2 }}>{event.title}</h3>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    style={{ flexShrink: 0, width: 34, height: 34, borderRadius: 8, border: 'none', background: '#F0ECE4', color: '#555', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    aria-label="Sluiten"
-                  >
-                    ✕
-                  </button>
+              {/* Close button — always top-right, floats over banner if present */}
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                style={{ position: 'absolute', top: 16, right: 16, width: 36, height: 36, borderRadius: '50%', border: 'none', background: event.banner_image ? 'rgba(0,0,0,0.35)' : 'rgba(240,236,228,0.9)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', color: event.banner_image ? '#fff' : '#555', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}
+                aria-label="Sluiten"
+              >
+                ✕
+              </button>
+
+              <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {/* Title */}
+                <div style={{ paddingRight: 24 }}>
+                  {event.is_evenement && (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: '.7rem', fontWeight: 700, color: 'var(--color-accent)', marginBottom: 8, letterSpacing: '0.07em', textTransform: 'uppercase' as const }}>
+                      <i className="fa-solid fa-star"></i> Uitgelicht evenement
+                    </span>
+                  )}
+                  <h3 style={{ margin: 0, color: 'var(--color-primary-dark, #3a0710)', fontSize: '1.75rem', fontWeight: 900, lineHeight: 1.15, letterSpacing: '-0.01em' }}>{event.title}</h3>
                 </div>
 
-                {/* Meta info */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '.88rem', color: '#444' }}>
-                    <i className="fa-regular fa-calendar" style={{ color: 'var(--color-accent)', width: 16 }}></i>
-                    <span>{weekday} {dateStr}</span>
+                {/* Meta card */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 9, background: '#faf9f7', border: '1px solid #ede9e1', borderRadius: 12, padding: '14px 18px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.88rem', color: '#333' }}>
+                    <i className="fa-regular fa-calendar" style={{ color: 'var(--color-accent)', width: 14, textAlign: 'center' as const }}></i>
+                    <span style={{ fontWeight: 600 }}>{weekday} {dateStr}</span>
                   </div>
                   {event.time && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '.88rem', color: '#444' }}>
-                      <i className="fa-regular fa-clock" style={{ color: 'var(--color-accent)', width: 16 }}></i>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.88rem', color: '#333' }}>
+                      <i className="fa-regular fa-clock" style={{ color: 'var(--color-accent)', width: 14, textAlign: 'center' as const }}></i>
                       <span>{event.time}</span>
                     </div>
                   )}
                   {event.location && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: '.88rem', color: '#444' }}>
-                      <i className="fa-solid fa-location-dot" style={{ color: 'var(--color-accent)', width: 16 }}></i>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.88rem', color: '#333' }}>
+                      <i className="fa-solid fa-location-dot" style={{ color: 'var(--color-accent)', width: 14, textAlign: 'center' as const }}></i>
                       <span>{event.location}</span>
                     </div>
                   )}
@@ -120,24 +120,24 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
                 {/* Hero image */}
                 {event.cover_image && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={event.cover_image} alt={event.title} style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: 10, display: 'block' }} />
+                  <img src={event.cover_image} alt={event.title} style={{ width: '100%', maxHeight: 240, objectFit: 'cover', borderRadius: 12, display: 'block' }} />
                 )}
 
                 {/* Sub-header */}
                 {event.header && (
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: 'var(--color-primary-dark, #3a0710)' }}>{event.header}</p>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: '1.05rem', color: 'var(--color-primary-dark, #3a0710)', lineHeight: 1.4 }}>{event.header}</p>
                 )}
 
                 {/* Body / description */}
                 {(event.body || event.description) && (
-                  <p style={{ margin: 0, fontSize: '.9rem', color: '#333', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                  <p style={{ margin: 0, fontSize: '.92rem', color: '#444', lineHeight: 1.72, whiteSpace: 'pre-wrap' }}>
                     {event.body || event.description}
                   </p>
                 )}
 
                 {/* Facebook post embed */}
                 {event.facebook_post_url && (
-                  <div style={{ overflow: 'hidden', borderRadius: 10 }}>
+                  <div style={{ overflow: 'hidden', borderRadius: 12, border: '1px solid #ede9e1' }}>
                     <iframe
                       src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(event.facebook_post_url)}&show_text=true&width=500`}
                       width="100%"
@@ -151,7 +151,7 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
                 )}
 
                 {/* Action buttons */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 4, borderTop: '1px solid #F0ECE4' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 16, borderTop: '1px solid #ede9e1' }}>
                   {event.document_url && (
                     <a href={event.document_url} target="_blank" rel="noopener" className="cal-add-btn cal-add-btn--primary">
                       <i className="fa-solid fa-file-arrow-down"></i> Uitnodiging
