@@ -42,6 +42,7 @@ interface LeidingPanelProps {
   initialTab?: string
   initialMonth?: number
   portalBackgrounds?: Record<string, { style: string; custom_url?: string }>
+  takEmails?: Record<string, string>
 }
 
 export default function LeidingPanel({
@@ -54,6 +55,7 @@ export default function LeidingPanel({
   initialTak,
   initialMonth,
   portalBackgrounds = {},
+  takEmails = {},
 }: LeidingPanelProps) {
   const [activeTak] = useState(TAKKEN.includes(initialTak ?? '') ? (initialTak as string) : 'groep')
   const [inlineView, setInlineView] = useState<null | 'kampen' | 'echos'>(null)
@@ -1134,6 +1136,7 @@ export default function LeidingPanel({
       {showKampAanmaken && (
         <KampAanmakenModal
           tak={activeTak}
+          defaultContactEmail={takEmails[activeTak] ?? ''}
           onClose={() => setShowKampAanmaken(false)}
           onCreated={(created) => {
             setKampen(prev => [...prev, created as Kamp])

@@ -4,8 +4,8 @@ import { useState } from 'react'
 const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' as const }
 const labelStyle = { display: 'block', fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 5 }
 
-export default function KampAanmakenModal({ tak, onClose, onCreated }: { tak: string; onClose: () => void; onCreated: (kamp: unknown) => void }) {
-  const [form, setForm] = useState({ naam: '', locatie: '', datum_van: '', datum_tot: '', prijs: '', contact_info: '', beschrijving: '' })
+export default function KampAanmakenModal({ tak, defaultContactEmail = '', onClose, onCreated }: { tak: string; defaultContactEmail?: string; onClose: () => void; onCreated: (kamp: unknown) => void }) {
+  const [form, setForm] = useState({ naam: '', locatie: '', datum_van: '', datum_tot: '', prijs: '', contact_info: defaultContactEmail, beschrijving: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -72,8 +72,8 @@ export default function KampAanmakenModal({ tak, onClose, onCreated }: { tak: st
                 <input type="number" min="0" step="0.01" style={inputStyle} value={form.prijs} onChange={e => setForm(p => ({ ...p, prijs: e.target.value }))} placeholder="0" />
               </div>
               <div>
-                <label style={labelStyle}>Contact info</label>
-                <input style={inputStyle} value={form.contact_info} onChange={e => setForm(p => ({ ...p, contact_info: e.target.value }))} placeholder="+32 470 12 34 56" />
+                <label style={labelStyle}>Contact e-mail</label>
+                <input type="email" style={inputStyle} value={form.contact_info} onChange={e => setForm(p => ({ ...p, contact_info: e.target.value }))} placeholder="tak@kriko-m.be" />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={labelStyle}>Beschrijving</label>

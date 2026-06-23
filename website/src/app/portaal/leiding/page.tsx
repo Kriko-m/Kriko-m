@@ -27,7 +27,7 @@ export default async function LeidingPortaalPage({
     admin.from('kampen').select('*, kamp_bestanden(*)').order('datum_van', { ascending: true }),
     admin.from('echos').select('*').order('year', { ascending: false }).order('month', { ascending: false }),
     admin.from('calendar').select('*').order('date', { ascending: true }),
-    admin.from('settings').select('leiding_ics_token, portal_backgrounds').eq('id', 1).single(),
+    admin.from('settings').select('leiding_ics_token, portal_backgrounds, takken').eq('id', 1).single(),
     admin.from('todos').select('*').eq('tak', tak || 'groep').eq('werkjaar', werkjaar).order('created_at', { ascending: true }),
   ])
 
@@ -38,6 +38,10 @@ export default async function LeidingPortaalPage({
   const calendarEvents = (calendarRes.data ?? []) as CalendarEvent[]
   const icsToken = (settingsRes.data?.leiding_ics_token ?? '') as string
   const portalBackgrounds = (settingsRes.data?.portal_backgrounds ?? {}) as Record<string, { style: string; custom_url?: string }>
+  const takSettings = (settingsRes.data?.takken ?? {}) as Record<string, { email?: string }>
+  const takEmails: Record<string, string> = Object.fromEntries(
+    Object.entries(takSettings).map(([k, v]) => [k, v?.email ?? ''])
+  )
   const todos = (todosRes.data ?? []) as TodoItem[]
 
   return (
@@ -53,6 +57,7 @@ export default async function LeidingPortaalPage({
       initialTab={tab}
       initialMonth={month ? parseInt(month, 10) : undefined}
       portalBackgrounds={portalBackgrounds}
+      takEmails={takEmails}
     />
   )
 }
