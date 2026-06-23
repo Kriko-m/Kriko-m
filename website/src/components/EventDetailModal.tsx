@@ -67,7 +67,7 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
           />
           <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2001, padding: '16px', pointerEvents: 'none' }}>
             <div
-              style={{ position: 'relative', pointerEvents: 'auto', background: '#fff', borderRadius: 22, boxShadow: '0 40px 100px rgba(58,7,16,0.26), 0 0 0 1px rgba(0,0,0,0.04)', width: '100%', maxWidth: 700, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
+              style={{ position: 'relative', pointerEvents: 'auto', background: '#fff', borderRadius: 22, boxShadow: '0 40px 100px rgba(58,7,16,0.26), 0 0 0 1px rgba(0,0,0,0.04)', width: '100%', maxWidth: 860, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Banner image */}
@@ -137,10 +137,10 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
 
                 {/* Facebook post embed */}
                 {event.facebook_post_url && (
-                  <div style={{ overflow: 'hidden', borderRadius: 12, border: '1px solid #ede9e1' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center', borderRadius: 12, border: '1px solid #ede9e1', overflow: 'hidden', background: '#f0f2f5' }}>
                     <iframe
                       src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(event.facebook_post_url)}&show_text=true&width=500`}
-                      width="100%"
+                      width="500"
                       height="500"
                       style={{ border: 'none', display: 'block' }}
                       scrolling="no"
