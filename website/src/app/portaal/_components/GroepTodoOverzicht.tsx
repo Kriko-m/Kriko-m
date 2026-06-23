@@ -143,8 +143,7 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
                         return (
                           <div key={month} style={{ border: '1.5px solid #E2EBE5', borderRadius: 12, background: '#FAFCFA', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
                             <div>
-                              <h5 style={{ margin: 0, color: '#1A3D2A', fontSize: '.95rem', fontWeight: 800, marginBottom: 3 }}>{MAANDEN[month]}</h5>
-                              <p style={{ margin: 0, color: '#6A8A75', fontSize: '.75rem', fontWeight: 600 }}>{count} {count === 1 ? 'taak' : 'taken'}</p>
+                              <h5 style={{ margin: 0, color: '#1A3D2A', fontSize: '.95rem', fontWeight: 800 }}>{MAANDEN[month]}</h5>
                             </div>
 
                             {/* Todo Items */}
