@@ -17,7 +17,7 @@ function googleCalUrl(event: CalendarEvent) {
 export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent; todayMs: number }) {
   const [open, setOpen] = useState(false)
   const hasRichContent = !!(event.banner_image || event.cover_image || event.body || event.document_url)
-  const canExpand = event.is_evenement && (hasRichContent || !!event.description)
+  const canExpand = hasRichContent || !!event.description
 
   const d = new Date(event.date)
   const day = String(d.getDate()).padStart(2, '0')

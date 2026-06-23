@@ -264,7 +264,7 @@ export default function KalenderActiviteitModal({
               {canPublish && (
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem' }}>
                   <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} style={{ cursor: 'pointer' }} />
-                  ⭐ Belangrijk evenement (extra info + ster)
+                  ⭐ Uitlichten op kalender (ster + highlight)
                 </label>
               )}
             </div>
@@ -283,7 +283,7 @@ export default function KalenderActiviteitModal({
               </div>
             )}
 
-            {canPublish && form.is_evenement && (
+            {canPublish && form.audience.includes('groep') && (
               <div style={{ padding: 14, background: '#f9f9f9', border: '1.5px solid #E2C58D', borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <span style={{ fontSize: '.78rem', fontWeight: 700, color: '#9A6B12' }}>
                   ✨ Extra info voor de publieke kalender (klapt open bij klik)

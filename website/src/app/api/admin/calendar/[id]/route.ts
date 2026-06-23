@@ -46,12 +46,11 @@ export async function PATCH(
   }
   if ('audience' in body) update.audience = [...new Set(resultingAudience)]
   if ('is_evenement' in body) update.is_evenement = resultingEvenement
-  // Media enkel zinvol op evenementen.
-  if ('cover_image' in body) update.cover_image = resultingEvenement ? (body.cover_image || '') : ''
-  if ('document_url' in body) update.document_url = resultingEvenement ? (body.document_url || '') : ''
-  if ('banner_image' in body) update.banner_image = resultingEvenement ? (body.banner_image || '') : ''
-  if ('header' in body) update.header = resultingEvenement ? (body.header || '') : ''
-  if ('body' in body) update.body = resultingEvenement ? (body.body || '') : ''
+  if ('cover_image' in body) update.cover_image = body.cover_image || ''
+  if ('document_url' in body) update.document_url = body.document_url || ''
+  if ('banner_image' in body) update.banner_image = body.banner_image || ''
+  if ('header' in body) update.header = body.header || ''
+  if ('body' in body) update.body = body.body || ''
 
   const { data, error } = await admin
     .from('calendar')
