@@ -80,35 +80,35 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
   return (
     <>
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 999 }} onClick={onClose} />
-      <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, pointerEvents: 'none', padding: 8 }}>
-        <div style={{ pointerEvents: 'auto', width: '99%', maxWidth: '1400px', maxHeight: '95vh', background: '#fff', borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, pointerEvents: 'none', padding: 12 }}>
+        <div style={{ pointerEvents: 'auto', width: '99%', maxWidth: '1150px', maxHeight: '95vh', background: '#fff', borderRadius: 18, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
           {/* Header */}
-          <div style={{ padding: '16px 20px', borderBottom: '2px solid #E8F0EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '18px 24px', borderBottom: '2px solid #E8F0EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.1rem' }}>To-do Beheerder</h3>
-              <p style={{ margin: '2px 0 0', color: '#6A8A75', fontSize: '.75rem' }}>Beheer en voeg taken toe per tak en maand</p>
+              <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.25rem' }}>To-do Beheerder</h3>
+              <p style={{ margin: '3px 0 0', color: '#6A8A75', fontSize: '.8rem' }}>Beheer en voeg taken toe per tak en maand</p>
             </div>
-            <button onClick={onClose} type="button" style={{ width: 32, height: 32, border: 'none', borderRadius: 8, background: '#F0ECE4', color: '#1A3D2A', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            <button onClick={onClose} type="button" style={{ width: 36, height: 36, border: 'none', borderRadius: 10, background: '#F0ECE4', color: '#1A3D2A', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
           </div>
 
-          {error && <div style={{ margin: '8px 20px 0', background: '#fdf0f2', border: '1.5px solid #e0c0c4', color: '#B23A4D', padding: '8px 10px', borderRadius: 8, fontSize: '.75rem', fontWeight: 600 }}>{error}</div>}
+          {error && <div style={{ margin: '10px 24px 0', background: '#fdf0f2', border: '1.5px solid #e0c0c4', color: '#B23A4D', padding: '10px 14px', borderRadius: 10, fontSize: '.8rem', fontWeight: 600 }}>{error}</div>}
 
           {/* Content */}
           <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
             {/* Tak Sidebar */}
-            <div style={{ width: 140, borderRight: '2px solid #E8F0EB', overflowY: 'auto', padding: 8, background: '#FAFCFA', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ width: 165, borderRight: '2px solid #E8F0EB', overflowY: 'auto', padding: 10, background: '#FAFCFA', display: 'flex', flexDirection: 'column', gap: 6 }}>
               {TAKKEN.map(tak => (
                 <button
                   key={tak}
                   onClick={() => { setActiveTak(tak); setAddingMonth(null); setMultiMonths([]); setAddTitle('') }}
                   style={{
-                    padding: '8px 10px',
+                    padding: '10px 12px',
                     textAlign: 'left',
                     border: activeTak === tak ? `2.5px solid ${takColor}` : '2px solid transparent',
                     background: activeTak === tak ? '#EEF5F1' : 'transparent',
-                    borderRadius: 8,
-                    fontSize: '.78rem',
+                    borderRadius: 10,
+                    fontSize: '.85rem',
                     fontWeight: activeTak === tak ? 700 : 600,
                     color: activeTak === tak ? takColor : '#6A8A75',
                     cursor: 'pointer',
@@ -128,44 +128,44 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
               ) : (
                 <>
                   {/* Tak Header */}
-                  <div style={{ padding: '10px 16px', borderBottom: `3px solid ${takColor}`, background: '#fff' }}>
-                    <h4 style={{ margin: 0, color: takColor, fontSize: '.95rem', fontWeight: 800 }}>{TAK_NAMEN[activeTak] ?? activeTak}</h4>
+                  <div style={{ padding: '14px 20px', borderBottom: `3px solid ${takColor}`, background: '#fff' }}>
+                    <h4 style={{ margin: 0, color: takColor, fontSize: '1.05rem', fontWeight: 800 }}>{TAK_NAMEN[activeTak] ?? activeTak}</h4>
                   </div>
 
                   {/* Months Grid */}
-                  <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+                  <div style={{ flex: 1, overflow: 'auto', padding: '16px 20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
                       {MONTH_ORDER.map(month => {
                         const items = takTodos(activeTak, month)
                         const isAdding = addingMonth === month
                         const count = items.length
 
                         return (
-                          <div key={month} style={{ border: '1px solid #E2EBE5', borderRadius: 10, background: '#FAFCFA', padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <div key={month} style={{ border: '1.5px solid #E2EBE5', borderRadius: 12, background: '#FAFCFA', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
                             <div>
-                              <h5 style={{ margin: 0, color: '#1A3D2A', fontSize: '.8rem', fontWeight: 800, marginBottom: 2 }}>{MAANDEN[month]}</h5>
-                              <p style={{ margin: 0, color: '#6A8A75', fontSize: '.65rem', fontWeight: 600 }}>{count} {count === 1 ? 'taak' : 'taken'}</p>
+                              <h5 style={{ margin: 0, color: '#1A3D2A', fontSize: '.95rem', fontWeight: 800, marginBottom: 3 }}>{MAANDEN[month]}</h5>
+                              <p style={{ margin: 0, color: '#6A8A75', fontSize: '.75rem', fontWeight: 600 }}>{count} {count === 1 ? 'taak' : 'taken'}</p>
                             </div>
 
                             {/* Todo Items */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                               {items.length === 0 && !isAdding && (
-                                <p style={{ color: '#8A9A8A', fontSize: '.7rem', margin: 0 }}>Geen taken</p>
+                                <p style={{ color: '#8A9A8A', fontSize: '.8rem', margin: 0 }}>Geen taken</p>
                               )}
                               {items.map(t => (
-                                <div key={t.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, padding: '5px 6px', background: '#fff', borderRadius: 6, border: '1px solid #E8F0EB' }}>
+                                <div key={t.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 10px', background: '#fff', borderRadius: 8, border: '1px solid #E8F0EB' }}>
                                   <input
                                     type="checkbox"
                                     checked={t.completed}
                                     onChange={() => toggle(t)}
-                                    style={{ marginTop: 2, cursor: 'pointer', width: 14, height: 14, flexShrink: 0 }}
+                                    style={{ marginTop: 2, cursor: 'pointer', width: 16, height: 16, flexShrink: 0 }}
                                   />
-                                  <span style={{ flex: 1, fontSize: '.7rem', textDecoration: t.completed ? 'line-through' : 'none', color: t.completed ? '#8A9A8A' : '#1A3D2A', fontWeight: t.completed ? 500 : 600, lineHeight: 1.3 }}>
+                                  <span style={{ flex: 1, fontSize: '.82rem', textDecoration: t.completed ? 'line-through' : 'none', color: t.completed ? '#8A9A8A' : '#1A3D2A', fontWeight: t.completed ? 500 : 600, lineHeight: 1.35 }}>
                                     {t.title}
                                   </span>
                                   <button
                                     onClick={() => remove(t.id)}
-                                    style={{ background: 'none', border: 'none', color: '#B23A4D', cursor: 'pointer', fontSize: '.65rem', padding: 1, flexShrink: 0, marginTop: -2 }}
+                                    style={{ background: 'none', border: 'none', color: '#B23A4D', cursor: 'pointer', fontSize: '.75rem', padding: 2, flexShrink: 0 }}
                                     title="Verwijder"
                                   >
                                     ✕
@@ -176,19 +176,19 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
 
                             {/* Add Form */}
                             {isAdding ? (
-                              <form onSubmit={e => { e.preventDefault(); add() }} style={{ display: 'flex', flexDirection: 'column', gap: 5, paddingTop: 5, borderTop: '1px solid #E8F0EB' }}>
+                              <form onSubmit={e => { e.preventDefault(); add() }} style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 8, borderTop: '1px solid #E8F0EB' }}>
                                 <input
                                   autoFocus
                                   value={addTitle}
                                   onChange={e => setAddTitle(e.target.value)}
-                                  placeholder="Taak…"
-                                  style={{ width: '100%', padding: '5px 6px', fontSize: '.7rem', border: '1px solid #C2D9C9', borderRadius: 6, boxSizing: 'border-box' }}
+                                  placeholder="Taak toevoegen…"
+                                  style={{ width: '100%', padding: '8px 10px', fontSize: '.82rem', border: '1.5px solid #C2D9C9', borderRadius: 8, boxSizing: 'border-box' }}
                                 />
-                                <div style={{ display: 'flex', gap: 4 }}>
-                                  <button type="submit" style={{ flex: 1, padding: '4px 6px', background: takColor, color: '#fff', border: 'none', borderRadius: 5, fontSize: '.65rem', fontWeight: 700, cursor: 'pointer' }}>
-                                    +
+                                <div style={{ display: 'flex', gap: 6 }}>
+                                  <button type="submit" style={{ flex: 1, padding: '6px 10px', background: takColor, color: '#fff', border: 'none', borderRadius: 6, fontSize: '.8rem', fontWeight: 700, cursor: 'pointer' }}>
+                                    Voeg toe
                                   </button>
-                                  <button type="button" onClick={() => { setAddingMonth(null); setAddTitle(''); setMultiMonths([]) }} style={{ padding: '4px 6px', background: 'none', border: '1px solid #C2D9C9', borderRadius: 5, fontSize: '.65rem', color: '#6A8A75', cursor: 'pointer' }}>
+                                  <button type="button" onClick={() => { setAddingMonth(null); setAddTitle(''); setMultiMonths([]) }} style={{ padding: '6px 10px', background: 'none', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '.8rem', color: '#6A8A75', cursor: 'pointer' }}>
                                     ✕
                                   </button>
                                 </div>
@@ -196,9 +196,9 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
                             ) : (
                               <button
                                 onClick={() => { setAddingMonth(month); setAddTitle(''); setMultiMonths([]) }}
-                                style={{ alignSelf: 'flex-start', background: 'none', border: 'none', color: takColor, fontSize: '.68rem', fontWeight: 700, cursor: 'pointer', padding: '2px 0' }}
+                                style={{ alignSelf: 'flex-start', background: 'none', border: 'none', color: takColor, fontSize: '.8rem', fontWeight: 700, cursor: 'pointer', padding: '4px 0' }}
                               >
-                                + voeg toe
+                                + toevoegen
                               </button>
                             )}
                           </div>
@@ -208,22 +208,22 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
                   </div>
 
                   {/* Multi-Month Tool */}
-                  <div style={{ padding: '10px 16px', borderTop: '2px solid #E8F0EB', background: '#EEF5F133' }}>
+                  <div style={{ padding: '14px 20px', borderTop: '2px solid #E8F0EB', background: '#EEF5F133' }}>
                     <details style={{ cursor: 'pointer' }}>
-                      <summary style={{ color: '#1A3D2A', fontWeight: 700, fontSize: '.75rem', userSelect: 'none', marginBottom: 6 }}>
+                      <summary style={{ color: '#1A3D2A', fontWeight: 700, fontSize: '.85rem', userSelect: 'none', marginBottom: 8 }}>
                         💡 Voeg toe aan meerdere maanden
                       </summary>
-                      <div style={{ padding: '8px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div style={{ padding: '10px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
                         <input
                           type="text"
-                          placeholder="Taaknaam…"
+                          placeholder="Voer taaknaam in…"
                           value={addTitle}
                           onChange={e => setAddTitle(e.target.value)}
-                          style={{ width: '100%', padding: '6px 8px', fontSize: '.7rem', border: '1px solid #C2D9C9', borderRadius: 6, boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '8px 12px', fontSize: '.82rem', border: '1.5px solid #C2D9C9', borderRadius: 8, boxSizing: 'border-box' }}
                         />
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                           {MONTH_ORDER.map(month => (
-                            <label key={month} style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', padding: '4px 7px', background: multiMonths.includes(month) ? takColor : '#fff', border: `1px solid ${multiMonths.includes(month) ? takColor : '#C2D9C9'}`, borderRadius: 6, color: multiMonths.includes(month) ? '#fff' : '#1A3D2A', fontSize: '.65rem', fontWeight: 600 }}>
+                            <label key={month} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', padding: '6px 10px', background: multiMonths.includes(month) ? takColor : '#fff', border: `1.5px solid ${multiMonths.includes(month) ? takColor : '#C2D9C9'}`, borderRadius: 8, color: multiMonths.includes(month) ? '#fff' : '#1A3D2A', fontSize: '.8rem', fontWeight: 600 }}>
                               <input
                                 type="checkbox"
                                 checked={multiMonths.includes(month)}
@@ -231,7 +231,7 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
                                   if (e.target.checked) setMultiMonths([...multiMonths, month])
                                   else setMultiMonths(multiMonths.filter(m => m !== month))
                                 }}
-                                style={{ width: 12, height: 12, cursor: 'pointer' }}
+                                style={{ width: 14, height: 14, cursor: 'pointer' }}
                               />
                               {MAANDEN[month].slice(0, 3)}
                             </label>
@@ -245,9 +245,9 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
                             }
                           }}
                           disabled={multiMonths.length === 0 || !addTitle.trim()}
-                          style={{ padding: '5px 10px', background: multiMonths.length > 0 && addTitle.trim() ? takColor : '#C2D9C9', color: '#fff', border: 'none', borderRadius: 6, fontSize: '.7rem', fontWeight: 700, cursor: multiMonths.length > 0 && addTitle.trim() ? 'pointer' : 'not-allowed', opacity: multiMonths.length > 0 && addTitle.trim() ? 1 : 0.6 }}
+                          style={{ padding: '8px 16px', background: multiMonths.length > 0 && addTitle.trim() ? takColor : '#C2D9C9', color: '#fff', border: 'none', borderRadius: 8, fontSize: '.82rem', fontWeight: 700, cursor: multiMonths.length > 0 && addTitle.trim() ? 'pointer' : 'not-allowed', opacity: multiMonths.length > 0 && addTitle.trim() ? 1 : 0.6 }}
                         >
-                          {multiMonths.length > 0 ? `+${multiMonths.length}` : 'Selecteer'}
+                          {multiMonths.length > 0 ? `Voeg toe aan ${multiMonths.length} maand${multiMonths.length > 1 ? 'en' : ''}` : 'Selecteer maanden'}
                         </button>
                       </div>
                     </details>
