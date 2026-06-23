@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react'
 import { TodoItem } from '@/lib/types'
 import { PORTAAL_TAKKEN, TAK_NAMEN, TAK_KLEUREN } from '@/lib/constants'
 
-// Scoutsjaar-volgorde: september → augustus.
 const MONTH_ORDER = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8]
-const MAAND_KORT: Record<number, string> = {
-  1: 'jan', 2: 'feb', 3: 'mrt', 4: 'apr', 5: 'mei', 6: 'jun',
-  7: 'jul', 8: 'aug', 9: 'sep', 10: 'okt', 11: 'nov', 12: 'dec',
+const MAANDEN: Record<number, string> = {
+  1: 'januari', 2: 'februari', 3: 'maart', 4: 'april', 5: 'mei', 6: 'juni',
+  7: 'juli', 8: 'augustus', 9: 'september', 10: 'oktober', 11: 'november', 12: 'december',
 }
 
 const TAKKEN = PORTAAL_TAKKEN as readonly string[]
@@ -16,20 +15,22 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
   const [todos, setTodos] = useState<TodoItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [addCell, setAddCell] = useState<string | null>(null) // `${tak}-${month}`
+  const [activeTak, setActiveTak] = useState<string>(TAKKEN[0])
+  const [addingMonth, setAddingMonth] = useState<number | null>(null)
   const [addTitle, setAddTitle] = useState('')
+  const [multiMonths, setMultiMonths] = useState<number[]>([])
 
   useEffect(() => {
     (async () => {
       const res = await fetch('/api/admin/todos?all=1')
       if (res.ok) setTodos(await res.json())
-      else setError('Kon to-do’s niet laden.')
+      else setError('Kon to-do\'s niet laden.')
       setLoading(false)
     })()
   }, [])
 
-  function cellTodos(tak: string, month: number) {
-    return todos.filter(t => t.tak === tak && t.month === month)
+  function takTodos(tak: string, month: number) {
+    return todos.filter(t => t.tak === tak && t.month === month).sort((a, b) => a.title.localeCompare(b.title))
   }
 
   async function toggle(t: TodoItem) {
@@ -49,132 +50,214 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
     if (res.ok) setTodos(prev => prev.filter(x => x.id !== id))
   }
 
-  async function add(tak: string, month: number) {
+  async function add() {
     if (!addTitle.trim()) return
-    const res = await fetch('/api/admin/todos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: addTitle.trim(), month, tak }),
-    })
-    if (res.ok) {
-      const created = await res.json()
-      setTodos(prev => [...prev, created])
+    const monthsToAdd = multiMonths.length > 0 ? multiMonths : (addingMonth ? [addingMonth] : [])
+    if (monthsToAdd.length === 0) return
+
+    try {
+      for (const month of monthsToAdd) {
+        const res = await fetch('/api/admin/todos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: addTitle.trim(), month, tak: activeTak }),
+        })
+        if (res.ok) {
+          const created = await res.json()
+          setTodos(prev => [...prev, created])
+        }
+      }
       setAddTitle('')
-      setAddCell(null)
-    } else {
+      setAddingMonth(null)
+      setMultiMonths([])
+    } catch {
       setError('Kon taak niet toevoegen.')
     }
   }
 
+  const takColor = TAK_KLEUREN[activeTak] ?? '#1A3D2A'
+
   return (
     <>
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 999 }} onClick={onClose} />
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 999 }} onClick={onClose} />
       <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, pointerEvents: 'none', padding: 16 }}>
-        <div style={{ pointerEvents: 'auto', width: '98%', maxWidth: 1280, maxHeight: '92vh', background: '#fff', borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.22)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ pointerEvents: 'auto', width: '98%', maxWidth: 900, maxHeight: '92vh', background: '#fff', borderRadius: 20, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
           {/* Header */}
-          <div style={{ padding: '18px 24px', borderBottom: '1.5px solid #E8F0EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '24px 28px', borderBottom: '2px solid #E8F0EB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.25rem' }}>To-do overzicht</h3>
-              <p style={{ margin: '2px 0 0', color: '#6A8A75', fontSize: '.82rem' }}>Alle taken per tak en per maand (huidig werkjaar).</p>
+              <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.4rem' }}>To-do Beheerder</h3>
+              <p style={{ margin: '4px 0 0', color: '#6A8A75', fontSize: '.85rem' }}>Beheer en voeg taken toe per tak en maand</p>
             </div>
-            <button onClick={onClose} type="button" style={{ width: 34, height: 34, border: '1.5px solid #C2D9C9', borderRadius: 8, background: 'none', color: '#6A8A75', fontSize: '1.1rem', cursor: 'pointer' }}>✕</button>
+            <button onClick={onClose} type="button" style={{ width: 38, height: 38, border: 'none', borderRadius: 10, background: '#F0ECE4', color: '#1A3D2A', fontSize: '1.3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
           </div>
 
-          {error && <div style={{ margin: '12px 24px 0', background: '#fdf0f2', border: '1.5px solid #e0c0c4', color: '#B23A4D', padding: '8px 12px', borderRadius: 8, fontSize: '.82rem', fontWeight: 600 }}>{error}</div>}
+          {error && <div style={{ margin: '12px 28px 0', background: '#fdf0f2', border: '1.5px solid #e0c0c4', color: '#B23A4D', padding: '10px 14px', borderRadius: 10, fontSize: '.82rem', fontWeight: 600 }}>{error}</div>}
 
-          {/* Matrix */}
-          <div style={{ overflow: 'auto', padding: 16 }}>
-            {loading ? (
-              <p style={{ color: '#6A8A75', fontSize: '.9rem', padding: 16 }}>Laden…</p>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: `64px repeat(${TAKKEN.length}, minmax(180px, 1fr))`, gap: 8, minWidth: 760 }}>
-                {/* Header row */}
-                <div />
-                {TAKKEN.map(tak => (
-                  <div key={tak} style={{ textAlign: 'center', fontWeight: 800, fontSize: '.82rem', color: '#1A3D2A', padding: '6px 4px', borderBottom: `3px solid ${TAK_KLEUREN[tak] ?? '#C2D9C9'}`, position: 'sticky', top: 0, background: '#fff', zIndex: 2 }}>
-                    {TAK_NAMEN[tak] ?? tak}
+          {/* Content */}
+          <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+            {/* Tak Sidebar */}
+            <div style={{ width: 180, borderRight: '2px solid #E8F0EB', overflowY: 'auto', padding: 12, background: '#FAFCFA', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {TAKKEN.map(tak => (
+                <button
+                  key={tak}
+                  onClick={() => { setActiveTak(tak); setAddingMonth(null); setMultiMonths([]); setAddTitle('') }}
+                  style={{
+                    padding: '12px 14px',
+                    textAlign: 'left',
+                    border: activeTak === tak ? `2.5px solid ${takColor}` : '2px solid transparent',
+                    background: activeTak === tak ? '#EEF5F1' : 'transparent',
+                    borderRadius: 10,
+                    fontSize: '.88rem',
+                    fontWeight: activeTak === tak ? 700 : 600,
+                    color: activeTak === tak ? takColor : '#6A8A75',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {TAK_NAMEN[tak] ?? tak}
+                </button>
+              ))}
+            </div>
+
+            {/* Main Content */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              {loading ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#6A8A75' }}>Laden…</div>
+              ) : (
+                <>
+                  {/* Tak Header */}
+                  <div style={{ padding: '16px 28px', borderBottom: `3px solid ${takColor}`, background: '#fff' }}>
+                    <h4 style={{ margin: 0, color: takColor, fontSize: '1.15rem', fontWeight: 800 }}>{TAK_NAMEN[activeTak] ?? activeTak}</h4>
                   </div>
-                ))}
 
-                {/* Month rows */}
-                {MONTH_ORDER.map(month => (
-                  <FragmentRow
-                    key={month}
-                    month={month}
-                    takken={TAKKEN}
-                    cellTodos={cellTodos}
-                    onToggle={toggle}
-                    onRemove={remove}
-                    addCell={addCell}
-                    setAddCell={setAddCell}
-                    addTitle={addTitle}
-                    setAddTitle={setAddTitle}
-                    onAdd={add}
-                  />
-                ))}
-              </div>
-            )}
+                  {/* Months Grid */}
+                  <div style={{ flex: 1, overflow: 'auto', padding: '24px 28px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+                      {MONTH_ORDER.map(month => {
+                        const items = takTodos(activeTak, month)
+                        const isAdding = addingMonth === month
+                        const count = items.length
+
+                        return (
+                          <div key={month} style={{ border: '1.5px solid #E2EBE5', borderRadius: 14, background: '#FAFCFA', padding: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            <div>
+                              <h5 style={{ margin: 0, color: '#1A3D2A', fontSize: '.95rem', fontWeight: 800, marginBottom: 4 }}>{MAANDEN[month]}</h5>
+                              <p style={{ margin: 0, color: '#6A8A75', fontSize: '.75rem', fontWeight: 600 }}>{count} {count === 1 ? 'taak' : 'taken'}</p>
+                            </div>
+
+                            {/* Todo Items */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                              {items.length === 0 && !isAdding && (
+                                <p style={{ color: '#8A9A8A', fontSize: '.8rem', margin: 0 }}>Geen taken</p>
+                              )}
+                              {items.map(t => (
+                                <div key={t.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 10px', background: '#fff', borderRadius: 8, border: '1px solid #E8F0EB' }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={t.completed}
+                                    onChange={() => toggle(t)}
+                                    style={{ marginTop: 3, cursor: 'pointer', width: 16, height: 16, flexShrink: 0 }}
+                                  />
+                                  <span style={{ flex: 1, fontSize: '.82rem', textDecoration: t.completed ? 'line-through' : 'none', color: t.completed ? '#8A9A8A' : '#1A3D2A', fontWeight: t.completed ? 500 : 600 }}>
+                                    {t.title}
+                                  </span>
+                                  <button
+                                    onClick={() => remove(t.id)}
+                                    style={{ background: 'none', border: 'none', color: '#B23A4D', cursor: 'pointer', fontSize: '.75rem', padding: 2, flexShrink: 0 }}
+                                    title="Verwijder"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Add Form */}
+                            {isAdding ? (
+                              <form onSubmit={e => { e.preventDefault(); add() }} style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 8, borderTop: '1px solid #E8F0EB' }}>
+                                <input
+                                  autoFocus
+                                  value={addTitle}
+                                  onChange={e => setAddTitle(e.target.value)}
+                                  placeholder="Taak toevoegen…"
+                                  style={{ width: '100%', padding: '8px 10px', fontSize: '.82rem', border: '1.5px solid #C2D9C9', borderRadius: 8, boxSizing: 'border-box' }}
+                                />
+                                <div style={{ display: 'flex', gap: 6 }}>
+                                  <button type="submit" style={{ flex: 1, padding: '6px 10px', background: takColor, color: '#fff', border: 'none', borderRadius: 6, fontSize: '.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                                    Voeg toe
+                                  </button>
+                                  <button type="button" onClick={() => { setAddingMonth(null); setAddTitle(''); setMultiMonths([]) }} style={{ padding: '6px 10px', background: 'none', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '.78rem', color: '#6A8A75', cursor: 'pointer' }}>
+                                    ✕
+                                  </button>
+                                </div>
+                              </form>
+                            ) : (
+                              <button
+                                onClick={() => { setAddingMonth(month); setAddTitle(''); setMultiMonths([]) }}
+                                style={{ alignSelf: 'flex-start', background: 'none', border: 'none', color: takColor, fontSize: '.78rem', fontWeight: 700, cursor: 'pointer', padding: '4px 0' }}
+                              >
+                                + toevoegen
+                              </button>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Multi-Month Tool */}
+                  <div style={{ padding: '18px 28px', borderTop: '2px solid #E8F0EB', background: '#EEF5F133' }}>
+                    <details style={{ cursor: 'pointer' }}>
+                      <summary style={{ color: '#1A3D2A', fontWeight: 700, fontSize: '.88rem', userSelect: 'none', marginBottom: 8 }}>
+                        💡 Taak toevoegen aan meerdere maanden
+                      </summary>
+                      <div style={{ padding: '12px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <input
+                          type="text"
+                          placeholder="Voer taaknaam in…"
+                          value={addTitle}
+                          onChange={e => setAddTitle(e.target.value)}
+                          style={{ width: '100%', padding: '8px 12px', fontSize: '.82rem', border: '1.5px solid #C2D9C9', borderRadius: 8, boxSizing: 'border-box' }}
+                        />
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                          {MONTH_ORDER.map(month => (
+                            <label key={month} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', padding: '6px 10px', background: multiMonths.includes(month) ? takColor : '#fff', border: `1.5px solid ${multiMonths.includes(month) ? takColor : '#C2D9C9'}`, borderRadius: 8, color: multiMonths.includes(month) ? '#fff' : '#1A3D2A', fontSize: '.8rem', fontWeight: 600 }}>
+                              <input
+                                type="checkbox"
+                                checked={multiMonths.includes(month)}
+                                onChange={e => {
+                                  if (e.target.checked) setMultiMonths([...multiMonths, month])
+                                  else setMultiMonths(multiMonths.filter(m => m !== month))
+                                }}
+                                style={{ width: 14, height: 14, cursor: 'pointer' }}
+                              />
+                              {MAANDEN[month].slice(0, 3)}
+                            </label>
+                          ))}
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (multiMonths.length > 0) {
+                              setAddingMonth(null)
+                              add()
+                            }
+                          }}
+                          disabled={multiMonths.length === 0 || !addTitle.trim()}
+                          style={{ padding: '8px 16px', background: multiMonths.length > 0 && addTitle.trim() ? takColor : '#C2D9C9', color: '#fff', border: 'none', borderRadius: 8, fontSize: '.82rem', fontWeight: 700, cursor: multiMonths.length > 0 && addTitle.trim() ? 'pointer' : 'not-allowed', opacity: multiMonths.length > 0 && addTitle.trim() ? 1 : 0.6 }}
+                        >
+                          {multiMonths.length > 0 ? `Voeg toe aan ${multiMonths.length} maand${multiMonths.length > 1 ? 'en' : ''}` : 'Selecteer maanden'}
+                        </button>
+                      </div>
+                    </details>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </>
-  )
-}
-
-function FragmentRow({
-  month, takken, cellTodos, onToggle, onRemove, addCell, setAddCell, addTitle, setAddTitle, onAdd,
-}: {
-  month: number
-  takken: readonly string[]
-  cellTodos: (tak: string, month: number) => TodoItem[]
-  onToggle: (t: TodoItem) => void
-  onRemove: (id: string) => void
-  addCell: string | null
-  setAddCell: (v: string | null) => void
-  addTitle: string
-  setAddTitle: (v: string) => void
-  onAdd: (tak: string, month: number) => void
-}) {
-  return (
-    <>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 10, fontWeight: 800, fontSize: '.78rem', color: '#6A8A75', textTransform: 'uppercase' }}>
-        {MAAND_KORT[month]}
-      </div>
-      {takken.map(tak => {
-        const cellKey = `${tak}-${month}`
-        const items = cellTodos(tak, month)
-        const adding = addCell === cellKey
-        return (
-          <div key={cellKey} style={{ border: '1px solid #E2EBE5', borderRadius: 10, background: '#FAFCFA', padding: 8, minHeight: 52, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {items.map(t => (
-              <div key={t.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: '.8rem' }}>
-                <input type="checkbox" checked={t.completed} onChange={() => onToggle(t)} style={{ marginTop: 2, cursor: 'pointer', flexShrink: 0 }} />
-                <span style={{ flex: 1, minWidth: 0, wordBreak: 'break-word', textDecoration: t.completed ? 'line-through' : 'none', color: t.completed ? '#8A9A8A' : '#1A3D2A', fontWeight: t.completed ? 500 : 600 }}>{t.title}</span>
-                <button onClick={() => onRemove(t.id)} title="Verwijder" style={{ background: 'none', border: 'none', color: '#B23A4D', cursor: 'pointer', fontSize: '.78rem', padding: 0, flexShrink: 0 }}>✕</button>
-              </div>
-            ))}
-
-            {adding ? (
-              <form onSubmit={e => { e.preventDefault(); onAdd(tak, month) }} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <input
-                  autoFocus
-                  value={addTitle}
-                  onChange={e => setAddTitle(e.target.value)}
-                  placeholder="Nieuwe taak…"
-                  style={{ width: '100%', padding: '4px 6px', fontSize: '.78rem', border: '1.5px solid #C2D9C9', borderRadius: 6, boxSizing: 'border-box' }}
-                />
-                <div style={{ display: 'flex', gap: 4 }}>
-                  <button type="submit" style={{ flex: 1, padding: '3px 6px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 5, fontSize: '.72rem', fontWeight: 700, cursor: 'pointer' }}>Voeg toe</button>
-                  <button type="button" onClick={() => { setAddCell(null); setAddTitle('') }} style={{ padding: '3px 6px', background: 'none', border: '1px solid #C2D9C9', borderRadius: 5, fontSize: '.72rem', color: '#6A8A75', cursor: 'pointer' }}>✕</button>
-                </div>
-              </form>
-            ) : (
-              <button onClick={() => { setAddCell(cellKey); setAddTitle('') }} style={{ alignSelf: 'flex-start', background: 'none', border: 'none', color: '#6A8A75', fontSize: '.74rem', fontWeight: 700, cursor: 'pointer', padding: '2px 0' }}>+ taak</button>
-            )}
-          </div>
-        )
-      })}
     </>
   )
 }
