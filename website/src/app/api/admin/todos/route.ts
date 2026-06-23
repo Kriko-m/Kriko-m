@@ -8,16 +8,20 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const { searchParams } = new URL(req.url)
+  const all = searchParams.get('all') === '1'
   const tak = searchParams.get('tak') || 'evenementen'
 
   const werkjaar = await getActiveWerkjaar()
   const admin = createAdminClient()
-  const { data, error } = await admin
+  let query = admin
     .from('todos')
     .select('*')
-    .eq('tak', tak)
     .eq('werkjaar', werkjaar)
-    .order('created_at', { ascending: true })
+
+  // all=1 → alle takken (groepsleiding-overzicht); anders één tak.
+  if (!all) query = query.eq('tak', tak)
+
+  const { data, error } = await query.order('created_at', { ascending: true })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

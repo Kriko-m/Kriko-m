@@ -49,6 +49,7 @@ export default async function LeidingPortaalPage({
   const icsToken = (settingsRes.data?.leiding_ics_token ?? '') as string
   const portalBackgrounds = (settingsRes.data?.portal_backgrounds ?? {}) as Record<string, { style: string; custom_url?: string }>
   const takSettings = (settingsRes.data?.takken ?? {}) as Record<string, { email?: string }>
+  const takConfigs = (settingsRes.data?.takken ?? {}) as Record<string, Record<string, unknown>>
   const takEmails: Record<string, string> = Object.fromEntries(
     Object.entries(takSettings).map(([k, v]) => [k, v?.email ?? ''])
   )
@@ -69,6 +70,7 @@ export default async function LeidingPortaalPage({
       openKampId={kamp}
       portalBackgrounds={portalBackgrounds}
       takEmails={takEmails}
+      takConfigs={takConfigs}
     />
   )
 }

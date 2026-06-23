@@ -5,6 +5,8 @@ import { Kamp, Echo, CalendarEvent, TodoItem } from '@/lib/types'
 import KampBeheerModal from '../_components/KampBeheerModal'
 import KampAanmakenModal from '../_components/KampAanmakenModal'
 import KalenderActiviteitModal from '../_components/KalenderActiviteitModal'
+import GroepTodoOverzicht from '../_components/GroepTodoOverzicht'
+import WebsiteContentEditor from '../_components/WebsiteContentEditor'
 import { AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, PORTAAL_TAKKEN, TAK_KLEUREN } from '@/lib/constants'
 import { mergeCampsIntoCalendar } from '@/lib/calendar'
@@ -41,6 +43,7 @@ interface LeidingPanelProps {
   openKampId?: string
   portalBackgrounds?: Record<string, { style: string; custom_url?: string }>
   takEmails?: Record<string, string>
+  takConfigs?: Record<string, Record<string, unknown>>
 }
 
 export default function LeidingPanel({
@@ -55,10 +58,16 @@ export default function LeidingPanel({
   openKampId,
   portalBackgrounds = {},
   takEmails = {},
+  takConfigs = {},
 }: LeidingPanelProps) {
   const [activeTak] = useState(TAKKEN.includes(initialTak ?? '') ? (initialTak as string) : 'evenementen')
   // Geen Kriko Echo voor overkoepelende tabs (evenementen / groepsleiding).
   const isEchoTak = activeTak !== 'evenementen' && activeTak !== 'groepsleiding'
+  const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
+  const isGroepsleidingTak = activeTak === 'groepsleiding'
+  // Overkoepelende tabs (evenementen/groepsleiding): enkel groepsleiding mag bewerken.
+  const isOverkoepelend = activeTak === 'evenementen' || activeTak === 'groepsleiding'
+  const canEditTak = !isOverkoepelend || isGroepsleiding
   const [inlineView, setInlineView] = useState<null | 'kampen' | 'echos'>(null)
   
   const [kampen, setKampen] = useState<Kamp[]>(initialKampen)
@@ -68,12 +77,12 @@ export default function LeidingPanel({
   const [editKampId, setEditKampId] = useState<string | null>(null)
   const [showKampAanmaken, setShowKampAanmaken] = useState(false)
   const [showKalenderModal, setShowKalenderModal] = useState(false)
+  const [showTodoOverzicht, setShowTodoOverzicht] = useState(false)
+  const [showWebsiteEditor, setShowWebsiteEditor] = useState(false)
 
   const [selectedMonth, setSelectedMonth] = useState(initialMonth ?? (new Date().getMonth() + 1))
   const [newTodoTitle, setNewTodoTitle] = useState('')
   const [showAddTodoPopover, setShowAddTodoPopover] = useState(false)
-
-  const _canPublish = role === 'admin' || role === 'groepsleiding'
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const echoFileInputRef = useRef<HTMLInputElement>(null)
@@ -462,6 +471,7 @@ export default function LeidingPanel({
                   </div>
 
                   {/* Action 3: Tak activiteit toevoegen */}
+                  {canEditTak && (
                   <button
                     onClick={() => setShowKalenderModal(true)}
                     style={{
@@ -481,16 +491,51 @@ export default function LeidingPanel({
                     className="action-card-hover"
                   >
                     <i className="fa-solid fa-calendar-plus" style={{ fontSize: '2.2rem', color: '#1A3D2A' }}></i>
-                    <strong style={{ fontSize: '.92rem', color: '#1A3D2A' }}>tak activiteit toevoegen aan kalender</strong>
+                    <strong style={{ fontSize: '.92rem', color: '#1A3D2A' }}>activiteit toevoegen aan kalender</strong>
                   </button>
+                  )}
+
+                  {/* Groepsleiding-only: To-do overzicht */}
+                  {isGroepsleidingTak && isGroepsleiding && (
+                  <button
+                    onClick={() => setShowTodoOverzicht(true)}
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      gap: 12, padding: '32px 20px', border: '2px solid #C2D9C9', borderRadius: 16,
+                      background: '#fff', cursor: 'pointer', textAlign: 'center', fontFamily: 'inherit',
+                    }}
+                    className="action-card-hover"
+                  >
+                    <i className="fa-solid fa-list-check" style={{ fontSize: '2.2rem', color: '#1A3D2A' }}></i>
+                    <strong style={{ fontSize: '.92rem', color: '#1A3D2A' }}>to-do overzicht (alle takken)</strong>
+                  </button>
+                  )}
+
+                  {/* Groepsleiding-only: Website-content */}
+                  {isGroepsleidingTak && isGroepsleiding && (
+                  <button
+                    onClick={() => setShowWebsiteEditor(true)}
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      gap: 12, padding: '32px 20px', border: '2px solid #C2D9C9', borderRadius: 16,
+                      background: '#fff', cursor: 'pointer', textAlign: 'center', fontFamily: 'inherit',
+                    }}
+                    className="action-card-hover"
+                  >
+                    <i className="fa-solid fa-pen-ruler" style={{ fontSize: '2.2rem', color: '#1A3D2A' }}></i>
+                    <strong style={{ fontSize: '.92rem', color: '#1A3D2A' }}>website-content aanpassen</strong>
+                  </button>
+                  )}
                 </div>
 
                 {/* Inline Kamp Panel */}
                 {inlineView === 'kampen' && (
                   <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 16, padding: 20 }}>
-                    <button onClick={() => setShowKampAanmaken(true)} style={{ marginBottom: 20, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
-                      + Weekend/Kamp toevoegen
-                    </button>
+                    {canEditTak && (
+                      <button onClick={() => setShowKampAanmaken(true)} style={{ marginBottom: 20, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
+                        + Weekend/Kamp toevoegen
+                      </button>
+                    )}
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                       {takKampen.length === 0 && <p style={{ color: '#6A8A75', fontSize: '.88rem' }}>Er zijn nog geen kampen voor deze tak aangemaakt.</p>}
@@ -514,11 +559,13 @@ export default function LeidingPanel({
                                   <strong style={{ fontSize: '2rem', color: '#1A3D2A', display: 'block' }}>{kamp.naam}</strong>
                                   <span style={{ fontSize: '.82rem', color: '#6A8A75' }}>📅 {periode} · 📍 {kamp.locatie}</span>
                                 </div>
-                                <button
-                                  onClick={() => { setEditKampId(kamp.id); setShowKampModal(true) }}
-                                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#1A3D2A', color: '#fff', borderRadius: 8, fontSize: '.82rem', fontWeight: 700, border: 'none', cursor: 'pointer', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                                  ⚙️ Beheer
-                                </button>
+                                {canEditTak && (
+                                  <button
+                                    onClick={() => { setEditKampId(kamp.id); setShowKampModal(true) }}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#1A3D2A', color: '#fff', borderRadius: 8, fontSize: '.82rem', fontWeight: 700, border: 'none', cursor: 'pointer', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                                    ⚙️ Beheer
+                                  </button>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -1158,7 +1205,7 @@ export default function LeidingPanel({
       )}
       {showKalenderModal && (
         <KalenderActiviteitModal
-          canPublish={false}
+          canPublish={isGroepsleiding}
           initialAudience={AUDIENCE_TAGS.includes(activeTak as AudienceTag) ? [activeTak as AudienceTag] : []}
           onClose={() => setShowKalenderModal(false)}
           onSaved={() => {
@@ -1166,6 +1213,12 @@ export default function LeidingPanel({
             showFlash('Activiteit toegevoegd aan kalender!')
           }}
         />
+      )}
+      {showTodoOverzicht && (
+        <GroepTodoOverzicht onClose={() => setShowTodoOverzicht(false)} />
+      )}
+      {showWebsiteEditor && (
+        <WebsiteContentEditor takConfigs={takConfigs} onClose={() => setShowWebsiteEditor(false)} />
       )}
     </div>
   )
