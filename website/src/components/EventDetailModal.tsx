@@ -160,9 +160,13 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
                   <a href={googleCalUrl(event)} className="cal-add-btn" target="_blank" rel="noopener">
                     <i className="fa-brands fa-google"></i> Google
                   </a>
-                  <a href={`/api/kalender/ics?event=${event.id}`} className="cal-add-btn">
-                    <i className="fa-regular fa-calendar"></i> Apple / Outlook
-                  </a>
+                  <button
+                    type="button"
+                    className="cal-add-btn"
+                    onClick={() => { window.location.href = `webcal://${window.location.host}/api/kalender/ics?event=${event.id}` }}
+                  >
+                    <i className="fa-brands fa-apple"></i> Apple
+                  </button>
                   {event.facebook_event_url && (
                     <a href={event.facebook_event_url} target="_blank" rel="noopener" className="cal-add-btn">
                       <i className="fa-brands fa-facebook"></i> Facebook
