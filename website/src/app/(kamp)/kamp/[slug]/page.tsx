@@ -82,13 +82,15 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
       {/* ── Hero ── */}
       <div className="kamp-hero-area">
         <div className="container">
-          <span className="hero-eyebrow" style={{ color: takKleur }}>
+          <span className="kamp-tak-badge">
+            <span className="kamp-tak-dot" style={{ background: takKleur }} />
             {TAK_NAMEN[kamp.tak] ?? kamp.tak}
           </span>
           <h1 className="tak-hero-title kamp-hero-naam">{kamp.naam}</h1>
           <div className="kamp-hero-chips">
-            <span className="kamp-hero-chip">
-              📅 {periodeStr} &middot; {aantalNachten} {aantalNachten === 1 ? 'nacht' : 'nachten'}
+            <span className="kamp-hero-chip kamp-hero-chip--primary" style={{ borderColor: takKleur }}>
+              <i className="fa-solid fa-calendar-day" style={{ color: takKleur }} />
+              <span>{periodeStr}<span className="kamp-hero-chip-sub"> · {aantalNachten} {aantalNachten === 1 ? 'nacht' : 'nachten'}</span></span>
             </span>
             {kamp.locatie && (
               <a
@@ -96,10 +98,15 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
                 target="_blank" rel="noopener noreferrer"
                 className="kamp-hero-chip kamp-hero-chip-link"
               >
-                📍 {kamp.locatie} ↗
+                <i className="fa-solid fa-location-dot" /> {kamp.locatie}
+                <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '.7em', opacity: .7 }} />
               </a>
             )}
-            {prijs && <span className="kamp-hero-chip">🏷 {prijs}</span>}
+            {prijs && (
+              <span className="kamp-hero-chip">
+                <i className="fa-solid fa-tag" /> {prijs}
+              </span>
+            )}
           </div>
           {kamp.beschrijving && (
             <p className="kamp-hero-beschrijving">{kamp.beschrijving}</p>
@@ -114,7 +121,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
 
             {/* Left: RSVP — primary action */}
             <div className="kamp-rsvp-col">
-              <div className="kamp-glass-card kamp-rsvp-card">
+              <div className="kamp-glass-card kamp-rsvp-card" style={{ borderTop: `4px solid ${takKleur}` }}>
                 <RsvpForm slug={slug} kampTak={kamp.tak} />
               </div>
             </div>
@@ -125,7 +132,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
 
                 {hasInfo && (
                   <details className="kamp-accordion" open>
-                    <summary className="kamp-accordion-header">Praktische info</summary>
+                    <summary className="kamp-accordion-header"><i className="fa-solid fa-circle-info kamp-accordion-icon" />Praktische info</summary>
                     <div className="kamp-accordion-body kamp-praktisch-grid">
                       {kamp.briefadres && (
                         <div>
@@ -145,7 +152,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
 
                 {bestanden.length > 0 && (
                   <details className="kamp-accordion" open>
-                    <summary className="kamp-accordion-header">Documenten &amp; links</summary>
+                    <summary className="kamp-accordion-header"><i className="fa-solid fa-paperclip kamp-accordion-icon" />Documenten &amp; links</summary>
                     <div className="kamp-accordion-body">
                       <div className="kamp-bijlagen-grid">
                         {bestanden.map(b => (
@@ -166,7 +173,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
 
                 {paklijst.length > 0 && (
                   <details className="kamp-accordion">
-                    <summary className="kamp-accordion-header">Inpaklijst</summary>
+                    <summary className="kamp-accordion-header"><i className="fa-solid fa-suitcase-rolling kamp-accordion-icon" />Inpaklijst</summary>
                     <div className="kamp-accordion-body">
                       <p className="kamp-paklijst-hint">Vink af terwijl je inpakt — wordt bijgehouden in je browser.</p>
                       <PaklijstViewer paklijst={paklijst} />
