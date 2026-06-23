@@ -34,6 +34,7 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
       data-date={event.date}
       onClick={canExpand ? () => setOpen(o => !o) : undefined}
       style={canExpand ? { cursor: 'pointer' } : undefined}
+      role={canExpand ? 'button' : undefined}
       aria-expanded={canExpand ? open : undefined}
     >
       <div className="cal-event-date" aria-hidden="true">

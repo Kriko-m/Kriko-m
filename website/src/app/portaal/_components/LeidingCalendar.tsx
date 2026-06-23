@@ -27,6 +27,11 @@ function dayOfWeekMon(d: Date): number {
   return (d.getDay() + 6) % 7
 }
 
+// Use local time to avoid UTC offset shifting the date string by one day (e.g. UTC+2 midnight → previous UTC day)
+function toLocalDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 export default function LeidingCalendar({ initialCalendar, kampen, highlightTak, canPublish, icsToken, readOnly, twoColumn = false }: Props) {
   const today = new Date()
   const searchParams = useSearchParams()
@@ -78,7 +83,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
     return map
   }, [entries])
 
-  const todayDate = new Date().toISOString().slice(0, 10)
+  const todayDate = toLocalDateStr(new Date())
 
   // Right column: only upcoming when no day selected; all entries for a selected day
   const rightEntries = useMemo(() => {
@@ -156,7 +161,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
 
   // ─── Calendar Grid Component ───────────────────────────────────────────────
   function CalendarGrid() {
-    const todayStr = today.toISOString().slice(0, 10)
+    const todayStr = toLocalDateStr(today)
 
     return (
       <div style={{ background: '#fff', borderRadius: 14, border: '1.5px solid #C2D9C9', overflow: 'hidden' }}>
@@ -187,7 +192,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
           {calGrid.map((cell) => {
             const isCurrentMonth = cell.date!.getMonth() === calMonth
-            const dateStr = cell.date!.toISOString().slice(0, 10)
+            const dateStr = toLocalDateStr(cell.date!)
             const isToday = dateStr === todayStr
             const isSelected = dateStr === selectedDate
             const dayEvents = eventsByDate.get(dateStr) || []

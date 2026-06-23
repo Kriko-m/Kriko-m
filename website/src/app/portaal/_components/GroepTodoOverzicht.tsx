@@ -160,7 +160,6 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
                       {MONTH_ORDER.map(month => {
                         const items = takTodos(activeTak, month)
                         const isAdding = addingMonth === month
-                        const count = items.length
 
                         return (
                           <div key={month} style={{ border: '1.5px solid #E2EBE5', borderRadius: 12, background: '#FAFCFA', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
