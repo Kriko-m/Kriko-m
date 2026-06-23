@@ -2,12 +2,6 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "kriko-php",
-      "runtimeExecutable": "php",
-      "runtimeArgs": ["-S", "localhost:8080", "-t", "kriko-m"],
-      "port": 8080
-    },
-    {
       "name": "kriko-next",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "website"],

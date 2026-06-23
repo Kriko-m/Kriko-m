@@ -34,7 +34,7 @@ export const getAllCalendarEvents = unstable_cache(
   { revalidate: 300, tags: ['calendar'] }
 )
 
-// Enkel publieke events (audience bevat 'ouders') — de oudercalender. Voor de
+// Enkel publieke events (audience bevat 'groep') — de oudercalender. Voor de
 // publieke site en de publieke ICS-feed.
 export const getPublicCalendarEvents = unstable_cache(
   async () => {
@@ -42,7 +42,7 @@ export const getPublicCalendarEvents = unstable_cache(
     const { data } = await supabase
       .from('calendar')
       .select('*')
-      .contains('audience', ['ouders'])
+      .contains('audience', ['groep'])
       .order('date', { ascending: true })
     return data ?? []
   },

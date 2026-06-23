@@ -60,14 +60,13 @@ export default function LeidingPanel({
   takEmails = {},
   takConfigs = {},
 }: LeidingPanelProps) {
-  const [activeTak] = useState(TAKKEN.includes(initialTak ?? '') ? (initialTak as string) : 'evenementen')
-  // Geen Kriko Echo voor overkoepelende tabs (evenementen / groepsleiding).
-  const isEchoTak = activeTak !== 'evenementen' && activeTak !== 'groepsleiding'
+  const [activeTak] = useState(TAKKEN.includes(initialTak ?? '') ? (initialTak as string) : 'kapoenen')
+  // Enkel de 4 leeftijdstakken hebben een Kriko Echo; de groepsleiding-tab niet.
+  const isEchoTak = activeTak !== 'groepsleiding'
   const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
   const isGroepsleidingTak = activeTak === 'groepsleiding'
-  // Overkoepelende tabs (evenementen/groepsleiding): enkel groepsleiding mag bewerken.
-  const isOverkoepelend = activeTak === 'evenementen' || activeTak === 'groepsleiding'
-  const canEditTak = !isOverkoepelend || isGroepsleiding
+  // Elke bereikbare tab is bewerkbaar (de groepsleiding-tab is route-gegate naar GL).
+  const canEditTak = true
   const [inlineView, setInlineView] = useState<null | 'kampen' | 'echos'>(null)
   
   const [kampen, setKampen] = useState<Kamp[]>(initialKampen)
@@ -234,8 +233,13 @@ export default function LeidingPanel({
     setTimeout(() => setFlash(''), 3000)
   }
 
-  // Filter lists
-  const takKampen = kampen.filter(k => k.tak === activeTak || ((activeTak === 'evenementen' || activeTak === 'groepsleiding') && k.tak === 'alle'))
+  // Filter lists — kampen dragen tags (audience). Tak-tab toont kampen met die
+  // tak-tag; de groepsleiding-tab toont overkoepelende kampen ('groep'/'leiding').
+  const takKampen = kampen.filter(k =>
+    isGroepsleidingTak
+      ? (k.audience?.includes('groep') || k.audience?.includes('leiding'))
+      : k.audience?.includes(activeTak as never)
+  )
   const takEchos = echos.filter(e => e.tak === activeTak)
   const filteredTodos = todos.filter(t => t.month === selectedMonth)
 
@@ -359,7 +363,7 @@ export default function LeidingPanel({
     .filter(ev => {
       if (ev.date < todayStr) return false
       return ev.audience.includes('leiding') || 
-             ev.audience.includes('ouders') || 
+             ev.audience.includes('groep') || 
              ev.audience.includes(activeTak as AudienceTag)
     })
     .slice(0, 5)
@@ -1187,13 +1191,15 @@ export default function LeidingPanel({
       {showKampModal && editKampId && (
         <KampBeheerModal
           kamp={kampen.find(k => k.id === editKampId)!}
+          isGroepsleiding={isGroepsleiding}
           onClose={() => { setShowKampModal(false); setEditKampId(null) }}
           onKampUpdated={(updated) => setKampen(prev => prev.map(k => k.id === updated.id ? updated : k))}
         />
       )}
       {showKampAanmaken && (
         <KampAanmakenModal
-          tak={activeTak}
+          defaultTak={activeTak}
+          isGroepsleiding={isGroepsleiding}
           defaultContactEmail={takEmails[activeTak] ?? ''}
           onClose={() => setShowKampAanmaken(false)}
           onCreated={(created) => {

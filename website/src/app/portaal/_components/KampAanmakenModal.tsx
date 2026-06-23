@@ -1,16 +1,43 @@
 'use client'
 import { useState } from 'react'
+import { KAMP_AGE_TAKKEN } from '@/lib/kamp'
+import { AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
 
 const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' as const }
 const labelStyle = { display: 'block', fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 5 }
 
-export default function KampAanmakenModal({ tak, defaultContactEmail = '', onClose, onCreated }: { tak: string; defaultContactEmail?: string; onClose: () => void; onCreated: (kamp: unknown) => void }) {
+export default function KampAanmakenModal({
+  defaultTak,
+  isGroepsleiding = false,
+  defaultContactEmail = '',
+  onClose,
+  onCreated,
+}: {
+  defaultTak: string
+  isGroepsleiding?: boolean
+  defaultContactEmail?: string
+  onClose: () => void
+  onCreated: (kamp: unknown) => void
+}) {
+  // Beschikbare tags: leiding = enkel de leeftijdstakken; GL ook 'groep' + 'leiding'.
+  const beschikbareTags: string[] = isGroepsleiding
+    ? [...KAMP_AGE_TAKKEN, 'groep', 'leiding']
+    : [...KAMP_AGE_TAKKEN]
+  // Preselecteer de huidige tab-tak (enkel als het een leeftijdstak is).
+  const initAudience = (KAMP_AGE_TAKKEN as readonly string[]).includes(defaultTak) ? [defaultTak] : []
+
   const [form, setForm] = useState({ naam: '', locatie: '', datum_van: '', datum_tot: '', prijs: '', contact_info: defaultContactEmail, beschrijving: '' })
+  const [audience, setAudience] = useState<string[]>(initAudience)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  function toggleTag(tag: string) {
+    setAudience(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (audience.length === 0) { setError('Selecteer minstens één tag.'); return }
     setLoading(true)
     setError('')
     const res = await fetch('/api/admin/kampen', {
@@ -24,14 +51,15 @@ export default function KampAanmakenModal({ tak, defaultContactEmail = '', onClo
         prijs: form.prijs ? Number(form.prijs) : 0,
         contact_info: form.contact_info,
         beschrijving: form.beschrijving,
-        tak: tak === 'evenementen' || tak === 'groepsleiding' ? 'alle' : tak,
+        audience,
       }),
     })
     if (res.ok) {
       const created = await res.json()
       onCreated(created)
     } else {
-      setError('Fout bij aanmaken. Probeer opnieuw.')
+      const data = await res.json().catch(() => ({}))
+      setError(data.error || 'Fout bij aanmaken. Probeer opnieuw.')
     }
     setLoading(false)
   }
@@ -49,6 +77,22 @@ export default function KampAanmakenModal({ tak, defaultContactEmail = '', onClo
 
           <form onSubmit={handleSubmit} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
             {error && <div style={{ background: '#fdf0f2', border: '1.5px solid #e0c0c4', color: '#B23A4D', padding: '10px 14px', borderRadius: 8, fontSize: '.85rem', fontWeight: 600 }}>{error}</div>}
+
+            <div>
+              <label style={labelStyle}>Voor wie? (tags)</label>
+              <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+                {beschikbareTags.map(tag => {
+                  const on = audience.includes(tag)
+                  return (
+                    <button key={tag} type="button" onClick={() => toggleTag(tag)}
+                      style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.78rem', fontWeight: 700,
+                        background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
+                      {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div style={{ gridColumn: '1 / -1' }}>

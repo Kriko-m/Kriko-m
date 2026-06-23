@@ -3,7 +3,7 @@ import { getPublicCalendarEvents, getKampen } from '@/lib/db'
 import { Kamp } from '@/lib/types'
 import { IcsEvent, icsHeader, buildEventVevent, buildKampVevent, toUtcIcsString, foldIcsLine } from '@/lib/ics'
 
-// Publieke oudercalender-feed: enkel events met de 'ouders'-tag, plus open
+// Publieke oudercalender-feed: enkel events met de 'groep'-tag, plus open
 // kampen/weekenden. Interne leiding-events verschijnen hier nooit.
 export async function GET(request: NextRequest) {
   try {

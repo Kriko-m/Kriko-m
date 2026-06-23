@@ -38,7 +38,7 @@ export default async function LeidingPortaalPage({
     admin.from('echos').select('*').order('year', { ascending: false }).order('month', { ascending: false }),
     admin.from('calendar').select('*').order('date', { ascending: true }),
     admin.from('settings').select('leiding_ics_token, portal_backgrounds, takken').eq('id', 1).single(),
-    admin.from('todos').select('*').eq('tak', tak || 'evenementen').eq('werkjaar', werkjaar).order('created_at', { ascending: true }),
+    admin.from('todos').select('*').eq('tak', tak).eq('werkjaar', werkjaar).order('created_at', { ascending: true }),
   ])
 
   if (authRes.error || !authRes.data.user) redirect('/portaal')
@@ -57,7 +57,7 @@ export default async function LeidingPortaalPage({
 
   return (
     <LeidingPanel
-      key={`${tak ?? 'evenementen'}-${tab ?? 'kalender'}-${month ?? ''}`}
+      key={`${tak}-${tab ?? 'kalender'}-${month ?? ''}`}
       initialKampen={kampen}
       initialEchos={echos}
       initialCalendar={calendarEvents}

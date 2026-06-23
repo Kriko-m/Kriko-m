@@ -1,13 +1,7 @@
 // Gedeelde, pure kalender-helpers (geen server-only imports → bruikbaar in
 // client components én server components).
 
-import { AudienceTag, CalendarEvent, CalendarEntry, Kamp } from './types'
-
-// Kamp-tak → audience-tags. 'alle' betekent: alle takken.
-function kampTakToAudience(tak: Kamp['tak']): AudienceTag[] {
-  if (tak === 'alle') return ['kapoenen', 'welpen', 'jonggivers', 'givers']
-  return [tak]
-}
+import { CalendarEvent, CalendarEntry, Kamp } from './types'
 
 // Zet een echt kalender-event om naar een CalendarEntry.
 export function eventToEntry(ev: CalendarEvent): CalendarEntry {
@@ -24,7 +18,7 @@ export function kampToEntry(kamp: Kamp): CalendarEntry {
     time: '',
     location: kamp.locatie,
     description: kamp.beschrijving,
-    audience: kampTakToAudience(kamp.tak),
+    audience: kamp.audience ?? [],
     is_evenement: false,
     cover_image: '',
     document_url: '',

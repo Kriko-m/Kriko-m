@@ -47,9 +47,9 @@ export interface Leader {
   role: string
 }
 
-// Audience-tags bepalen de zichtbaarheid: een event met 'ouders' is publiek
-// (oudercalender); alle events zijn zichtbaar in de leidingcalender.
-export type AudienceTag = 'leiding' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' | 'ouders'
+// Audience-tags bepalen de zichtbaarheid: een event met 'groep' is publiek
+// (website-kalender); alle events zijn zichtbaar in de leidingcalender.
+export type AudienceTag = 'leiding' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' | 'groep'
 
 export interface CalendarEvent {
   id: string
@@ -133,7 +133,9 @@ export interface Kamp {
   id: string
   slug: string
   naam: string
-  tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' | 'alle'
+  // Tags: welke takken/groep/leiding dit kamp betreft (zelfde vocab als de
+  // kalender). Kampen verschijnen nooit publiek, dus 'groep' = enkel intern.
+  audience: AudienceTag[]
   datum_van: string
   datum_tot: string
   locatie: string
@@ -207,7 +209,7 @@ export interface TodoItem {
   title: string
   month: number
   completed: boolean
-  tak: 'evenementen' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' | 'groepsleiding'
+  tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' | 'groepsleiding'
   werkjaar: string
   created_at?: string
 }

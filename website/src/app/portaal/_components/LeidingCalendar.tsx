@@ -374,7 +374,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
                   )}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0, alignItems: 'center' }}>
-                  {!readOnly && !isKamp && !(!canPublish && ev.audience.includes('ouders')) && (
+                  {!readOnly && !isKamp && !(!canPublish && ev.audience.includes('groep')) && (
                     <button onClick={() => { setEditId(ev.id); setShowForm(true) }} title="Bewerken" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: '#f0f0f0', color: '#999', fontSize: '.9rem', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
                       <i className="fas fa-pen"></i>
                     </button>
@@ -416,7 +416,7 @@ export default function LeidingCalendar({ initialCalendar, kampen, highlightTak,
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: '.75rem', fontWeight: 700, color: '#6A8A75', marginRight: 2 }}>Filter:</span>
-          {(['ouders', 'leiding'] as const).map(tag => (
+          {(['groep', 'leiding'] as const).map(tag => (
             <button key={tag} type="button" onClick={() => toggleFilter(tag)}
               style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.75rem', fontWeight: 700,
                 background: filter.has(tag) ? AUDIENCE_KLEUREN[tag] : 'transparent', color: filter.has(tag) ? '#fff' : AUDIENCE_KLEUREN[tag] }}>

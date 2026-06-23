@@ -3,7 +3,7 @@
 --  Voer dit script uit in Supabase → SQL Editor → New query
 -- ============================================================
 --
--- Publieke groepsevenementen (audience bevat 'ouders' + is_evenement) krijgen
+-- Publieke groepsevenementen (audience bevat 'groep' + is_evenement) krijgen
 -- extra visuele velden zodat ze op de publieke kalender uitgebreid getoond
 -- kunnen worden. cover_image (hero-foto) en document_url (uitnodiging) bestaan al.
 -- Idempotent: veilig om meermaals te draaien.

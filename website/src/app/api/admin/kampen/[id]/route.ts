@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
-import { requireLeiding } from '@/lib/auth'
+import { requireLeiding, requireGroepsleiding } from '@/lib/auth'
+import { sanitizeKampAudience } from '@/lib/kamp'
 import { revalidateTag } from 'next/cache'
 
 export async function PATCH(
@@ -12,10 +13,22 @@ export async function PATCH(
 
   const { id } = await params
   const body = await req.json()
-  const allowed = ['naam', 'tak', 'datum_van', 'datum_tot', 'locatie', 'beschrijving', 'prijs', 'paklijst', 'briefadres', 'contact_info', 'foto']
+  const allowed = ['naam', 'datum_van', 'datum_tot', 'locatie', 'beschrijving', 'prijs', 'paklijst', 'briefadres', 'contact_info', 'foto']
   const update: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) update[key] = body[key]
+  }
+
+  // Tags (audience) apart valideren; 'groep'/'leiding' enkel voor groepsleiding.
+  if ('audience' in body) {
+    const { audience, needsGroepsleiding } = sanitizeKampAudience(body.audience)
+    if (audience.length === 0) {
+      return NextResponse.json({ error: 'Selecteer minstens één tag.' }, { status: 400 })
+    }
+    if (needsGroepsleiding && !(await requireGroepsleiding())) {
+      return NextResponse.json({ error: 'Enkel groepsleiding mag de tags ‘groep’ of ‘leiding’ gebruiken.' }, { status: 403 })
+    }
+    update.audience = audience
   }
 
   const admin = createAdminClient()

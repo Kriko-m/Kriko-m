@@ -139,7 +139,10 @@ export function buildKampVevent(kamp: Kamp, nowStr: string): string[] {
   lines.push(`DTSTART;VALUE=DATE:${startYmd}`)
   lines.push(`DTEND;VALUE=DATE:${endYmd}`)
 
-  const takName = kamp.tak === 'alle' ? 'Groep' : kamp.tak.charAt(0).toUpperCase() + kamp.tak.slice(1)
+  const ageTakken = (kamp.audience ?? []).filter(a => ['kapoenen', 'welpen', 'jonggivers', 'givers'].includes(a))
+  const takName = ageTakken.length >= 4
+    ? 'Groep'
+    : ((kamp.audience ?? []).map(a => a.charAt(0).toUpperCase() + a.slice(1)).join(', ') || 'Kamp')
   lines.push(`SUMMARY:${escapeIcsText(`🏕️ Weekend/Kamp [${takName}]: ${kamp.naam}`)}`)
 
   let desc = kamp.beschrijving || ''

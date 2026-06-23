@@ -31,7 +31,7 @@ export async function PATCH(
   const resultingEvenement = 'is_evenement' in body ? !!body.is_evenement : !!existing.is_evenement
 
   const touchesPublic =
-    resultingAudience.includes('ouders') || (existing.audience ?? []).includes('ouders')
+    resultingAudience.includes('groep') || (existing.audience ?? []).includes('groep')
   const touchesEvenement = resultingEvenement || existing.is_evenement
 
   // Publieke events / evenementen mogen enkel door groepsleiding bewerkt worden.

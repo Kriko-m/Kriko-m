@@ -5,6 +5,40 @@ import type { KampBestand } from '@/lib/types'
 
 export type PaklijstCategorie = { categorie: string; items: string[] }
 
+// ── Kamp-tags (audience) ────────────────────────────────────
+// Geldige tags voor een kamp (zelfde vocab als de kalender). 'groep' en
+// 'leiding' zijn voorbehouden aan groepsleiding.
+export const KAMP_TAGS = ['leiding', 'kapoenen', 'welpen', 'jonggivers', 'givers', 'groep'] as const
+export const KAMP_AGE_TAKKEN = ['kapoenen', 'welpen', 'jonggivers', 'givers'] as const
+const GL_ONLY_KAMP_TAGS = new Set<string>(['groep', 'leiding'])
+
+// Schoont de aangeleverde tags en bepaalt of groepsleiding-rechten nodig zijn.
+export function sanitizeKampAudience(raw: unknown): { audience: string[]; needsGroepsleiding: boolean } {
+  const valid = new Set<string>(KAMP_TAGS)
+  const audience = Array.isArray(raw)
+    ? [...new Set(raw.filter((a: unknown): a is string => typeof a === 'string' && valid.has(a)))]
+    : []
+  const needsGroepsleiding = audience.some(a => GL_ONLY_KAMP_TAGS.has(a))
+  return { audience, needsGroepsleiding }
+}
+
+// Eerste leeftijdstak uit de tags (voor kleur/sjabloon/deeplink); valt terug op 'groep'.
+export function kampPrimaryTak(audience: string[] | undefined | null): string {
+  const list = audience ?? []
+  return (KAMP_AGE_TAKKEN as readonly string[]).find(t => list.includes(t)) ?? 'groep'
+}
+
+// True als alle vier de leeftijdstakken aanwezig zijn.
+export function kampIsHeleGroep(audience: string[] | undefined | null): boolean {
+  const list = audience ?? []
+  return (KAMP_AGE_TAKKEN as readonly string[]).every(t => list.includes(t))
+}
+
+// Paklijst-sjabloonsleutel: hele groep → 'groep', anders de eerste tak.
+export function kampPaklijstTemplateKey(audience: string[] | undefined | null): string {
+  return kampIsHeleGroep(audience) ? 'groep' : kampPrimaryTak(audience)
+}
+
 // Tekst → gestructureerde paklijst. Formaat per regel: "Categorie: item1, item2".
 export function parsePackingList(text: string): PaklijstCategorie[] {
   if (!text) return []

@@ -57,7 +57,7 @@ export default function KalenderActiviteitModal({
   const [facebookLinkOpen, setFacebookLinkOpen] = useState(!!(editEvent?.facebook_event_url))
   const [externalLinkOpen, setExternalLinkOpen] = useState(!!(editEvent?.external_link_url))
 
-  const selectableTags: AudienceTag[] = canPublish ? [...AUDIENCE_TAGS] : AUDIENCE_TAGS.filter(t => t !== 'ouders')
+  const selectableTags: AudienceTag[] = canPublish ? [...AUDIENCE_TAGS] : AUDIENCE_TAGS.filter(t => t !== 'groep')
 
   function toggleAudience(tag: AudienceTag) {
     setForm(p => {
@@ -188,9 +188,9 @@ export default function KalenderActiviteitModal({
                   )
                 })}
               </div>
-              {form.audience.includes('ouders') && (
+              {form.audience.includes('groep') && (
                 <span style={{ display: 'block', marginTop: 5, fontSize: '.73rem', color: '#9A6B12', fontWeight: 600 }}>
-                  ⚠️ Met de tag &ldquo;Ouders&rdquo; wordt dit zichtbaar op de publieke website.
+                  ⚠️ Met de tag &ldquo;Groep&rdquo; wordt dit zichtbaar op de publieke website.
                 </span>
               )}
             </div>

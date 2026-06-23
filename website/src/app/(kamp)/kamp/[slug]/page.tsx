@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase'
 import { requireLeiding } from '@/lib/auth'
-import { TAK_NAMEN, TAK_KLEUREN } from '@/lib/constants'
-import { BESTAND_LABELS, bestandHref } from '@/lib/kamp'
+import { TAK_KLEUREN, AUDIENCE_NAMEN } from '@/lib/constants'
+import { BESTAND_LABELS, bestandHref, kampPrimaryTak, kampIsHeleGroep, KAMP_AGE_TAKKEN } from '@/lib/kamp'
 import { Kamp } from '@/lib/types'
 import RsvpForm from './RsvpForm'
 import PaklijstViewer from './PaklijstViewer'
@@ -51,7 +51,14 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
 
   const bestanden = kamp.kamp_bestanden ?? []
   const paklijst: { categorie: string; items: string[] }[] = Array.isArray(kamp.paklijst) ? kamp.paklijst : []
-  const takKleur = TAK_KLEUREN[kamp.tak] ?? '#1A3D2A'
+  const primaryTak = kampPrimaryTak(kamp.audience)
+  const takKleur = TAK_KLEUREN[primaryTak] ?? '#1A3D2A'
+  // Label voor de tak-badge: "Hele groep" als alle 4 takken, anders de tags.
+  const takLabel = kampIsHeleGroep(kamp.audience)
+    ? 'Hele groep'
+    : (kamp.audience ?? []).map(a => AUDIENCE_NAMEN[a] ?? a).join(' · ') || 'Kamp'
+  // Portaal-deeplink: eerste leeftijdstak, anders de groepsleiding-tab.
+  const deeplinkTak = (KAMP_AGE_TAKKEN as readonly string[]).includes(primaryTak) ? primaryTak : 'groepsleiding'
   const fotoUrl = kamp.foto ? `${FOTO_BASE}/${kamp.foto}` : null
   const prijs = kamp.prijs != null && kamp.prijs > 0
     ? `€${Number(kamp.prijs).toFixed(2).replace('.', ',')}`
@@ -73,7 +80,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
         <div className="kamp-leiding-banner">
           <span>👋 Je bekijkt de publieke versie als leiding.</span>
           <Link
-            href={`/portaal/leiding?tak=${kamp.tak === 'alle' ? 'evenementen' : kamp.tak}&kamp=${kamp.id}`}
+            href={`/portaal/leiding?tak=${deeplinkTak}&kamp=${kamp.id}`}
             className="kamp-leiding-btn"
           >✏️ Naar portaal →</Link>
         </div>
@@ -84,7 +91,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
         <div className="container">
           <span className="kamp-tak-badge">
             <span className="kamp-tak-dot" style={{ background: takKleur }} />
-            {TAK_NAMEN[kamp.tak] ?? kamp.tak}
+            {takLabel}
           </span>
           <h1 className="tak-hero-title kamp-hero-naam">{kamp.naam}</h1>
           <div className="kamp-hero-chips">
@@ -122,7 +129,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
             {/* Left: RSVP — primary action */}
             <div className="kamp-rsvp-col">
               <div className="kamp-glass-card kamp-rsvp-card" style={{ borderTop: `4px solid ${takKleur}` }}>
-                <RsvpForm slug={slug} kampTak={kamp.tak} />
+                <RsvpForm slug={slug} kampTak={primaryTak} />
               </div>
             </div>
 

@@ -1,10 +1,11 @@
 'use client'
 import { useState } from 'react'
 import { Kamp, KampBestand } from '@/lib/types'
-import { TAK_KLEUREN } from '@/lib/constants'
+import { TAK_KLEUREN, AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
 import {
   parsePackingList, formatPackingList,
   BESTAND_TYPES, BESTAND_LABELS, PaklijstCategorie,
+  KAMP_AGE_TAKKEN, kampPrimaryTak, kampPaklijstTemplateKey,
 } from '@/lib/kamp'
 import PaklijstEditor from './PaklijstEditor'
 import { RsvpPanel } from './CampRsvpPanel'
@@ -15,15 +16,22 @@ type Tab = 'gegevens' | 'bijlagen' | 'inpaklijst' | 'antwoorden'
 const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' as const }
 const labelStyle = { display: 'block', fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 5 }
 
-export default function KampBeheerModal({ kamp: initialKamp, onClose, onKampUpdated }: { kamp: Kamp; onClose: () => void; onKampUpdated: (kamp: Kamp) => void }) {
+export default function KampBeheerModal({ kamp: initialKamp, isGroepsleiding = false, onClose, onKampUpdated }: { kamp: Kamp; isGroepsleiding?: boolean; onClose: () => void; onKampUpdated: (kamp: Kamp) => void }) {
   const [kamp, setKamp] = useState<Kamp>(initialKamp)
   const [activeTab, setActiveTab] = useState<Tab>('gegevens')
   const [loading, setLoading] = useState(false)
   const [flash, setFlash] = useState('')
   const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => void } | null>(null)
+  const [audience, setAudience] = useState<string[]>(kamp.audience ?? [])
 
-  const templateKey = kamp.tak === 'alle' ? 'groep' : kamp.tak
-  const kleur = TAK_KLEUREN[kamp.tak] ?? '#1A3D2A'
+  // Beschikbare tags: leiding = leeftijdstakken; GL ook 'groep' + 'leiding'.
+  const beschikbareTags: string[] = isGroepsleiding ? [...KAMP_AGE_TAKKEN, 'groep', 'leiding'] : [...KAMP_AGE_TAKKEN]
+  function toggleTag(tag: string) {
+    setAudience(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])
+  }
+
+  const templateKey = kampPaklijstTemplateKey(kamp.audience)
+  const kleur = TAK_KLEUREN[kampPrimaryTak(kamp.audience)] ?? '#1A3D2A'
 
   const van = new Date(kamp.datum_van)
   const tot = new Date(kamp.datum_tot)
@@ -57,7 +65,7 @@ export default function KampBeheerModal({ kamp: initialKamp, onClose, onKampUpda
       body: JSON.stringify({
         naam: form.naam, locatie: form.locatie, datum_van: form.datum_van, datum_tot: form.datum_tot,
         prijs: form.prijs ? Number(form.prijs) : 0, contact_info: form.contact_info,
-        briefadres: form.briefadres, beschrijving: form.beschrijving,
+        briefadres: form.briefadres, beschrijving: form.beschrijving, audience,
       }),
     })
     if (res.ok) {
@@ -66,7 +74,8 @@ export default function KampBeheerModal({ kamp: initialKamp, onClose, onKampUpda
       onKampUpdated({ ...kamp, ...updated })
       showFlash('Opgeslagen!')
     } else {
-      showFlash('Fout bij opslaan.')
+      const err = await res.json().catch(() => ({}))
+      showFlash(err.error || 'Fout bij opslaan.')
     }
     setLoading(false)
   }
@@ -239,6 +248,21 @@ export default function KampBeheerModal({ kamp: initialKamp, onClose, onKampUpda
             {/* Gegevens */}
             {activeTab === 'gegevens' && (
               <form onSubmit={handleSaveGegevens} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div>
+                  <label style={labelStyle}>Voor wie? (tags)</label>
+                  <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+                    {beschikbareTags.map(tag => {
+                      const on = audience.includes(tag)
+                      return (
+                        <button key={tag} type="button" onClick={() => toggleTag(tag)}
+                          style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.78rem', fontWeight: 700,
+                            background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
+                          {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                   <div><label style={labelStyle}>Naam</label><input style={inputStyle} value={form.naam} onChange={e => setForm(p => ({ ...p, naam: e.target.value }))} required /></div>
                   <div><label style={labelStyle}>Locatie</label><input style={inputStyle} value={form.locatie} onChange={e => setForm(p => ({ ...p, locatie: e.target.value }))} /></div>

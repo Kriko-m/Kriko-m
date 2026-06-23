@@ -8,12 +8,12 @@ import { revalidateTag } from 'next/cache'
 const VALID_AUDIENCE = new Set<string>(AUDIENCE_TAGS)
 
 // Schoont en valideert de audience-tags en past de rechten toe. Enkel
-// groepsleiding mag publiceren naar 'ouders' (publiek) of evenementen aanmaken.
+// groepsleiding mag publiceren naar 'groep' (publiek) of evenementen aanmaken.
 function sanitizeAudience(raw: unknown, isEvenement: boolean, isGroepsleiding: boolean) {
   let audience = Array.isArray(raw) ? raw.filter(a => VALID_AUDIENCE.has(a)) : []
   let evenement = !!isEvenement
   if (!isGroepsleiding) {
-    audience = audience.filter(a => a !== 'ouders') // gewone leiding mag niet publiek publiceren
+    audience = audience.filter(a => a !== 'groep') // gewone leiding mag niet publiek publiceren
     evenement = false
   }
   // Dedupe
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const body = await req.json()
-  const wantsPublic = Array.isArray(body.audience) && body.audience.includes('ouders')
+  const wantsPublic = Array.isArray(body.audience) && body.audience.includes('groep')
   const wantsEvenement = !!body.is_evenement
 
   // Publiek publiceren of evenement aanmaken = enkel groepsleiding.
