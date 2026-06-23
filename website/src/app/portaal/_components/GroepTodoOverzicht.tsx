@@ -19,6 +19,7 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
   const [addingMonth, setAddingMonth] = useState<number | null>(null)
   const [addTitle, setAddTitle] = useState('')
   const [multiMonths, setMultiMonths] = useState<number[]>([])
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
 
   useEffect(() => {
     (async () => {
@@ -75,6 +76,24 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
     }
   }
 
+  async function resetAll() {
+    const takTodosToDelete = todos.filter(t => t.tak === activeTak)
+    if (takTodosToDelete.length === 0) {
+      setShowResetConfirm(false)
+      return
+    }
+
+    try {
+      for (const t of takTodosToDelete) {
+        await fetch(`/api/admin/todos/${t.id}`, { method: 'DELETE' })
+      }
+      setTodos(prev => prev.filter(t => t.tak !== activeTak))
+      setShowResetConfirm(false)
+    } catch {
+      setError('Kon taken niet verwijderen.')
+    }
+  }
+
   const takColor = TAK_KLEUREN[activeTak] ?? '#1A3D2A'
 
   return (
@@ -89,7 +108,10 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
               <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.25rem' }}>To-do Beheerder</h3>
               <p style={{ margin: '3px 0 0', color: '#6A8A75', fontSize: '.8rem' }}>Beheer en voeg taken toe per tak en maand</p>
             </div>
-            <button onClick={onClose} type="button" style={{ width: 36, height: 36, border: 'none', borderRadius: 10, background: '#F0ECE4', color: '#1A3D2A', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button onClick={() => setShowResetConfirm(true)} type="button" style={{ padding: '8px 12px', border: '1.5px solid #B23A4D', borderRadius: 8, background: 'none', color: '#B23A4D', fontSize: '.9rem', fontWeight: 700, cursor: 'pointer' }}>Reset alles</button>
+              <button onClick={onClose} type="button" style={{ width: 36, height: 36, border: 'none', borderRadius: 10, background: '#F0ECE4', color: '#1A3D2A', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
           </div>
 
           {error && <div style={{ margin: '10px 24px 0', background: '#fdf0f2', border: '1.5px solid #e0c0c4', color: '#B23A4D', padding: '10px 14px', borderRadius: 10, fontSize: '.8rem', fontWeight: 600 }}>{error}</div>}
@@ -257,6 +279,23 @@ export default function GroepTodoOverzicht({ onClose }: { onClose: () => void })
           </div>
         </div>
       </div>
+
+      {/* Reset Confirmation Dialog */}
+      {showResetConfirm && (
+        <>
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1001 }} onClick={() => setShowResetConfirm(false)} />
+          <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1002, pointerEvents: 'none', padding: 16 }}>
+            <div style={{ pointerEvents: 'auto', background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', maxWidth: 400 }}>
+              <h3 style={{ margin: '0 0 8px', color: '#1A3D2A', fontSize: '1.1rem', fontWeight: 800 }}>Alles verwijderen?</h3>
+              <p style={{ margin: '0 0 20px', color: '#6A8A75', fontSize: '.85rem', lineHeight: 1.4 }}>Dit zal alle taken voor <strong>{TAK_NAMEN[activeTak] ?? activeTak}</strong> verwijderen. Dit kan niet ongedaan gemaakt worden.</p>
+              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                <button onClick={() => setShowResetConfirm(false)} type="button" style={{ padding: '8px 16px', border: '1.5px solid #C2D9C9', borderRadius: 8, background: 'none', color: '#6A8A75', fontSize: '.85rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Annuleer</button>
+                <button onClick={resetAll} type="button" style={{ padding: '8px 16px', border: 'none', borderRadius: 8, background: '#B23A4D', color: '#fff', fontSize: '.85rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Ja, verwijder alles</button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </>
   )
 }
