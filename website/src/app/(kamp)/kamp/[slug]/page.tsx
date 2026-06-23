@@ -57,6 +57,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
     ? `€${Number(kamp.prijs).toFixed(2).replace('.', ',')}`
     : null
 
+  const hasInfo = !!(kamp.briefadres || kamp.contact_info)
 
   return (
     <div
@@ -66,10 +67,8 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
         '--tak-kleur': takKleur,
       } as React.CSSProperties}
     >
-      {/* Full-page bordeaux overlay */}
       <div className="kamp-bg-overlay" />
 
-      {/* Leiding notice */}
       {leiding && (
         <div className="kamp-leiding-banner">
           <span>👋 Je bekijkt de publieke versie als leiding.</span>
@@ -77,7 +76,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
         </div>
       )}
 
-      {/* ── Hero text — kamp naam on the background ── */}
+      {/* ── Hero ── */}
       <div className="kamp-hero-area">
         <div className="container">
           <span className="hero-eyebrow" style={{ color: takKleur }}>
@@ -99,79 +98,81 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
             )}
             {prijs && <span className="kamp-hero-chip">🏷 {prijs}</span>}
           </div>
+          {kamp.beschrijving && (
+            <p className="kamp-hero-beschrijving">{kamp.beschrijving}</p>
+          )}
         </div>
       </div>
 
-      {/* ── Glass card body ── */}
+      {/* ── Body ── */}
       <div className="kamp-glass-body">
         <div className="container">
-          <div className="tak-layout">
+          <div className="kamp-layout">
 
-            {/* Left: info glass cards */}
-            <div className="kamp-info-col">
-
-              {kamp.beschrijving && (
-                <div className="kamp-glass-card kamp-info-card">
-                  <h2>Over dit kamp</h2>
-                  <p className="kamp-beschrijving">{kamp.beschrijving}</p>
-                </div>
-              )}
-
-              {(kamp.briefadres || kamp.contact_info) && (
-                <div className="kamp-glass-card kamp-info-card">
-                  <h2>Praktische info</h2>
-                  <div className="kamp-praktisch-grid">
-                    {kamp.briefadres && (
-                      <div>
-                        <div className="kamp-praktisch-label">✉ Briefadres op kamp</div>
-                        <pre className="kamp-briefadres">{kamp.briefadres}</pre>
-                      </div>
-                    )}
-                    {kamp.contact_info && (
-                      <div>
-                        <div className="kamp-praktisch-label">📞 Contact leiding</div>
-                        <p className="kamp-contact">{kamp.contact_info}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {bestanden.length > 0 && (
-                <div className="kamp-glass-card kamp-info-card">
-                  <h2>Documenten &amp; links</h2>
-                  <div className="kamp-bijlagen-grid">
-                    {bestanden.map(b => (
-                      <a key={b.id} href={bestandHref(b)} target="_blank" rel="noopener" className="kamp-bijlage-card">
-                        <span className="kamp-bijlage-icon">{BIJLAGE_ICONEN[b.type] ?? '📎'}</span>
-                        <span className="kamp-bijlage-info">
-                          <strong>{b.naam}</strong>
-                          <span className="kamp-bijlage-type">
-                            {BESTAND_LABELS[b.type]?.replace(/^[^\s]+ /, '') ?? 'Bijlage'} {b.url ? '↗' : '↓'}
-                          </span>
-                        </span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {paklijst.length > 0 && (
-                <div className="kamp-glass-card kamp-info-card">
-                  <h2>Inpaklijst</h2>
-                  <p className="kamp-paklijst-hint">Vink af terwijl je inpakt — wordt bijgehouden in je browser.</p>
-                  <PaklijstViewer paklijst={paklijst} />
-                </div>
-              )}
-
-            </div>
-
-            {/* Right: RSVP glass card */}
+            {/* Left: RSVP — primary action */}
             <div className="kamp-rsvp-col">
               <div className="kamp-glass-card kamp-rsvp-card">
                 <RsvpForm slug={slug} kampTak={kamp.tak} />
               </div>
             </div>
+
+            {/* Right: Info accordion */}
+            {(hasInfo || bestanden.length > 0 || paklijst.length > 0) && (
+              <div className="kamp-info-col">
+
+                {hasInfo && (
+                  <details className="kamp-accordion" open>
+                    <summary className="kamp-accordion-header">Praktische info</summary>
+                    <div className="kamp-accordion-body kamp-praktisch-grid">
+                      {kamp.briefadres && (
+                        <div>
+                          <div className="kamp-praktisch-label">✉ Briefadres op kamp</div>
+                          <pre className="kamp-briefadres">{kamp.briefadres}</pre>
+                        </div>
+                      )}
+                      {kamp.contact_info && (
+                        <div>
+                          <div className="kamp-praktisch-label">📞 Contact leiding</div>
+                          <p className="kamp-contact">{kamp.contact_info}</p>
+                        </div>
+                      )}
+                    </div>
+                  </details>
+                )}
+
+                {bestanden.length > 0 && (
+                  <details className="kamp-accordion" open>
+                    <summary className="kamp-accordion-header">Documenten &amp; links</summary>
+                    <div className="kamp-accordion-body">
+                      <div className="kamp-bijlagen-grid">
+                        {bestanden.map(b => (
+                          <a key={b.id} href={bestandHref(b)} target="_blank" rel="noopener" className="kamp-bijlage-card">
+                            <span className="kamp-bijlage-icon">{BIJLAGE_ICONEN[b.type] ?? '📎'}</span>
+                            <span className="kamp-bijlage-info">
+                              <strong>{b.naam}</strong>
+                              <span className="kamp-bijlage-type">
+                                {BESTAND_LABELS[b.type]?.replace(/^[^\s]+ /, '') ?? 'Bijlage'} {b.url ? '↗' : '↓'}
+                              </span>
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </details>
+                )}
+
+                {paklijst.length > 0 && (
+                  <details className="kamp-accordion">
+                    <summary className="kamp-accordion-header">Inpaklijst</summary>
+                    <div className="kamp-accordion-body">
+                      <p className="kamp-paklijst-hint">Vink af terwijl je inpakt — wordt bijgehouden in je browser.</p>
+                      <PaklijstViewer paklijst={paklijst} />
+                    </div>
+                  </details>
+                )}
+
+              </div>
+            )}
 
           </div>
         </div>
