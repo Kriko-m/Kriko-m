@@ -2,24 +2,25 @@
 
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { PORTAAL_TAKKEN, GROEPSLEIDING_ONLY_TAKKEN, TAK_NAMEN } from '@/lib/constants'
 
 interface Props {
   isAdmin: boolean
+  role?: string
 }
 
-const TAKKEN = [
-  { key: 'kapoenen', label: 'Kapoenen' },
-  { key: 'welpen', label: 'Welpen' },
-  { key: 'jonggivers', label: 'Jonggivers' },
-  { key: 'givers', label: 'Givers' },
-]
-
-export default function PortaalSidebar({ isAdmin: _isAdmin }: Props) {
+export default function PortaalSidebar({ isAdmin: _isAdmin, role }: Props) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const activeTak = searchParams.get('tak') || ''
 
   const onLeidingPage = pathname === '/portaal/leiding' || pathname.startsWith('/portaal/leiding/')
+  const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
+
+  // Groepsleiding-only takken verbergen voor gewone leiding.
+  const takken = PORTAAL_TAKKEN.filter(
+    tak => isGroepsleiding || !(GROEPSLEIDING_ONLY_TAKKEN as readonly string[]).includes(tak)
+  )
 
   return (
     <aside className="portaal-sidebar-nav">
@@ -41,18 +42,27 @@ export default function PortaalSidebar({ isAdmin: _isAdmin }: Props) {
         <span>Kalender</span>
       </Link>
 
+      {/* Algemene info */}
+      <Link
+        href="/portaal/algemene-info"
+        className={`portaal-sidebar-link${pathname === '/portaal/algemene-info' ? ' active' : ''}`}
+      >
+        <i className="fa-solid fa-circle-info" style={{ width: 18, textAlign: 'center', fontSize: '0.9rem' }}></i>
+        <span>Algemene info</span>
+      </Link>
+
       {/* Tak links */}
-      {TAKKEN.map(tak => {
-        const isTakActive = onLeidingPage && activeTak === tak.key
+      {takken.map(tak => {
+        const isTakActive = onLeidingPage && activeTak === tak
 
         return (
           <Link
-            key={tak.key}
-            href={`/portaal/leiding?tak=${tak.key}`}
+            key={tak}
+            href={`/portaal/leiding?tak=${tak}`}
             className={`portaal-sidebar-tak${isTakActive ? ' active' : ''}`}
             style={{ textDecoration: 'none' }}
           >
-            <span>{tak.label}</span>
+            <span>{TAK_NAMEN[tak] ?? tak}</span>
           </Link>
         )
       })}

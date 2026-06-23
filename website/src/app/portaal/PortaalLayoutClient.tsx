@@ -69,7 +69,7 @@ export default function PortaalLayoutClient({ children, naam, isAdmin, role }: P
       {showNav ? (
         <div className="portaal-page-layout">
           <Suspense fallback={<aside className="portaal-sidebar-nav" />}>
-            <PortaalSidebar isAdmin={isAdmin} />
+            <PortaalSidebar isAdmin={isAdmin} role={role} />
           </Suspense>
           <main className="portaal-page-main" style={{ position: 'relative' }}>
             {children}

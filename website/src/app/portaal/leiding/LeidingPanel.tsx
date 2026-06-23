@@ -38,6 +38,7 @@ interface LeidingPanelProps {
   initialTak?: string
   initialTab?: string
   initialMonth?: number
+  openKampId?: string
   portalBackgrounds?: Record<string, { style: string; custom_url?: string }>
   takEmails?: Record<string, string>
 }
@@ -51,6 +52,7 @@ export default function LeidingPanel({
   icsToken: _icsToken,
   initialTak,
   initialMonth,
+  openKampId,
   portalBackgrounds = {},
   takEmails = {},
 }: LeidingPanelProps) {
@@ -189,6 +191,16 @@ export default function LeidingPanel({
       setSelectedMonth(initialMonth)
     }
   }, [initialMonth])
+
+  // Diep-link vanaf publieke kamppagina: open meteen het beheerscherm van dat kamp.
+  useEffect(() => {
+    if (!openKampId) return
+    if (!kampen.some(k => k.id === openKampId)) return
+    setInlineView('kampen')
+    setEditKampId(openKampId)
+    setShowKampModal(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openKampId])
 
   const activeMonthRef = (node: HTMLButtonElement | null) => {
     if (node) {

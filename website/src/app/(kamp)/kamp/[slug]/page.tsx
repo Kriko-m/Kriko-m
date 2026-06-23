@@ -72,7 +72,10 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
       {leiding && (
         <div className="kamp-leiding-banner">
           <span>👋 Je bekijkt de publieke versie als leiding.</span>
-          <Link href="/portaal/leiding" className="kamp-leiding-btn">✏️ Naar portaal →</Link>
+          <Link
+            href={`/portaal/leiding?tak=${kamp.tak === 'alle' ? 'evenementen' : kamp.tak}&kamp=${kamp.id}`}
+            className="kamp-leiding-btn"
+          >✏️ Naar portaal →</Link>
         </div>
       )}
 
