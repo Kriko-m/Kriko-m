@@ -2550,6 +2550,76 @@ body.portal-theme .tak-hero.primair {
     margin-top: 10px;
     display: block;
 }
+
+/* ─── Inline uitgeklapt evenement-detail ─── */
+.cal-event.is-open {
+    box-shadow: 0 8px 28px rgba(101, 11, 25, 0.16);
+}
+
+.cal-event-detail {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: cal-detail-in 0.22s ease;
+}
+
+@keyframes cal-detail-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.cal-event-banner {
+    width: 100%;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+}
+
+.cal-event-hero {
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+    border-radius: 12px;
+    display: block;
+}
+
+.cal-event-header {
+    font-family: var(--font-nunito), sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--color-primary-dark);
+    margin: 0;
+}
+
+.cal-event-fulltext {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--color-text-dark);
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.cal-add-btn--primary {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #3a2000;
+    font-weight: 700;
+}
+.cal-add-btn--primary:hover {
+    background-color: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    color: #3a2000;
+}
+
+.cal-expand-btn {
+    cursor: pointer;
+    font-family: inherit;
+}
+
 .cal-day.has-event.has-evenement {
     background-color: var(--color-accent);
     color: var(--color-primary-dark);

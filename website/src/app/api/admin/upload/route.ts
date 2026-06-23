@@ -117,15 +117,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(data)
     }
 
-    if (uploadType === 'evenement-cover' || uploadType === 'evenement-document') {
+    if (uploadType === 'evenement-cover' || uploadType === 'evenement-banner' || uploadType === 'evenement-document') {
       // Evenement-media (enkel groepsleiding maakt evenementen aan; requireLeiding
       // volstaat hier voor de upload zelf — koppeling gebeurt via de calendar-API).
-      if (uploadType === 'evenement-cover' && !IMAGE_MIME.has(file.type)) {
-        return NextResponse.json({ error: 'Coverfoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
+      const isImageType = uploadType === 'evenement-cover' || uploadType === 'evenement-banner'
+      if (isImageType && !IMAGE_MIME.has(file.type)) {
+        return NextResponse.json({ error: 'Afbeelding moet een JPG, PNG of WebP zijn.' }, { status: 400 })
       }
-      // Cover → publieke kamp-fotos bucket; document → publieke kamp-bestanden bucket.
-      const bucket = uploadType === 'evenement-cover' ? 'kamp-fotos' : 'kamp-bestanden'
-      const prefix = uploadType === 'evenement-cover' ? 'ev-cover' : 'ev-doc'
+      // Afbeeldingen → publieke kamp-fotos bucket; document → publieke kamp-bestanden bucket.
+      const bucket = isImageType ? 'kamp-fotos' : 'kamp-bestanden'
+      const prefix = uploadType === 'evenement-cover' ? 'ev-cover' : uploadType === 'evenement-banner' ? 'ev-banner' : 'ev-doc'
       const filename = `${prefix}-${Date.now()}.${ext}`
 
       const { error: storageError } = await admin.storage

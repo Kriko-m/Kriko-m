@@ -56,6 +56,9 @@ export async function POST(req: NextRequest) {
       is_evenement: evenement,
       cover_image: evenement ? (body.cover_image || '') : '',
       document_url: evenement ? (body.document_url || '') : '',
+      banner_image: evenement ? (body.banner_image || '') : '',
+      header: evenement ? (body.header || '') : '',
+      body: evenement ? (body.body || '') : '',
       werkjaar,
     })
     .select()

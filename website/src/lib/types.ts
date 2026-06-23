@@ -62,6 +62,9 @@ export interface CalendarEvent {
   is_evenement: boolean
   cover_image: string
   document_url: string
+  banner_image?: string
+  header?: string
+  body?: string
   facebook_event_url?: string | null
   external_link_url?: string | null
   werkjaar?: string

@@ -49,6 +49,9 @@ export async function PATCH(
   // Media enkel zinvol op evenementen.
   if ('cover_image' in body) update.cover_image = resultingEvenement ? (body.cover_image || '') : ''
   if ('document_url' in body) update.document_url = resultingEvenement ? (body.document_url || '') : ''
+  if ('banner_image' in body) update.banner_image = resultingEvenement ? (body.banner_image || '') : ''
+  if ('header' in body) update.header = resultingEvenement ? (body.header || '') : ''
+  if ('body' in body) update.body = resultingEvenement ? (body.body || '') : ''
 
   const { data, error } = await admin
     .from('calendar')
