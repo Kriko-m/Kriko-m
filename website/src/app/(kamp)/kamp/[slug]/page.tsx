@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase'
@@ -62,7 +61,17 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
   const overigeBestanden = bestanden.filter(b => !(b.type === 'presentatie' && b.url && googleSlidesEmbed(b.url)))
 
   return (
-    <div>
+    <div
+      className="kamp-page-root"
+      style={{
+        '--bg-photo': fotoUrl ? `url(${fotoUrl})` : 'none',
+        '--tak-kleur': takKleur,
+      } as React.CSSProperties}
+    >
+      {/* Full-page bordeaux overlay */}
+      <div className="kamp-bg-overlay" />
+
+      {/* Leiding notice */}
       {leiding && (
         <div className="kamp-leiding-banner">
           <span>👋 Je bekijkt de publieke versie als leiding.</span>
@@ -70,24 +79,9 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
         </div>
       )}
 
-      {/* ── Full-width hero — matches public tak-hero style ── */}
-      <section
-        className="kamp-page-hero"
-        style={{ '--tak-kleur': takKleur } as React.CSSProperties}
-      >
-        {fotoUrl && (
-          <Image
-            src={fotoUrl}
-            alt={kamp.naam}
-            fill
-            priority
-            sizes="100vw"
-            style={{ objectFit: 'cover' }}
-            className="tak-hero-img"
-          />
-        )}
-        <div className="kamp-page-hero-overlay" />
-        <div className="container kamp-page-hero-body">
+      {/* ── Hero text — kamp naam on the background ── */}
+      <div className="kamp-hero-area">
+        <div className="container">
           <span className="hero-eyebrow" style={{ color: takKleur }}>
             {TAK_NAMEN[kamp.tak] ?? kamp.tak}
           </span>
@@ -108,100 +102,102 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
             {prijs && <span className="kamp-hero-chip">🏷 {prijs}</span>}
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* ── Two-column body ── */}
-      <div className="kamp-body-section container">
-        <div className="tak-layout">
+      {/* ── Glass card body ── */}
+      <div className="kamp-glass-body">
+        <div className="container">
+          <div className="tak-layout">
 
-          {/* Left: info cards */}
-          <div className="kamp-info-col">
+            {/* Left: info glass cards */}
+            <div className="kamp-info-col">
 
-            {kamp.beschrijving && (
-              <div className="leaders-section kamp-info-card">
-                <h2>Over dit kamp</h2>
-                <p className="kamp-beschrijving">{kamp.beschrijving}</p>
-              </div>
-            )}
-
-            {(kamp.briefadres || kamp.contact_info) && (
-              <div className="leaders-section kamp-info-card">
-                <h2>Praktische info</h2>
-                <div className="kamp-praktisch-grid">
-                  {kamp.briefadres && (
-                    <div>
-                      <div className="kamp-praktisch-label">✉ Briefadres op kamp</div>
-                      <pre className="kamp-briefadres">{kamp.briefadres}</pre>
-                    </div>
-                  )}
-                  {kamp.contact_info && (
-                    <div>
-                      <div className="kamp-praktisch-label">📞 Contact leiding</div>
-                      <p className="kamp-contact">{kamp.contact_info}</p>
-                    </div>
-                  )}
+              {kamp.beschrijving && (
+                <div className="kamp-glass-card kamp-info-card">
+                  <h2>Over dit kamp</h2>
+                  <p className="kamp-beschrijving">{kamp.beschrijving}</p>
                 </div>
-              </div>
-            )}
+              )}
 
-            {bestanden.length > 0 && (
-              <div className="leaders-section kamp-info-card">
-                <h2>Documenten &amp; links</h2>
-                <div className="kamp-bijlagen-grid">
-                  {overigeBestanden.map(b => (
-                    <a key={b.id} href={bestandHref(b)} target="_blank" rel="noopener" className="kamp-bijlage-card">
-                      <span className="kamp-bijlage-icon">{BIJLAGE_ICONEN[b.type] ?? '📎'}</span>
-                      <span className="kamp-bijlage-info">
-                        <strong>{b.naam}</strong>
-                        <span className="kamp-bijlage-type">
-                          {BESTAND_LABELS[b.type]?.replace(/^[^\s]+ /, '') ?? 'Bijlage'} {b.url ? '↗' : '↓'}
-                        </span>
-                      </span>
-                    </a>
-                  ))}
-                  {slidesEmbeds.map(b => (
-                    <a key={b.id} href={bestandHref(b)} target="_blank" rel="noopener" className="kamp-bijlage-card">
-                      <span className="kamp-bijlage-icon">📊</span>
-                      <span className="kamp-bijlage-info">
-                        <strong>{b.naam}</strong>
-                        <span className="kamp-bijlage-type">Presentatie ↗</span>
-                      </span>
-                    </a>
-                  ))}
-                </div>
-                {slidesEmbeds.map(b => (
-                  <div key={`embed-${b.id}`} className="kamp-slides-wrap">
-                    <strong className="kamp-slides-titel">📊 {b.naam}</strong>
-                    <div className="kamp-slides-frame">
-                      <iframe
-                        src={googleSlidesEmbed(b.url!)!}
-                        title={b.naam}
-                        allowFullScreen
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
-                      />
-                    </div>
+              {(kamp.briefadres || kamp.contact_info) && (
+                <div className="kamp-glass-card kamp-info-card">
+                  <h2>Praktische info</h2>
+                  <div className="kamp-praktisch-grid">
+                    {kamp.briefadres && (
+                      <div>
+                        <div className="kamp-praktisch-label">✉ Briefadres op kamp</div>
+                        <pre className="kamp-briefadres">{kamp.briefadres}</pre>
+                      </div>
+                    )}
+                    {kamp.contact_info && (
+                      <div>
+                        <div className="kamp-praktisch-label">📞 Contact leiding</div>
+                        <p className="kamp-contact">{kamp.contact_info}</p>
+                      </div>
+                    )}
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              )}
 
-            {paklijst.length > 0 && (
-              <div className="leaders-section kamp-info-card">
-                <h2>Inpaklijst</h2>
-                <p className="kamp-paklijst-hint">Vink af terwijl je inpakt — wordt bijgehouden in je browser.</p>
-                <PaklijstViewer paklijst={paklijst} />
-              </div>
-            )}
+              {bestanden.length > 0 && (
+                <div className="kamp-glass-card kamp-info-card">
+                  <h2>Documenten &amp; links</h2>
+                  <div className="kamp-bijlagen-grid">
+                    {overigeBestanden.map(b => (
+                      <a key={b.id} href={bestandHref(b)} target="_blank" rel="noopener" className="kamp-bijlage-card">
+                        <span className="kamp-bijlage-icon">{BIJLAGE_ICONEN[b.type] ?? '📎'}</span>
+                        <span className="kamp-bijlage-info">
+                          <strong>{b.naam}</strong>
+                          <span className="kamp-bijlage-type">
+                            {BESTAND_LABELS[b.type]?.replace(/^[^\s]+ /, '') ?? 'Bijlage'} {b.url ? '↗' : '↓'}
+                          </span>
+                        </span>
+                      </a>
+                    ))}
+                    {slidesEmbeds.map(b => (
+                      <a key={b.id} href={bestandHref(b)} target="_blank" rel="noopener" className="kamp-bijlage-card">
+                        <span className="kamp-bijlage-icon">📊</span>
+                        <span className="kamp-bijlage-info">
+                          <strong>{b.naam}</strong>
+                          <span className="kamp-bijlage-type">Presentatie ↗</span>
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                  {slidesEmbeds.map(b => (
+                    <div key={`embed-${b.id}`} className="kamp-slides-wrap">
+                      <strong className="kamp-slides-titel">📊 {b.naam}</strong>
+                      <div className="kamp-slides-frame">
+                        <iframe
+                          src={googleSlidesEmbed(b.url!)!}
+                          title={b.naam}
+                          allowFullScreen
+                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-          </div>
+              {paklijst.length > 0 && (
+                <div className="kamp-glass-card kamp-info-card">
+                  <h2>Inpaklijst</h2>
+                  <p className="kamp-paklijst-hint">Vink af terwijl je inpakt — wordt bijgehouden in je browser.</p>
+                  <PaklijstViewer paklijst={paklijst} />
+                </div>
+              )}
 
-          {/* Right: RSVP form */}
-          <div>
-            <div className="side-card kamp-rsvp-card">
-              <RsvpForm slug={slug} kampTak={kamp.tak} />
             </div>
-          </div>
 
+            {/* Right: RSVP glass card */}
+            <div>
+              <div className="kamp-glass-card kamp-rsvp-card">
+                <RsvpForm slug={slug} kampTak={kamp.tak} />
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
