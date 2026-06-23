@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase'
 import { requireLeiding } from '@/lib/auth'
 import { TAK_NAMEN, TAK_KLEUREN } from '@/lib/constants'
-import { BESTAND_LABELS, bestandHref, googleSlidesEmbed } from '@/lib/kamp'
+import { BESTAND_LABELS, bestandHref } from '@/lib/kamp'
 import { Kamp } from '@/lib/types'
 import RsvpForm from './RsvpForm'
 import PaklijstViewer from './PaklijstViewer'
@@ -57,8 +57,6 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
     ? `€${Number(kamp.prijs).toFixed(2).replace('.', ',')}`
     : null
 
-  const slidesEmbeds = bestanden.filter(b => b.type === 'presentatie' && b.url && googleSlidesEmbed(b.url))
-  const overigeBestanden = bestanden.filter(b => !(b.type === 'presentatie' && b.url && googleSlidesEmbed(b.url)))
 
   return (
     <div
@@ -143,7 +141,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
                 <div className="kamp-glass-card kamp-info-card">
                   <h2>Documenten &amp; links</h2>
                   <div className="kamp-bijlagen-grid">
-                    {overigeBestanden.map(b => (
+                    {bestanden.map(b => (
                       <a key={b.id} href={bestandHref(b)} target="_blank" rel="noopener" className="kamp-bijlage-card">
                         <span className="kamp-bijlage-icon">{BIJLAGE_ICONEN[b.type] ?? '📎'}</span>
                         <span className="kamp-bijlage-info">
@@ -154,29 +152,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
                         </span>
                       </a>
                     ))}
-                    {slidesEmbeds.map(b => (
-                      <a key={b.id} href={bestandHref(b)} target="_blank" rel="noopener" className="kamp-bijlage-card">
-                        <span className="kamp-bijlage-icon">📊</span>
-                        <span className="kamp-bijlage-info">
-                          <strong>{b.naam}</strong>
-                          <span className="kamp-bijlage-type">Presentatie ↗</span>
-                        </span>
-                      </a>
-                    ))}
                   </div>
-                  {slidesEmbeds.map(b => (
-                    <div key={`embed-${b.id}`} className="kamp-slides-wrap">
-                      <strong className="kamp-slides-titel">📊 {b.naam}</strong>
-                      <div className="kamp-slides-frame">
-                        <iframe
-                          src={googleSlidesEmbed(b.url!)!}
-                          title={b.naam}
-                          allowFullScreen
-                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
-                        />
-                      </div>
-                    </div>
-                  ))}
                 </div>
               )}
 
@@ -191,7 +167,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
             </div>
 
             {/* Right: RSVP glass card */}
-            <div>
+            <div className="kamp-rsvp-col">
               <div className="kamp-glass-card kamp-rsvp-card">
                 <RsvpForm slug={slug} kampTak={kamp.tak} />
               </div>

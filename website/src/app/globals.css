@@ -4927,9 +4927,7 @@ body.portal-theme .portaal-nav {
     justify-content: space-between;
     height: 60px;
     padding: 0 28px;
-    background: rgba(58,7,16,0.82);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: var(--color-primary-dark);
     border-bottom: 1px solid rgba(201,150,58,0.22);
 }
 
@@ -5063,7 +5061,7 @@ body.portal-theme .portaal-nav {
 .kamp-glass-body {
     position: relative;
     z-index: 1;
-    padding-top: 48px;
+    padding-top: 32px;
     padding-bottom: 80px;
 }
 
@@ -5074,12 +5072,12 @@ body.portal-theme .portaal-nav {
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(201,150,58,0.28);
     border-radius: 20px;
-    padding: 28px;
+    padding: 20px;
     box-shadow: 0 8px 32px rgba(58,7,16,0.22);
 }
 
 .kamp-info-card {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 /* ── RSVP card — more opaque for form readability ── */
@@ -5091,13 +5089,253 @@ body.portal-theme .portaal-nav {
 
 /* ── Section headings inside glass cards ── */
 .kamp-info-col h2 {
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    font-weight: 800;
+    font-family: var(--font-londrina);
+    font-size: 1.6rem;
+    font-weight: 400;
     color: var(--color-primary-dark);
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+    padding-bottom: 7px;
+    border-bottom: 2px solid rgba(201,150,58,0.3);
+}
+
+/* ── RSVP form ── */
+.rsvp-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1.5px solid rgba(58,7,16,0.1);
+}
+
+.rsvp-titel {
+    font-family: var(--font-londrina);
+    font-size: 2.4rem;
+    font-weight: 400;
+    color: var(--color-primary-dark);
+    letter-spacing: 0.05em;
+    margin: 0 0 4px;
+}
+
+.rsvp-sub {
+    color: var(--color-text-muted);
+    font-size: .85rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.rsvp-error {
+    background: hsla(4,75%,48%,0.08);
+    border: 1.5px solid var(--color-error);
+    color: var(--color-error);
+    padding: 11px 14px;
+    border-radius: var(--border-radius-sm);
     margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1.5px solid rgba(58,7,16,0.12);
+    font-weight: 600;
+    font-size: .85rem;
+}
+
+.rsvp-rijen {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rsvp-rij {
+    border: 2px solid rgba(201,150,58,0.3);
+    border-radius: 14px;
+    padding: 16px 18px;
+    background: rgba(240,236,228,0.5);
+    position: relative;
+    transition: border-color .2s, background .2s;
+}
+
+.rsvp-rij--ja  { border-color: hsl(145,42%,65%); background: hsl(145,55%,97%); }
+.rsvp-rij--nee { border-color: hsl(350,55%,72%); background: hsl(350,55%,98%); }
+
+.rsvp-verwijder {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 0 4px;
+    transition: color .15s;
+}
+
+.rsvp-verwijder:hover { color: var(--color-error); }
+
+.rsvp-naam-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.rsvp-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rsvp-opmerking {
+    margin-top: 12px;
+}
+
+.rsvp-label {
+    font-size: .7rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.rsvp-keuze {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rsvp-keuze-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.rsvp-keuze-btn {
+    padding: 16px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: var(--font-londrina);
+    font-size: 1.35rem;
+    letter-spacing: .06em;
+    font-weight: 400;
+    border: 2px solid var(--color-border);
+    background: var(--color-bg-white);
+    color: var(--color-text-muted);
+    transition: border-color .15s, background .15s, color .15s, transform .1s;
+}
+
+.rsvp-keuze-btn:hover { transform: translateY(-1px); }
+
+.rsvp-keuze-btn--ja:hover,
+.rsvp-keuze-btn--ja.is-active {
+    border-color: hsl(145,55%,45%);
+    background: hsl(145,55%,93%);
+    color: hsl(145,60%,22%);
+}
+
+.rsvp-keuze-btn--nee:hover,
+.rsvp-keuze-btn--nee.is-active {
+    border-color: hsl(350,55%,52%);
+    background: hsl(350,55%,96%);
+    color: hsl(350,60%,32%);
+}
+
+.rsvp-add-kind {
+    margin-top: 12px;
+    display: block;
+    width: 100%;
+    padding: 11px;
+    background: none;
+    border: 1.5px dashed rgba(58,7,16,0.18);
+    border-radius: 10px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: .85rem;
+    transition: border-color .15s, color .15s, background .15s;
+}
+
+.rsvp-add-kind:hover {
+    border-color: var(--color-accent);
+    color: var(--color-primary-dark);
+    background: rgba(201,150,58,0.06);
+}
+
+.rsvp-submit {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    margin-top: 16px;
+    background: var(--color-accent);
+    color: #3a2000;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--font-londrina);
+    font-size: 1.3rem;
+    letter-spacing: .06em;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+}
+
+.rsvp-submit:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+}
+
+.rsvp-submit:disabled {
+    opacity: .7;
+    cursor: wait;
+}
+
+.rsvp-disclaimer {
+    font-size: .72rem;
+    color: var(--color-text-muted);
+    margin-top: 10px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+/* ── RSVP success state ── */
+.rsvp-success {
+    text-align: center;
+    padding: 8px 0;
+}
+
+.rsvp-success-icon {
+    font-size: 2.8rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.rsvp-success-title {
+    font-family: var(--font-londrina);
+    font-size: 2rem;
+    font-weight: 400;
+    color: hsl(145,60%,22%);
+    letter-spacing: .04em;
+    margin-bottom: 10px;
+}
+
+.rsvp-success-text {
+    color: hsl(145,40%,30%);
+    font-size: .9rem;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+
+.rsvp-success-btn {
+    padding: 9px 20px;
+    background: none;
+    border: 1.5px solid hsl(145,42%,55%);
+    border-radius: 8px;
+    color: hsl(145,55%,28%);
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: .85rem;
+    transition: background .15s;
+}
+
+.rsvp-success-btn:hover {
+    background: hsl(145,55%,94%);
 }
 
 /* ── Beschrijving ── */
@@ -5234,6 +5472,8 @@ body.portal-theme .portaal-nav {
     .kamp-rsvp-card {
         position: static;
     }
+    .kamp-rsvp-col { order: 1; }
+    .kamp-info-col  { order: 2; }
 }
 
 @media (max-width: 760px) {
