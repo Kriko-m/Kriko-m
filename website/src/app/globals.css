@@ -972,7 +972,7 @@ body.portal-theme .tak-hero.primair {
     color: #fcebbe;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.85), 0 2px 4px rgba(0, 0, 0, 0.95);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 }
 
 .tak-layout {

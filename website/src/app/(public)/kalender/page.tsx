@@ -20,7 +20,6 @@ export default async function KalenderPage() {
     <>
       <section className="tak-hero primair hero-kalender">
         <div className="container">
-          <span className="hero-eyebrow">Activiteiten &amp; evenementen</span>
           <h1 className="tak-hero-title">Kalender</h1>
         </div>
       </section>

@@ -21,6 +21,52 @@ const MONTHS_NL: Record<number, string> = {
 
 const VALID_TAKKEN = ['kapoenen', 'welpen', 'jonggivers', 'givers']
 
+const TAK_TRADITIES: Record<string, { wetTitle: string; wet: string; extraTitle?: string; extra?: React.ReactNode }> = {
+  kapoenen: {
+    wetTitle: 'De Kapoenenwet & Belofte',
+    wet: 'Een kapoen is een vriend van alle mensen, dieren en planten. Een kapoen speelt samen, deelt eerlijk en helpt graag waar hij kan.',
+    extraTitle: 'Het Kapoenenlied',
+    extra: (
+      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.92rem', borderLeft: '4px solid var(--color-kapoenen)' }}>
+        &ldquo;Kapoenen van de Kriko, vol vuur en met veel moed!<br />
+        Wij spelen alle zondagen, want scouting doet ons goed.<br />
+        Met onze rode das rond de nek en lach op ons gezicht,<br />
+        Gaan wij op avontuur tot de avond op ons licht!&rdquo;
+      </div>
+    ),
+  },
+  welpen: {
+    wetTitle: 'De Welpenwet & Belofte',
+    wet: 'Een welp is eerlijk, gehoorzaam en vriendelijk. Een welp lacht, zet door en helpt anderen waar mogelijk.',
+    extraTitle: 'Het Jungleboek Thema',
+    extra: (
+      <p style={{ fontSize: '0.92rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
+        Onze welpenwerking is gebaseerd op het <strong>Jungleboek</strong> van Rudyard Kipling! De leiding neemt junglenamen aan zoals <strong>Akela</strong>, <strong>Baloo</strong>, <strong>Bagheera</strong> en <strong>Kaa</strong>. De welpen zijn ingedeeld in kleine <em>nesten</em> om samen op ontdekking te gaan.
+      </p>
+    ),
+  },
+  jonggivers: {
+    wetTitle: 'De Jonggiverbelofte',
+    wet: 'Ik beloof te proberen een goede jonggiver te zijn, me in te zetten voor de groep, en respect te hebben voor mens en natuur.',
+    extraTitle: 'Patrouilles & Outdoor Avontuur',
+    extra: (
+      <p style={{ fontSize: '0.92rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
+        Bij de jonggivers werken we in vaste <strong>patrouilles</strong> met een patrouilleleider (PL) en assistent (APL). We leren sjorren met balken en touwen, tochten stappen met kaart en kompas, en koken op ons eigen houtvuur tijdens het weekend.
+      </p>
+    ),
+  },
+  givers: {
+    wetTitle: 'De Giverbelofte',
+    wet: 'Ik beloof me in te zetten voor onze groep, verantwoordelijkheid te nemen en te bouwen aan een echte vriendengroep waarin iedereen zichzelf kan zijn.',
+    extraTitle: 'Zelfstandigheid & Buitenlands Kamp',
+    extra: (
+      <p style={{ fontSize: '0.92rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
+        De givers (14–17 jaar) krijgen veel vrijheid en verantwoordelijkheid. Ze steken zelf de handen uit de mouwen om hun <strong>buitenlands kamp</strong> te financieren via acties en werkjes, en trekken elke zomer op een onvergetelijk avontuur.
+      </p>
+    ),
+  },
+}
+
 export async function generateStaticParams() {
   return VALID_TAKKEN.map((slug) => ({ slug }))
 }
@@ -92,6 +138,28 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                 Vergeet niet de maandelijkse planner (Kriko Echo) te downloaden om te zien of we een speciale activiteit hebben!
               </p>
             </div>
+
+            {/* Traditie & Belofte */}
+            {TAK_TRADITIES[slug] && (
+              <div style={{ backgroundColor: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', padding: 40, border: '1px solid var(--color-border)' }}>
+                <h3 style={{ fontSize: '1.6rem', marginBottom: 14, color: 'var(--color-primary-dark)' }}>
+                  <i className="fa-solid fa-scroll" style={{ color: 'var(--color-secondary)', marginRight: 10 }}></i>
+                  {TAK_TRADITIES[slug].wetTitle}
+                </h3>
+                <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 24, fontStyle: 'italic' }}>
+                  &ldquo;{TAK_TRADITIES[slug].wet}&rdquo;
+                </p>
+
+                {TAK_TRADITIES[slug].extraTitle && (
+                  <>
+                    <h4 style={{ fontSize: '1.25rem', marginBottom: 12, color: 'var(--color-primary-dark)' }}>
+                      {TAK_TRADITIES[slug].extraTitle}
+                    </h4>
+                    {TAK_TRADITIES[slug].extra}
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Leiding */}
             <div className="leaders-section">

@@ -69,6 +69,7 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
               <Image src="/images/logo-finaal.png" alt="Kriko-M logo" width={140} height={140} priority />
             </Link>
             <ul className="nav-links">
+              <li><Link href="/info" className={isActive('/info') ? 'nav-active' : ''}>INFO</Link></li>
               <li
                 className={`has-dropdown${takkenOpen ? ' open' : ''}`}
                 onClick={() => setTakkenOpen(!takkenOpen)}
@@ -85,7 +86,6 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
               </li>
               <li><Link href="/echos" className={isActive('/echos') ? 'nav-active' : ''}>KRIKO ECHO</Link></li>
               <li><Link href="/kalender" className={isActive('/kalender') ? 'nav-active' : ''}>KALENDER</Link></li>
-              <li><Link href="/info" className={isActive('/info') ? 'nav-active' : ''}>INFO</Link></li>
               <li><Link href="/verhuur" className={isActive('/verhuur') ? 'nav-active' : ''}>VERHUUR</Link></li>
               <li className="nav-mobile-only">
                 <Link href="/inschrijven" className={isActive('/inschrijven') ? 'nav-active' : ''}>INSCHRIJVEN</Link>
