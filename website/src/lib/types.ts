@@ -28,6 +28,10 @@ export interface Settings {
   reg_fee_first: number
   reg_fee_extra: number
   takken: Record<string, TakConfig>
+  // Geheim token voor de private leiding-ICS-feed (zie /api/leiding/ics).
+  leiding_ics_token?: string
+  // Per-tak portaalachtergrond-configuratie (zie /api/admin/portal-backgrounds).
+  portal_backgrounds?: Record<string, { style: string; custom_url?: string | null }>
 }
 
 export interface TakConfig {
@@ -55,11 +59,13 @@ export interface CalendarEvent {
   id: string
   title: string
   date: string
+  datum_tot?: string | null // einddatum voor meerdaagse losse events
   time: string
   location: string
   description: string
   audience: AudienceTag[]
   is_evenement: boolean
+  banner_image?: string | null
   facebook_event_url?: string | null
   facebook_post_url?: string | null
   external_link_url?: string | null
@@ -72,7 +78,7 @@ export interface CalendarEvent {
 export interface CalendarEntry extends Omit<CalendarEvent, 'audience'> {
   source: 'event' | 'kamp'
   audience: AudienceTag[]
-  datum_tot?: string // einddatum voor meerdaagse kampen
+  datum_tot?: string | null // einddatum voor meerdaagse kampen
   slug?: string      // voor doorklik naar het kamp
 }
 
