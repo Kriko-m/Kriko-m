@@ -2,21 +2,18 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getPublicCalendarEvents } from '@/lib/db'
 import HeroCTA from '@/components/HeroCTA'
+import UpcomingEvent from '@/components/EventDetailModal'
 import { CalendarEvent } from '@/lib/types'
-
-const MONTHS_NL: Record<number, string> = {
-  1: 'Jan', 2: 'Feb', 3: 'Mrt', 4: 'Apr', 5: 'Mei', 6: 'Jun',
-  7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Okt', 11: 'Nov', 12: 'Dec',
-}
 
 export default async function HomePage() {
   const allEvents = (await getPublicCalendarEvents()) as CalendarEvent[]
   // Toon enkel aankomende activiteiten (vanaf vandaag), max. 5.
   const today = new Date()
   today.setHours(0, 0, 0, 0)
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
   const events = allEvents
-    .filter(e => new Date(e.date) >= today)
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .filter((e: CalendarEvent) => (e.datum_tot || e.date) >= todayStr)
+    .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 5)
 
   return (
@@ -113,40 +110,22 @@ export default async function HomePage() {
 
           {/* Kalender */}
           <div className="calendar-card">
-            <h3 style={{ fontSize: '1.75rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h3 style={{ fontSize: '1.75rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
               <svg style={{ width: 24, height: 24, fill: 'none', stroke: 'var(--color-secondary)' }} strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               Aankomende Activiteiten
             </h3>
-            <div className="calendar-list">
+            <div className="cal-upcoming" style={{ marginTop: 0 }}>
               {events.length === 0 ? (
-                <p style={{ color: 'var(--color-text-muted)' }}>Er zijn momenteel geen geplande groepsactiviteiten.</p>
+                <p className="cal-upcoming-empty">Er zijn momenteel geen geplande groepsactiviteiten.</p>
               ) : (
-                events.map((event: CalendarEvent) => {
-                  const d = new Date(event.date)
-                  return (
-                    <div key={event.id} className="calendar-item">
-                      <div className="calendar-date-block">
-                        <span className="calendar-day">{String(d.getDate()).padStart(2, '0')}</span>
-                        <span className="calendar-month">{MONTHS_NL[d.getMonth() + 1]}</span>
-                      </div>
-                      <div className="calendar-details">
-                        <div className="calendar-time">
-                          <svg style={{ width: 16, height: 16 }} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>{event.time} &bull; {event.location}</span>
-                        </div>
-                        <h4>{event.title}</h4>
-                        <p className="calendar-desc">{event.description}</p>
-                      </div>
-                    </div>
-                  )
-                })
+                events.map((event: CalendarEvent) => (
+                  <UpcomingEvent key={event.id} event={event} todayMs={today.getTime()} />
+                ))
               )}
             </div>
-            <Link href="/kalender" className="calendar-view-all">Bekijk alle activiteiten &rarr;</Link>
+            <Link href="/kalender" className="calendar-view-all" style={{ marginTop: 24 }}>Bekijk alle activiteiten &rarr;</Link>
           </div>
 
           {/* Info zijbalk */}

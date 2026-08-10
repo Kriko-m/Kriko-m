@@ -66,6 +66,8 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
           className="tak-hero-img"
           fill
           priority
+          sizes="100vw"
+          quality={85}
           style={{ objectFit: 'cover', zIndex: 1 }}
         />
         <div className="tak-hero-overlay" />

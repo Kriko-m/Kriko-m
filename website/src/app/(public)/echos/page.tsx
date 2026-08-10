@@ -35,7 +35,6 @@ export default async function EchosPage() {
     <>
       <section className="tak-hero primair hero-echos">
         <div className="container">
-          <span className="hero-eyebrow">Maandelijks bulletin</span>
           <h1 className="tak-hero-title">Kriko Echo</h1>
         </div>
       </section>
