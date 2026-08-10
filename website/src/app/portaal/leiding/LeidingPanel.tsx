@@ -1090,27 +1090,6 @@ export default function LeidingPanel({
           onCancel={() => setConfirmDialog(null)}
         />
       )}
-      {showKampModal && editKampId && (
-        <KampBeheerModal
-          kamp={kampen.find(k => k.id === editKampId)!}
-          isGroepsleiding={isGroepsleiding}
-          onClose={() => { setShowKampModal(false); setEditKampId(null) }}
-          onKampUpdated={(updated) => setKampen(prev => prev.map(k => k.id === updated.id ? updated : k))}
-        />
-      )}
-      {showKampAanmaken && (
-        <KampAanmakenModal
-          defaultTak={activeTak}
-          isGroepsleiding={isGroepsleiding}
-          defaultContactEmail={takEmails[activeTak] ?? ''}
-          onClose={() => setShowKampAanmaken(false)}
-          onCreated={(created) => {
-            setKampen(prev => [...prev, created as Kamp])
-            setShowKampAanmaken(false)
-            showFlash('Kamp/Weekend aangemaakt!')
-          }}
-        />
-      )}
       {showKalenderModal && (
         <KalenderActiviteitModal
           canPublish={isGroepsleiding}
