@@ -92,7 +92,7 @@ export default async function InfoPage() {
 
               <div style={{ backgroundColor: 'rgba(101,11,25,0.06)', borderRadius: 'var(--border-radius-md)', padding: 18, borderLeft: '4px solid var(--color-primary)' }}>
                 <p style={{ fontSize: '0.92rem', color: 'var(--color-primary-dark)', margin: 0 }}>
-                  Aarzel niet om contact op te nemen met de groepsleiding via <CopyButton text={email} label={email} />. We helpen met plezier!
+                  Aarzel niet om contact op te nemen met de groepsleiding via <CopyButton text={email}>{email}</CopyButton>. We helpen met plezier!
                 </p>
               </div>
             </div>
@@ -160,7 +160,7 @@ export default async function InfoPage() {
               </p>
               <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', lineHeight: 1.5, margin: 0 }}>
                 <strong>Vragen voor de leiding?</strong><br />
-                <CopyButton text={email} label={email} />
+                <CopyButton text={email}>{email}</CopyButton>
               </p>
             </div>
           </div>
