@@ -5,11 +5,10 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { PORTAAL_TAKKEN, GROEPSLEIDING_ONLY_TAKKEN, TAK_NAMEN } from '@/lib/constants'
 
 interface Props {
-  isAdmin: boolean
   role?: string
 }
 
-export default function PortaalSidebar({ isAdmin: _isAdmin, role }: Props) {
+export default function PortaalSidebar({ role }: Props) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const activeTak = searchParams.get('tak') || ''

@@ -14,7 +14,7 @@ export default function ConfirmDialog({ message, confirmLabel = 'Verwijderen', d
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onCancel()
-      if (e.key === 'Enter') onConfirm()
+      if (e.key === 'Enter') { e.preventDefault(); onConfirm() }
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)

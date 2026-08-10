@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
 import { requireLeiding } from '@/lib/auth'
+import { PORTAAL_TAKKEN } from '@/lib/constants'
 import { revalidateTag } from 'next/cache'
+
+const VALID_TAKKEN = new Set<string>(PORTAAL_TAKKEN)
 
 export async function PATCH(req: NextRequest) {
   const user = await requireLeiding()
@@ -12,6 +15,10 @@ export async function PATCH(req: NextRequest) {
   const { tak, style, customUrl } = await req.json()
   if (!tak || !style) {
     return NextResponse.json({ error: 'tak en style zijn verplicht' }, { status: 400 })
+  }
+  // tak moet een geldige portaaltak zijn — voorkomt willekeurige keys in de JSONB.
+  if (!VALID_TAKKEN.has(tak)) {
+    return NextResponse.json({ error: 'Ongeldige tak' }, { status: 400 })
   }
 
   const admin = createAdminClient()

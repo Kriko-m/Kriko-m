@@ -12,7 +12,8 @@ export async function PATCH(
   const { id } = await params
   const body = await req.json()
   const admin = createAdminClient()
-  await admin.from('messages').update({ read: body.read }).eq('id', id)
+  const { error } = await admin.from('messages').update({ read: !!body.read }).eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }
 
@@ -25,6 +26,7 @@ export async function DELETE(
 
   const { id } = await params
   const admin = createAdminClient()
-  await admin.from('messages').delete().eq('id', id)
+  const { error } = await admin.from('messages').delete().eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

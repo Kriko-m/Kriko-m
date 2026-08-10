@@ -20,8 +20,6 @@ export function kampToEntry(kamp: Kamp): CalendarEntry {
     description: kamp.beschrijving,
     audience: kamp.audience ?? [],
     is_evenement: false,
-    cover_image: '',
-    document_url: '',
     werkjaar: kamp.werkjaar,
     source: 'kamp',
     slug: kamp.slug,

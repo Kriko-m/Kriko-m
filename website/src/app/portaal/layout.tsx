@@ -6,15 +6,15 @@ export const metadata: Metadata = { title: 'Leiding login – Scouts Kriko-M' }
 
 export default async function PortaalLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createServerSupabaseClient()
-  const { data: { session } } = await supabase.auth.getSession()
+  // getUser() valideert de sessie server-side (getSession() leest enkel de JWT
+  // zonder verificatie — niet betrouwbaar voor rol-afhankelijke UI).
+  const { data: { user } } = await supabase.auth.getUser()
 
-  const user = session?.user
   const naam = user ? ((user.user_metadata?.naam as string) || user.email?.split('@')[0] || 'gebruiker') : ''
-  const isAdmin = user ? (user.app_metadata?.role === 'admin' || user.app_metadata?.role === 'groepsleiding') : false
   const role = user?.app_metadata?.role || ''
 
   return (
-    <PortaalLayoutClient naam={naam} isAdmin={isAdmin} role={role}>
+    <PortaalLayoutClient naam={naam} role={role}>
       {children}
     </PortaalLayoutClient>
   )

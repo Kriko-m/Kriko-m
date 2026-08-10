@@ -68,3 +68,14 @@ export const MAANDEN = [
   'januari', 'februari', 'maart', 'april', 'mei', 'juni',
   'juli', 'augustus', 'september', 'oktober', 'november', 'december',
 ]
+
+// Productie-URL — fallback wanneer leiding lokaal test, zodat gekopieerde
+// uitnodigingslinks nooit naar localhost wijzen.
+export const SITE_URL = 'https://kriko-m-indol.vercel.app'
+
+// Origin voor publiek deelbare links (RSVP-uitnodigingen e.d.).
+export function publicOrigin(): string {
+  const origin = typeof window !== 'undefined' ? window.location.origin : ''
+  if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1')) return SITE_URL
+  return origin
+}

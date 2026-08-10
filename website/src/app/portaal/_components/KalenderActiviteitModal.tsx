@@ -6,7 +6,7 @@ import { AUDIENCE_TAGS, AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants
 type FormState = {
   title: string; date: string; datum_tot: string; timeStart: string; timeEnd: string
   location: string; description: string; audience: AudienceTag[]
-  is_evenement: boolean
+  is_evenement: boolean; banner_image: string
   facebook_event_url: string; facebook_post_url: string; external_link_url: string
 }
 
@@ -19,7 +19,7 @@ function emptyForm(preAudience: AudienceTag[]): FormState {
   return {
     title: '', date: '', datum_tot: '', timeStart: '', timeEnd: '',
     location: '', description: '', audience: preAudience,
-    is_evenement: false,
+    is_evenement: false, banner_image: '',
     facebook_event_url: '', facebook_post_url: '', external_link_url: '',
   }
 }
@@ -41,9 +41,9 @@ export default function KalenderActiviteitModal({
 }) {
   const [form, setForm] = useState<FormState>(() =>
     editEvent
-      ? { title: editEvent.title, date: editEvent.date, datum_tot: '',
+      ? { title: editEvent.title, date: editEvent.date, datum_tot: editEvent.datum_tot ?? '',
           location: editEvent.location, description: editEvent.description, audience: editEvent.audience,
-          is_evenement: editEvent.is_evenement,
+          is_evenement: editEvent.is_evenement, banner_image: editEvent.banner_image ?? '',
           facebook_event_url: editEvent.facebook_event_url ?? '', facebook_post_url: editEvent.facebook_post_url ?? '', external_link_url: editEvent.external_link_url ?? '',
           ...parseTime(editEvent.time) }
       : emptyForm(initialAudience)
@@ -61,6 +61,19 @@ export default function KalenderActiviteitModal({
       const has = p.audience.includes(tag)
       return { ...p, audience: has ? p.audience.filter(a => a !== tag) : [...p.audience, tag] }
     })
+  }
+
+  async function uploadMedia(file: File): Promise<string | null> {
+    const fd = new FormData(); fd.append('file', file); fd.append('type', 'evenement-banner')
+    const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+    if (!res.ok) { setFlash('Fout bij uploaden van afbeelding.'); return null }
+    return ((await res.json()).url) as string
+  }
+
+  async function handleBannerChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; if (!file) return
+    setLoading(true); const url = await uploadMedia(file)
+    if (url) setForm(p => ({ ...p, banner_image: url })); setLoading(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -82,6 +95,7 @@ export default function KalenderActiviteitModal({
       time: [form.timeStart, form.timeEnd].filter(Boolean).join(' - '),
       location: form.location, description: form.description,
       audience: form.audience, is_evenement: form.is_evenement,
+      banner_image: form.banner_image || null,
       facebook_event_url: form.facebook_event_url || null,
       facebook_post_url: form.facebook_post_url || null,
       external_link_url: form.external_link_url || null,
@@ -241,6 +255,23 @@ export default function KalenderActiviteitModal({
                 </label>
               )}
             </div>
+
+            {canPublish && form.audience.includes('groep') && (
+              <div style={{ padding: '12px 14px', background: '#fdf9f0', border: '1.5px solid #E2C58D', borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <span style={{ fontSize: '.78rem', fontWeight: 700, color: '#9A6B12' }}>📸 Bannerfoto (optioneel — verschijnt bovenaan de evenementenkaart)</span>
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleBannerChange} style={{ fontSize: '.8rem' }} />
+                {form.banner_image && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={form.banner_image} alt="banner" style={{ width: 120, height: 56, objectFit: 'cover', borderRadius: 6 }} />
+                    <button type="button" onClick={() => setForm(p => ({ ...p, banner_image: '' }))}
+                      style={{ fontSize: '.75rem', color: '#B23A4D', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                      ✕ Verwijderen
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {facebookLinkOpen && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

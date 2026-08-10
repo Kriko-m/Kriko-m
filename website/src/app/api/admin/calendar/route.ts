@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
       facebook_event_url: body.facebook_event_url || null,
       facebook_post_url: body.facebook_post_url || null,
       external_link_url: body.external_link_url || null,
+      banner_image: body.banner_image || null,
       audience,
       is_evenement: evenement,
       werkjaar,

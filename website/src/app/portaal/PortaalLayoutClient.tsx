@@ -8,11 +8,10 @@ import PortaalSidebar from './_components/PortaalSidebar'
 interface Props {
   children: React.ReactNode
   naam: string
-  isAdmin: boolean
   role?: string
 }
 
-export default function PortaalLayoutClient({ children, naam, isAdmin, role }: Props) {
+export default function PortaalLayoutClient({ children, naam, role }: Props) {
   const pathname = usePathname()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -65,13 +64,13 @@ export default function PortaalLayoutClient({ children, naam, isAdmin, role }: P
 
   return (
     <>
-      {showNav && <PortaalNav naam={naam} isAdmin={isAdmin} role={role} />}
+      {showNav && <PortaalNav naam={naam} />}
       {showNav ? (
         <div className="portaal-page-layout">
           <Suspense fallback={<aside className="portaal-sidebar-nav" />}>
-            <PortaalSidebar isAdmin={isAdmin} role={role} />
+            <PortaalSidebar role={role} />
           </Suspense>
-          <main className="portaal-page-main" style={{ position: 'relative' }}>
+          <main className="portaal-page-main portaal-page-main--anchor">
             {children}
             {isPending && (
               <div style={{
@@ -92,10 +91,6 @@ export default function PortaalLayoutClient({ children, naam, isAdmin, role }: P
                     <div style={{ position: 'absolute', height: '100%', width: '50%', background: '#1A3D2A', borderRadius: 2, animation: 'portaal-loading-bar 1.2s infinite ease-in-out' }} />
                   </div>
                 </div>
-                <style>{`
-                  @keyframes portaal-pulse { 0%,100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.08); opacity: 1; } }
-                  @keyframes portaal-loading-bar { 0% { left: -50%; } 100% { left: 100%; } }
-                `}</style>
               </div>
             )}
           </main>

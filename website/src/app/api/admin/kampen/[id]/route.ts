@@ -48,8 +48,9 @@ export async function DELETE(
 
   const { id } = await params
   const admin = createAdminClient()
-  await admin.from('kampen').delete().eq('id', id)
-  
+  const { error } = await admin.from('kampen').delete().eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
   revalidateTag('kampen', 'max')
   return NextResponse.json({ ok: true })
 }

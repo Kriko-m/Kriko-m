@@ -8,11 +8,9 @@ import { useEffect, useState } from 'react'
 
 interface Props {
   naam: string
-  isAdmin: boolean
-  role?: string
 }
 
-export default function PortaalNav({ naam, isAdmin: _isAdmin }: Props) {
+export default function PortaalNav({ naam }: Props) {
   const router = useRouter()
   const supabase = createClient()
 

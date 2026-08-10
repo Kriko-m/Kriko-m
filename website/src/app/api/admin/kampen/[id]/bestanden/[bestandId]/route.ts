@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
 import { requireLeiding } from '@/lib/auth'
+import { revalidateTag } from 'next/cache'
 
 export async function DELETE(
   req: NextRequest,
@@ -28,6 +29,7 @@ export async function DELETE(
     const { error } = await admin.from('kamp_bestanden').delete().eq('id', bestandId)
     if (error) throw error
 
+    revalidateTag('kampen', 'max')
     return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('Delete camp file error:', err)

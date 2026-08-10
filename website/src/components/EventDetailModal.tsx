@@ -11,10 +11,12 @@ function googleCalUrl(event: CalendarEvent) {
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${d}/${d}&details=${encodeURIComponent(event.description ?? '')}&location=${encodeURIComponent(event.location ?? '')}`
 }
 
-export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent; todayMs: number }) {
+export default function UpcomingEvent({ event, todayMs, featured }: { event: CalendarEvent; todayMs: number; featured?: boolean }) {
   const [open, setOpen] = useState(false)
 
-  const d = new Date(event.date)
+  // Lokaal parsen (YYYY-MM-DD via new Date() is UTC → kan een dag verschuiven).
+  const [yy, mm, dd] = event.date.split('-').map(Number)
+  const d = new Date(yy, (mm ?? 1) - 1, dd ?? 1)
   const day = String(d.getDate()).padStart(2, '0')
   const month = MONTHS_SHORT[d.getMonth() + 1]
   const weekday = WEEKDAYS[d.getDay()]
@@ -22,17 +24,55 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
   const diff = Math.round((d.getTime() - todayMs) / 86400000)
   const countdown = diff === 0 ? 'Vandaag' : diff === 1 ? 'Morgen' : `Nog ${diff} dagen`
 
-  return (
-    <>
-      <article
-        className={`cal-event${event.is_evenement ? ' cal-event-evenement' : ''}`}
-        id={`event-${event.id}`}
-        data-date={event.date}
-        onClick={() => setOpen(true)}
-        style={{ cursor: 'pointer' }}
-        role="button"
-        aria-haspopup="dialog"
-      >
+  const card = featured ? (
+    <article
+      className={`cal-event cal-event--featured${event.is_evenement ? ' cal-event-evenement' : ''}`}
+      id={`event-${event.id}`}
+      data-date={event.date}
+      onClick={() => setOpen(true)}
+      style={{ flexDirection: 'column', gap: 0, padding: 0, overflow: 'hidden', cursor: 'pointer' }}
+      role="button"
+      aria-haspopup="dialog"
+    >
+      {event.banner_image
+        ? <img src={event.banner_image} alt="" style={{ width: '100%', height: 320, objectFit: 'cover', display: 'block' }} />
+        : <div style={{ width: '100%', height: 12, background: event.is_evenement ? 'var(--color-primary)' : 'var(--color-accent)' }} />}
+      <div style={{ padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+          <span className={`cal-countdown${event.is_evenement ? ' cal-countdown--evenement' : ''}`} style={{ fontSize: '.8rem', padding: '3px 12px' }}>
+            {event.is_evenement && <i className="fa-solid fa-star" style={{ marginRight: 6 }} />}
+            {countdown}
+          </span>
+          {event.is_evenement && (
+            <span style={{ fontSize: '.72rem', fontWeight: 700, color: 'var(--color-accent)', letterSpacing: '0.07em', textTransform: 'uppercase' as const }}>
+              <i className="fa-solid fa-star" style={{ marginRight: 4 }} />Uitgelicht evenement
+            </span>
+          )}
+        </div>
+        <h2 className="cal-event-title cal-event-title--featured">{event.title}</h2>
+        <div className="cal-event-meta" style={{ fontSize: '.92rem', gap: '8px 20px' }}>
+          <span><i className="fa-regular fa-calendar"></i> {weekday} {dateStr}</span>
+          {event.time && <span><i className="fa-regular fa-clock"></i> {event.time}</span>}
+          {event.location && <span><i className="fa-solid fa-location-dot"></i> {event.location}</span>}
+        </div>
+        <div>
+          <button type="button" className="btn btn-primary" style={{ marginTop: 4 }} onClick={(e) => { e.stopPropagation(); setOpen(true) }}>
+            <i className="fa-solid fa-circle-info"></i> Details bekijken
+          </button>
+        </div>
+      </div>
+    </article>
+  ) : (
+    <article
+      className={`cal-event${event.is_evenement ? ' cal-event-evenement' : ''}`}
+      id={`event-${event.id}`}
+      data-date={event.date}
+      onClick={() => setOpen(true)}
+      style={{ cursor: 'pointer', gap: 0, padding: 0, overflow: 'hidden', alignItems: 'stretch' }}
+      role="button"
+      aria-haspopup="dialog"
+    >
+      <div style={{ display: 'flex', gap: 18, padding: 20, flex: 1, minWidth: 0 }}>
         <div className="cal-event-date" aria-hidden="true">
           <span className="cal-event-day">{day}</span>
           <span className="cal-event-month">{month}</span>
@@ -49,14 +89,22 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
             {event.location && <span><i className="fa-solid fa-location-dot"></i> {event.location}</span>}
           </div>
           {event.description && <p className="cal-event-desc">{event.description}</p>}
-
           <div className="cal-event-actions">
             <button type="button" className="cal-add-btn cal-expand-btn" onClick={(e) => { e.stopPropagation(); setOpen(true) }}>
               <i className="fa-solid fa-circle-info"></i> Meer info
             </button>
           </div>
         </div>
-      </article>
+      </div>
+      {event.banner_image
+        ? <img src={event.banner_image} alt="" style={{ width: 90, flexShrink: 0, objectFit: 'cover', display: 'block' }} />
+        : null}
+    </article>
+  )
+
+  return (
+    <>
+      {card}
 
       {/* Modal */}
       {open && (
@@ -67,14 +115,20 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
           />
           <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2001, padding: '16px', pointerEvents: 'none' }}>
             <div
-              style={{ position: 'relative', pointerEvents: 'auto', background: '#fff', borderRadius: 22, boxShadow: '0 40px 100px rgba(58,7,16,0.26), 0 0 0 1px rgba(0,0,0,0.04)', width: '100%', maxWidth: 860, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
+              style={{ position: 'relative', pointerEvents: 'auto', background: '#fff', borderRadius: 22, boxShadow: '0 40px 100px rgba(58,7,16,0.26), 0 0 0 1px rgba(0,0,0,0.04)', width: '100%', maxWidth: 822, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Banner image */}
+              {event.banner_image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={event.banner_image} alt="" style={{ width: '100%', maxHeight: 260, objectFit: 'cover', borderRadius: '22px 22px 0 0', display: 'block' }} />
+              )}
+
               {/* Close button */}
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                style={{ position: 'absolute', top: 16, right: 16, width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'rgba(240,236,228,0.9)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', color: '#555', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}
+                style={{ position: 'absolute', top: 16, right: 16, width: 36, height: 36, borderRadius: '50%', border: 'none', background: event.banner_image ? 'rgba(0,0,0,0.35)' : 'rgba(240,236,228,0.9)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', color: event.banner_image ? '#fff' : '#555', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}
                 aria-label="Sluiten"
               >
                 ✕
@@ -113,12 +167,12 @@ export default function UpcomingEvent({ event, todayMs }: { event: CalendarEvent
 
                 {/* Facebook post embed — main content */}
                 {event.facebook_post_url && (
-                  <div style={{ display: 'flex', justifyContent: 'center', borderRadius: 12, border: '1px solid #ede9e1', overflow: 'hidden', background: '#f0f2f5' }}>
+                  <div style={{ borderRadius: 12, border: '1px solid #ede9e1', overflow: 'hidden', background: '#f0f2f5' }}>
                     <iframe
-                      src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(event.facebook_post_url)}&show_text=true&width=500`}
-                      width="500"
-                      height="500"
-                      style={{ border: 'none', display: 'block' }}
+                      src={`https://www.facebook.com/plugins/post.php?href=${encodeURIComponent(event.facebook_post_url)}&show_text=true&width=750`}
+                      width="750"
+                      height="720"
+                      style={{ border: 'none', display: 'block', width: '100%' }}
                       scrolling="no"
                       allowFullScreen
                       allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"

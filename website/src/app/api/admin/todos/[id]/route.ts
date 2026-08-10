@@ -15,7 +15,7 @@ export async function PATCH(
 
   const update: Record<string, unknown> = {}
   if ('completed' in body) update.completed = !!body.completed
-  if ('title' in body) update.title = body.title
+  if ('title' in body) update.title = String(body.title ?? '').trim().slice(0, 300)
 
   const { data, error } = await admin
     .from('todos')

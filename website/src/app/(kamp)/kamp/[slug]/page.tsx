@@ -183,7 +183,7 @@ export default async function KampRsvpPage({ params }: { params: Promise<{ slug:
                     <summary className="kamp-accordion-header"><i className="fa-solid fa-suitcase-rolling kamp-accordion-icon" />Inpaklijst</summary>
                     <div className="kamp-accordion-body">
                       <p className="kamp-paklijst-hint">Vink af terwijl je inpakt — wordt bijgehouden in je browser.</p>
-                      <PaklijstViewer paklijst={paklijst} />
+                      <PaklijstViewer paklijst={paklijst} slug={slug} />
                     </div>
                   </details>
                 )}

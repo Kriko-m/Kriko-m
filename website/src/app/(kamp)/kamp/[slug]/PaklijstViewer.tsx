@@ -6,8 +6,11 @@ interface PaklijstCategorie {
   items: string[]
 }
 
-export default function PaklijstViewer({ paklijst }: { paklijst: PaklijstCategorie[] }) {
+export default function PaklijstViewer({ paklijst, slug }: { paklijst: PaklijstCategorie[]; slug: string }) {
   const totalItems = paklijst.reduce((sum, cat) => sum + cat.items.length, 0)
+  // Per kamp gescheiden opslag — anders lekken afvinkstatussen tussen kampen
+  // (en kon de voortgang >100% worden).
+  const storageKey = `paklijst-checked-${slug}`
 
   const [expanded, setExpanded] = useState<Record<number, boolean>>(
     () => Object.fromEntries(paklijst.map((_, i) => [i, i === 0]))
@@ -18,15 +21,15 @@ export default function PaklijstViewer({ paklijst }: { paklijst: PaklijstCategor
   useEffect(() => {
     setMounted(true)
     try {
-      const stored = localStorage.getItem('paklijst-checked')
+      const stored = localStorage.getItem(storageKey)
       if (stored) setChecked(JSON.parse(stored))
     } catch {}
-  }, [])
+  }, [storageKey])
 
   function toggleCheck(key: string) {
     setChecked(prev => {
       const next = { ...prev, [key]: !prev[key] }
-      try { localStorage.setItem('paklijst-checked', JSON.stringify(next)) } catch {}
+      try { localStorage.setItem(storageKey, JSON.stringify(next)) } catch {}
       return next
     })
   }
@@ -138,7 +141,7 @@ export default function PaklijstViewer({ paklijst }: { paklijst: PaklijstCategor
           type="button"
           onClick={() => {
             setChecked({})
-            try { localStorage.removeItem('paklijst-checked') } catch {}
+            try { localStorage.removeItem(storageKey) } catch {}
           }}
           style={{ marginTop: 14, fontSize: '.78rem', color: 'var(--color-text-muted)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontFamily: 'inherit' }}
         >

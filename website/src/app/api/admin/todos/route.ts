@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   const { data, error } = await admin
     .from('todos')
     .insert({
-      title,
+      title: String(title).trim().slice(0, 300),
       month: Number(month),
       tak,
       completed: false,

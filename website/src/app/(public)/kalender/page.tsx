@@ -1,6 +1,5 @@
 import { getPublicCalendarEvents } from '@/lib/db'
 import type { Metadata } from 'next'
-import CalendarGrid from '@/components/CalendarGrid'
 import UpcomingEvent from '@/components/EventDetailModal'
 import SubscribeCalendarButton from '@/components/SubscribeCalendarButton'
 import { CalendarEvent } from '@/lib/types'
@@ -10,8 +9,12 @@ export const metadata: Metadata = { title: 'Kalender | Scouts Kriko-M' }
 export default async function KalenderPage() {
   const events = (await getPublicCalendarEvents()) as CalendarEvent[]
   const today = new Date(); today.setHours(0,0,0,0)
-  const upcoming = events.filter((e: CalendarEvent) => new Date(e.date) >= today)
-  const gridEvents = events.map((e: CalendarEvent) => ({ id: e.id, date: e.date, title: e.title, time: e.time, evenement: e.is_evenement }))
+  // Datum als string vergelijken (vermijdt UTC-verschuiving). Een meerdaags event
+  // blijft "aankomend" zolang zijn einddatum nog niet voorbij is.
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  const upcoming = events.filter((e: CalendarEvent) => (e.datum_tot || e.date) >= todayStr)
+  const nextEvent = upcoming[0] ?? null
+  const restEvents = upcoming.slice(1)
 
   return (
     <>
@@ -23,14 +26,22 @@ export default async function KalenderPage() {
       </section>
 
       <section className="section container section--no-top">
-        {events.length === 0 ? (
+        {upcoming.length === 0 ? (
           <div className="cal-empty">
             <p>Er staan momenteel geen activiteiten gepland. Kom snel eens terug kijken!</p>
           </div>
         ) : (
           <div className="cal-layout">
+            {/* Left col: featured next event + subscribe */}
             <div className="cal-left-col">
-              <CalendarGrid events={gridEvents} />
+              {nextEvent && (
+                <>
+                  <p className="cal-featured-label">
+                    <i className="fa-solid fa-bolt"></i> Eerstvolgende activiteit
+                  </p>
+                  <UpcomingEvent event={nextEvent} todayMs={today.getTime()} featured={true} />
+                </>
+              )}
               <div className="cal-actions">
                 <div className="cal-actions-group">
                   <SubscribeCalendarButton />
@@ -45,19 +56,19 @@ export default async function KalenderPage() {
               </p>
             </div>
 
+            {/* Right col: rest of upcoming */}
             <div className="cal-upcoming">
               <h3 className="cal-upcoming-title">Aankomende activiteiten</h3>
-              {upcoming.length === 0 ? (
-                <p className="cal-upcoming-empty">Er zijn momenteel geen aankomende activiteiten gepland.</p>
+              {restEvents.length === 0 ? (
+                <p className="cal-upcoming-empty">Geen andere activiteiten gepland.</p>
               ) : (
-                upcoming.map((event: CalendarEvent) => (
+                restEvents.map((event: CalendarEvent) => (
                   <UpcomingEvent key={event.id} event={event} todayMs={today.getTime()} />
                 ))
               )}
             </div>
           </div>
         )}
-
       </section>
     </>
   )
