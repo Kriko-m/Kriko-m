@@ -15,7 +15,6 @@ export default function TakkenOverzicht() {
     <>
       <section className="tak-hero primair hero-takken">
         <div className="container">
-          <span className="hero-eyebrow">Scouts Kriko-M</span>
           <h1 className="tak-hero-title">Onze Takken</h1>
         </div>
       </section>

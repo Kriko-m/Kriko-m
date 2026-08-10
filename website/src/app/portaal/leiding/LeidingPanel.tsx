@@ -1,15 +1,12 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Kamp, Echo, CalendarEvent, TodoItem } from '@/lib/types'
-import KampBeheerModal from '../_components/KampBeheerModal'
-import KampAanmakenModal from '../_components/KampAanmakenModal'
+import { Echo, CalendarEvent, TodoItem } from '@/lib/types'
 import KalenderActiviteitModal from '../_components/KalenderActiviteitModal'
 import GroepTodoOverzicht from '../_components/GroepTodoOverzicht'
 import WebsiteContentEditor from '../_components/WebsiteContentEditor'
 import { AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, PORTAAL_TAKKEN, TAK_KLEUREN } from '@/lib/constants'
-import { mergeCampsIntoCalendar } from '@/lib/calendar'
 import ConfirmDialog from '../_components/ConfirmDialog'
 
 const TAKKEN = PORTAAL_TAKKEN as readonly string[]
@@ -31,7 +28,6 @@ const MONTH_OPTIONS = [
 ]
 
 interface LeidingPanelProps {
-  initialKampen: Kamp[]
   initialEchos: Echo[]
   initialCalendar: CalendarEvent[]
   initialTodos: TodoItem[]
@@ -40,14 +36,12 @@ interface LeidingPanelProps {
   initialTak?: string
   initialTab?: string
   initialMonth?: number
-  openKampId?: string
   portalBackgrounds?: Record<string, { style: string; custom_url?: string }>
   takEmails?: Record<string, string>
   takConfigs?: Record<string, Record<string, unknown>>
 }
 
 export default function LeidingPanel({
-  initialKampen,
   initialEchos,
   initialCalendar,
   initialTodos,
@@ -55,7 +49,6 @@ export default function LeidingPanel({
   icsToken: _icsToken,
   initialTak,
   initialMonth,
-  openKampId,
   portalBackgrounds = {},
   takEmails = {},
   takConfigs = {},
@@ -67,14 +60,10 @@ export default function LeidingPanel({
   const isGroepsleidingTak = activeTak === 'groepsleiding'
   // Elke bereikbare tab is bewerkbaar (de groepsleiding-tab is route-gegate naar GL).
   const canEditTak = true
-  const [inlineView, setInlineView] = useState<null | 'kampen' | 'echos'>(null)
+  const [inlineView, setInlineView] = useState<null | 'echos'>(null)
   
-  const [kampen, setKampen] = useState<Kamp[]>(initialKampen)
   const [echos, setEchos] = useState<Echo[]>(initialEchos)
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
-  const [showKampModal, setShowKampModal] = useState(false)
-  const [editKampId, setEditKampId] = useState<string | null>(null)
-  const [showKampAanmaken, setShowKampAanmaken] = useState(false)
   const [showKalenderModal, setShowKalenderModal] = useState(false)
   const [showTodoOverzicht, setShowTodoOverzicht] = useState(false)
   const [showWebsiteEditor, setShowWebsiteEditor] = useState(false)
@@ -200,16 +189,6 @@ export default function LeidingPanel({
     }
   }, [initialMonth])
 
-  // Diep-link vanaf publieke kamppagina: open meteen het beheerscherm van dat kamp.
-  useEffect(() => {
-    if (!openKampId) return
-    if (!kampen.some(k => k.id === openKampId)) return
-    setInlineView('kampen')
-    setEditKampId(openKampId)
-    setShowKampModal(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openKampId])
-
   const activeMonthRef = (node: HTMLButtonElement | null) => {
     if (node) {
       const container = node.parentElement as HTMLDivElement | null
@@ -233,13 +212,6 @@ export default function LeidingPanel({
     setTimeout(() => setFlash(''), 3000)
   }
 
-  // Filter lists — kampen dragen tags (audience). Tak-tab toont kampen met die
-  // tak-tag; de groepsleiding-tab toont overkoepelende kampen ('groep'/'leiding').
-  const takKampen = kampen.filter(k =>
-    isGroepsleidingTak
-      ? (k.audience?.includes('groep') || k.audience?.includes('leiding'))
-      : k.audience?.includes(activeTak as never)
-  )
   const takEchos = echos.filter(e => e.tak === activeTak)
   const filteredTodos = todos.filter(t => t.month === selectedMonth)
 
@@ -357,9 +329,8 @@ export default function LeidingPanel({
                     null
 
   // Filter calendar events for upcoming widget
-  const mergedEntries = mergeCampsIntoCalendar(initialCalendar, kampen)
   const todayStr = new Date().toISOString().split('T')[0]
-  const taggedEvents = mergedEntries
+  const taggedEvents = initialCalendar
     .filter(ev => {
       if (ev.date < todayStr) return false
       return ev.audience.includes('leiding') || 
@@ -452,28 +423,6 @@ export default function LeidingPanel({
                     </div>
                   )}
 
-                  {/* Action 2: Kampen en weekendjes */}
-                  <div
-                    onClick={() => setInlineView(inlineView === 'kampen' ? null : 'kampen')}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 12,
-                      padding: '32px 20px',
-                      border: `2px solid ${inlineView === 'kampen' ? '#1A3D2A' : '#C2D9C9'}`,
-                      borderRadius: 16,
-                      background: inlineView === 'kampen' ? '#EEF5F1' : '#fff',
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                    }}
-                    className="action-card-hover"
-                  >
-                    <i className="fa-solid fa-tent" style={{ fontSize: '2.2rem', color: '#1A3D2A' }}></i>
-                    <strong style={{ fontSize: '.92rem', color: '#1A3D2A' }}>kampen en weekendjes</strong>
-                  </div>
-
                   {/* Action 3: Tak activiteit toevoegen */}
                   {canEditTak && (
                   <button
@@ -531,53 +480,6 @@ export default function LeidingPanel({
                   </button>
                   )}
                 </div>
-
-                {/* Inline Kamp Panel */}
-                {inlineView === 'kampen' && (
-                  <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 16, padding: 20 }}>
-                    {canEditTak && (
-                      <button onClick={() => setShowKampAanmaken(true)} style={{ marginBottom: 20, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
-                        + Weekend/Kamp toevoegen
-                      </button>
-                    )}
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                      {takKampen.length === 0 && <p style={{ color: '#6A8A75', fontSize: '.88rem' }}>Er zijn nog geen kampen voor deze tak aangemaakt.</p>}
-                      {takKampen.map(kamp => {
-                        const van = new Date(kamp.datum_van)
-                        const tot = new Date(kamp.datum_tot)
-                        const periode = `${van.getDate()}/${van.getMonth() + 1} – ${tot.getDate()}/${tot.getMonth() + 1}/${tot.getFullYear()}`
-
-                        return (
-                          <div key={kamp.id} style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 14, overflow: 'hidden' }}>
-                            {kamp.foto && (
-                              <div style={{ width: '100%', height: 260 }}>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/kamp-fotos/${kamp.foto}`} alt="Cover" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                              </div>
-                            )}
-
-                            <div style={{ padding: 20 }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 0 }}>
-                                <div>
-                                  <strong style={{ fontSize: '2rem', color: '#1A3D2A', display: 'block' }}>{kamp.naam}</strong>
-                                  <span style={{ fontSize: '.82rem', color: '#6A8A75' }}>📅 {periode} · 📍 {kamp.locatie}</span>
-                                </div>
-                                {canEditTak && (
-                                  <button
-                                    onClick={() => { setEditKampId(kamp.id); setShowKampModal(true) }}
-                                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#1A3D2A', color: '#fff', borderRadius: 8, fontSize: '.82rem', fontWeight: 700, border: 'none', cursor: 'pointer', textDecoration: 'none', whiteSpace: 'nowrap' }}>
-                                    ⚙️ Beheer
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
 
                 {/* Inline Echo Panel */}
                 {inlineView === 'echos' && isEchoTak && (

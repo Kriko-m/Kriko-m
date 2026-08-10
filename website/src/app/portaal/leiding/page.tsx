@@ -32,9 +32,8 @@ export default async function LeidingPortaalPage({
   const werkjaar = await getActiveWerkjaar()
 
   const admin = createAdminClient()
-  const [authRes, kampenRes, echosRes, calendarRes, settingsRes, todosRes] = await Promise.all([
+  const [authRes, echosRes, calendarRes, settingsRes, todosRes] = await Promise.all([
     supabase.auth.getUser(),
-    admin.from('kampen').select('*, kamp_bestanden(*)').order('datum_van', { ascending: true }),
     admin.from('echos').select('*').order('year', { ascending: false }).order('month', { ascending: false }),
     admin.from('calendar').select('*').order('date', { ascending: true }),
     admin.from('settings').select('leiding_ics_token, portal_backgrounds, takken').eq('id', 1).single(),
@@ -43,7 +42,6 @@ export default async function LeidingPortaalPage({
 
   if (authRes.error || !authRes.data.user) redirect('/portaal')
 
-  const kampen = (kampenRes.data ?? []) as Kamp[]
   const echos = (echosRes.data ?? []) as Echo[]
   const calendarEvents = (calendarRes.data ?? []) as CalendarEvent[]
   const icsToken = (settingsRes.data?.leiding_ics_token ?? '') as string
@@ -58,7 +56,6 @@ export default async function LeidingPortaalPage({
   return (
     <LeidingPanel
       key={`${tak}-${tab ?? 'kalender'}-${month ?? ''}`}
-      initialKampen={kampen}
       initialEchos={echos}
       initialCalendar={calendarEvents}
       initialTodos={todos}
@@ -66,8 +63,7 @@ export default async function LeidingPortaalPage({
       icsToken={icsToken}
       initialTak={tak}
       initialTab={tab}
-      initialMonth={month ? parseInt(month, 10) : undefined}
-      openKampId={kamp}
+      initialMonth={month ? Number(month) : undefined}
       portalBackgrounds={portalBackgrounds}
       takEmails={takEmails}
       takConfigs={takConfigs}

@@ -14,7 +14,7 @@ export default async function HomePage() {
   const events = allEvents
     .filter((e: CalendarEvent) => (e.datum_tot || e.date) >= todayStr)
     .sort((a, b) => a.date.localeCompare(b.date))
-    .slice(0, 5)
+    .slice(0, 3)
 
   return (
     <>

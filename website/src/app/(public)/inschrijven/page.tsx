@@ -15,8 +15,7 @@ export default async function InschrijvenPage() {
     <>
       <section className="tak-hero primair hero-inschrijven">
         <div className="container">
-          <span className="hero-eyebrow">Word lid</span>
-          <h1 className="tak-hero-title">Inschrijven &amp; Lidgeld</h1>
+          <h1 className="tak-hero-title">Inschrijven</h1>
         </div>
       </section>
 
