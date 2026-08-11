@@ -110,6 +110,90 @@ const TAK_LEADERS: Record<string, Leader[]> = {
   ],
 }
 
+const TAK_DETAILS: Record<string, { title: string; content: React.ReactNode }> = {
+  kapoenen: {
+    title: 'Wat is een kapoen?',
+    content: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
+        <p>
+          Kapoenen zijn onze jongste leden van 6 tot 8 jaar. Ze ontdekken al spelend wat het is om scout of gids te zijn.
+        </p>
+        <p>
+          Het leven van een kapoen is vol spel en fantasie. De leiding bedenkt spelen op maat van kapoenen. Wat vinden ze leuk en wat kunnen ze al op die leeftijd?
+        </p>
+        <p>
+          Samen met hun leeftijdsgenootjes leren ze al spelenderwijs omgaan met elkaar, leren ze winnen en verliezen. Maar we zetten hen ook aan om buiten te spelen en te genieten van de natuur in al zijn aspecten.
+        </p>
+        <p>
+          Op het einde van het jaar gaan ze begin augustus gedurende vijf dagen samen op kamp. Hier leven de kinderen samen in hun groep en leren met zichzelf en anderen omgaan.
+        </p>
+      </div>
+    ),
+  },
+  welpen: {
+    title: 'Wat is een welp?',
+    content: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
+        <p style={{ margin: 0 }}>Een welp:</p>
+        <ul style={{ paddingLeft: 24, margin: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <li>is tussen 8 en 11 jaar,</li>
+          <li>zit meestal in 3e, 4e of 5e leerjaar,</li>
+          <li>groeit een millimeter per week,</li>
+          <li>krijgt er op een jaar drie tanden bij,</li>
+          <li>wordt elke week 5 gram zwaarder.</li>
+        </ul>
+        <p>
+          Welpen hebben veel energie. Hun enthousiasme kent soms geen grenzen. Ze bouwen graag kampen, verzinnen een geheime taal en halen kattenkwaad uit. Hun vrienden staan centraal.
+        </p>
+        <p>
+          Samen met hun vrienden ontdekken ze al ravottend hun eigen kunnen en ontwikkelen ze hun vaardigheden. De vaste gewoontes en gebruiken van onze groep versterken het gevoel van verbondenheid met elkaar.
+        </p>
+        <p>
+          Op het einde van het jaar gaan ze begin augustus gedurende zeven dagen samen op kamp. Hier leven de kinderen samen in hun groep en leren met zichzelf en anderen omgaan.
+        </p>
+      </div>
+    ),
+  },
+  jonggivers: {
+    title: 'Wat is een jonggiver?',
+    content: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
+        <p>
+          Jonggivers zijn tussen 11 en 13 jaar oud.
+        </p>
+        <p>
+          Jonggivers houden van avontuur en steken graag de handen uit de mouwen. Ze vinden het leuk om inspraak te hebben en gaan graag nieuwe uitdagingen aan: vlottentocht, koken op houtvuur, slapen in patrouilletenten. Jonggivers leren samenwerken, engagement tonen en zich inzetten voor anderen. Zo ontdekken ze stilaan wat scouting echt inhoudt en leggen hun belofte met trots af.
+        </p>
+        <p>
+          Jonggivers zitten op de wip tussen kind en puber. Hun leefwereld verandert razendsnel en wordt plots veel complexer. Al die veranderingen zijn soms overweldigend.
+        </p>
+        <p>
+          Op geen enkele leeftijd verschillen kinderen zo fel van elkaar als bij de jonggivers. Bovendien hebben ze vaak schrik om anders te zijn. Vrienden, hun plaats in de groep en de ontwikkeling van hun eigen identiteit en stijl zijn voor jonggivers belangrijk.
+        </p>
+        <p>
+          Op het einde van het jaar gaan ze begin augustus gedurende elf dagen samen op kamp. Hier leven de jongeren samen in hun groep, slapen in tenten en leren stilaan de vaardigheden en technieken van een echte scout.
+        </p>
+      </div>
+    ),
+  },
+  givers: {
+    title: 'Wat is een giver?',
+    content: (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
+        <p>
+          De givers zijn de oudste leden van onze scouts en zijn 14 tot 17 jaar oud. Zelf vinden ze hun eigen leefwereld vaak nogal verwarrend, verrassend, moeilijk te vatten… en dat is meteen ook één van de kenmerken van deze jongeren.
+        </p>
+        <p>
+          Als leiding proberen we toegang te krijgen tot hun leefwereld. En hen zo bij te staan tijdens deze soms moeilijke maar belangrijke periode in hun ontwikkeling tot volwassene.
+        </p>
+        <p>
+          Giver zijn houdt meer in dan enkel activiteiten op zondag, we gaan 1 keer in de drie jaar op buitenlands kamp, organiseren activiteiten om onze kas te spijzen, enz. maar zijn ook al mee verantwoordelijk voor de werking van onze scouts. Giverhulp wordt bijvoorbeeld verwacht op onze eetfestijnen. Maar giver zijn is vooral ook plezier maken met je vrienden, samen leuke ervaringen delen en groeien in de scouts.
+        </p>
+      </div>
+    ),
+  },
+}
+
 export async function generateStaticParams() {
   return VALID_TAKKEN.map((slug) => ({ slug }))
 }
@@ -186,8 +270,15 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
 
             {/* Beschrijving */}
             <div style={{ backgroundColor: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', padding: 40, border: '1px solid var(--color-border)' }}>
-              <h3 style={{ fontSize: '1.8rem', marginBottom: 18, color: 'var(--color-primary-dark)' }}>Wie zijn we?</h3>
-              <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 20 }}>{tak.description}</p>
+              <h3 style={{ fontSize: '1.8rem', marginBottom: 18, color: 'var(--color-primary-dark)', textTransform: 'uppercase' }}>
+                {TAK_DETAILS[slug]?.title ?? `Wat is een ${slug}?`}
+              </h3>
+              {TAK_DETAILS[slug]?.content ?? (
+                <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 20 }}>
+                  {tak.description}
+                </p>
+              )}
+              
               <h4 style={{ fontSize: '1.3rem', marginTop: 30, marginBottom: 12, color: 'var(--color-primary-dark)' }}>Programma &amp; Vergaderingen</h4>
               <p style={{ color: 'var(--color-text-muted)' }}>
                 Elke zondagochtend verzamelen we aan onze scoutslokalen op het VP-plein van <strong>9:45 tot 12:30</strong> stipt.
