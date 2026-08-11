@@ -262,7 +262,73 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
         </div>
       </section>
 
-      <section className="section container section--no-top">
+      {/* Speelse Schuine Leidingsfoto OUTSIDE columns (Tussen Hero & Inhoud) */}
+      <section className="container" style={{ marginTop: 40, marginBottom: 10 }}>
+        <div style={{
+          position: 'relative',
+          transform: 'rotate(-1.5deg)',
+          transition: 'transform 0.3s ease',
+          width: '100%',
+        }}>
+          {/* Plakband/Tape Effecten aan de hoeken */}
+          <div style={{
+            position: 'absolute',
+            top: -12,
+            left: 36,
+            transform: 'rotate(-12deg)',
+            width: 110,
+            height: 28,
+            backgroundColor: 'rgba(240, 230, 210, 0.85)',
+            border: '1px solid rgba(200, 190, 170, 0.5)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
+            zIndex: 10,
+            backdropFilter: 'blur(2px)'
+          }} />
+          <div style={{
+            position: 'absolute',
+            top: -12,
+            right: 36,
+            transform: 'rotate(10deg)',
+            width: 110,
+            height: 28,
+            backgroundColor: 'rgba(240, 230, 210, 0.85)',
+            border: '1px solid rgba(200, 190, 170, 0.5)',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
+            zIndex: 10,
+            backdropFilter: 'blur(2px)'
+          }} />
+
+          <div style={{
+            backgroundColor: '#fff',
+            padding: '16px 16px 20px 16px',
+            borderRadius: 12,
+            boxShadow: '0 16px 36px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.05)',
+            border: '1px solid var(--color-border)'
+          }}>
+            <div style={{ position: 'relative', width: '100%', height: 380, borderRadius: 8, overflow: 'hidden' }}>
+              <Image
+                src={`/images/leiding_${slug}.jpg`}
+                alt={`Leidingsploeg ${tak.name}`}
+                fill
+                style={{ objectFit: 'cover' }}
+                sizes="100vw"
+              />
+            </div>
+            <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 8px', flexWrap: 'wrap', gap: 10 }}>
+              <span style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', fontWeight: 700 }}>
+                <i className="fa-solid fa-camera" style={{ color: 'var(--color-secondary)', marginRight: 10 }}></i>
+                Leidingsploeg {tak.name} (Werkjaar 2025-2026)
+              </span>
+              <span style={{ fontSize: '0.9rem', backgroundColor: 'var(--color-bg-linen)', color: 'var(--color-secondary)', padding: '6px 16px', borderRadius: 16, fontWeight: 700 }}>
+                <i className="fa-solid fa-users" style={{ marginRight: 8 }}></i>
+                {leadersToDisplay.length} Leid(st)ers
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section container section--no-top" style={{ paddingTop: 30 }}>
         <div className="tak-layout">
 
           {/* Linker kolom */}
@@ -308,58 +374,6 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginTop: 8, marginBottom: 24 }}>
                 Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of bel de leiding!
               </p>
-
-              {/* Speelse Schuine Leidingsfoto Polaroid Card */}
-              <div style={{
-                position: 'relative',
-                marginTop: 12,
-                marginBottom: 36,
-                transform: 'rotate(-2deg)',
-                transition: 'transform 0.3s ease',
-                width: '100%',
-              }}>
-                {/* Plakband/Tape Effect */}
-                <div style={{
-                  position: 'absolute',
-                  top: -14,
-                  left: '50%',
-                  transform: 'translateX(-50%) rotate(1.5deg)',
-                  width: 120,
-                  height: 28,
-                  backgroundColor: 'rgba(240, 230, 210, 0.85)',
-                  border: '1px solid rgba(200, 190, 170, 0.5)',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
-                  zIndex: 10,
-                  backdropFilter: 'blur(2px)'
-                }} />
-
-                <div style={{
-                  backgroundColor: '#fff',
-                  padding: '14px 14px 18px 14px',
-                  borderRadius: 8,
-                  boxShadow: '0 14px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
-                  border: '1px solid var(--color-border)'
-                }}>
-                  <div style={{ position: 'relative', width: '100%', height: 320, borderRadius: 6, overflow: 'hidden' }}>
-                    <Image
-                      src={`/images/leiding_${slug}.jpg`}
-                      alt={`Leidingsploeg ${tak.name}`}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      sizes="(max-width: 768px) 100vw, 55vw"
-                    />
-                  </div>
-                  <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
-                    <span style={{ fontSize: '1rem', color: 'var(--color-primary-dark)', fontWeight: 700, letterSpacing: '0.2px' }}>
-                      Leidingsploeg {tak.name}
-                    </span>
-                    <span style={{ fontSize: '0.8rem', backgroundColor: 'var(--color-bg-linen)', color: 'var(--color-secondary)', padding: '4px 12px', borderRadius: 14, fontWeight: 700 }}>
-                      <i className="fa-solid fa-camera" style={{ marginRight: 6 }}></i>
-                      Werkjaar 2025-2026
-                    </span>
-                  </div>
-                </div>
-              </div>
 
               <div className="leaders-grid">
                 {leadersToDisplay.map((leader: Leader) => {
