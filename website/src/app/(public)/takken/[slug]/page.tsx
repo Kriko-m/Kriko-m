@@ -309,9 +309,9 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               <div style={{
                 position: 'absolute',
                 top: -45,
-                left: -30,
+                left: -75,
                 zIndex: 10,
-                transform: 'rotate(-12deg)',
+                transform: 'rotate(-14deg)',
                 width: 250,
                 transition: 'transform 0.3s ease',
               }}>
@@ -332,28 +332,25 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
 
                 <div style={{
                   backgroundColor: '#fff',
-                  padding: '8px 8px 12px 8px',
+                  padding: 8,
                   borderRadius: 8,
                   boxShadow: '0 14px 30px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08)',
                   border: '1px solid var(--color-border)'
                 }}>
-                  <div style={{ position: 'relative', width: '100%', height: 160, borderRadius: 5, overflow: 'hidden' }}>
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', borderRadius: 5, overflow: 'hidden' }}>
                     <Image
                       src={`/images/leiding_${slug}.jpg`}
                       alt={`Leidingsploeg ${tak.name}`}
                       fill
-                      style={{ objectFit: 'cover' }}
+                      style={{ objectFit: 'contain' }}
                       sizes="250px"
                     />
                   </div>
-                  <p style={{ margin: '8px 0 2px', textAlign: 'center', fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-primary-dark)' }}>
-                    Leidingsploeg {tak.name}
-                  </p>
                 </div>
               </div>
 
               {/* Titel en Introductie met insprong voor de foto */}
-              <div style={{ paddingLeft: 200 }}>
+              <div style={{ paddingLeft: 140 }}>
                 <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>
                   De Leiding
                 </h3>
