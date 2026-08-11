@@ -7,7 +7,7 @@ import { CalendarEvent } from '@/lib/types'
 
 export default async function HomePage() {
   const allEvents = (await getPublicCalendarEvents()) as CalendarEvent[]
-  // Toon enkel aankomende activiteiten (vanaf vandaag), max. 5.
+  // Toon enkel aankomende activiteiten (vanaf vandaag), max. 3.
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
@@ -30,7 +30,7 @@ export default async function HomePage() {
         />
         <div className="hero-overlay">
           <div className="hero-text">
-            <span className="hero-sub">Scouts &amp; Gidsen</span>
+            <span className="hero-sub">Scouts</span>
             <span className="hero-title">Kriko-M</span>
             <HeroCTA />
           </div>
@@ -39,48 +39,199 @@ export default async function HomePage() {
 
       <hr className="section-divider" />
 
-      {/* 2. Welkom & Introductie */}
+      {/* 2. Welkom & Quick Info Cards */}
       <section className="section container" id="welkom">
-        <div className="welcome-grid">
-          <div>
-            <h3 style={{ fontSize: '2rem', marginBottom: 16, color: 'var(--color-primary-dark)' }}>
-              Al meer dan 80 jaar scouting in Sint-Niklaas
-            </h3>
-            <p style={{ marginBottom: 16, fontSize: '1.05rem', color: 'var(--color-text-dark)' }}>
-              Scouts Kriko-M staat voor actie, vriendschap en zelfstandigheid. Elke zondagochtend van{' '}
-              <strong>9:45 tot 12:30</strong> openen wij ons lokaal op het VP-plein voor een namiddag vol
-              bosspelen, sjorringen, sportieve uitdagingen en gezelligheid.
+        <div className="welcome-grid" style={{ alignItems: 'stretch' }}>
+          
+          {/* Linker kolom: Welkomsttekst */}
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ marginBottom: 12 }}>
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                borderRadius: '20px',
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--color-accent)',
+                fontSize: '0.82rem',
+                fontWeight: 800,
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase'
+              }}>
+                ⚜️ Scouts Kriko-M Sint-Niklaas
+              </span>
+            </div>
+
+            <h2 style={{
+              fontSize: '2.4rem',
+              marginBottom: 18,
+              color: 'var(--color-primary-dark)',
+              fontWeight: 800,
+              lineHeight: 1.2,
+              letterSpacing: '-0.5px'
+            }}>
+              Welkom bij Kriko-M! ✌️
+            </h2>
+
+            <p style={{ marginBottom: 16, fontSize: '1.08rem', color: '#2B2B2B', lineHeight: 1.65 }}>
+              Ook dit jaar staat onze enthousiaste leidingsploeg weer elke zondag klaar om alle leden een onvergetelijke namiddag vol avontuur, spel en vriendschap te bezorgen op ons terrein aan het VP-plein.
             </p>
-            <p style={{ color: 'var(--color-text-muted)' }}>
-              Onze leiding is een enthousiaste en ervaren groep vrijwilligers die elke week de leukste en
-              veiligste activiteiten bedenken voor onze leden. Ontdek snel in welke tak jouw kind past en
-              kom gerust eens gratis proberen!
+
+            <p style={{ marginBottom: 16, fontSize: '1.05rem', color: '#2B2B2B', lineHeight: 1.65 }}>
+              Van onze jongste kapoenen tot onze oudste givers en leiding: met heel wat eigen talenten en zotveel goesting duiken we samen in het nieuwe scoutingjaar!
             </p>
-            <div style={{ marginTop: 24, display: 'flex', gap: 16 }}>
-              <Link href="/inschrijven" className="btn btn-secondary">Hoe werkt het?</Link>
-              <Link href="/verhuur" className="btn btn-outline">Ons lokaal</Link>
+
+            <p style={{ marginBottom: 24, fontSize: '1rem', color: '#4A4A4A', lineHeight: 1.6 }}>
+              Wil je de leiding bereiken of de maandplanning bekijken? De contactgegevens en alle takinfo vind je overzichtelijk in onze maandelijkse Kriko Echo.
+            </p>
+
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              <Link href="/inschrijven" className="btn btn-secondary" style={{ padding: '12px 24px', fontWeight: 700 }}>
+                Hoe werkt het?
+              </Link>
+              <Link href="/verhuur" className="btn btn-outline" style={{ padding: '12px 24px', fontWeight: 700 }}>
+                Ons lokaal
+              </Link>
             </div>
           </div>
-          <div style={{ position: 'relative' }}>
+
+          {/* Rechter kolom: Quick Stats / Info Cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 18, justifyContent: 'center' }}>
+            
+            {/* Card 1: Wanneer */}
             <div style={{
-              width: '100%', height: 350,
-              borderRadius: 'var(--border-radius-lg)',
-              overflow: 'hidden',
-              boxShadow: 'var(--shadow-lg)',
-              border: '4px solid var(--color-bg-white)',
-              transform: 'rotate(-2deg)',
-              background: 'linear-gradient(rgba(102,12,25,0.2), rgba(102,12,25,0.2)), url(/images/hero-bg.webp) center/cover',
-            }} />
+              backgroundColor: 'var(--color-bg-white)',
+              padding: '22px 24px',
+              borderRadius: 'var(--border-radius-md)',
+              boxShadow: '0 8px 24px rgba(101, 11, 25, 0.08)',
+              border: '1px solid rgba(101, 11, 25, 0.12)',
+              borderLeft: '6px solid var(--color-primary)',
+              display: 'flex',
+              gap: 18,
+              alignItems: 'center',
+              transition: 'transform 0.2s ease, boxShadow 0.2s ease'
+            }}>
+              <div style={{
+                width: 50,
+                height: 50,
+                borderRadius: '12px',
+                backgroundColor: 'rgba(101, 11, 25, 0.08)',
+                color: 'var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.4rem',
+                flexShrink: 0
+              }}>
+                🕒
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '1.15rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}>
+                  Wanneer?
+                </h4>
+                <p style={{ margin: '4px 0 0', fontSize: '0.98rem', color: '#333333', lineHeight: 1.4 }}>
+                  Elke zondag van <strong>9:45 tot 12:30</strong> (voormiddag)
+                </p>
+              </div>
+            </div>
+
+            {/* Card 2: Waar */}
+            <div style={{
+              backgroundColor: 'var(--color-bg-white)',
+              padding: '22px 24px',
+              borderRadius: 'var(--border-radius-md)',
+              boxShadow: '0 8px 24px rgba(101, 11, 25, 0.08)',
+              border: '1px solid rgba(101, 11, 25, 0.12)',
+              borderLeft: '6px solid var(--color-primary)',
+              display: 'flex',
+              gap: 18,
+              alignItems: 'center'
+            }}>
+              <div style={{
+                width: 50,
+                height: 50,
+                borderRadius: '12px',
+                backgroundColor: 'rgba(101, 11, 25, 0.08)',
+                color: 'var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.4rem',
+                flexShrink: 0
+              }}>
+                📍
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '1.15rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}>
+                  Waar?
+                </h4>
+                <p style={{ margin: '4px 0 0', fontSize: '0.98rem', color: '#333333', lineHeight: 1.4 }}>
+                  VP-plein (Industriepark-Noord 33), 9100 Sint-Niklaas
+                </p>
+              </div>
+            </div>
+
+            {/* Card 3: Echo & Contact */}
+            <div style={{
+              backgroundColor: 'var(--color-bg-white)',
+              padding: '22px 24px',
+              borderRadius: 'var(--border-radius-md)',
+              boxShadow: '0 8px 24px rgba(101, 11, 25, 0.08)',
+              border: '1px solid rgba(101, 11, 25, 0.12)',
+              borderLeft: '6px solid var(--color-primary)',
+              display: 'flex',
+              gap: 18,
+              alignItems: 'center'
+            }}>
+              <div style={{
+                width: 50,
+                height: 50,
+                borderRadius: '12px',
+                backgroundColor: 'rgba(101, 11, 25, 0.08)',
+                color: 'var(--color-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.4rem',
+                flexShrink: 0
+              }}>
+                📄
+              </div>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '1.15rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}>
+                  Kriko Echo &amp; Contact
+                </h4>
+                <p style={{ margin: '4px 0 6px', fontSize: '0.95rem', color: '#333333', lineHeight: 1.4 }}>
+                  Maandelijkse planning &amp; leidinggegevens in de Echo.
+                </p>
+                <Link href="/echos" style={{ fontSize: '0.92rem', color: 'var(--color-primary)', fontWeight: 800, textDecoration: 'underline' }}>
+                  Bekijk of download de Echo &raquo;
+                </Link>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
       <hr className="section-divider" />
 
-      {/* 3. Takken */}
+      {/* 3. Onze Takken */}
       <section className="vic-takken-section">
-        <div className="page-header" style={{ padding: '32px 40px 28px' }}>
-          <h2 className="page-header-title">Onze Takken</h2>
+        <div className="page-header" style={{ padding: '36px 40px 28px', textAlign: 'center' }}>
+          <span style={{
+            fontSize: '0.85rem',
+            color: 'var(--color-primary)',
+            fontWeight: 800,
+            letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            display: 'block',
+            marginBottom: 4
+          }}>
+            Voor elke leeftijd
+          </span>
+          <h2 className="page-header-title" style={{ margin: 0 }}>Onze Takken</h2>
         </div>
         <div className="vic-takken-grid">
           {[
@@ -111,7 +262,7 @@ export default async function HomePage() {
           {/* Kalender */}
           <div className="calendar-card">
             <h3 style={{ fontSize: '1.75rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-              <svg style={{ width: 24, height: 24, fill: 'none', stroke: 'var(--color-secondary)' }} strokeWidth={2} viewBox="0 0 24 24">
+              <svg style={{ width: 24, height: 24, fill: 'none', stroke: 'var(--color-primary)' }} strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               Aankomende Activiteiten
@@ -147,10 +298,10 @@ export default async function HomePage() {
                   { label: 'Scoutswinkel (Hopper)', text: 'Algemene scoutshemden en broeken koop je bij Hopper, groepsdassen en T-shirts koop je in onze webshop.' },
                 ].map(({ label, text }) => (
                   <li key={label} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                    <span style={{ color: 'var(--color-secondary)', fontWeight: 'bold', fontSize: '1.2rem', lineHeight: 1 }}>&bull;</span>
+                    <span style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '1.2rem', lineHeight: 1 }}>&bull;</span>
                     <div>
-                      <strong style={{ display: 'block', fontSize: '0.95rem' }}>{label}</strong>
-                      <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>{text}</span>
+                      <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-primary-dark)' }}>{label}</strong>
+                      <span style={{ fontSize: '0.9rem', color: '#4A4A4A' }}>{text}</span>
                     </div>
                   </li>
                 ))}
@@ -158,6 +309,125 @@ export default async function HomePage() {
             </div>
           </div>
 
+        </div>
+      </section>
+
+      <hr className="section-divider" />
+
+      {/* 5. Waarom Kriko-M? (Troeven) */}
+      <section className="section container">
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1.5px', fontWeight: 800, color: 'var(--color-primary)' }}>
+            Waarom kiezen voor ons?
+          </span>
+          <h2 style={{ fontSize: '2.2rem', color: 'var(--color-primary-dark)', fontWeight: 800, marginTop: 4 }}>
+            De Troeven van Kriko-M 🌲
+          </h2>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+          <div style={{
+            backgroundColor: 'var(--color-bg-white)',
+            padding: '36px 28px',
+            borderRadius: 'var(--border-radius-md)',
+            boxShadow: '0 8px 24px rgba(101, 11, 25, 0.06)',
+            textAlign: 'center',
+            borderTop: '4px solid var(--color-primary)'
+          }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>🌲</div>
+            <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12, fontWeight: 800 }}>
+              Bosspelen &amp; Avontuur
+            </h3>
+            <p style={{ color: '#4A4A4A', fontSize: '0.98rem', lineHeight: 1.6 }}>
+              Spel, sjorringen, vuur maken, avonturen in het groen en creatieve uitdagingen aangepast aan elke leeftijd.
+            </p>
+          </div>
+
+          <div style={{
+            backgroundColor: 'var(--color-bg-white)',
+            padding: '36px 28px',
+            borderRadius: 'var(--border-radius-md)',
+            boxShadow: '0 8px 24px rgba(101, 11, 25, 0.06)',
+            textAlign: 'center',
+            borderTop: '4px solid var(--color-primary)'
+          }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>🤝</div>
+            <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12, fontWeight: 800 }}>
+              Vriendschap voor het Leven
+            </h3>
+            <p style={{ color: '#4A4A4A', fontSize: '0.98rem', lineHeight: 1.6 }}>
+              Samen lachen, grenzen verleggen en hechte vrienden maken in een warme en hechte groepssfeer.
+            </p>
+          </div>
+
+          <div style={{
+            backgroundColor: 'var(--color-bg-white)',
+            padding: '36px 28px',
+            borderRadius: 'var(--border-radius-md)',
+            boxShadow: '0 8px 24px rgba(101, 11, 25, 0.06)',
+            textAlign: 'center',
+            borderTop: '4px solid var(--color-primary)'
+          }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: 16 }}>🛡️</div>
+            <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12, fontWeight: 800 }}>
+              Ervaren &amp; Gedreven Leiding
+            </h3>
+            <p style={{ color: '#4A4A4A', fontSize: '0.98rem', lineHeight: 1.6 }}>
+              Een enthousiaste ploeg vrijwilligers die elke week met vol passie zorgt voor een veilige en plezante omgeving.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <hr className="section-divider" />
+
+      {/* 6. Nieuwe Leden & Lokaalverhuur Banner */}
+      <section className="section container" style={{ marginBottom: 60 }}>
+        <div style={{
+          backgroundColor: 'var(--color-primary-dark)',
+          color: 'white',
+          borderRadius: 'var(--border-radius-lg)',
+          padding: '48px 36px',
+          boxShadow: 'var(--shadow-lg)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: 32,
+          alignItems: 'center'
+        }}>
+          <div>
+            <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: 'var(--color-accent)', fontWeight: 800 }}>
+              Zin om mee te doen?
+            </span>
+            <h2 style={{ fontSize: '2.2rem', color: 'white', fontWeight: 800, margin: '8px 0 12px' }}>
+              Kom gerust eens proberen! 🏕️
+            </h2>
+            <p style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '1.05rem', lineHeight: 1.6 }}>
+              Nieuwe leden zijn het hele jaar door welkom. Je kan altijd 2 tot 3 zondagen gratis komen proeven van de scoutssfeer.
+            </p>
+            <div style={{ marginTop: 24, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              <Link href="/inschrijven" className="btn btn-secondary" style={{ padding: '12px 24px', fontWeight: 700 }}>
+                Inschrijven &amp; Meer info
+              </Link>
+            </div>
+          </div>
+
+          <div style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(8px)',
+            padding: '32px',
+            borderRadius: 'var(--border-radius-md)',
+            border: '1px solid rgba(255, 255, 255, 0.15)'
+          }}>
+            <h3 style={{ fontSize: '1.4rem', color: 'var(--color-accent)', marginBottom: 8, fontWeight: 800 }}>
+              Ons Lokaal Huren? 🏠
+            </h3>
+            <p style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '0.98rem', marginBottom: 20, lineHeight: 1.5 }}>
+              Op zoek naar een terrein of lokaal voor je jeugdbeweging of evenement op het VP-plein in Sint-Niklaas?
+            </p>
+            <Link href="/verhuur" className="btn btn-outline" style={{ borderColor: 'white', color: 'white', padding: '10px 20px', fontWeight: 700 }}>
+              Bekijk ons verhuur &raquo;
+            </Link>
+          </div>
         </div>
       </section>
     </>

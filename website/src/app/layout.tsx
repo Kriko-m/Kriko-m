@@ -18,10 +18,10 @@ export const metadata: Metadata = {
     default: "Scouts Kriko-M",
     template: "%s · Scouts Kriko-M",
   },
-  description: "Scouts & Gidsen Kriko-M uit Sint-Niklaas — info over de takken, kalender, Kriko Echo, verhuur en de webshop.",
+  description: "Scouts Kriko-M uit Sint-Niklaas — info over de takken, kalender, Kriko Echo, verhuur en de webshop.",
   openGraph: {
     title: "Scouts Kriko-M",
-    description: "Scouts & Gidsen Kriko-M uit Sint-Niklaas — takken, kalender, Kriko Echo, verhuur en webshop.",
+    description: "Scouts Kriko-M uit Sint-Niklaas — takken, kalender, Kriko Echo, verhuur en webshop.",
     url: SITE_URL,
     siteName: "Scouts Kriko-M",
     locale: "nl_BE",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary",
     title: "Scouts Kriko-M",
-    description: "Scouts & Gidsen Kriko-M uit Sint-Niklaas.",
+    description: "Scouts Kriko-M uit Sint-Niklaas.",
     images: ["/images/logo-finaal.png"],
   },
 };

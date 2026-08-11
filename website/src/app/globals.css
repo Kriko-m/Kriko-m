@@ -25,9 +25,9 @@
     --color-primary-hover: #650B19;
 
     /* Beige â€” inschrijven-knop Â· subtitels Â· decoratieve lijn */
-    --color-accent: #fcebbe;
-    --color-accent-hover: #e8d4a0;
-    --color-accent-light: #fef5e4;
+    --color-accent: #EDE8D0;
+    --color-accent-hover: #e0d9b8;
+    --color-accent-light: #f7f4e6;
 
     /* Secondary = alias van het accent (backwards-compat met bestaande klassen) */
     --color-secondary: var(--color-accent);

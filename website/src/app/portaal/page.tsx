@@ -50,7 +50,7 @@ function PortaalContent() {
         <Image src="/images/logo-finaal.png" alt="Kriko-M logo" width={60} height={60} style={{ objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
         <div style={{ lineHeight: 1.1 }}>
           <span style={{ display: 'block', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '1.8rem', letterSpacing: '.06em', textTransform: 'uppercase', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>Kriko-M</span>
-          <span style={{ fontSize: '.82rem', fontWeight: 700, color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase', letterSpacing: '.08em' }}>Scouts &amp; Gidsen Sint-Niklaas</span>
+          <span style={{ fontSize: '.82rem', fontWeight: 700, color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase', letterSpacing: '.08em' }}>Scouts Kriko-M Sint-Niklaas</span>
         </div>
       </div>
 

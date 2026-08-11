@@ -21,7 +21,7 @@ export default function Footer({
         {/* Kolom 1: Merk */}
         <div className="footer-col footer-col-brand">
           <span className="footer-brand-name">Kriko-M</span>
-          <span className="footer-brand-sub">Scouts &amp; Gidsen &mdash; Sint-Niklaas</span>
+          <span className="footer-brand-sub">Scouts &mdash; Sint-Niklaas</span>
           <div className="footer-brand-divider"></div>
           <span className="footer-brand-desc">Elke zondag op het VP-plein. Avontuur, vriendschap en buiten zijn — dat is wat we doen.</span>
           <span className="footer-social-label">Volg ons</span>
@@ -86,7 +86,7 @@ export default function Footer({
       </div>
 
       <div className="site-footer-bottom">
-        <span>&copy; {year} Scouts &amp; Gidsen Kriko-M Sint-Niklaas</span>
+        <span>&copy; {year} Scouts Kriko-M Sint-Niklaas</span>
         <span className="footer-legal-links">
           <Link href="/privacy">Privacyverklaring</Link>
           <span aria-hidden="true">&middot;</span>
