@@ -305,14 +305,14 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
             {/* Leiding */}
             <div className="leaders-section" style={{ position: 'relative', overflow: 'visible' }}>
               
-              {/* Schuine Foto op de linker bovenhoek van de Leidingkaart (zoals getekend) */}
+              {/* Schuine Foto aan de RECHTER BOVENHOEK van de Leidingkaart */}
               <div style={{
                 position: 'absolute',
-                top: -45,
-                left: -75,
+                top: -35,
+                right: -30,
                 zIndex: 10,
-                transform: 'rotate(-14deg)',
-                width: 250,
+                transform: 'rotate(7deg)',
+                width: 220,
                 transition: 'transform 0.3s ease',
               }}>
                 {/* Plakband/Tape Effect */}
@@ -320,8 +320,8 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                   position: 'absolute',
                   top: -10,
                   left: '50%',
-                  transform: 'translateX(-50%) rotate(4deg)',
-                  width: 75,
+                  transform: 'translateX(-50%) rotate(-4deg)',
+                  width: 70,
                   height: 22,
                   backgroundColor: 'rgba(240, 230, 210, 0.85)',
                   border: '1px solid rgba(200, 190, 170, 0.5)',
@@ -332,25 +332,25 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
 
                 <div style={{
                   backgroundColor: '#fff',
-                  padding: 8,
+                  padding: 6,
                   borderRadius: 8,
-                  boxShadow: '0 14px 30px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08)',
-                  border: '1px solid var(--color-border)'
+                  boxShadow: '0 12px 28px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
+                  border: '1px solid var(--color-border)',
                 }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', borderRadius: 5, overflow: 'hidden' }}>
                     <Image
                       src={`/images/leiding_${slug}.jpg`}
                       alt={`Leidingsploeg ${tak.name}`}
                       fill
-                      style={{ objectFit: 'contain' }}
-                      sizes="250px"
+                      style={{ objectFit: 'cover' }}
+                      sizes="220px"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Titel en Introductie met insprong voor de foto */}
-              <div style={{ paddingLeft: 140 }}>
+              {/* Titel en Introductie met ruimte rechts voor de foto */}
+              <div style={{ paddingRight: 180 }}>
                 <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>
                   De Leiding
                 </h3>
