@@ -308,8 +308,8 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               {/* Schuine Foto aan de RECHTER BOVENHOEK van de Leidingkaart */}
               <div style={{
                 position: 'absolute',
-                top: -35,
-                right: -150,
+                top: 10,
+                right: -130,
                 zIndex: 10,
                 transform: 'rotate(7deg)',
                 width: 220,
@@ -349,8 +349,8 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                 </div>
               </div>
 
-              {/* Titel en Introductie */}
-              <div>
+              {/* Titel en Introductie met vette insprong rechts zodat tekst nooit achter de foto verdwijnt */}
+              <div style={{ paddingRight: 120 }}>
                 <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>
                   De Leiding
                 </h3>
