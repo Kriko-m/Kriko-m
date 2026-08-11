@@ -309,6 +309,58 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                 Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of bel de leiding!
               </p>
 
+              {/* Speelse Schuine Leidingsfoto Polaroid Card */}
+              <div style={{
+                position: 'relative',
+                marginTop: 12,
+                marginBottom: 36,
+                transform: 'rotate(-2deg)',
+                transition: 'transform 0.3s ease',
+                width: '100%',
+              }}>
+                {/* Plakband/Tape Effect */}
+                <div style={{
+                  position: 'absolute',
+                  top: -14,
+                  left: '50%',
+                  transform: 'translateX(-50%) rotate(1.5deg)',
+                  width: 120,
+                  height: 28,
+                  backgroundColor: 'rgba(240, 230, 210, 0.85)',
+                  border: '1px solid rgba(200, 190, 170, 0.5)',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
+                  zIndex: 10,
+                  backdropFilter: 'blur(2px)'
+                }} />
+
+                <div style={{
+                  backgroundColor: '#fff',
+                  padding: '14px 14px 18px 14px',
+                  borderRadius: 8,
+                  boxShadow: '0 14px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
+                  border: '1px solid var(--color-border)'
+                }}>
+                  <div style={{ position: 'relative', width: '100%', height: 320, borderRadius: 6, overflow: 'hidden' }}>
+                    <Image
+                      src={`/images/leiding_${slug}.jpg`}
+                      alt={`Leidingsploeg ${tak.name}`}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      sizes="(max-width: 768px) 100vw, 55vw"
+                    />
+                  </div>
+                  <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 4px' }}>
+                    <span style={{ fontSize: '1rem', color: 'var(--color-primary-dark)', fontWeight: 700, letterSpacing: '0.2px' }}>
+                      Leidingsploeg {tak.name}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', backgroundColor: 'var(--color-bg-linen)', color: 'var(--color-secondary)', padding: '4px 12px', borderRadius: 14, fontWeight: 700 }}>
+                      <i className="fa-solid fa-camera" style={{ marginRight: 6 }}></i>
+                      Werkjaar 2025-2026
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               <div className="leaders-grid">
                 {leadersToDisplay.map((leader: Leader) => {
                   const parts = leader.name.split(' ')
@@ -403,59 +455,6 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
             </div>
           </div>
 
-        </div>
-      </section>
-
-      {/* Sfeervolle Leidingsfoto Feature Banner */}
-      <section style={{ backgroundColor: 'var(--color-bg-white)', borderTop: '1px solid var(--color-border)', padding: '50px 0', marginTop: 30 }}>
-        <div className="container">
-          <div style={{
-            backgroundColor: 'var(--color-bg-linen)',
-            borderRadius: 'var(--border-radius-lg)',
-            padding: 32,
-            boxShadow: 'var(--shadow-md)',
-            border: '1px solid var(--color-border)',
-            display: 'grid',
-            gridTemplateColumns: '1.2fr 1fr',
-            gap: 36,
-            alignItems: 'center'
-          }}>
-            <div style={{ position: 'relative', width: '100%', height: 340, borderRadius: 'var(--border-radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-md)', border: '3px solid #fff' }}>
-              <Image
-                src={`/images/leiding_${slug}.jpg`}
-                alt={`Leidingsploeg ${tak.name}`}
-                fill
-                style={{ objectFit: 'cover' }}
-                sizes="(max-width: 768px) 100vw, 55vw"
-              />
-              <div style={{ position: 'absolute', bottom: 14, left: 14, backgroundColor: 'rgba(0,0,0,0.75)', color: '#fff', padding: '6px 14px', borderRadius: 20, fontSize: '0.82rem', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <i className="fa-solid fa-camera" style={{ color: 'var(--color-accent-light)' }}></i>
-                <span>Leidingsploeg {tak.name}</span>
-              </div>
-            </div>
-
-            <div>
-              <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, color: 'var(--color-secondary)' }}>
-                Onze Leidingsploeg
-              </span>
-              <h3 style={{ fontSize: '1.9rem', color: 'var(--color-primary-dark)', marginTop: 4, marginBottom: 14 }}>
-                Elke zondag paraat voor de {tak.name}!
-              </h3>
-              <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 20 }}>
-                Met een gepassioneerde ploeg leiding zorgen we elke week opnieuw voor fantastische spelen, avontuur en een veilige omgeving waarin ieder kind zichzelf kan zijn.
-              </p>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                <span style={{ backgroundColor: '#fff', padding: '8px 14px', borderRadius: 'var(--border-radius-md)', fontSize: '0.88rem', color: 'var(--color-primary-dark)', fontWeight: 600, border: '1px solid var(--color-border)' }}>
-                  <i className="fa-solid fa-users" style={{ marginRight: 8, color: 'var(--color-secondary)' }}></i>
-                  {leadersToDisplay.length} Leid(st)ers
-                </span>
-                <span style={{ backgroundColor: '#fff', padding: '8px 14px', borderRadius: 'var(--border-radius-md)', fontSize: '0.88rem', color: 'var(--color-primary-dark)', fontWeight: 600, border: '1px solid var(--color-border)' }}>
-                  <i className="fa-solid fa-envelope" style={{ marginRight: 8, color: 'var(--color-secondary)' }}></i>
-                  {tak.email}
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
     </>
