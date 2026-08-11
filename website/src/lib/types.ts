@@ -49,6 +49,7 @@ export interface TakConfig {
 export interface Leader {
   name: string
   role: string
+  totem?: string
 }
 
 // Audience-tags bepalen de zichtbaarheid: een event met 'groep' is publiek

@@ -165,7 +165,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                   <i className="fa-solid fa-scroll" style={{ color: 'var(--color-secondary)', marginRight: 10 }}></i>
                   {TAK_TRADITIES[slug].wetTitle}
                 </h3>
-                <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 24, fontStyle: 'italic', whitespace: 'pre-line' }}>
+                <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 24, fontStyle: 'italic', whiteSpace: 'pre-line' }}>
                   &ldquo;{TAK_TRADITIES[slug].wet}&rdquo;
                 </p>
 
