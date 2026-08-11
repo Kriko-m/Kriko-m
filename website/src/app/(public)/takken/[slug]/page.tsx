@@ -86,6 +86,30 @@ const TAK_TRADITIES: Record<string, { wetTitle: string; wet: string; extraTitle?
   },
 }
 
+const TAK_LEADERS: Record<string, Leader[]> = {
+  kapoenen: [
+    { name: 'Marthe Isik', totem: 'Dageraad rode doortastende Drongo', phone: '+32 470 34 37 20' },
+    { name: 'Lies Osselaer' },
+    { name: 'Pieter Room', totem: 'Lapis Lazuli Blauw Goud Levenslustige Lori', phone: '+32 479 26 38 48' },
+  ],
+  welpen: [
+    { name: 'Vic Verhaegen', totem: 'Wasabigroene Vindingrijke Mus', phone: '+32 477 21 36 53' },
+    { name: 'Lotte Waeckens', totem: 'Asterlila Aimabele Antilope', phone: '+32 479 36 93 14' },
+    { name: 'Lotte Cerpentier', totem: 'Ringoogparelmoer Gele Ruimhartige Rayador', phone: '+32 495 99 29 57' },
+    { name: 'Yenthe Scholiers', totem: 'Diepspinel Roze Dromerige Dolfijn', phone: '+32 493 96 76 90' },
+  ],
+  jonggivers: [
+    { name: 'Jelle Scholiers', totem: 'Blijmoedige Beo', phone: '+32 491 91 99 90' },
+    { name: 'Sara Meyten', totem: 'Wavellietgroene Wilskrachtige Waterwolf', phone: '+32 468 58 09 01' },
+    { name: 'Marie Vanesbroek', totem: 'Karmozijn rode karaktervolle Kavka', phone: '+32 468 53 49 81' },
+  ],
+  givers: [
+    { name: 'Thomas Meyten', totem: 'Attente Agoeti', phone: '+32 468 25 88 92' },
+    { name: 'Eve Bonza', totem: 'Vulkaanpyriet goud Vurige Vlinder', phone: '+32 465 31 18 81' },
+    { name: 'Lucas Van Cleemput', totem: 'Kiene Kia', phone: '+32 468 41 95 02' },
+  ],
+}
+
 export async function generateStaticParams() {
   return VALID_TAKKEN.map((slug) => ({ slug }))
 }
@@ -105,6 +129,19 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
   const [settings, allEchos] = await Promise.all([getSettings(), getEchos()])
   const tak = settings?.takken?.[slug]
   if (!tak) notFound()
+
+  // Combineren van leidinggegevens met totems en telefoonnummers
+  const staticLeaders = TAK_LEADERS[slug] ?? []
+  const dbLeaders: Leader[] = tak.leaders ?? []
+  const leadersToDisplay: Leader[] = staticLeaders.map(sl => {
+    const dbMatch = dbLeaders.find((dbl: Leader) => dbl.name.toLowerCase() === sl.name.toLowerCase())
+    return {
+      name: sl.name,
+      role: dbMatch?.role ?? sl.role ?? 'Leid(st)er',
+      totem: sl.totem,
+      phone: sl.phone,
+    }
+  })
 
   // 2 meest recente echos voor deze tak (huidige + volgende maand)
   const now = new Date()
@@ -183,39 +220,33 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
             {/* Leiding */}
             <div className="leaders-section">
               <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>De Leiding</h3>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginTop: 8, marginBottom: 20 }}>
-                Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of stuur een mailtje!
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginTop: 8, marginBottom: 24 }}>
+                Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of bel de leiding!
               </p>
 
-              {/* Leidingsfoto */}
-              <div style={{ position: 'relative', width: '100%', height: 320, borderRadius: 'var(--border-radius-md)', overflow: 'hidden', marginBottom: 24, boxShadow: 'var(--shadow-md)', border: '2px solid var(--color-border)' }}>
-                <Image
-                  src={`/images/leiding_${slug}.jpg`}
-                  alt={`Leidingsploeg ${tak.name}`}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  sizes="(max-width: 768px) 100vw, 60vw"
-                />
-              </div>
-
               <div className="leaders-grid">
-                {(tak.leaders ?? []).map((leader: Leader) => {
+                {leadersToDisplay.map((leader: Leader) => {
                   const parts = leader.name.split(' ')
                   const initials = parts.length >= 2
                     ? parts[0][0] + parts[parts.length - 1][0]
                     : leader.name.slice(0, 2)
                   return (
-                    <div key={leader.name} className="leader-card">
+                    <div key={leader.name} className="leader-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: 20 }}>
                       <div className="leader-avatar">{initials.toUpperCase()}</div>
-                      <h4>{leader.name}</h4>
+                      <h4 style={{ fontSize: '1.1rem', marginBottom: 4 }}>{leader.name}</h4>
                       {leader.totem && (
-                        <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', fontStyle: 'italic', marginTop: 2 }}>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-dark)', fontStyle: 'italic', marginBottom: 8, lineHeight: 1.4 }}>
                           {leader.totem}
                         </p>
                       )}
-                      <p style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--color-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>
-                        {leader.role}
-                      </p>
+                      {leader.phone && (
+                        <p style={{ marginTop: 'auto', paddingTop: 8, fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-primary)' }}>
+                          <a href={`tel:${leader.phone.replace(/\s+/g, '')}`} style={{ color: 'inherit', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                            <i className="fa-solid fa-phone" style={{ fontSize: '0.85em', color: 'var(--color-secondary)' }}></i>
+                            {leader.phone}
+                          </a>
+                        </p>
+                      )}
                     </div>
                   )
                 })}
@@ -284,6 +315,23 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               <Link href="/shop" className="btn btn-secondary" style={{ marginTop: 14, width: '100%', justifyContent: 'center' }}>
                 <i className="fa-solid fa-cart-shopping" style={{ marginRight: 6 }}></i> Naar de Webshop &raquo;
               </Link>
+            </div>
+
+            {/* Leidingsfoto Kaart in rechter kolom */}
+            <div className="side-card" style={{ padding: 18 }}>
+              <h3 style={{ fontSize: '1.15rem', marginBottom: 12, color: 'var(--color-primary-dark)' }}>
+                <i className="fa-solid fa-camera" style={{ color: 'var(--color-secondary)', marginRight: 8 }}></i>
+                Leidingsploeg {tak.name}
+              </h3>
+              <div style={{ position: 'relative', width: '100%', height: 260, borderRadius: 'var(--border-radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)' }}>
+                <Image
+                  src={`/images/leiding_${slug}.jpg`}
+                  alt={`Leidingsploeg ${tak.name}`}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, 30vw"
+                />
+              </div>
             </div>
           </div>
 
