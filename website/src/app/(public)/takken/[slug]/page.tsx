@@ -23,46 +23,65 @@ const VALID_TAKKEN = ['kapoenen', 'welpen', 'jonggivers', 'givers']
 
 const TAK_TRADITIES: Record<string, { wetTitle: string; wet: string; extraTitle?: string; extra?: React.ReactNode }> = {
   kapoenen: {
-    wetTitle: 'De Kapoenenwet & Belofte',
-    wet: 'Een kapoen is een vriend van alle mensen, dieren en planten. Een kapoen speelt samen, deelt eerlijk en helpt graag waar hij kan.',
+    wetTitle: 'De Kapoenenwet',
+    wet: 'Ik ben een kapoen en ik probeer mijn best te doen.',
     extraTitle: 'Het Kapoenenlied',
     extra: (
-      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.92rem', borderLeft: '4px solid var(--color-kapoenen)' }}>
-        &ldquo;Kapoenen van de Kriko, vol vuur en met veel moed!<br />
-        Wij spelen alle zondagen, want scouting doet ons goed.<br />
-        Met onze rode das rond de nek en lach op ons gezicht,<br />
-        Gaan wij op avontuur tot de avond op ons licht!&rdquo;
+      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.95rem', borderLeft: '4px solid var(--color-kapoenen)', lineHeight: 1.6 }}>
+        1, 2, 3, 4, kapoenen hebben veel plezier, 1, 2, 3, 4, kapoenenland is hier.<br />
+        En zonder glimlach bij de hand gaat niemand naar kapoenenland.<br />
+        1, 2, 3, 4, kapoenenland is hier.
       </div>
     ),
   },
   welpen: {
-    wetTitle: 'De Welpenwet & Belofte',
-    wet: 'Een welp is eerlijk, gehoorzaam en vriendelijk. Een welp lacht, zet door en helpt anderen waar mogelijk.',
-    extraTitle: 'Het Jungleboek Thema',
+    wetTitle: 'De Welpenwet',
+    wet: 'Ik zeg wat ik voel, gruwel van vals gezwets,\nIk bereik eerlijk mijn doel, zonder dat ik iemand kwets.\nIk respecteer alles wat leeft en de Kracht die leven geeft.\nIk voel me één, met de wereld om me heen.\nHou niet van nep en deel alles wat ik heb.\nWant niemand is alles, niemand is niets, iedereen is altijd iets.',
+    extraTitle: 'Het Welpenlied',
     extra: (
-      <p style={{ fontSize: '0.92rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
-        Onze welpenwerking is gebaseerd op het <strong>Jungleboek</strong> van Rudyard Kipling! De leiding neemt junglenamen aan zoals <strong>Akela</strong>, <strong>Baloo</strong>, <strong>Bagheera</strong> en <strong>Kaa</strong>. De welpen zijn ingedeeld in kleine <em>nesten</em> om samen op ontdekking te gaan.
-      </p>
+      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.92rem', borderLeft: '4px solid var(--color-welpen)', lineHeight: 1.6 }}>
+        Ja dat zijn wij welpen blij die zingen samen in de rij<br />
+        wij spelen graag wij werken graag wij doen ons beste best, wij doen ons beste best.<br />
+        Een welpenbroek een bordeaux das, twee groene kousjes voor de was<br />
+        een bruine trui vergeet hem niet zo zingen wij graag ons lied.<br />
+        Ja dat zijn wij welpen blij die zingen samen in de rij<br />
+        wij spelen graag wij werken graag wij doen ons beste best, wij doen ons beste best.<br />
+        En dat we van de kriko zijn daar zijn we trots op groot en klein<br />
+        en komt ge ons tegen op een keer dan zijn we met eentje meer!<br />
+        Ja dat zijn wij welpen blij die zingen samen in de rij<br />
+        wij spelen graag wij werken graag wij doen ons beste best, wij doen ons beste best.<br />
+        <strong style={{ fontStyle: 'normal' }}>De leiding doet de rest!</strong>
+      </div>
     ),
   },
   jonggivers: {
-    wetTitle: 'De Jonggiverbelofte',
-    wet: 'Ik beloof te proberen een goede jonggiver te zijn, me in te zetten voor de groep, en respect te hebben voor mens en natuur.',
-    extraTitle: 'Patrouilles & Outdoor Avontuur',
+    wetTitle: 'De Jonggiverwet',
+    wet: 'Wij zijn jonggivers, wij wagen het avontuur.\nWij zijn eerlijk en delen onze vreugde.\nWij zijn goede kameraden voor elkaar.\nWij willen winnen maar kunnen verliezen.\nWij zijn tot luisteren bereid.\nOnze grootste vreugde is pleziertjes doen.\nWij leven graag in de natuur.\nDe leiding is onze gids.',
+    extraTitle: 'Het (Jong)giverlied',
     extra: (
-      <p style={{ fontSize: '0.92rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
-        Bij de jonggivers werken we in vaste <strong>patrouilles</strong> met een patrouilleleider (PL) en assistent (APL). We leren sjorren met balken en touwen, tochten stappen met kaart en kompas, en koken op ons eigen houtvuur tijdens het weekend.
-      </p>
+      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.92rem', borderLeft: '4px solid var(--color-jonggivers)', lineHeight: 1.6 }}>
+        Een giver is een puber gezond en weltevree en weltevree.<br />
+        Die zingt met volle longen, met alle and&apos;ren mee.<br />
+        En onze leuze klinkt &ldquo;wees vaardig&rdquo;, want het leven is een strijd.<br />
+        En we vinden het leven aardig, evenwel zijn wij bereid.<br />
+        Natuur is onze woning, zo gaan wij hand in hand, in hand, in hand<br />
+        ten strijde voor de koning, voor vorst en vaderland.
+      </div>
     ),
   },
   givers: {
-    wetTitle: 'De Giverbelofte',
-    wet: 'Ik beloof me in te zetten voor onze groep, verantwoordelijkheid te nemen en te bouwen aan een echte vriendengroep waarin iedereen zichzelf kan zijn.',
-    extraTitle: 'Zelfstandigheid & Buitenlands Kamp',
+    wetTitle: 'De Giverwet',
+    wet: 'Een giver is oprecht, op zijn of haar woord kan men vertrouwen.\nEen giver is trouw aan de naaste en zichzelf.\nEen giver is vriendelijk en voorkomend, een broeder of zuster voor elke andere giver.\nEen giver is hoffelijk en weet dat de anderen op hem kunnen rekenen.\nEen giver is hulpvaardig en doet geen half werk.\nEen giver is sober en draagt zorg voor het goed van de ander.\nEen giver leeft met open ogen in de natuur.',
+    extraTitle: 'Het Giverlied & Buitenlands Kamp',
     extra: (
-      <p style={{ fontSize: '0.92rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>
-        De givers (14–17 jaar) krijgen veel vrijheid en verantwoordelijkheid. Ze steken zelf de handen uit de mouwen om hun <strong>buitenlands kamp</strong> te financieren via acties en werkjes, en trekken elke zomer op een onvergetelijk avontuur.
-      </p>
+      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.92rem', borderLeft: '4px solid var(--color-givers)', lineHeight: 1.6 }}>
+        Een giver is een puber gezond en weltevree en weltevree.<br />
+        Die zingt met volle longen, met alle and&apos;ren mee.<br />
+        En onze leuze klinkt &ldquo;wees vaardig&rdquo;, want het leven is een strijd.<br />
+        En we vinden het leven aardig, evenwel zijn wij bereid.<br />
+        Natuur is onze woning, zo gaan wij hand in hand, in hand, in hand<br />
+        ten strijde voor de koning, voor vorst en vaderland.
+      </div>
     ),
   },
 }
@@ -146,7 +165,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                   <i className="fa-solid fa-scroll" style={{ color: 'var(--color-secondary)', marginRight: 10 }}></i>
                   {TAK_TRADITIES[slug].wetTitle}
                 </h3>
-                <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 24, fontStyle: 'italic' }}>
+                <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 24, fontStyle: 'italic', whitespace: 'pre-line' }}>
                   &ldquo;{TAK_TRADITIES[slug].wet}&rdquo;
                 </p>
 
@@ -164,9 +183,21 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
             {/* Leiding */}
             <div className="leaders-section">
               <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>De Leiding</h3>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginTop: 8 }}>
-                Dit team staat elke zondag klaar. Heb je een vraag? Spreek ons gerust aan of stuur een mailtje.
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginTop: 8, marginBottom: 20 }}>
+                Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of stuur een mailtje!
               </p>
+
+              {/* Leidingsfoto */}
+              <div style={{ position: 'relative', width: '100%', height: 320, borderRadius: 'var(--border-radius-md)', overflow: 'hidden', marginBottom: 24, boxShadow: 'var(--shadow-md)', border: '2px solid var(--color-border)' }}>
+                <Image
+                  src={`/images/leiding_${slug}.jpg`}
+                  alt={`Leidingsploeg ${tak.name}`}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  sizes="(max-width: 768px) 100vw, 60vw"
+                />
+              </div>
+
               <div className="leaders-grid">
                 {(tak.leaders ?? []).map((leader: Leader) => {
                   const parts = leader.name.split(' ')
@@ -177,6 +208,11 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                     <div key={leader.name} className="leader-card">
                       <div className="leader-avatar">{initials.toUpperCase()}</div>
                       <h4>{leader.name}</h4>
+                      {leader.totem && (
+                        <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', fontStyle: 'italic', marginTop: 2 }}>
+                          {leader.totem}
+                        </p>
+                      )}
                       <p style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--color-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>
                         {leader.role}
                       </p>
@@ -236,12 +272,17 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               />
             </div>
 
-            {/* Uniform kaart */}
+            {/* Uniform & Webshop kaart */}
             <div className="side-card">
-              <h3>Uniform regels</h3>
-              <p style={{ fontSize: '0.9rem', lineHeight: 1.5, color: 'var(--color-text-dark)' }}>{tak.uniform}</p>
-              <Link href="/shop" className="tak-card-link" style={{ marginTop: 14, display: 'inline-flex' }}>
-                Bestel onze groepsdas &raquo;
+              <h3>Uniform &amp; Webshop</h3>
+              <p style={{ fontSize: '0.9rem', lineHeight: 1.5, color: 'var(--color-text-dark)' }}>
+                {tak.uniform}
+              </p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: 10 }}>
+                Onze officiële <strong>groepsdas</strong>, <strong>T-shirts</strong> en tweedehands kledij bestel je nu eenvoudig via Katrien in onze vernieuwde online webshop!
+              </p>
+              <Link href="/shop" className="btn btn-secondary" style={{ marginTop: 14, width: '100%', justifyContent: 'center' }}>
+                <i className="fa-solid fa-cart-shopping" style={{ marginRight: 6 }}></i> Naar de Webshop &raquo;
               </Link>
             </div>
           </div>
@@ -251,3 +292,4 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
     </>
   )
 }
+
