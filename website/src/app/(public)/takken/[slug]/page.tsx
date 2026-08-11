@@ -262,73 +262,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
         </div>
       </section>
 
-      {/* Speelse Schuine Leidingsfoto OUTSIDE columns (Tussen Hero & Inhoud) */}
-      <section className="container" style={{ marginTop: 40, marginBottom: 10 }}>
-        <div style={{
-          position: 'relative',
-          transform: 'rotate(-1.5deg)',
-          transition: 'transform 0.3s ease',
-          width: '100%',
-        }}>
-          {/* Plakband/Tape Effecten aan de hoeken */}
-          <div style={{
-            position: 'absolute',
-            top: -12,
-            left: 36,
-            transform: 'rotate(-12deg)',
-            width: 110,
-            height: 28,
-            backgroundColor: 'rgba(240, 230, 210, 0.85)',
-            border: '1px solid rgba(200, 190, 170, 0.5)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
-            zIndex: 10,
-            backdropFilter: 'blur(2px)'
-          }} />
-          <div style={{
-            position: 'absolute',
-            top: -12,
-            right: 36,
-            transform: 'rotate(10deg)',
-            width: 110,
-            height: 28,
-            backgroundColor: 'rgba(240, 230, 210, 0.85)',
-            border: '1px solid rgba(200, 190, 170, 0.5)',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
-            zIndex: 10,
-            backdropFilter: 'blur(2px)'
-          }} />
-
-          <div style={{
-            backgroundColor: '#fff',
-            padding: '16px 16px 20px 16px',
-            borderRadius: 12,
-            boxShadow: '0 16px 36px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.05)',
-            border: '1px solid var(--color-border)'
-          }}>
-            <div style={{ position: 'relative', width: '100%', height: 380, borderRadius: 8, overflow: 'hidden' }}>
-              <Image
-                src={`/images/leiding_${slug}.jpg`}
-                alt={`Leidingsploeg ${tak.name}`}
-                fill
-                style={{ objectFit: 'cover' }}
-                sizes="100vw"
-              />
-            </div>
-            <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 8px', flexWrap: 'wrap', gap: 10 }}>
-              <span style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', fontWeight: 700 }}>
-                <i className="fa-solid fa-camera" style={{ color: 'var(--color-secondary)', marginRight: 10 }}></i>
-                Leidingsploeg {tak.name} (Werkjaar 2025-2026)
-              </span>
-              <span style={{ fontSize: '0.9rem', backgroundColor: 'var(--color-bg-linen)', color: 'var(--color-secondary)', padding: '6px 16px', borderRadius: 16, fontWeight: 700 }}>
-                <i className="fa-solid fa-users" style={{ marginRight: 8 }}></i>
-                {leadersToDisplay.length} Leid(st)ers
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section container section--no-top" style={{ paddingTop: 30 }}>
+      <section className="section container section--no-top" style={{ paddingTop: 40 }}>
         <div className="tak-layout">
 
           {/* Linker kolom */}
@@ -369,13 +303,66 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
             )}
 
             {/* Leiding */}
-            <div className="leaders-section">
-              <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>De Leiding</h3>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginTop: 8, marginBottom: 24 }}>
-                Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of bel de leiding!
-              </p>
+            <div className="leaders-section" style={{ position: 'relative', overflow: 'visible' }}>
+              
+              {/* Schuine Foto op de linker bovenhoek van de Leidingkaart (zoals getekend) */}
+              <div style={{
+                position: 'absolute',
+                top: -45,
+                left: -30,
+                zIndex: 10,
+                transform: 'rotate(-12deg)',
+                width: 250,
+                transition: 'transform 0.3s ease',
+              }}>
+                {/* Plakband/Tape Effect */}
+                <div style={{
+                  position: 'absolute',
+                  top: -10,
+                  left: '50%',
+                  transform: 'translateX(-50%) rotate(4deg)',
+                  width: 75,
+                  height: 22,
+                  backgroundColor: 'rgba(240, 230, 210, 0.85)',
+                  border: '1px solid rgba(200, 190, 170, 0.5)',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
+                  zIndex: 12,
+                  backdropFilter: 'blur(2px)'
+                }} />
 
-              <div className="leaders-grid">
+                <div style={{
+                  backgroundColor: '#fff',
+                  padding: '8px 8px 12px 8px',
+                  borderRadius: 8,
+                  boxShadow: '0 14px 30px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08)',
+                  border: '1px solid var(--color-border)'
+                }}>
+                  <div style={{ position: 'relative', width: '100%', height: 160, borderRadius: 5, overflow: 'hidden' }}>
+                    <Image
+                      src={`/images/leiding_${slug}.jpg`}
+                      alt={`Leidingsploeg ${tak.name}`}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      sizes="250px"
+                    />
+                  </div>
+                  <p style={{ margin: '8px 0 2px', textAlign: 'center', fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-primary-dark)' }}>
+                    Leidingsploeg {tak.name}
+                  </p>
+                </div>
+              </div>
+
+              {/* Titel en Introductie met insprong voor de foto */}
+              <div style={{ paddingLeft: 200 }}>
+                <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>
+                  De Leiding
+                </h3>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginTop: 8, marginBottom: 24 }}>
+                  Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of bel de leiding!
+                </p>
+              </div>
+
+              <div className="leaders-grid" style={{ marginTop: 24 }}>
                 {leadersToDisplay.map((leader: Leader) => {
                   const parts = leader.name.split(' ')
                   const initials = parts.length >= 2
