@@ -309,7 +309,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               <div style={{
                 position: 'absolute',
                 top: -35,
-                right: -30,
+                right: -75,
                 zIndex: 10,
                 transform: 'rotate(7deg)',
                 width: 220,
@@ -350,7 +350,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               </div>
 
               {/* Titel en Introductie met ruimte rechts voor de foto */}
-              <div style={{ paddingRight: 180 }}>
+              <div style={{ paddingRight: 100 }}>
                 <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>
                   De Leiding
                 </h3>
