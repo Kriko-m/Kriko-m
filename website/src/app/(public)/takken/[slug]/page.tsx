@@ -274,16 +274,10 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                 {TAK_DETAILS[slug]?.title ?? `Wat is een ${slug}?`}
               </h3>
               {TAK_DETAILS[slug]?.content ?? (
-                <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 20 }}>
+                <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 0 }}>
                   {tak.description}
                 </p>
               )}
-              
-              <h4 style={{ fontSize: '1.3rem', marginTop: 30, marginBottom: 12, color: 'var(--color-primary-dark)' }}>Programma &amp; Vergaderingen</h4>
-              <p style={{ color: 'var(--color-text-muted)' }}>
-                Elke zondagochtend verzamelen we aan onze scoutslokalen op het VP-plein van <strong>9:45 tot 12:30</strong> stipt.
-                Vergeet niet de maandelijkse planner (Kriko Echo) te downloaden om te zien of we een speciale activiteit hebben!
-              </p>
             </div>
 
             {/* Traditie & Belofte */}
