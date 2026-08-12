@@ -9,11 +9,6 @@ const MONTHS_NL: Record<number, string> = {
   7:'juli',8:'augustus',9:'september',10:'oktober',11:'november',12:'december',
 }
 
-const TAK_AGES: Record<string, string> = {
-  kapoenen: '6 – 8 jaar', welpen: '8 – 11 jaar',
-  jonggivers: '11 – 14 jaar', givers: '14 – 17 jaar',
-}
-
 const TAKKEN_KEYS = ['kapoenen', 'welpen', 'jonggivers', 'givers']
 
 export default async function EchosPage() {
@@ -49,7 +44,6 @@ export default async function EchosPage() {
                 <div key={takKey} className={`echo-card echo-card-${takKey}`}>
                   <div className="echo-card-inner">
                     <span className="echo-card-naam">{naam}</span>
-                    <span className="echo-card-leeftijd">{TAK_AGES[takKey]}</span>
                     <div className="echo-card-pdfs">
                       {pdfs.length === 0 ? (
                         <p className="echo-card-empty">Momenteel geen editie beschikbaar.</p>

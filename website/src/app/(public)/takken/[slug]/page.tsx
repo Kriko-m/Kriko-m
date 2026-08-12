@@ -194,6 +194,13 @@ const TAK_DETAILS: Record<string, { title: string; content: React.ReactNode }> =
   },
 }
 
+const TAK_UNIFORM: Record<string, string> = {
+  kapoenen: 'Voor de kapoenen bestaat het uniform enkel uit een groepsdas (bordeaux-beige). Een T-shirt of trui van onze scouts is ook altijd leuk om te dragen! Verder dragen ze vooral comfortabele speelkleren die vuil mogen worden.',
+  welpen: 'Bij de welpen bestaat het uniform uit een groepsdas (bordeaux-beige). Een T-shirt of trui van Kriko-M is zeker een fijne extra! Verder zijn stevige speelkleren die tegen een stootje kunnen ideaal om in het bos te ravotten.',
+  jonggivers: 'Vanaf de jonggivers dragen we het echte scoutsuniform: een groepsdas (bordeaux-beige), een scoutshemd en een groene scoutsbroek of -rok. Een T-shirt of trui van onze scouts is ook altijd leuk voor tijdens de vergaderingen!',
+  givers: 'Bij de givers dragen we het volledige scoutsuniform: de groepsdas (bordeaux-beige), een scoutshemd en een groene scoutsbroek of -rok. Een T-shirt of trui van Kriko-M is daarnaast een toffe extra voor tijdens de activiteiten.',
+}
+
 export async function generateStaticParams() {
   return VALID_TAKKEN.map((slug) => ({ slug }))
 }
@@ -456,10 +463,11 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginBottom: 8 }}>Vragen aan de leiding?</p>
               <CopyButton
                 text={tak.email}
-                className="btn btn-outline"
+                variant="button"
+                className="btn btn-secondary"
                 style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}
               >
-                <i className="fas fa-copy"></i> {tak.email}
+                {tak.email} <i className="fa-regular fa-copy" style={{ fontSize: '0.85em', opacity: 0.7 }}></i>
               </CopyButton>
               <WhatsAppJoinButton
                 takName={tak.name}
@@ -470,15 +478,24 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
             {/* Uniform & Webshop kaart */}
             <div className="side-card">
               <h3>Uniform &amp; Webshop</h3>
-              <p style={{ fontSize: '0.9rem', lineHeight: 1.5, color: 'var(--color-text-dark)' }}>
-                {tak.uniform}
+              <p style={{ fontSize: '0.92rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 16 }}>
+                {TAK_UNIFORM[slug] ?? tak.uniform}
               </p>
-              <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: 10 }}>
-                Onze officiële <strong>groepsdas</strong>, <strong>T-shirts</strong> en tweedehands kledij bestel je nu eenvoudig via Katrien in onze vernieuwde online webshop!
-              </p>
-              <Link href="/shop" className="btn btn-secondary" style={{ marginTop: 14, width: '100%', justifyContent: 'center' }}>
-                <i className="fa-solid fa-cart-shopping" style={{ marginRight: 6 }}></i> Naar de Webshop &raquo;
-              </Link>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <Link href="/shop" className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
+                  <i className="fa-solid fa-cart-shopping" style={{ marginRight: 6 }}></i> Kriko-M Webshop
+                </Link>
+                <a
+                  href="https://www.hopper.be/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  <i className="fa-solid fa-arrow-up-right-from-square" style={{ marginRight: 6 }}></i> Naar Hopper Winkel
+                </a>
+              </div>
             </div>
           </div>
 

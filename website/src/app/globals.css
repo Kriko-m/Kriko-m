@@ -673,16 +673,27 @@ a {
     box-sizing: border-box;
 }
 
+.vic-takken-section--full {
+    max-width: 100%;
+    padding: 8px 48px 72px;
+}
+
+.tak-hero.hero-takken {
+    margin-bottom: 12px;
+}
+
 .vic-takken-section--full .vic-tak-card {
-    min-height: 560px;
+    min-height: 450px;
 }
 
 .vic-takken-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 56px;
-    max-width: 1600px;
+    gap: 48px;
+    width: 100%;
+    max-width: 1280px;
     margin: 0 auto;
+    justify-content: center;
 }
 
 .vic-tak-card {
@@ -735,6 +746,7 @@ a {
     letter-spacing: 0.04em;
     text-transform: uppercase;
     text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    margin-bottom: 24px;
 }
 
 .vic-tak-age {
@@ -5785,10 +5797,11 @@ body.portal-theme .portaal-nav {
     }
 }
 
-@media (max-width: 400px) {
-    .kamp-bijlagen-grid {
-        grid-template-columns: 1fr;
+@media (max-width: 768px) {
+    .info-takken-grid {
+        grid-template-columns: 1fr !important;
     }
 }
+
 
 

@@ -19,14 +19,24 @@ export default function WhatsAppJoinButton({ takName, whatsappUrl }: Props) {
         style={{
           marginTop: 4,
           width: '100%',
-          background: 'transparent',
+          backgroundColor: 'transparent',
           color: '#25D366',
-          border: '1.5px solid #25D366',
+          border: '2px solid #25D366',
+          boxShadow: 'none',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 8,
-          cursor: 'pointer'
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#25D366'
+          e.currentTarget.style.color = '#ffffff'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent'
+          e.currentTarget.style.color = '#25D366'
         }}
       >
         <i className="fab fa-whatsapp" style={{ fontSize: '1.1rem' }}></i> Doe mee op WhatsApp
