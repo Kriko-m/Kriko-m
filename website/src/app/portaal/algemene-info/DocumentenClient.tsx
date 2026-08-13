@@ -190,9 +190,13 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   // Separate Modal states
   const [itemModalOpen, setItemModalOpen] = useState(false)
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
-  const [newCategoryInput, setNewCategoryInput] = useState('')
-  const [userCreatedCategories, setUserCreatedCategories] = useState<string[]>([])
+  const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false)
 
+  const [newCategoryInput, setNewCategoryInput] = useState('')
+  const [editingCategoryName, setEditingCategoryName] = useState('')
+  const [editCategoryInput, setEditCategoryInput] = useState('')
+
+  const [userCreatedCategories, setUserCreatedCategories] = useState<string[]>([])
   const [editingItem, setEditingItem] = useState<PortalResource | null>(null)
 
   // Drag and Drop states
@@ -211,6 +215,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [isDeletingCategory, setIsDeletingCategory] = useState(false)
 
   // Dynamic category list (Presets + active DB categories + user-created categories)
   const allCategoriesList = Array.from(
@@ -254,6 +259,13 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     setCategoryModalOpen(true)
   }
 
+  function openEditCategoryModal(catName: string) {
+    setEditingCategoryName(catName)
+    setEditCategoryInput(catName)
+    setError('')
+    setEditCategoryModalOpen(true)
+  }
+
   function handleCreateCategory(e: React.FormEvent) {
     e.preventDefault()
     if (!newCategoryInput.trim()) return
@@ -266,12 +278,21 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     setNewCategoryInput('')
   }
 
-  async function handleRenameCategory(oldCat: string) {
-    const rawOld = oldCat === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : oldCat
-    const newName = window.prompt(`Voer een nieuwe naam in voor categorie "${oldCat}":`, oldCat)
-    if (!newName || !newName.trim() || newName.trim() === oldCat) return
+  async function handleRenameCategorySubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!editCategoryInput.trim()) return
 
-    const trimmedNew = newName.trim()
+    const rawOld = editingCategoryName === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : editingCategoryName
+    const trimmedNew = editCategoryInput.trim()
+
+    if (trimmedNew === editingCategoryName) {
+      setEditCategoryModalOpen(false)
+      return
+    }
+
+    setSubmitting(true)
+    setError('')
+
     try {
       const res = await fetch('/api/admin/portal-resources/rename-category', {
         method: 'POST',
@@ -282,10 +303,48 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       if (!res.ok) throw new Error(data.error || 'Fout bij hernoemen van categorie')
 
       setResources(prev => prev.map(r => r.category === rawOld ? { ...r, category: trimmedNew } : r))
-      setUserCreatedCategories(prev => prev.map(c => c === oldCat ? trimmedNew : c))
+      setUserCreatedCategories(prev => prev.map(c => c === editingCategoryName ? trimmedNew : c))
+      setEditCategoryModalOpen(false)
       router.refresh()
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Fout bij hernoemen van categorie')
+      setError(err instanceof Error ? err.message : 'Fout bij hernoemen van categorie')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleDeleteCategory() {
+    if (!editingCategoryName) return
+    const count = resources.filter(r => r.category === (editingCategoryName === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : editingCategoryName)).length
+
+    const confirmMsg = count > 0
+      ? `Weet je zeker dat je de categorie "${editingCategoryName}" en alle ${count} items daarin wilt verwijderen?`
+      : `Weet je zeker dat je de categorie "${editingCategoryName}" wilt verwijderen?`
+
+    if (!confirm(confirmMsg)) return
+
+    setIsDeletingCategory(true)
+    setError('')
+    const rawCategory = editingCategoryName === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : editingCategoryName
+
+    try {
+      const res = await fetch('/api/admin/portal-resources/delete-category', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: rawCategory }),
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Fout bij verwijderen van categorie')
+
+      setResources(prev => prev.filter(r => r.category !== rawCategory))
+      setUserCreatedCategories(prev => prev.filter(c => c !== editingCategoryName && c !== rawCategory))
+      setEditCategoryModalOpen(false)
+      router.refresh()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Verwijderen mislukt')
+    } finally {
+      setIsDeletingCategory(false)
     }
   }
 
@@ -677,8 +736,8 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                   <span>{catName}</span>
                   {showEditControls && (
                     <button
-                      onClick={() => handleRenameCategory(catName)}
-                      title="Categorienaam bewerken"
+                      onClick={() => openEditCategoryModal(catName)}
+                      title="Categorie bewerken of verwijderen"
                       style={{
                         background: '#F0ECE4',
                         border: 'none',
@@ -694,7 +753,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                         marginLeft: 4,
                       }}
                     >
-                      <i className="fa-solid fa-pen-to-square"></i> Categorie bewerken
+                      <i className="fa-solid fa-gear"></i> Categorie bewerken
                     </button>
                   )}
                 </h2>
@@ -813,6 +872,83 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 >
                   Categorie Aanmaken
                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Dedicated Modal for Editing / Renaming / Deleting a Category */}
+      {editCategoryModalOpen && (
+        <div className="portaal-modal-overlay">
+          <div className="portaal-modal-card" style={{ maxWidth: 460 }}>
+            <div className="portaal-modal-header">
+              <h3 className="portaal-modal-title">⚙️ Categorie Bewerken</h3>
+              <button className="portaal-modal-close" onClick={() => setEditCategoryModalOpen(false)}>&times;</button>
+            </div>
+
+            <form onSubmit={handleRenameCategorySubmit}>
+              <div className="portaal-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {error && (
+                  <div className="portaal-modal-alert error">
+                    {error}
+                  </div>
+                )}
+
+                <div>
+                  <label className="form-label" htmlFor="edit_cat_input">Categorienaam *</label>
+                  <input
+                    type="text"
+                    id="edit_cat_input"
+                    className="form-control"
+                    value={editCategoryInput}
+                    onChange={(e) => setEditCategoryInput(e.target.value)}
+                    required
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              <div className="portaal-modal-footer" style={{ justifyContent: 'space-between' }}>
+                <button
+                  type="button"
+                  onClick={handleDeleteCategory}
+                  disabled={isDeletingCategory || submitting}
+                  style={{
+                    background: '#FEE2E2',
+                    color: '#991B1B',
+                    border: '1px solid #FCA5A5',
+                    borderRadius: 10,
+                    padding: '8px 14px',
+                    fontSize: '.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <i className="fa-solid fa-trash-can"></i>
+                  <span>{isDeletingCategory ? 'Verwijderen…' : 'Verwijderen'}</span>
+                </button>
+
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    type="button"
+                    className="btn btn-outline"
+                    onClick={() => setEditCategoryModalOpen(false)}
+                    disabled={submitting}
+                  >
+                    Annuleren
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-secondary"
+                    disabled={submitting || !editCategoryInput.trim()}
+                  >
+                    {submitting ? 'Opslaan…' : 'Opslaan'}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
