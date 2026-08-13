@@ -333,7 +333,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                     position: 'relative',
                     display: 'flex',
                     flexDirection: 'column',
-                    justify: 'space-between',
+                    justifyContent: 'space-between',
                     gap: 12,
                     padding: '20px',
                     borderRadius: 16,
