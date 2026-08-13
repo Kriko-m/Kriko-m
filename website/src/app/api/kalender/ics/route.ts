@@ -1,10 +1,8 @@
 import { NextRequest } from 'next/server'
-import { getPublicCalendarEvents, getKampen } from '@/lib/db'
-import { Kamp } from '@/lib/types'
-import { IcsEvent, icsHeader, buildEventVevent, buildKampVevent, toUtcIcsString, foldIcsLine } from '@/lib/ics'
+import { getPublicCalendarEvents } from '@/lib/db'
+import { IcsEvent, icsHeader, buildEventVevent, foldIcsLine } from '@/lib/ics'
 
-// Publieke oudercalender-feed: enkel events met de 'groep'-tag, plus open
-// kampen/weekenden. Interne leiding-events verschijnen hier nooit.
+// Publieke oudercalender-feed: enkel events met de 'groep'-tag.
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -12,26 +10,16 @@ export async function GET(request: NextRequest) {
     const download = searchParams.get('download') === '1' || searchParams.get('download') === 'true'
 
     let calendarEvents = (await getPublicCalendarEvents()) as IcsEvent[]
-    let camps = (await getKampen()) as Kamp[]
 
     if (singleId) {
       calendarEvents = calendarEvents.filter(e => e.id === singleId)
-      camps = []
     }
 
     const lines = icsHeader('Scouts Kriko-M')
-    const nowStr = toUtcIcsString(new Date())
+    const nowStr = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
 
-    // 1. Gewone (publieke) kalender-events
     for (const event of calendarEvents) {
       lines.push(...buildEventVevent(event, nowStr))
-    }
-
-    // 2. Kampen/weekenden (altijd zichtbaar via privélink)
-    if (!singleId) {
-      for (const camp of camps) {
-        lines.push(...buildKampVevent(camp, nowStr))
-      }
     }
 
     lines.push('END:VCALENDAR')

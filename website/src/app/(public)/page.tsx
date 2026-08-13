@@ -124,60 +124,32 @@ export default async function HomePage() {
 
       <hr className="section-divider" />
 
-      {/* 4. Kalender & Info */}
+      {/* 4. Aankomende Activiteiten (Full-width modern grid) */}
       <section className="section container" style={{ marginBottom: 40 }}>
-        <div className="home-grid">
-
-          {/* Kalender */}
-          <div className="calendar-card">
-            <h3 style={{ fontSize: '1.75rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-              <svg style={{ width: 24, height: 24, fill: 'none', stroke: 'var(--color-primary)' }} strokeWidth={2} viewBox="0 0 24 24">
+        <div className="home-events-section">
+          <div className="home-events-header">
+            <h3 className="home-events-title">
+              <svg style={{ width: 28, height: 28, fill: 'none', stroke: 'currentColor' }} strokeWidth={2.2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               Aankomende Activiteiten
             </h3>
-            <div className="cal-upcoming" style={{ marginTop: 0 }}>
-              {events.length === 0 ? (
-                <p className="cal-upcoming-empty">Er zijn momenteel geen geplande groepsactiviteiten.</p>
-              ) : (
-                events.map((event: CalendarEvent) => (
-                  <UpcomingEvent key={event.id} event={event} todayMs={today.getTime()} />
-                ))
-              )}
-            </div>
-            <Link href="/kalender" className="calendar-view-all" style={{ marginTop: 24 }}>Bekijk alle activiteiten &rarr;</Link>
+            <Link href="/kalender" className="btn btn-outline" style={{ fontWeight: 700, padding: '9px 20px', fontSize: '0.92rem' }}>
+              Bekijk volledige kalender &rarr;
+            </Link>
           </div>
 
-          {/* Info zijbalk */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
-            <div className="info-banner">
-              <h3>Kriko Echo planning</h3>
-              <p>Elke maand brengt onze leiding de &ldquo;Kriko Echo&rdquo; uit: het complete programmaboekje met alle activiteiten en informatie per tak. Zorg dat je op de hoogte bent!</p>
-              <Link href="/echos" className="btn btn-primary" style={{ alignSelf: 'flex-start', fontWeight: 700 }}>
-                Download de Echo &raquo;
-              </Link>
+          {events.length === 0 ? (
+            <p className="cal-upcoming-empty" style={{ textAlign: 'center', padding: '30px 0' }}>
+              Er zijn momenteel geen geplande groepsactiviteiten.
+            </p>
+          ) : (
+            <div className="home-events-grid">
+              {events.map((event: CalendarEvent) => (
+                <UpcomingEvent key={event.id} event={event} todayMs={today.getTime()} />
+              ))}
             </div>
-
-            <div style={{ backgroundColor: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', border: '1px solid var(--color-border)', padding: 30 }}>
-              <h4 style={{ marginBottom: 12, fontSize: '1.3rem' }}>Praktische Info</h4>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                {[
-                  { label: 'Wanneer?', text: 'Elke zondag van 9:45 tot 12:30.' },
-                  { label: 'Waar?',    text: 'VP-plein (Industriepark-Noord 33, naast drankenhandel De Vidts), 9100 Sint-Niklaas.' },
-                  { label: 'Scoutswinkel (Hopper)', text: 'Algemene scoutshemden en broeken koop je bij Hopper, groepsdassen en T-shirts koop je in onze webshop.' },
-                ].map(({ label, text }) => (
-                  <li key={label} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                    <span style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '1.2rem', lineHeight: 1 }}>&bull;</span>
-                    <div>
-                      <strong style={{ display: 'block', fontSize: '0.95rem', color: 'var(--color-primary-dark)' }}>{label}</strong>
-                      <span style={{ fontSize: '0.9rem', color: '#4A4A4A' }}>{text}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
+          )}
         </div>
       </section>
     </>

@@ -86,20 +86,6 @@ export const getShopProducts = unstable_cache(
   { revalidate: 300, tags: ['shop-products'] }
 )
 
-export const getKampen = (tak?: string) => {
-  return unstable_cache(
-    async () => {
-      const supabase = createAdminClient()
-      let query = supabase.from('kampen').select('*, kamp_bestanden(*)').order('datum_van', { ascending: true })
-      if (tak) query = query.eq('tak', tak)
-      const { data } = await query
-      return data ?? []
-    },
-    ['kampen-cache', tak ?? 'all'],
-    { revalidate: 300, tags: ['kampen', tak ? `kampen-${tak}` : 'kampen-all'] }
-  )()
-}
-
 export async function getOrders() {
   const supabase = createAdminClient()
   const { data } = await supabase

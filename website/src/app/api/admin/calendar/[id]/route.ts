@@ -32,26 +32,39 @@ export async function PATCH(
 
   const touchesPublic =
     resultingAudience.includes('groep') || (existing.audience ?? []).includes('groep')
-  const touchesEvenement = resultingEvenement || existing.is_evenement
 
-  // Publieke events / evenementen mogen enkel door groepsleiding bewerkt worden.
-  if (touchesPublic || touchesEvenement) {
+  // Publieke events (groep tag) mogen enkel door groepsleiding bewerkt worden.
+  if (touchesPublic) {
     const gl = await requireGroepsleiding()
-    if (!gl) return NextResponse.json({ error: 'Enkel groepsleiding kan publieke events of evenementen bewerken.' }, { status: 403 })
+    if (!gl) return NextResponse.json({ error: 'Enkel groepsleiding kan publieke events bewerken.' }, { status: 403 })
   }
 
   const update: Record<string, unknown> = {}
-  for (const key of ['title', 'date', 'datum_tot', 'time', 'location', 'description', 'facebook_event_url', 'facebook_post_url', 'external_link_url', 'banner_image']) {
+  for (const key of ['title', 'date', 'datum_tot', 'time', 'location', 'description', 'facebook_event_url', 'facebook_post_url', 'external_link_url', 'document_url', 'banner_image', 'icon']) {
     if (key in body) update[key] = body[key] ?? null
   }
   if ('audience' in body) update.audience = [...new Set(resultingAudience)]
   if ('is_evenement' in body) update.is_evenement = resultingEvenement
-  const { data, error } = await admin
+
+  let { data, error } = await admin
     .from('calendar')
     .update(update)
     .eq('id', id)
     .select()
     .single()
+
+  // Indien de 'icon' kolom nog niet bestaat in Supabase, voer de update uit zonder 'icon'
+  if (error && error.message?.includes("'icon'")) {
+    delete update.icon
+    const retry = await admin
+      .from('calendar')
+      .update(update)
+      .eq('id', id)
+      .select()
+      .single()
+    data = retry.data
+    error = retry.error
+  }
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
@@ -69,16 +82,15 @@ export async function DELETE(
   const { id } = await params
   const admin = createAdminClient()
 
-  // Bestaand event ophalen: publieke events / evenementen mogen — net als bij
-  // bewerken — enkel door groepsleiding verwijderd worden.
+  // Bestaand event ophalen: publieke events mogen enkel door groepsleiding verwijderd worden.
   const { data: existing } = await admin
     .from('calendar')
     .select('audience, is_evenement')
     .eq('id', id)
     .single()
-  if (existing && ((existing.audience ?? []).includes('groep') || existing.is_evenement)) {
+  if (existing && (existing.audience ?? []).includes('groep')) {
     const gl = await requireGroepsleiding()
-    if (!gl) return NextResponse.json({ error: 'Enkel groepsleiding kan publieke events of evenementen verwijderen.' }, { status: 403 })
+    if (!gl) return NextResponse.json({ error: 'Enkel groepsleiding kan publieke events verwijderen.' }, { status: 403 })
   }
 
   const { error } = await admin.from('calendar').delete().eq('id', id)

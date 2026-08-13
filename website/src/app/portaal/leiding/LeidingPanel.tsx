@@ -8,6 +8,8 @@ import WebsiteContentEditor from '../_components/WebsiteContentEditor'
 import { AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, PORTAAL_TAKKEN, TAK_KLEUREN } from '@/lib/constants'
 import ConfirmDialog from '../_components/ConfirmDialog'
+import { EventDetailDialog } from '@/components/EventDetailModal'
+import { getEventIcon } from '@/lib/calendar'
 
 const TAKKEN = PORTAAL_TAKKEN as readonly string[]
 const MAANDEN = ['', 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
@@ -65,6 +67,8 @@ export default function LeidingPanel({
   const [echos, setEchos] = useState<Echo[]>(initialEchos)
   const [todos, setTodos] = useState<TodoItem[]>(initialTodos)
   const [showKalenderModal, setShowKalenderModal] = useState(false)
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | undefined>(undefined)
+  const [activeViewEvent, setActiveViewEvent] = useState<CalendarEvent | null>(null)
   const [showTodoOverzicht, setShowTodoOverzicht] = useState(false)
   const [showWebsiteEditor, setShowWebsiteEditor] = useState(false)
 
@@ -593,16 +597,37 @@ export default function LeidingPanel({
                         const d = new Date(ev.date)
                         const day = d.toLocaleDateString('nl-BE', { day: '2-digit' })
                         const month = d.toLocaleDateString('nl-BE', { month: 'short' })
+                        const iconClass = getEventIcon(ev)
                         return (
-                          <div key={ev.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', fontSize: '.82rem' }}>
+                          <div
+                            key={ev.id}
+                            onClick={() => setActiveViewEvent(ev)}
+                            style={{
+                              display: 'flex',
+                              gap: 10,
+                              alignItems: 'center',
+                              fontSize: '.82rem',
+                              padding: '8px 10px',
+                              borderRadius: 10,
+                              background: '#FAFBF9',
+                              border: '1px solid #E0E5E1',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease',
+                            }}
+                            className="action-card-hover"
+                          >
                             <div style={{ background: '#EEF5F1', borderRadius: 8, padding: '4px 8px', textAlign: 'center', minWidth: 40, flexShrink: 0 }}>
                               <div style={{ fontWeight: 800, color: '#1A3D2A', lineHeight: 1 }}>{day}</div>
                               <div style={{ fontSize: '.62rem', opacity: 0.8, color: '#1A3D2A' }}>{month}</div>
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontWeight: 700, color: '#1A3D2A', wordBreak: 'break-word', whiteSpace: 'normal' }}>{ev.is_evenement ? '⭐ ' : ''}{ev.title}</div>
-                              <div style={{ fontSize: '.72rem', color: '#6A8A75', wordBreak: 'break-word', whiteSpace: 'normal' }}>{ev.time || 'Hele dag'}{ev.location ? ` · 📍 ${ev.location}` : ''}</div>
+                              <div style={{ fontWeight: 700, color: '#1A3D2A', wordBreak: 'break-word', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                {iconClass ? <i className={`fa-solid ${iconClass}`} style={{ fontSize: '.78rem', color: '#1A3D2A' }}></i> : null}
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ev.title}</span>
+                              </div>
+                              <div style={{ fontSize: '.72rem', color: '#6A8A75' }}>{ev.time || 'Hele dag'}{ev.location ? ` · 📍 ${ev.location}` : ''}</div>
                             </div>
+                            <i className="fa-solid fa-chevron-right" style={{ fontSize: '.75rem', color: '#1A3D2A', opacity: 0.6 }}></i>
                           </div>
                         )
                       })
@@ -1094,10 +1119,26 @@ export default function LeidingPanel({
         <KalenderActiviteitModal
           canPublish={isGroepsleiding}
           initialAudience={AUDIENCE_TAGS.includes(activeTak as AudienceTag) ? [activeTak as AudienceTag] : []}
-          onClose={() => setShowKalenderModal(false)}
+          editEvent={editingEvent}
+          onClose={() => {
+            setShowKalenderModal(false)
+            setEditingEvent(undefined)
+          }}
           onSaved={() => {
             setShowKalenderModal(false)
-            showFlash('Activiteit toegevoegd aan kalender!')
+            setEditingEvent(undefined)
+            showFlash(editingEvent ? 'Activiteit bijgewerkt!' : 'Activiteit toegevoegd aan kalender!')
+          }}
+        />
+      )}
+      {activeViewEvent && (
+        <EventDetailDialog
+          event={activeViewEvent}
+          todayMs={new Date().getTime()}
+          onClose={() => setActiveViewEvent(null)}
+          onEdit={() => {
+            setEditingEvent(activeViewEvent)
+            setShowKalenderModal(true)
           }}
         />
       )}

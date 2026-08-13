@@ -2,12 +2,13 @@
 import { useState } from 'react'
 import { CalendarEvent, AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
+import { PRESET_EVENT_ICONS } from '@/lib/calendar'
 
 type FormState = {
   title: string; date: string; datum_tot: string; timeStart: string; timeEnd: string
   location: string; description: string; audience: AudienceTag[]
-  is_evenement: boolean; banner_image: string
-  facebook_event_url: string; facebook_post_url: string; external_link_url: string
+  is_evenement: boolean; banner_image: string; icon: string
+  facebook_event_url: string; facebook_post_url: string; external_link_url: string; document_url: string
 }
 
 function parseTime(time: string) {
@@ -19,8 +20,8 @@ function emptyForm(preAudience: AudienceTag[]): FormState {
   return {
     title: '', date: '', datum_tot: '', timeStart: '', timeEnd: '',
     location: '', description: '', audience: preAudience,
-    is_evenement: false, banner_image: '',
-    facebook_event_url: '', facebook_post_url: '', external_link_url: '',
+    is_evenement: false, banner_image: '', icon: '',
+    facebook_event_url: '', facebook_post_url: '', external_link_url: '', document_url: '',
   }
 }
 
@@ -39,13 +40,17 @@ export default function KalenderActiviteitModal({
   onSaved: (event: CalendarEvent, isNew: boolean) => void
   onDeleted?: (id: string) => void
 }) {
+  const [activeTab, setActiveTab] = useState<'basis' | 'opties'>('basis')
   const [form, setForm] = useState<FormState>(() =>
     editEvent
-      ? { title: editEvent.title, date: editEvent.date, datum_tot: editEvent.datum_tot ?? '',
+      ? {
+          title: editEvent.title, date: editEvent.date, datum_tot: editEvent.datum_tot ?? '',
           location: editEvent.location, description: editEvent.description, audience: editEvent.audience,
-          is_evenement: editEvent.is_evenement, banner_image: editEvent.banner_image ?? '',
-          facebook_event_url: editEvent.facebook_event_url ?? '', facebook_post_url: editEvent.facebook_post_url ?? '', external_link_url: editEvent.external_link_url ?? '',
-          ...parseTime(editEvent.time) }
+          is_evenement: editEvent.is_evenement, banner_image: editEvent.banner_image ?? '', icon: editEvent.icon ?? '',
+          facebook_event_url: editEvent.facebook_event_url ?? '', facebook_post_url: editEvent.facebook_post_url ?? '',
+          external_link_url: editEvent.external_link_url ?? '', document_url: editEvent.document_url ?? '',
+          ...parseTime(editEvent.time)
+        }
       : emptyForm(initialAudience)
   )
   const [loading, setLoading] = useState(false)
@@ -53,6 +58,7 @@ export default function KalenderActiviteitModal({
   const [validationErrors, setValidationErrors] = useState<Set<string>>(new Set())
   const [facebookLinkOpen, setFacebookLinkOpen] = useState(!!(editEvent?.facebook_event_url || editEvent?.facebook_post_url))
   const [externalLinkOpen, setExternalLinkOpen] = useState(!!(editEvent?.external_link_url))
+  const [documentOpen, setDocumentOpen] = useState(!!(editEvent?.document_url))
 
   const selectableTags: AudienceTag[] = canPublish ? [...AUDIENCE_TAGS] : AUDIENCE_TAGS.filter(t => t !== 'groep')
 
@@ -63,17 +69,31 @@ export default function KalenderActiviteitModal({
     })
   }
 
-  async function uploadMedia(file: File): Promise<string | null> {
-    const fd = new FormData(); fd.append('file', file); fd.append('type', 'evenement-banner')
+  async function uploadMedia(file: File, type: 'evenement-banner' | 'evenement-document'): Promise<string | null> {
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('type', type)
     const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-    if (!res.ok) { setFlash('Fout bij uploaden van afbeelding.'); return null }
+    if (!res.ok) { setFlash('Fout bij uploaden van bestand.'); return null }
     return ((await res.json()).url) as string
   }
 
   async function handleBannerChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; if (!file) return
-    setLoading(true); const url = await uploadMedia(file)
-    if (url) setForm(p => ({ ...p, banner_image: url })); setLoading(false)
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLoading(true)
+    const url = await uploadMedia(file, 'evenement-banner')
+    if (url) setForm(p => ({ ...p, banner_image: url }))
+    setLoading(false)
+  }
+
+  async function handleDocumentChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLoading(true)
+    const url = await uploadMedia(file, 'evenement-document')
+    if (url) setForm(p => ({ ...p, document_url: url }))
+    setLoading(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -85,7 +105,8 @@ export default function KalenderActiviteitModal({
     if (form.audience.length === 0) errors.add('audience')
     if (errors.size > 0) {
       setValidationErrors(errors)
-      setTimeout(() => setValidationErrors(new Set()), 3000)
+      setActiveTab('basis') // Switch to basis tab to show validation error
+      setTimeout(() => setValidationErrors(new Set()), 3500)
       return
     }
     setValidationErrors(new Set())
@@ -96,9 +117,11 @@ export default function KalenderActiviteitModal({
       location: form.location, description: form.description,
       audience: form.audience, is_evenement: form.is_evenement,
       banner_image: form.banner_image || null,
+      icon: form.icon || null,
       facebook_event_url: form.facebook_event_url || null,
       facebook_post_url: form.facebook_post_url || null,
       external_link_url: form.external_link_url || null,
+      document_url: form.document_url || null,
     }
     const isNew = !editEvent
     const url = editEvent ? `/api/admin/calendar/${editEvent.id}` : '/api/admin/calendar'
@@ -122,184 +145,302 @@ export default function KalenderActiviteitModal({
     setLoading(false)
   }
 
-  const inputStyle = { width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' as const }
-  const labelStyle = { display: 'block', fontSize: '.8rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 5 }
+  const inputStyle = {
+    width: '100%', padding: '10px 14px', border: '1.5px solid #C2D9C9', borderRadius: 10,
+    fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' as const, background: '#FFF'
+  }
+  const labelStyle = { display: 'block', fontSize: '.82rem', fontWeight: 800, color: '#1A3D2A', marginBottom: 6 }
   const errorOutline = (f: string): React.CSSProperties => validationErrors.has(f)
-    ? { boxShadow: '0 0 0 2px #e74c3c, 0 0 10px rgba(231,76,60,.35)', borderRadius: 8 }
+    ? { boxShadow: '0 0 0 2px #e74c3c, 0 0 10px rgba(231,76,60,.35)', borderRadius: 10 }
     : {}
 
   return (
     <>
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 999 }} onClick={onClose} />
-      <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, pointerEvents: 'none' }}>
-        <div style={{ pointerEvents: 'auto', width: '95%', maxWidth: 800, maxHeight: '92vh', overflow: 'auto', background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,20,15,0.45)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)', zIndex: 1200 }} onClick={onClose} />
+      <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1201, padding: 16, pointerEvents: 'none' }}>
+        <div style={{ pointerEvents: 'auto', width: '95%', maxWidth: 720, maxHeight: '90vh', overflow: 'auto', background: '#fff', borderRadius: 20, padding: 32, boxShadow: '0 24px 60px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 800, fontSize: '1.3rem' }}>
-              {editEvent ? 'Activiteit bewerken' : 'Nieuwe activiteit'}
-            </h3>
-            <div style={{ display: 'flex', gap: 8 }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12, borderBottom: '1px solid #E8F0EA' }}>
+            <div>
+              <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.3rem', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                {editEvent ? '✏️ Activiteit bewerken' : '➕ Nieuwe activiteit'}
+              </h3>
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               {editEvent && (
                 <button type="button" onClick={handleDelete}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', background: 'none', border: '1.5px solid #e0c0c4', borderRadius: 8, color: '#B23A4D', fontSize: '.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
-                  <i className="fas fa-trash" style={{ fontSize: '.72rem' }}></i> Verwijderen
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#FFF5F5', border: '1.5px solid #E0C0C4', borderRadius: 10, color: '#B23A4D', fontSize: '.8rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                  <i className="fas fa-trash" style={{ fontSize: '.75rem' }}></i> Verwijderen
                 </button>
               )}
               <button type="button" onClick={onClose}
-                style={{ width: 32, height: 32, border: '1.5px solid #C2D9C9', borderRadius: 8, background: 'none', color: '#6A8A75', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                style={{ width: 34, height: 34, border: '1.5px solid #C2D9C9', borderRadius: '50%', background: '#F8FAF9', color: '#6A8A75', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 ✕
               </button>
             </div>
           </div>
 
+          {/* Navigation Tabs */}
+          <div style={{ display: 'flex', gap: 8, borderBottom: '2px solid #E8F0EA', paddingBottom: 8 }}>
+            <button
+              type="button"
+              onClick={() => setActiveTab('basis')}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 10,
+                border: 'none',
+                background: activeTab === 'basis' ? '#1A3D2A' : '#EEF5F1',
+                color: activeTab === 'basis' ? '#fff' : '#1A3D2A',
+                fontWeight: 800,
+                fontSize: '.88rem',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              📋 Basisgegevens
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('opties')}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 10,
+                border: 'none',
+                background: activeTab === 'opties' ? '#1A3D2A' : '#EEF5F1',
+                color: activeTab === 'opties' ? '#fff' : '#1A3D2A',
+                fontWeight: 800,
+                fontSize: '.88rem',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              ⚙️ Opties & Links
+              {(form.icon || form.is_evenement || form.external_link_url || form.document_url || form.facebook_event_url) ? (
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#C9963A', display: 'inline-block' }} />
+              ) : null}
+            </button>
+          </div>
+
           {flash && (
-            <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 14px', borderRadius: 8, marginBottom: 14, fontWeight: 600, fontSize: '.9rem' }}>
+            <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 14px', borderRadius: 10, fontWeight: 600, fontSize: '.9rem' }}>
               {flash}
             </div>
           )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-            {/* Audience tags */}
-            <div style={{ ...errorOutline('audience'), borderRadius: 8, padding: validationErrors.has('audience') ? 12 : 0 }}>
-              <label style={labelStyle}>Voor wie? (tags)</label>
-              <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
-                {selectableTags.map(tag => {
-                  const on = form.audience.includes(tag)
-                  return (
-                    <button key={tag} type="button" onClick={() => toggleAudience(tag)}
-                      style={{ padding: '4px 12px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.75rem', fontWeight: 700,
-                        background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag] }}>
-                      {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
-                    </button>
-                  )
-                })}
-              </div>
-              {form.audience.includes('groep') && (
-                <span style={{ display: 'block', marginTop: 5, fontSize: '.73rem', color: '#9A6B12', fontWeight: 600 }}>
-                  ⚠️ Met de tag &ldquo;Groep&rdquo; wordt dit zichtbaar op de publieke website.
-                </span>
-              )}
-            </div>
-
-            {/* Title */}
-            <div>
-              <label style={labelStyle}>Titel</label>
-              <input style={{ ...inputStyle, ...errorOutline('title') }} value={form.title}
-                onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
-                onBlur={() => setForm(p => ({ ...p, title: p.title.trim() }))}
-                placeholder="bijv. Groeps-BBQ" />
-            </div>
-
-            {/* Time & Dates */}
-            <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.5fr', gap: 16 }}>
-              <div>
-                <label style={labelStyle}>Tijdstip</label>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center', ...errorOutline('time') }}>
-                  <input type="time" style={{ ...inputStyle, flex: 1, border: 'none' }} value={form.timeStart} onChange={e => setForm(p => ({ ...p, timeStart: e.target.value }))} />
-                  <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
-                  <input type="time" style={{ ...inputStyle, flex: 1, border: 'none' }} value={form.timeEnd} onChange={e => setForm(p => ({ ...p, timeEnd: e.target.value }))} />
-                </div>
-              </div>
-              <div>
-                <label style={labelStyle}>Datum</label>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <div style={{ flex: 1 }}>
-                    <input type="date" style={{ ...inputStyle, width: '100%', ...errorOutline('date') }} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
+            {/* TAB 1: BASISGEGEVENS */}
+            {activeTab === 'basis' && (
+              <>
+                {/* Audience tags */}
+                <div style={{ ...errorOutline('audience'), borderRadius: 10 }}>
+                  <label style={labelStyle}>Voor wie is dit bedoeld? (tags) *</label>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {selectableTags.map(tag => {
+                      const on = form.audience.includes(tag)
+                      return (
+                        <button key={tag} type="button" onClick={() => toggleAudience(tag)}
+                          style={{ padding: '6px 14px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.8rem', fontWeight: 700,
+                            background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag], transition: 'all 0.15s ease' }}>
+                          {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
+                        </button>
+                      )
+                    })}
                   </div>
-                  {form.datum_tot ? (
-                    <>
-                      <span style={{ color: '#c9c9c9', fontWeight: 400, fontSize: '.75rem', flexShrink: 0 }}>–</span>
-                      <div style={{ flex: 1 }}>
-                        <input type="date" style={{ ...inputStyle, width: '100%', background: '#fafaf8', color: '#999', fontSize: '.85rem' }} value={form.datum_tot} onChange={e => setForm(p => ({ ...p, datum_tot: e.target.value }))} />
-                      </div>
-                      <button type="button" onClick={() => setForm(p => ({ ...p, datum_tot: '' }))}
-                        style={{ flexShrink: 0, background: 'none', border: 'none', color: '#ddd', cursor: 'pointer', fontSize: '.9rem', lineHeight: 1, padding: '0 2px' }}>×</button>
-                    </>
-                  ) : (
-                    <button type="button" onClick={() => setForm(p => ({ ...p, datum_tot: p.date || new Date().toISOString().split('T')[0] }))}
-                      style={{ flexShrink: 0, background: 'none', border: 'none', color: '#ccc', cursor: 'pointer', fontSize: '.7rem', fontWeight: 500, padding: '5px 6px', whiteSpace: 'nowrap', textDecoration: 'underline' }}>
-                      + einddatum
-                    </button>
-                  )}
                 </div>
-              </div>
-            </div>
 
-            {/* Location & Description */}
-            <div>
-              <label style={labelStyle}>Locatie</label>
-              <input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))}
-                onBlur={() => setForm(p => ({ ...p, location: p.location.trim() }))} placeholder="bijv. Scoutslokalen" />
-            </div>
-            <div>
-              <label style={labelStyle}>Omschrijving</label>
-              <textarea style={inputStyle} rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-                onBlur={() => setForm(p => ({ ...p, description: p.description.trim() }))} placeholder="Korte uitleg..." />
-            </div>
+                {/* Title */}
+                <div>
+                  <label style={labelStyle}>Titel van activiteit *</label>
+                  <input style={{ ...inputStyle, ...errorOutline('title') }} value={form.title}
+                    onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
+                    onBlur={() => setForm(p => ({ ...p, title: p.title.trim() }))}
+                    placeholder="bijv. Vergadering of Groeps-BBQ" />
+                </div>
 
-            {/* Optional toggles */}
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem' }}>
-                <input type="checkbox" checked={facebookLinkOpen} onChange={e => setFacebookLinkOpen(e.target.checked)} style={{ cursor: 'pointer' }} />
-                Facebook evenement?
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem' }}>
-                <input type="checkbox" checked={externalLinkOpen} onChange={e => setExternalLinkOpen(e.target.checked)} style={{ cursor: 'pointer' }} />
-                Externe link?
-              </label>
-              {canPublish && (
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 600, color: '#1A3D2A', fontSize: '.85rem' }}>
-                  <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} style={{ cursor: 'pointer' }} />
-                  ⭐ Uitlichten op kalender (ster + highlight)
-                </label>
-              )}
-            </div>
+                {/* Date & Time */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 16 }}>
+                  <div>
+                    <label style={labelStyle}>Tijdstip (van – tot)</label>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', ...errorOutline('time') }}>
+                      <input type="time" style={{ ...inputStyle, flex: 1 }} value={form.timeStart} onChange={e => setForm(p => ({ ...p, timeStart: e.target.value }))} />
+                      <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
+                      <input type="time" style={{ ...inputStyle, flex: 1 }} value={form.timeEnd} onChange={e => setForm(p => ({ ...p, timeEnd: e.target.value }))} />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Datum *</label>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <div style={{ flex: 1 }}>
+                        <input type="date" style={{ ...inputStyle, width: '100%', ...errorOutline('date') }} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
+                      </div>
+                      {form.datum_tot ? (
+                        <>
+                          <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
+                          <div style={{ flex: 1 }}>
+                            <input type="date" style={{ ...inputStyle, width: '100%', background: '#fafaf8', fontSize: '.85rem' }} value={form.datum_tot} onChange={e => setForm(p => ({ ...p, datum_tot: e.target.value }))} />
+                          </div>
+                          <button type="button" onClick={() => setForm(p => ({ ...p, datum_tot: '' }))} title="Einddatum verwijderen"
+                            style={{ flexShrink: 0, background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '1rem', padding: '0 4px' }}>×</button>
+                        </>
+                      ) : (
+                        <button type="button" onClick={() => setForm(p => ({ ...p, datum_tot: p.date || new Date().toISOString().split('T')[0] }))}
+                          style={{ flexShrink: 0, background: 'none', border: 'none', color: '#1A3D2A', cursor: 'pointer', fontSize: '.75rem', fontWeight: 700, padding: '5px 8px', whiteSpace: 'nowrap', textDecoration: 'underline' }}>
+                          + meerdaags
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-            {canPublish && form.audience.includes('groep') && (
-              <div style={{ padding: '12px 14px', background: '#fdf9f0', border: '1.5px solid #E2C58D', borderRadius: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <span style={{ fontSize: '.78rem', fontWeight: 700, color: '#9A6B12' }}>📸 Bannerfoto (optioneel — verschijnt bovenaan de evenementenkaart)</span>
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleBannerChange} style={{ fontSize: '.8rem' }} />
-                {form.banner_image && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={form.banner_image} alt="banner" style={{ width: 120, height: 56, objectFit: 'cover', borderRadius: 6 }} />
-                    <button type="button" onClick={() => setForm(p => ({ ...p, banner_image: '' }))}
-                      style={{ fontSize: '.75rem', color: '#B23A4D', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
-                      ✕ Verwijderen
-                    </button>
+                {/* Location & Description */}
+                <div>
+                  <label style={labelStyle}>Locatie</label>
+                  <input style={inputStyle} value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))}
+                    onBlur={() => setForm(p => ({ ...p, location: p.location.trim() }))} placeholder="bijv. Scoutslokalen Kriko-M" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Omschrijving & Praktische info</label>
+                  <textarea style={inputStyle} rows={3} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
+                    onBlur={() => setForm(p => ({ ...p, description: p.description.trim() }))} placeholder="Korte tekst met praktische informatie..." />
+                </div>
+              </>
+            )}
+
+            {/* TAB 2: OPTIES & LINKS */}
+            {activeTab === 'opties' && (
+              <>
+                {/* Belangrijk checkbox */}
+                <div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#8A6310', fontSize: '.88rem', background: '#FFF9E6', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #EAD8AB' }}>
+                    <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+                    Markeer als belangrijk evenement (subtiele gele datum)
+                  </label>
+                </div>
+
+                {/* Optional Icon Selector */}
+                <div>
+                  <label style={labelStyle}>Icoontje kiezen (optioneel)</label>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    {PRESET_EVENT_ICONS.map((ic) => {
+                      const selected = (form.icon || '') === ic.id
+                      return (
+                        <button
+                          key={ic.id || 'none'}
+                          type="button"
+                          onClick={() => setForm((p) => ({ ...p, icon: ic.id }))}
+                          title={ic.label}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            padding: '5px 12px',
+                            borderRadius: 8,
+                            border: selected ? '1.5px solid #1A3D2A' : '1.5px solid #E0E5E1',
+                            background: selected ? '#1A3D2A' : '#FAFBF9',
+                            color: selected ? '#FFF' : '#333',
+                            fontSize: '.8rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease',
+                          }}
+                        >
+                          {ic.id ? <i className={`fa-solid ${ic.id}`}></i> : '🚫'} {ic.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Option Toggles */}
+                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#1A3D2A', fontSize: '.85rem' }}>
+                    <input type="checkbox" checked={externalLinkOpen} onChange={e => setExternalLinkOpen(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+                    📝 Inschrijflink / Formulier?
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#1A3D2A', fontSize: '.85rem' }}>
+                    <input type="checkbox" checked={documentOpen} onChange={e => setDocumentOpen(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+                    📄 Uitnodiging (Flyer / PDF)?
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#1A3D2A', fontSize: '.85rem' }}>
+                    <input type="checkbox" checked={facebookLinkOpen} onChange={e => setFacebookLinkOpen(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+                    Facebook link?
+                  </label>
+                </div>
+
+                {/* Inschrijflink */}
+                {externalLinkOpen && (
+                  <div style={{ padding: '12px 16px', background: '#F0F5FF', border: '1.5px solid #C0D4FF', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <label style={labelStyle}>Invulformulier / Inschrijflink (URL)</label>
+                    <input style={inputStyle} value={form.external_link_url} onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))} placeholder="https://forms.google.com/... of inschrijf-URL" />
                   </div>
                 )}
-              </div>
+
+                {/* Uitnodiging PDF */}
+                {documentOpen && (
+                  <div style={{ padding: '12px 16px', background: '#FCF0F0', border: '1.5px solid #F2C0C0', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <label style={labelStyle}>Uitnodiging uploaden (PDF, JPG, PNG)</label>
+                    <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocumentChange} style={{ fontSize: '.8rem' }} />
+                    {form.document_url && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+                        <a href={form.document_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.82rem', color: '#1A3D2A', fontWeight: 700, textDecoration: 'underline' }}>
+                          📄 Huidige uitnodiging bekijken
+                        </a>
+                        <button type="button" onClick={() => setForm(p => ({ ...p, document_url: '' }))}
+                          style={{ fontSize: '.78rem', color: '#B23A4D', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>
+                          ✕ Verwijderen
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Facebook links */}
+                {facebookLinkOpen && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 16px', background: '#F0F4FA', border: '1.5px solid #D0DCF0', borderRadius: 12 }}>
+                    <div>
+                      <label style={labelStyle}>Facebook evenement link</label>
+                      <input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} placeholder="https://facebook.com/events/..." />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Facebook post URL (voor embed)</label>
+                      <input style={inputStyle} value={form.facebook_post_url} onChange={e => setForm(p => ({ ...p, facebook_post_url: e.target.value }))} placeholder="https://www.facebook.com/ScoutsKrikoM/posts/..." />
+                    </div>
+                  </div>
+                )}
+
+                {/* Cover foto voor publieke kalender */}
+                {canPublish && form.audience.includes('groep') && (
+                  <div style={{ padding: '12px 16px', background: '#FDF9F0', border: '1.5px solid #E2C58D', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <span style={{ fontSize: '.8rem', fontWeight: 800, color: '#9A6B12' }}>📸 Coverfoto voor publieke kalender (optioneel)</span>
+                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleBannerChange} style={{ fontSize: '.8rem' }} />
+                    {form.banner_image && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={form.banner_image} alt="cover" style={{ width: 120, height: 50, objectFit: 'cover', borderRadius: 8 }} />
+                        <button type="button" onClick={() => setForm(p => ({ ...p, banner_image: '' }))}
+                          style={{ fontSize: '.78rem', color: '#B23A4D', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>
+                          ✕ Verwijderen
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             )}
 
-            {facebookLinkOpen && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div>
-                  <label style={labelStyle}>Facebook evenement link</label>
-                  <input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} placeholder="https://facebook.com/events/..." />
-                </div>
-                <div>
-                  <label style={labelStyle}>Facebook post URL (voor embed)</label>
-                  <input style={inputStyle} value={form.facebook_post_url} onChange={e => setForm(p => ({ ...p, facebook_post_url: e.target.value }))} placeholder="https://www.facebook.com/ScoutsKrikoM/posts/..." />
-                </div>
-              </div>
-            )}
-
-            {externalLinkOpen && (
-              <div>
-                <label style={labelStyle}>Externe link</label>
-                <input style={inputStyle} value={form.external_link_url} onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))} placeholder="https://example.com/form" />
-              </div>
-            )}
-
-            <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+            {/* Modal Actions */}
+            <div style={{ display: 'flex', gap: 12, paddingTop: 10, borderTop: '1px solid #E8F0EA' }}>
               <button type="submit" disabled={loading}
-                style={{ padding: '10px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 700, cursor: 'pointer', fontSize: '.9rem', flex: 1 }}>
-                {loading ? 'Bezig…' : editEvent ? 'Opslaan' : 'Toevoegen'}
+                style={{ padding: '12px 24px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 800, cursor: 'pointer', fontSize: '.95rem', flex: 1, boxShadow: '0 4px 12px rgba(26,61,42,0.2)' }}>
+                {loading ? 'Bezig…' : editEvent ? '💾 Wijzigingen Opslaan' : '➕ Activiteit Opslaan'}
               </button>
               <button type="button" onClick={onClose}
-                style={{ padding: '10px 18px', background: '#f5f5f5', border: 'none', borderRadius: 8, fontFamily: 'inherit', fontWeight: 600, color: '#6A8A75', cursor: 'pointer', fontSize: '.9rem' }}>
+                style={{ padding: '12px 24px', background: '#F4F7F5', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, color: '#6A8A75', cursor: 'pointer', fontSize: '.95rem' }}>
                 Annuleren
               </button>
             </div>

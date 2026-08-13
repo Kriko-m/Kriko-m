@@ -1,11 +1,10 @@
 import { NextRequest } from 'next/server'
-import { getAllCalendarEvents, getKampen, getLeidingIcsToken } from '@/lib/db'
-import { CalendarEvent, Kamp } from '@/lib/types'
+import { getAllCalendarEvents, getLeidingIcsToken } from '@/lib/db'
+import { CalendarEvent } from '@/lib/types'
 import { AUDIENCE_NAMEN } from '@/lib/constants'
-import { IcsEvent, icsHeader, buildEventVevent, buildKampVevent, toUtcIcsString, foldIcsLine } from '@/lib/ics'
+import { IcsEvent, icsHeader, buildEventVevent, foldIcsLine } from '@/lib/ics'
 
-// Private leiding-feed: ALLE events + ALLE kampen. Beveiligd met een geheim
-// token in de URL (agenda-apps pollen anoniem, dus geen login-cookie mogelijk).
+// Private leiding-feed: ALLE events. Beveiligd met een geheim token in de URL.
 export async function GET(
   request: NextRequest,
   props: { params: Promise<{ token: string }> }
@@ -21,21 +20,14 @@ export async function GET(
     }
 
     const events = (await getAllCalendarEvents()) as CalendarEvent[]
-    const camps = (await getKampen()) as Kamp[]
 
     const lines = icsHeader('Scouts Kriko-M — Leiding')
-    const nowStr = toUtcIcsString(new Date())
+    const nowStr = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
 
     for (const event of events) {
-      // Prefix met de audience-tags zodat leiding in hun agenda meteen ziet
-      // voor wie het bedoeld is.
       const tags = (event.audience ?? []).map(a => AUDIENCE_NAMEN[a] ?? a)
       const prefix = tags.length ? `[${tags.join(', ')}] ` : ''
       lines.push(...buildEventVevent(event as IcsEvent, nowStr, prefix))
-    }
-
-    for (const camp of camps) {
-      lines.push(...buildKampVevent(camp, nowStr))
     }
 
     lines.push('END:VCALENDAR')

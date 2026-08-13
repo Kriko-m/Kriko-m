@@ -42,6 +42,13 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
+  const handleLogoClick = (e: React.MouseEvent) => {
+    if (pathname === '/') {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
   return (
     <>
       <LoadingScreen />
@@ -65,7 +72,7 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
       <header className="site-header">
         <nav className={`mainnav${menuOpen ? ' nav-open' : ''}`} id="mainnav">
           <div className="mainnav-inner">
-            <Link href="/" className="nav-logo">
+            <Link href="/" className="nav-logo" onClick={handleLogoClick}>
               <Image src="/images/logo-finaal.png" alt="Kriko-M logo" width={140} height={140} priority />
             </Link>
             <ul className="nav-links">

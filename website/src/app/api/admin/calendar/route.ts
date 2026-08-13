@@ -8,17 +8,15 @@ import { revalidateTag } from 'next/cache'
 const VALID_AUDIENCE = new Set<string>(AUDIENCE_TAGS)
 
 // Schoont en valideert de audience-tags en past de rechten toe. Enkel
-// groepsleiding mag publiceren naar 'groep' (publiek) of evenementen aanmaken.
-function sanitizeAudience(raw: unknown, isEvenement: boolean, isGroepsleiding: boolean) {
+// groepsleiding mag publiceren naar 'groep' (publiek).
+function sanitizeAudience(raw: unknown, isGroepsleiding: boolean) {
   let audience = Array.isArray(raw) ? raw.filter(a => VALID_AUDIENCE.has(a)) : []
-  let evenement = !!isEvenement
   if (!isGroepsleiding) {
     audience = audience.filter(a => a !== 'groep') // gewone leiding mag niet publiek publiceren
-    evenement = false
   }
   // Dedupe
   audience = [...new Set(audience)]
-  return { audience, evenement }
+  return audience
 }
 
 export async function POST(req: NextRequest) {
@@ -27,39 +25,59 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json()
   const wantsPublic = Array.isArray(body.audience) && body.audience.includes('groep')
-  const wantsEvenement = !!body.is_evenement
 
-  // Publiek publiceren of evenement aanmaken = enkel groepsleiding.
+  // Publiek publiceren naar ouderagenda = enkel groepsleiding.
   let isGroepsleiding = false
-  if (wantsPublic || wantsEvenement) {
+  if (wantsPublic) {
     const gl = await requireGroepsleiding()
-    if (!gl) return NextResponse.json({ error: 'Enkel groepsleiding kan publiceren naar de oudercalender of evenementen aanmaken.' }, { status: 403 })
+    if (!gl) return NextResponse.json({ error: 'Enkel groepsleiding kan publiceren naar de ouderagenda.' }, { status: 403 })
     isGroepsleiding = true
   }
 
-  const { audience, evenement } = sanitizeAudience(body.audience, wantsEvenement, isGroepsleiding)
+  const audience = sanitizeAudience(body.audience, isGroepsleiding)
+  const evenement = !!body.is_evenement
 
   const werkjaar = await getActiveWerkjaar()
   const admin = createAdminClient()
-  const { data, error } = await admin
+
+  const insertData: Record<string, unknown> = {
+    title: body.title,
+    date: body.date,
+    datum_tot: body.datum_tot || null,
+    time: body.time || '',
+    location: body.location || '',
+    description: body.description || '',
+    facebook_event_url: body.facebook_event_url || null,
+    facebook_post_url: body.facebook_post_url || null,
+    external_link_url: body.external_link_url || null,
+    document_url: body.document_url || null,
+    banner_image: body.banner_image || null,
+    audience,
+    is_evenement: evenement,
+    werkjaar,
+  }
+
+  if (body.icon) {
+    insertData.icon = body.icon
+  }
+
+  let { data, error } = await admin
     .from('calendar')
-    .insert({
-      title: body.title,
-      date: body.date,
-      datum_tot: body.datum_tot || null,
-      time: body.time || '',
-      location: body.location || '',
-      description: body.description || '',
-      facebook_event_url: body.facebook_event_url || null,
-      facebook_post_url: body.facebook_post_url || null,
-      external_link_url: body.external_link_url || null,
-      banner_image: body.banner_image || null,
-      audience,
-      is_evenement: evenement,
-      werkjaar,
-    })
+    .insert(insertData)
     .select()
     .single()
+
+  // Indien de 'icon' kolom nog niet bestaat in Supabase, voer de insert uit zonder 'icon'
+  if (error && error.message?.includes("'icon'")) {
+    delete insertData.icon
+    const retry = await admin
+      .from('calendar')
+      .insert(insertData)
+      .select()
+      .single()
+    data = retry.data
+    error = retry.error
+  }
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

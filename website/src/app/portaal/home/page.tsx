@@ -85,7 +85,7 @@ export default async function HomePage() {
                       <div style={{ fontSize: '.65rem', opacity: .85 }}>{month}</div>
                     </div>
                     <div className="portaal-cal-event-info">
-                      <div className="portaal-cal-event-title">{ev.is_evenement ? '⭐ ' : ''}{ev.title}</div>
+                      <div className="portaal-cal-event-title">{ev.title}</div>
                       {ev.location && <div className="portaal-cal-event-sub"><i className="fa-solid fa-location-dot" style={{ marginRight: 4 }}></i>{ev.location}</div>}
                       {ev.audience && ev.audience.length > 0 && (
                         <span style={{ display: 'inline-flex', gap: 4, flexWrap: 'wrap', marginTop: 3 }}>

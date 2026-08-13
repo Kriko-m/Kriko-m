@@ -68,20 +68,18 @@ export interface CalendarEvent {
   audience: AudienceTag[]
   is_evenement: boolean
   banner_image?: string | null
+  icon?: string | null
   facebook_event_url?: string | null
   facebook_post_url?: string | null
   external_link_url?: string | null
+  document_url?: string | null
   werkjaar?: string
   created_at?: string
 }
 
-// Een uit een kamp afgeleid (read-only) kalenderitem voor de leidingcalender.
-// `source` onderscheidt echte events van afgeleide kampen.
-export interface CalendarEntry extends Omit<CalendarEvent, 'audience'> {
-  source: 'event' | 'kamp'
-  audience: AudienceTag[]
-  datum_tot?: string | null // einddatum voor meerdaagse kampen
-  slug?: string      // voor doorklik naar het kamp
+export interface CalendarEntry extends CalendarEvent {
+  source?: 'event' | 'kamp'
+  slug?: string
 }
 
 export interface Echo {
@@ -131,50 +129,6 @@ export interface OrderItem {
   size: string
   price: number
   quantity: number
-}
-
-export interface Kamp {
-  id: string
-  slug: string
-  naam: string
-  // Tags: welke takken/groep/leiding dit kamp betreft (zelfde vocab als de
-  // kalender). Kampen verschijnen nooit publiek, dus 'groep' = enkel intern.
-  audience: AudienceTag[]
-  datum_van: string
-  datum_tot: string
-  locatie: string
-  beschrijving: string
-  prijs: number
-  foto: string
-  paklijst: { categorie: string; items: string[] }[] | null
-  briefadres: string
-  contact_info: string
-  werkjaar?: string
-  aangemaakt_op?: string
-  aangemaakt_door?: string
-  kamp_bestanden?: KampBestand[]
-}
-
-export interface KampBestand {
-  id: string
-  kamp_id: string
-  type: 'paklijst_pdf' | 'uitnodiging' | 'infobrief' | 'presentatie' | 'overige'
-  naam: string
-  file_name: string // leeg voor link-bijlagen (zie url)
-  url?: string // externe link (bv. Google Slides); leeg voor geüploade bestanden
-  uploaded_at?: string
-}
-
-export interface KampRsvp {
-  id: string
-  kamp_id: string
-  kind_naam: string
-  tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
-  status: 'ja' | 'nee'
-  opmerking: string
-  werkjaar?: string
-  created_at?: string
-  updated_at?: string
 }
 
 

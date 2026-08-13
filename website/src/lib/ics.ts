@@ -1,17 +1,13 @@
-// Gedeelde iCalendar (.ics) helpers voor de publieke oudercalender-feed en de
-// private leiding-feed. Bouwt VEVENT-blokken voor events en kampen.
-
-import { Kamp } from './types'
-
 export const CAL_TZ = 'Europe/Brussels'
 
 export interface IcsEvent {
   id: string
   title: string
   date: string
-  time: string
-  location: string
-  description: string
+  datum_tot?: string | null
+  time?: string | null
+  location?: string | null
+  description?: string | null
 }
 
 export function foldIcsLine(line: string): string {
@@ -63,6 +59,7 @@ function toLocalIcsString(dateStr: string, hh: number, mm: number): string {
 
 export function parseEventDates(event: IcsEvent) {
   const dateStr = event.date // YYYY-MM-DD
+  const endDateStr = event.datum_tot && event.datum_tot !== event.date ? event.datum_tot : dateStr
   const timeStr = event.time?.trim() ?? ''
 
   const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})/g)
@@ -78,12 +75,13 @@ export function parseEventDates(event: IcsEvent) {
     return {
       allDay: false as const,
       startLocal: toLocalIcsString(dateStr, sh, sm),
-      endLocal: toLocalIcsString(dateStr, eh, em),
+      endLocal: toLocalIcsString(endDateStr, eh, em),
     }
   }
   // Hele dag (DTEND is exclusief → +1 dag).
   const start = new Date(`${dateStr}T00:00:00Z`)
-  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000)
+  const end = new Date(`${endDateStr}T00:00:00Z`)
+  end.setDate(end.getDate() + 1)
   return {
     allDay: true as const,
     startYmd: start.toISOString().slice(0, 10).replace(/-/g, ''),
@@ -122,35 +120,6 @@ export function buildEventVevent(event: IcsEvent, nowStr: string, summaryPrefix 
   lines.push(`SUMMARY:${escapeIcsText(summaryPrefix + (event.title ?? 'Activiteit'))}`)
   if (event.description) lines.push(`DESCRIPTION:${escapeIcsText(event.description)}`)
   if (event.location) lines.push(`LOCATION:${escapeIcsText(event.location)}`)
-  lines.push('END:VEVENT')
-  return lines
-}
-
-// Bouwt één VEVENT-blok (meerdaags, hele dag) voor een kamp/weekend.
-export function buildKampVevent(kamp: Kamp, nowStr: string): string[] {
-  const uid = `${kamp.id}@kriko-m.be`
-  const startYmd = kamp.datum_van.replace(/-/g, '')
-  // DTEND is exclusief voor hele-dag-events → +1 dag.
-  const endDate = new Date(kamp.datum_tot + 'T00:00:00')
-  endDate.setDate(endDate.getDate() + 1)
-  const endYmd = endDate.toISOString().slice(0, 10).replace(/-/g, '')
-
-  const lines: string[] = ['BEGIN:VEVENT', `UID:${escapeIcsText(uid)}`, `DTSTAMP:${nowStr}`]
-  lines.push(`DTSTART;VALUE=DATE:${startYmd}`)
-  lines.push(`DTEND;VALUE=DATE:${endYmd}`)
-
-  const ageTakken = (kamp.audience ?? []).filter(a => ['kapoenen', 'welpen', 'jonggivers', 'givers'].includes(a))
-  const takName = ageTakken.length >= 4
-    ? 'Groep'
-    : ((kamp.audience ?? []).map(a => a.charAt(0).toUpperCase() + a.slice(1)).join(', ') || 'Kamp')
-  lines.push(`SUMMARY:${escapeIcsText(`🏕️ Weekend/Kamp [${takName}]: ${kamp.naam}`)}`)
-
-  let desc = kamp.beschrijving || ''
-  if (kamp.prijs > 0) desc += `\n\nPrijs: €${kamp.prijs.toFixed(2).replace('.', ',')}`
-  if (kamp.briefadres) desc += `\n\nBriefadres:\n${kamp.briefadres}`
-  if (kamp.contact_info) desc += `\n\nContact leiding:\n${kamp.contact_info}`
-  lines.push(`DESCRIPTION:${escapeIcsText(desc)}`)
-  if (kamp.locatie) lines.push(`LOCATION:${escapeIcsText(kamp.locatie)}`)
   lines.push('END:VEVENT')
   return lines
 }

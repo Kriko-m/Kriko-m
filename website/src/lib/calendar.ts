@@ -1,36 +1,28 @@
-// Gedeelde, pure kalender-helpers (geen server-only imports → bruikbaar in
-// client components én server components).
+import { CalendarEvent, CalendarEntry } from './types'
 
-import { CalendarEvent, CalendarEntry, Kamp } from './types'
+export const PRESET_EVENT_ICONS = [
+  { id: '', label: 'Geen icoon' },
+  { id: 'fa-star', label: 'Groot Event' },
+  { id: 'fa-campground', label: 'Kamp / Weekend' },
+  { id: 'fa-fire', label: 'Kampvuur' },
+  { id: 'fa-utensils', label: 'Eten / BBQ' },
+  { id: 'fa-beer-mug-empty', label: 'Bar / Café' },
+  { id: 'fa-music', label: 'Muziek / Party' },
+  { id: 'fa-gift', label: 'Sint / Feest' },
+  { id: 'fa-ghost', label: 'Griezel' },
+  { id: 'fa-person-hiking', label: 'Dropping / Tocht' },
+  { id: 'fa-lightbulb', label: 'Quiz' },
+  { id: 'fa-masks-theater', label: 'Bonte Avond' },
+  { id: 'fa-coins', label: 'Verkoop' },
+  { id: 'fa-ban', label: 'Geen vergadering' },
+]
+
+export function getEventIcon(event: CalendarEvent): string {
+  return event.icon || ''
+}
 
 // Zet een echt kalender-event om naar een CalendarEntry.
 export function eventToEntry(ev: CalendarEvent): CalendarEntry {
   return { ...ev, source: 'event' }
 }
 
-// Zet een kamp/weekend om naar een read-only CalendarEntry voor de leidingcalender.
-export function kampToEntry(kamp: Kamp): CalendarEntry {
-  return {
-    id: kamp.id,
-    title: kamp.naam,
-    date: kamp.datum_van,
-    datum_tot: kamp.datum_tot,
-    time: '',
-    location: kamp.locatie,
-    description: kamp.beschrijving,
-    audience: kamp.audience ?? [],
-    is_evenement: false,
-    werkjaar: kamp.werkjaar,
-    source: 'kamp',
-    slug: kamp.slug,
-  }
-}
-
-// Voegt events + kampen samen tot één gesorteerde lijst voor de leidingcalender.
-export function mergeCampsIntoCalendar(events: CalendarEvent[], kampen: Kamp[]): CalendarEntry[] {
-  const merged: CalendarEntry[] = [
-    ...events.map(eventToEntry),
-    ...kampen.map(kampToEntry),
-  ]
-  return merged.sort((a, b) => a.date.localeCompare(b.date))
-}

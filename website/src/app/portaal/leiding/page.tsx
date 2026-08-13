@@ -1,14 +1,14 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import LeidingPanel from './LeidingPanel'
-import { Kamp, Echo, CalendarEvent, TodoItem } from '@/lib/types'
+import { Echo, CalendarEvent, TodoItem } from '@/lib/types'
 import { getActiveWerkjaar } from '@/lib/db'
 import { PORTAAL_TAKKEN, GROEPSLEIDING_ONLY_TAKKEN } from '@/lib/constants'
 
 export default async function LeidingPortaalPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tak?: string; tab?: string; month?: string; kamp?: string }>
+  searchParams: Promise<{ tak?: string; tab?: string; month?: string }>
 }) {
   const supabase = await createServerSupabaseClient()
   const { data: { session } } = await supabase.auth.getSession()
@@ -20,7 +20,7 @@ export default async function LeidingPortaalPage({
   if (!isLeiding) redirect('/portaal')
   const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
 
-  const { tak, tab, month, kamp } = await searchParams
+  const { tak, tab, month } = await searchParams
 
   // De generieke /portaal/leiding bestaat niet meer: er moet altijd een geldige
   // tak zijn. Onbekende of afgeschermde takken sturen we terug naar de home.
