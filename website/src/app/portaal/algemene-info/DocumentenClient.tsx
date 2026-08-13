@@ -192,13 +192,21 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const [error, setError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  function openNewModal(defaultType: 'quicklink' | 'document' = 'document') {
+  function openNewModal(defaultType: 'quicklink' | 'document' = 'document', presetCategory?: string) {
     setEditingItem(null)
     setType(defaultType)
     setLabel('')
     setDescription('')
-    setCategory(defaultType === 'quicklink' ? 'Snelkoppelingen' : '🏕️ Kamp')
-    setCustomCategory('')
+
+    const targetCategory = presetCategory || (defaultType === 'quicklink' ? 'Snelkoppelingen' : '🏕️ Kamp')
+    if (PRESET_CATEGORIES.includes(targetCategory)) {
+      setCategory(targetCategory)
+      setCustomCategory('')
+    } else {
+      setCategory('CUSTOM')
+      setCustomCategory(targetCategory)
+    }
+
     setUrl('')
     setIcon(defaultType === 'quicklink' ? 'fa-brands fa-google-drive' : 'fa-solid fa-file')
     setSortOrder(defaultType === 'quicklink' ? 5 : 10)
@@ -223,6 +231,27 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     setSortOrder(item.sort_order)
     setError('')
     setModalOpen(true)
+  }
+
+  async function handleRenameCategory(oldCat: string) {
+    const newName = window.prompt(`Voer een nieuwe naam in voor categorie "${oldCat}":`, oldCat)
+    if (!newName || !newName.trim() || newName.trim() === oldCat) return
+
+    const trimmedNew = newName.trim()
+    try {
+      const res = await fetch('/api/admin/portal-resources/rename-category', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldCategory: oldCat, newCategory: trimmedNew }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Fout bij hernoemen van categorie')
+
+      setResources(prev => prev.map(r => r.category === oldCat ? { ...r, category: trimmedNew } : r))
+      router.refresh()
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Fout bij hernoemen van categorie')
+    }
   }
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -398,7 +427,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 className="action-card-hover"
               >
                 <i className="fa-solid fa-plus"></i>
-                <span>Nieuw Item Toevoegen</span>
+                <span>Nieuwe Categorie / Item</span>
               </button>
             )}
           </div>
@@ -411,14 +440,6 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
           <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1A3D2A', margin: 0 }}>
             ⚡ Snelkoppelingen
           </h2>
-          {showEditControls && (
-            <button
-              onClick={() => openNewModal('quicklink')}
-              style={{ background: 'none', border: 'none', color: '#1A3D2A', fontWeight: 700, fontSize: '.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
-            >
-              <i className="fa-solid fa-plus-circle"></i> Snelkoppeling toevoegen
-            </button>
-          )}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
@@ -432,6 +453,52 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               isDeleting={deletingId === link.id}
             />
           ))}
+
+          {/* Skeleton Add Card for Quicklinks in Edit Mode */}
+          {showEditControls && (
+            <div
+              onClick={() => openNewModal('quicklink', 'Snelkoppelingen')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '16px 18px',
+                borderRadius: 16,
+                border: '2px dashed #C2D9C9',
+                background: 'rgba(238, 245, 241, 0.45)',
+                color: '#1A3D2A',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+              className="action-card-hover"
+            >
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 12,
+                  background: '#fff',
+                  border: '1.5px dashed #1A3D2A',
+                  color: '#1A3D2A',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.1rem',
+                  flexShrink: 0,
+                }}
+              >
+                <i className="fa-solid fa-plus"></i>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <strong style={{ fontSize: '.9rem', fontWeight: 800, color: '#1A3D2A', display: 'block' }}>
+                  Snelkoppeling toevoegen
+                </strong>
+                <span style={{ fontSize: '.78rem', color: '#6A8A75' }}>
+                  Nieuwe link toevoegen
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -439,9 +506,33 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
         {Object.entries(categoriesMap).map(([catName, items]) => (
           <section key={catName}>
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A3D2A', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-              {catName}
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A3D2A', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>{catName}</span>
+                {showEditControls && (
+                  <button
+                    onClick={() => handleRenameCategory(catName)}
+                    title="Categorienaam bewerken"
+                    style={{
+                      background: '#F0ECE4',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '3px 8px',
+                      fontSize: '.75rem',
+                      color: '#1A3D2A',
+                      cursor: 'pointer',
+                      fontWeight: 700,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      marginLeft: 4,
+                    }}
+                  >
+                    <i className="fa-solid fa-pen-to-square"></i> Categorie bewerken
+                  </button>
+                )}
+              </h2>
+            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
               {items.map(item => (
@@ -454,6 +545,52 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                   isDeleting={deletingId === item.id}
                 />
               ))}
+
+              {/* Skeleton Add Card at the end of Category in Edit Mode */}
+              {showEditControls && (
+                <div
+                  onClick={() => openNewModal('document', catName)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '16px 18px',
+                    borderRadius: 16,
+                    border: '2px dashed #C2D9C9',
+                    background: 'rgba(238, 245, 241, 0.45)',
+                    color: '#1A3D2A',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                  className="action-card-hover"
+                >
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 12,
+                      background: '#fff',
+                      border: '1.5px dashed #1A3D2A',
+                      color: '#1A3D2A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '1.1rem',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <i className="fa-solid fa-plus"></i>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <strong style={{ fontSize: '.9rem', fontWeight: 800, color: '#1A3D2A', display: 'block' }}>
+                      Item toevoegen
+                    </strong>
+                    <span style={{ fontSize: '.78rem', color: '#6A8A75' }}>
+                      Toevoegen aan {catName}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         ))}
