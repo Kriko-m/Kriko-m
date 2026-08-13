@@ -40,11 +40,30 @@ const ICON_OPTIONS = [
 function RenderIcon({ icon }: { icon: string }) {
   if (icon === 'scouts-lelie' || icon === 'fa-solid fa-fleur-de-lis' || icon === '/images/scouts-lelie.png') {
     return (
-      <img
-        src="/images/scouts-lelie.png"
-        alt="Scouts Lelie"
-        style={{ width: 24, height: 24, objectFit: 'contain' }}
-      />
+      <svg width="22" height="22" viewBox="0 0 100 100" fill="#1A3D2A" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+        {/* Main Central Pointed Petal */}
+        <path d="M50 4 C50 4 67 22 67 44 H33 C33 22 47 4 50 4 Z" />
+        {/* Inner Diamond slit in central petal */}
+        <path d="M50 12 L56 41 H44 Z" fill="#EEF5F1" />
+
+        {/* Left Wing Petal */}
+        <path d="M37 43 C22 43 10 33 13 18 C15 7 28 12 36 24 C38 29 40 37 40 43 Z" />
+        {/* Left Star Cutout */}
+        <polygon points="23,22 25,27 30,27 26,30 28,35 23,32 18,35 20,30 16,27 21,27" fill="#EEF5F1" />
+
+        {/* Right Wing Petal */}
+        <path d="M63 43 C78 43 90 33 87 18 C85 7 72 12 64 24 C62 29 60 37 60 43 Z" />
+        {/* Right Star Cutout */}
+        <polygon points="77,22 79,27 84,27 80,30 82,35 77,32 72,35 74,30 70,27 75,27" fill="#EEF5F1" />
+
+        {/* Horizontal Tie Ring */}
+        <rect x="29" y="47" width="42" height="7" rx="3.5" />
+
+        {/* Lower Base Cutouts & Tail */}
+        <path d="M35 56 C28 66 35 78 44 75 C44 68 39 60 39 56 Z" />
+        <path d="M65 56 C72 66 65 78 56 75 C56 68 61 60 61 56 Z" />
+        <path d="M44 56 L50 86 L56 56 Z" />
+      </svg>
     )
   }
 
