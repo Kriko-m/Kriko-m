@@ -40,12 +40,30 @@ const ICON_OPTIONS = [
 function RenderIcon({ icon }: { icon: string }) {
   if (icon === 'scouts-lelie' || icon === 'fa-solid fa-fleur-de-lis') {
     return (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M12 2C12 2 15 5.5 15 8.2C15 9.8 13.8 11.2 12 11.6C10.2 11.2 9 9.8 9 8.2C9 5.5 12 2 12 2ZM6.5 9.5C8.2 9 9.8 10.2 10.8 11.8C9.5 12.4 8.5 13.5 8.5 15C8.5 16.5 9.5 17.5 11 17.8V16.5H13V17.8C14.5 17.5 15.5 16.5 15.5 15C15.5 13.5 14.5 12.4 13.2 11.8C14.2 10.2 15.8 9 17.5 9.5C19.2 10 19.8 12.2 18.5 14.2C17.2 16.2 14.5 17.6 13 18V19.5C14.8 19.5 16.5 20.2 16.5 21.5H7.5C7.5 20.2 9.2 19.5 11 19.5V18C9.5 17.6 6.8 16.2 5.5 14.2C4.2 12.2 4.8 10 6.5 9.5Z"
-          fill="#1A3D2A"
-        />
-        <rect x="7" y="15.8" width="10" height="2.2" rx="1.1" fill="#C9963A" />
+      <svg width="24" height="24" viewBox="0 0 100 100" fill="#1A3D2A" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+        {/* Top Central Leaf */}
+        <path d="M50 5 C52 16 66 26 66 46 H34 C34 26 48 16 50 5 Z" />
+        {/* Split line on central leaf */}
+        <path d="M50 7 V44" stroke="#EEF5F1" strokeWidth="2.5" strokeLinecap="round" />
+
+        {/* Left Outer Petal */}
+        <path d="M37 45 C24 45 13 36 15 21 C16 11 28 15 35 26 C38 31 40 39 40 45 Z" />
+        {/* Left Star Cutout */}
+        <polygon points="23,24 25,29 30,29 26,32 28,37 23,34 18,37 20,32 16,29 21,29" fill="#EEF5F1" />
+
+        {/* Right Outer Petal */}
+        <path d="M63 45 C76 45 87 36 85 21 C84 11 72 15 65 26 C62 31 60 39 60 45 Z" />
+        {/* Right Star Cutout */}
+        <polygon points="77,24 79,29 84,29 80,32 82,37 77,34 72,37 74,32 70,29 75,29" fill="#EEF5F1" />
+
+        {/* Horizontal Tie Ring */}
+        <ellipse cx="50" cy="51" rx="16" ry="3.8" fill="#1A3D2A" />
+        <ellipse cx="50" cy="51" rx="13" ry="1.6" fill="#EEF5F1" />
+
+        {/* Bottom Petals */}
+        <path d="M33 55 C29 65 35 75 43 72 C43 65 39 58 39 55 Z" />
+        <path d="M67 55 C71 65 65 75 57 72 C57 65 61 58 61 55 Z" />
+        <path d="M46 54 L50 82 L54 54 Z" />
       </svg>
     )
   }
