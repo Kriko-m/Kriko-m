@@ -10,7 +10,6 @@ interface Props {
 }
 
 const PRESET_CATEGORIES = [
-  '⚡ Snelkoppelingen',
   '🏕️ Kamp',
   '💶 Financieel',
   '🎲 Spel & Activiteiten',
@@ -279,9 +278,8 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   // Dynamic category list (Presets + active DB categories + user-created categories)
   const allCategoriesList = Array.from(
     new Set([
-      '⚡ Snelkoppelingen',
-      ...PRESET_CATEGORIES.filter(c => c !== '⚡ Snelkoppelingen'),
-      ...resources.map(r => r.category === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : r.category),
+      ...PRESET_CATEGORIES,
+      ...resources.map(r => r.category),
       ...userCreatedCategories,
     ])
   )
@@ -302,7 +300,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     setIcon('scouts-lelie')
     setError('')
 
-    const target = presetCategory === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : presetCategory || '🏕️ Kamp'
+    const target = presetCategory || '🏕️ Kamp'
     setCategory(allCategoriesList.includes(target) ? target : '🏕️ Kamp')
     setItemModalOpen(true)
   }
@@ -314,9 +312,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     setUrl(item.url)
     setIcon(item.icon)
     setError('')
-
-    const itemCat = item.category === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : item.category
-    setCategory(itemCat)
+    setCategory(item.category || 'Algemeen')
     setItemModalOpen(true)
   }
 
@@ -349,7 +345,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     e.preventDefault()
     if (!editCategoryInput.trim()) return
 
-    const rawOld = editingCategoryName === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : editingCategoryName
+    const rawOld = editingCategoryName
     const trimmedNew = editCategoryInput.trim()
 
     if (trimmedNew === editingCategoryName) {
@@ -382,7 +378,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
 
   function requestDeleteCategory() {
     if (!editingCategoryName) return
-    const rawCategory = editingCategoryName === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : editingCategoryName
+    const rawCategory = editingCategoryName
     const count = resources.filter(r => r.category === rawCategory).length
 
     const confirmMsg = count > 0
@@ -421,20 +417,17 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
 
   async function handleDropToCategory(resourceId: string, targetCat: string) {
     setDraggedId(null)
-    const rawTarget = targetCat === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : targetCat
     const item = resources.find(r => r.id === resourceId)
-    if (!item || item.category === rawTarget) return
-
-    const targetType = rawTarget === 'Snelkoppelingen' ? 'quicklink' : 'document'
+    if (!item || item.category === targetCat) return
 
     // Optimistic update
-    setResources(prev => prev.map(r => r.id === resourceId ? { ...r, category: rawTarget, type: targetType } : r))
+    setResources(prev => prev.map(r => r.id === resourceId ? { ...r, category: targetCat } : r))
 
     try {
       const res = await fetch(`/api/admin/portal-resources/${resourceId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: rawTarget, type: targetType }),
+        body: JSON.stringify({ category: targetCat }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Fout bij verplaatsen')
@@ -481,14 +474,11 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     setSubmitting(true)
     setError('')
 
-    const rawCategory = category === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : category
-    const itemType = rawCategory === 'Snelkoppelingen' ? 'quicklink' : 'document'
-
     const payload = {
-      type: itemType,
+      type: 'document',
       label: label.trim(),
       description: description.trim(),
-      category: rawCategory || 'Algemeen',
+      category: category || 'Algemeen',
       url: url.trim(),
       icon,
       sort_order: editingItem?.sort_order ?? 10,
@@ -553,25 +543,22 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     )
   }
 
-  const quicklinks = resources.filter(r => r.type === 'quicklink' || r.category === 'Snelkoppelingen')
-  const documentItems = resources.filter(r => r.type === 'document' && r.category !== 'Snelkoppelingen')
-
-  // Group document items by category (including empty user-created categories)
+  // Group items by category (including empty user-created categories)
   const categoryNames = Array.from(
     new Set([
       ...Object.keys(
-        documentItems.reduce((acc, item) => {
+        resources.reduce((acc, item) => {
           const cat = item.category || 'Algemeen'
           acc[cat] = true
           return acc
         }, {} as Record<string, boolean>)
       ),
-      ...userCreatedCategories.filter(c => c !== '⚡ Snelkoppelingen' && c !== 'Snelkoppelingen'),
+      ...userCreatedCategories,
     ])
   )
 
   const categoriesMap = categoryNames.reduce((acc, cat) => {
-    acc[cat] = documentItems.filter(r => r.category === cat)
+    acc[cat] = resources.filter(r => (r.category || 'Algemeen') === cat)
     return acc
   }, {} as Record<string, PortalResource[]>)
 
@@ -667,109 +654,6 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
           </div>
         )}
       </header>
-
-      {/* Top Quicklinks / Snelkoppelingen */}
-      <section
-        style={{
-          marginBottom: 36,
-          padding: dragOverCat === '⚡ Snelkoppelingen' ? '12px' : '0px',
-          borderRadius: 18,
-          border: dragOverCat === '⚡ Snelkoppelingen' ? '2px dashed #1A3D2A' : '2px solid transparent',
-          background: dragOverCat === '⚡ Snelkoppelingen' ? 'rgba(238, 245, 241, 0.6)' : 'transparent',
-          transition: 'all 0.15s ease',
-        }}
-        onDragOver={(e) => {
-          if (!showEditControls) return
-          e.preventDefault()
-          e.dataTransfer.dropEffect = 'move'
-          if (dragOverCat !== '⚡ Snelkoppelingen') setDragOverCat('⚡ Snelkoppelingen')
-        }}
-        onDragLeave={(e) => {
-          if (!showEditControls) return
-          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-            setDragOverCat(null)
-          }
-        }}
-        onDrop={(e) => {
-          if (!showEditControls) return
-          e.preventDefault()
-          setDragOverCat(null)
-          setDraggedId(null)
-          const resId = e.dataTransfer.getData('text/plain') || draggedId
-          if (resId) handleDropToCategory(resId, '⚡ Snelkoppelingen')
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1A3D2A', margin: 0 }}>
-            ⚡ Snelkoppelingen
-          </h2>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
-          {quicklinks.map(link => (
-            <ResourceCard
-              key={link.id}
-              item={link}
-              showEditControls={showEditControls}
-              onEdit={openEditItemModal}
-              onDelete={requestDeleteItem}
-              isDeleting={deletingId === link.id}
-              onDragStart={(e) => {
-                e.dataTransfer.setData('text/plain', link.id)
-                setDraggedId(link.id)
-              }}
-              onDragEnd={() => setDraggedId(null)}
-              isDragging={draggedId === link.id}
-            />
-          ))}
-
-          {/* Skeleton Add Card for Quicklinks in Edit Mode */}
-          {showEditControls && (
-            <div
-              onClick={() => openNewItemModal('⚡ Snelkoppelingen')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '16px 18px',
-                borderRadius: 16,
-                border: '2px dashed #C2D9C9',
-                background: 'rgba(238, 245, 241, 0.45)',
-                color: '#1A3D2A',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-              className="action-card-hover"
-            >
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  background: '#fff',
-                  border: '1.5px dashed #1A3D2A',
-                  color: '#1A3D2A',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '1.1rem',
-                  flexShrink: 0,
-                }}
-              >
-                <i className="fa-solid fa-plus"></i>
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <strong style={{ fontSize: '.9rem', fontWeight: 800, color: '#1A3D2A', display: 'block' }}>
-                  Snelkoppeling toevoegen
-                </strong>
-                <span style={{ fontSize: '.78rem', color: '#6A8A75' }}>
-                  Nieuwe link toevoegen
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Documenten & Sjablonen per Categorie */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
