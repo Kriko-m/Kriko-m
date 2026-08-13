@@ -41,12 +41,18 @@ function ResourceCard({
   onEdit,
   onDelete,
   isDeleting,
+  onDragStart,
+  onDragEnd,
+  isDragging,
 }: {
   item: PortalResource
   showEditControls: boolean
   onEdit: (item: PortalResource) => void
   onDelete: (id: string) => void
   isDeleting: boolean
+  onDragStart: (e: React.DragEvent) => void
+  onDragEnd: () => void
+  isDragging: boolean
 }) {
   const handleClick = () => {
     if (item.url) {
@@ -57,6 +63,9 @@ function ResourceCard({
   return (
     <div
       onClick={handleClick}
+      draggable={showEditControls}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
       style={{
         position: 'relative',
         display: 'flex',
@@ -67,8 +76,9 @@ function ResourceCard({
         background: '#fff',
         border: showEditControls ? '2px solid #1A3D2A' : '1.5px solid #C2D9C9',
         boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-        cursor: item.url ? 'pointer' : 'default',
-        transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
+        cursor: showEditControls ? 'grab' : item.url ? 'pointer' : 'default',
+        opacity: isDragging ? 0.4 : 1,
+        transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease',
       }}
       className="action-card-hover"
     >
@@ -91,6 +101,9 @@ function ResourceCard({
 
       <div style={{ flex: 1, minWidth: 0, paddingRight: showEditControls ? 64 : 12 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {showEditControls && (
+            <i className="fa-solid fa-grip-vertical" style={{ color: '#A0A0A0', fontSize: '.8rem', marginRight: 2, cursor: 'grab' }}></i>
+          )}
           <strong style={{ fontSize: '.95rem', fontWeight: 800, color: '#1A3D2A', lineHeight: 1.3 }}>
             {item.label}
           </strong>
@@ -176,6 +189,10 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const [modalOpen, setModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<PortalResource | null>(null)
 
+  // Drag and Drop states
+  const [draggedId, setDraggedId] = useState<string | null>(null)
+  const [dragOverCat, setDragOverCat] = useState<string | null>(null)
+
   // Form states
   const [type, setType] = useState<'quicklink' | 'document'>('document')
   const [label, setLabel] = useState('')
@@ -251,6 +268,31 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       router.refresh()
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Fout bij hernoemen van categorie')
+    }
+  }
+
+  async function handleDropToCategory(resourceId: string, targetCat: string) {
+    const item = resources.find(r => r.id === resourceId)
+    if (!item || item.category === targetCat) return
+
+    const targetType = targetCat === 'Snelkoppelingen' ? 'quicklink' : 'document'
+
+    // Optimistic update
+    setResources(prev => prev.map(r => r.id === resourceId ? { ...r, category: targetCat, type: targetType } : r))
+
+    try {
+      const res = await fetch(`/api/admin/portal-resources/${resourceId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: targetCat, type: targetType }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Fout bij verplaatsen')
+      router.refresh()
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Verplaatsen mislukt')
+      // Revert state
+      setResources(prev => prev.map(r => r.id === resourceId ? item : r))
     }
   }
 
@@ -435,7 +477,35 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       </header>
 
       {/* Top Quicklinks / Snelkoppelingen */}
-      <section style={{ marginBottom: 36 }}>
+      <section
+        style={{
+          marginBottom: 36,
+          padding: dragOverCat === 'Snelkoppelingen' ? '12px' : '0px',
+          borderRadius: 18,
+          border: dragOverCat === 'Snelkoppelingen' ? '2px dashed #1A3D2A' : '2px solid transparent',
+          background: dragOverCat === 'Snelkoppelingen' ? 'rgba(238, 245, 241, 0.6)' : 'transparent',
+          transition: 'all 0.15s ease',
+        }}
+        onDragOver={(e) => {
+          if (!showEditControls) return
+          e.preventDefault()
+          e.dataTransfer.dropEffect = 'move'
+          if (dragOverCat !== 'Snelkoppelingen') setDragOverCat('Snelkoppelingen')
+        }}
+        onDragLeave={(e) => {
+          if (!showEditControls) return
+          if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+            setDragOverCat(null)
+          }
+        }}
+        onDrop={(e) => {
+          if (!showEditControls) return
+          e.preventDefault()
+          setDragOverCat(null)
+          const resId = e.dataTransfer.getData('text/plain') || draggedId
+          if (resId) handleDropToCategory(resId, 'Snelkoppelingen')
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
           <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1A3D2A', margin: 0 }}>
             ⚡ Snelkoppelingen
@@ -451,6 +521,12 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               onEdit={openEditModal}
               onDelete={handleDelete}
               isDeleting={deletingId === link.id}
+              onDragStart={(e) => {
+                e.dataTransfer.setData('text/plain', link.id)
+                setDraggedId(link.id)
+              }}
+              onDragEnd={() => setDraggedId(null)}
+              isDragging={draggedId === link.id}
             />
           ))}
 
@@ -505,7 +581,35 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       {/* Documenten & Sjablonen per Categorie */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
         {Object.entries(categoriesMap).map(([catName, items]) => (
-          <section key={catName}>
+          <section
+            key={catName}
+            style={{
+              padding: dragOverCat === catName ? '12px' : '0px',
+              borderRadius: 18,
+              border: dragOverCat === catName ? '2px dashed #1A3D2A' : '2px solid transparent',
+              background: dragOverCat === catName ? 'rgba(238, 245, 241, 0.6)' : 'transparent',
+              transition: 'all 0.15s ease',
+            }}
+            onDragOver={(e) => {
+              if (!showEditControls) return
+              e.preventDefault()
+              e.dataTransfer.dropEffect = 'move'
+              if (dragOverCat !== catName) setDragOverCat(catName)
+            }}
+            onDragLeave={(e) => {
+              if (!showEditControls) return
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                setDragOverCat(null)
+              }
+            }}
+            onDrop={(e) => {
+              if (!showEditControls) return
+              e.preventDefault()
+              setDragOverCat(null)
+              const resId = e.dataTransfer.getData('text/plain') || draggedId
+              if (resId) handleDropToCategory(resId, catName)
+            }}
+          >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A3D2A', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span>{catName}</span>
@@ -543,6 +647,12 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                   onEdit={openEditModal}
                   onDelete={handleDelete}
                   isDeleting={deletingId === item.id}
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData('text/plain', item.id)
+                    setDraggedId(item.id)
+                  }}
+                  onDragEnd={() => setDraggedId(null)}
+                  isDragging={draggedId === item.id}
                 />
               ))}
 
