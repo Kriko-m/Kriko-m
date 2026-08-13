@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { CalendarEvent } from '@/lib/types'
-import UpcomingEvent, { EventDetailDialog } from './EventDetailModal'
+import { EventDetailDialog } from './EventDetailModal'
 import { getEventIcon } from '@/lib/calendar'
 
 const MONTH_NAMES = [

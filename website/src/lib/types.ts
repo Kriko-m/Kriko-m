@@ -92,6 +92,7 @@ export interface Echo {
   approved: boolean
   werkjaar?: string
   uploaded_at?: string
+  created_at?: string
 }
 
 export interface Product {

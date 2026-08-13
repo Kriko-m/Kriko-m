@@ -49,7 +49,7 @@ export async function GET() {
     }
 
     // Auto-seed default resources into DB if empty
-    const seedItems = DEFAULT_RESOURCES.map(({ id, ...rest }) => rest)
+    const seedItems = DEFAULT_RESOURCES.map(({ id: _id, ...rest }) => rest)
     const { data: seededData, error: seedError } = await admin
       .from('portal_resources')
       .insert(seedItems)

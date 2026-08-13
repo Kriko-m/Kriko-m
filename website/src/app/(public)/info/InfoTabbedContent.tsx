@@ -11,7 +11,7 @@ interface InfoTabbedContentProps {
 
 type TabType = 'praktisch' | 'takken' | 'uniform' | 'op-maat'
 
-export default function InfoTabbedContent({ email, address }: InfoTabbedContentProps) {
+export default function InfoTabbedContent({ email, address: _address }: InfoTabbedContentProps) {
   const [activeTab, setActiveTab] = useState<TabType>('praktisch')
 
   useEffect(() => {
@@ -248,6 +248,7 @@ export default function InfoTabbedContent({ email, address }: InfoTabbedContentP
                 >
                   {/* Tak Illustratie Afbeelding */}
                   <div style={{ height: 160, position: 'relative', overflow: 'hidden', borderBottom: `2px solid ${tak.border}` }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src={tak.img} 
                       alt={`Illustratie ${tak.name}`}

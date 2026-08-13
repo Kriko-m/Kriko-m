@@ -33,8 +33,8 @@ export default function EchoManager({ initialEchos }: Props) {
     .sort((a, b) => {
       if (b.year !== a.year) return b.year - a.year
       if (b.month !== a.month) return b.month - a.month
-      const aTime = (a as any).created_at || a.uploaded_at || ''
-      const bTime = (b as any).created_at || b.uploaded_at || ''
+      const aTime = a.created_at || a.uploaded_at || ''
+      const bTime = b.created_at || b.uploaded_at || ''
       if (aTime && bTime) return bTime.localeCompare(aTime)
       return 0
     })
