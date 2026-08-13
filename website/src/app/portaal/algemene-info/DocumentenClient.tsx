@@ -20,7 +20,9 @@ const PRESET_CATEGORIES = [
 
 const ICON_OPTIONS = [
   { label: 'Scouts Lelie', icon: 'scouts-lelie' },
+  { label: 'Huis / Lokaal', icon: 'fa-solid fa-house' },
   { label: 'Kampas (Jeugdverblijven)', icon: 'kampas' },
+  { label: 'Tent / Kamp', icon: 'fa-solid fa-tent' },
   { label: 'Scoutsklaver', icon: 'fa-solid fa-clover' },
   { label: 'Geld / Biljet', icon: 'fa-solid fa-money-bill-wave' },
   { label: 'Muntstukken / Geld', icon: 'fa-solid fa-coins' },
@@ -29,7 +31,6 @@ const ICON_OPTIONS = [
   { label: 'Rekenmachine', icon: 'fa-solid fa-calculator' },
   { label: 'Kassabon', icon: 'fa-solid fa-receipt' },
   { label: 'Map / Bestanden', icon: 'fa-brands fa-google-drive' },
-  { label: 'Tent / Kamp', icon: 'fa-solid fa-tent' },
   { label: 'Checklist', icon: 'fa-solid fa-clipboard-check' },
   { label: 'Spel / Document', icon: 'fa-solid fa-file-pen' },
   { label: 'Lijst / Overzicht', icon: 'fa-solid fa-list-check' },
