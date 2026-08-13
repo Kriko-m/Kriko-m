@@ -20,6 +20,7 @@ const PRESET_CATEGORIES = [
 
 const ICON_OPTIONS = [
   { label: 'Scouts Lelie', icon: 'scouts-lelie' },
+  { label: 'Kampas (Jeugdverblijven)', icon: 'kampas' },
   { label: 'Scoutsklaver', icon: 'fa-solid fa-clover' },
   { label: 'Geld / Biljet', icon: 'fa-solid fa-money-bill-wave' },
   { label: 'Muntstukken / Geld', icon: 'fa-solid fa-coins' },
@@ -67,6 +68,17 @@ function RenderIcon({ icon }: { icon: string }) {
         <path d="M35 56 C28 66 35 78 44 75 C44 68 39 60 39 56 Z" />
         <path d="M65 56 C72 66 65 78 56 75 C56 68 61 60 61 56 Z" />
         <path d="M44 56 L50 86 L56 56 Z" />
+      </svg>
+    )
+  }
+
+  if (icon === 'kampas') {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+        <circle cx="12" cy="12" r="9" stroke="#1A3D2A" strokeWidth="2" fill="none" />
+        <path d="M12 5L17 14H7L12 5Z" fill="#1A3D2A" />
+        <path d="M12 9L15 14H9L12 9Z" fill="#EEF5F1" />
+        <circle cx="12" cy="12" r="1.5" fill="#C9963A" />
       </svg>
     )
   }
