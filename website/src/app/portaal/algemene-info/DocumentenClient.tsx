@@ -35,12 +35,130 @@ const ICON_OPTIONS = [
   { label: 'Standaard Bestand', icon: 'fa-solid fa-file' },
 ]
 
+function ResourceCard({
+  item,
+  isGroepsleiding,
+  onEdit,
+  onDelete,
+  isDeleting,
+}: {
+  item: PortalResource
+  isGroepsleiding: boolean
+  onEdit: (item: PortalResource) => void
+  onDelete: (id: string) => void
+  isDeleting: boolean
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        gap: 16,
+        padding: '20px',
+        borderRadius: 16,
+        background: '#fff',
+        border: '1.5px solid #C2D9C9',
+        boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
+        transition: 'transform 0.15s, border-color 0.15s, box-shadow 0.15s',
+      }}
+      className="action-card-hover"
+    >
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: '#EEF5F1', color: '#1A3D2A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', flexShrink: 0 }}>
+          <i className={item.icon}></i>
+        </div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <strong style={{ fontSize: '1rem', fontWeight: 800, color: '#1A3D2A', display: 'block', lineHeight: 1.3, marginBottom: 4 }}>
+            {item.label}
+          </strong>
+          <p style={{ margin: 0, fontSize: '.85rem', color: '#6A8A75', lineHeight: 1.45 }}>
+            {item.description}
+          </p>
+        </div>
+      </div>
+
+      {/* Bottom Actions Row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingTop: 12, borderTop: '1px solid #EEF5F1' }}>
+        {item.url ? (
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: '.85rem',
+              fontWeight: 700,
+              color: '#1A3D2A',
+              textDecoration: 'none',
+              background: '#EEF5F1',
+              padding: '7px 14px',
+              borderRadius: 10,
+              transition: 'background-color 0.15s',
+            }}
+            className="action-card-hover"
+          >
+            <span>Openen</span>
+            <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '.78rem' }}></i>
+          </a>
+        ) : (
+          <span style={{ fontSize: '.82rem', color: '#888', fontStyle: 'italic' }}>
+            Geen link ingesteld
+          </span>
+        )}
+
+        {isGroepsleiding && (
+          <div style={{ display: 'flex', gap: 6 }}>
+            <button
+              onClick={() => onEdit(item)}
+              title="Bewerken"
+              style={{
+                background: '#F0ECE4',
+                border: 'none',
+                borderRadius: 8,
+                padding: '7px 12px',
+                fontSize: '.82rem',
+                color: '#1A3D2A',
+                cursor: 'pointer',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <i className="fa-solid fa-pen-to-square"></i> Bewerken
+            </button>
+            <button
+              onClick={() => onDelete(item.id)}
+              disabled={isDeleting}
+              title="Verwijderen"
+              style={{
+                background: '#FEE2E2',
+                border: 'none',
+                borderRadius: 8,
+                padding: '7px 10px',
+                fontSize: '.82rem',
+                color: '#B91C1C',
+                cursor: 'pointer',
+              }}
+            >
+              <i className="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function DocumentenClient({ initialResources, isGroepsleiding }: Props) {
   const router = useRouter()
   const [resources, setResources] = useState<PortalResource[]>(initialResources)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<PortalResource | null>(null)
-  
+
   // Form states
   const [type, setType] = useState<'quicklink' | 'document'>('document')
   const [label, setLabel] = useState('')
@@ -50,7 +168,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const [url, setUrl] = useState('')
   const [icon, setIcon] = useState('fa-solid fa-file')
   const [sortOrder, setSortOrder] = useState<number>(10)
-  
+
   // UI states
   const [submitting, setSubmitting] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -204,7 +322,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
 
   return (
     <div style={{ padding: '28px 24px', maxWidth: 1100, margin: '0 auto' }}>
-      
+
       {/* Header with Title & Action Button */}
       <header style={{ marginBottom: 28, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div>
@@ -258,61 +376,16 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
           {quicklinks.map(link => (
-            <div
+            <ResourceCard
               key={link.id}
-              style={{
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 14,
-                padding: '16px 18px',
-                borderRadius: 16,
-                background: '#fff',
-                border: '1.5px solid #C2D9C9',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-                transition: 'transform 0.15s, border-color 0.15s',
-              }}
-              className="action-card-hover"
-            >
-              <a
-                href={link.url || '#'}
-                target={link.url ? '_blank' : undefined}
-                rel="noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: 14, textDecoration: 'none', color: '#1A3D2A', flex: 1, minWidth: 0 }}
-              >
-                <div style={{ width: 42, height: 42, borderRadius: 12, background: '#EEF5F1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.3rem', flexShrink: 0 }}>
-                  <i className={link.icon} style={{ color: '#1A3D2A' }}></i>
-                </div>
-                <div style={{ minWidth: 0, paddingRight: isGroepsleiding ? 50 : 0 }}>
-                  <strong style={{ display: 'block', fontSize: '.92rem', color: '#1A3D2A' }}>{link.label}</strong>
-                  <span style={{ fontSize: '.76rem', color: '#6A8A75', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
-                    {link.description || link.url}
-                  </span>
-                </div>
-              </a>
-
-              {isGroepsleiding && (
-                <div style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: 4, background: '#fff', padding: '2px 4px', borderRadius: 8, border: '1px solid #E2C58D' }}>
-                  <button
-                    onClick={() => openEditModal(link)}
-                    title="Bewerken"
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1A3D2A', padding: '4px 6px', fontSize: '.8rem' }}
-                  >
-                    <i className="fa-solid fa-pen-to-square"></i>
-                  </button>
-                  <button
-                    onClick={() => handleDelete(link.id)}
-                    disabled={deletingId === link.id}
-                    title="Verwijderen"
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#B91C1C', padding: '4px 6px', fontSize: '.8rem' }}
-                  >
-                    <i className="fa-solid fa-trash-can"></i>
-                  </button>
-                </div>
-              )}
-            </div>
+              item={link}
+              isGroepsleiding={isGroepsleiding}
+              onEdit={openEditModal}
+              onDelete={handleDelete}
+              isDeleting={deletingId === link.id}
+            />
           ))}
         </div>
       </section>
@@ -327,101 +400,14 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
               {items.map(item => (
-                <div
+                <ResourceCard
                   key={item.id}
-                  style={{
-                    position: 'relative',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: 12,
-                    padding: '20px',
-                    borderRadius: 16,
-                    background: '#fff',
-                    border: '1.5px solid #C2D9C9',
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, paddingRight: isGroepsleiding ? 50 : 0 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: '#EEF5F1', color: '#1A3D2A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.15rem', flexShrink: 0 }}>
-                      <i className={item.icon}></i>
-                    </div>
-                    <div>
-                      <strong style={{ fontSize: '.98rem', color: '#1A3D2A', display: 'block', lineHeight: 1.3 }}>{item.label}</strong>
-                      <p style={{ margin: '4px 0 0', fontSize: '.84rem', color: '#6A8A75', lineHeight: 1.45 }}>
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Actions & Link button */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4, paddingTop: 10, borderTop: '1px solid #EEF5F1' }}>
-                    {item.url ? (
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 6,
-                          fontSize: '.84rem',
-                          fontWeight: 700,
-                          color: '#1A3D2A',
-                          textDecoration: 'none',
-                          background: '#EEF5F1',
-                          padding: '6px 12px',
-                          borderRadius: 8,
-                        }}
-                        className="action-card-hover"
-                      >
-                        <span>Openen / Downloaden</span>
-                        <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '.75rem' }}></i>
-                      </a>
-                    ) : (
-                      <span style={{ fontSize: '.8rem', color: '#888', fontStyle: 'italic' }}>
-                        Geen link ingesteld
-                      </span>
-                    )}
-
-                    {isGroepsleiding && (
-                      <div style={{ display: 'flex', gap: 6 }}>
-                        <button
-                          onClick={() => openEditModal(item)}
-                          title="Bewerken"
-                          style={{
-                            background: '#F0ECE4',
-                            border: 'none',
-                            borderRadius: 6,
-                            padding: '6px 10px',
-                            fontSize: '.8rem',
-                            color: '#1A3D2A',
-                            cursor: 'pointer',
-                            fontWeight: 600,
-                          }}
-                        >
-                          <i className="fa-solid fa-pen-to-square"></i> Bewerken
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          disabled={deletingId === item.id}
-                          title="Verwijderen"
-                          style={{
-                            background: '#FEE2E2',
-                            border: 'none',
-                            borderRadius: 6,
-                            padding: '6px 8px',
-                            fontSize: '.8rem',
-                            color: '#B91C1C',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <i className="fa-solid fa-trash-can"></i>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  item={item}
+                  isGroepsleiding={isGroepsleiding}
+                  onEdit={openEditModal}
+                  onDelete={handleDelete}
+                  isDeleting={deletingId === item.id}
+                />
               ))}
             </div>
           </section>
