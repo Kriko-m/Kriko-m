@@ -186,19 +186,23 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const router = useRouter()
   const [resources, setResources] = useState<PortalResource[]>(initialResources)
   const [editMode, setEditMode] = useState(false)
-  const [modalOpen, setModalOpen] = useState(false)
+
+  // Separate Modal states
+  const [itemModalOpen, setItemModalOpen] = useState(false)
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false)
+  const [newCategoryInput, setNewCategoryInput] = useState('')
+  const [userCreatedCategories, setUserCreatedCategories] = useState<string[]>([])
+
   const [editingItem, setEditingItem] = useState<PortalResource | null>(null)
 
   // Drag and Drop states
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [dragOverCat, setDragOverCat] = useState<string | null>(null)
 
-  // Form states (Unified 1-page form)
+  // Item Form states
   const [label, setLabel] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('🏕️ Kamp')
-  const [customCategory, setCustomCategory] = useState('')
-  const [isNewCategoryMode, setIsNewCategoryMode] = useState(false)
   const [url, setUrl] = useState('')
   const [icon, setIcon] = useState('fa-solid fa-file')
 
@@ -208,15 +212,17 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const [error, setError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  // Build dynamic categories list (preset + existing active categories)
-  const allExistingCategories = Array.from(
+  // Dynamic category list (Presets + active DB categories + user-created categories)
+  const allCategoriesList = Array.from(
     new Set([
-      ...PRESET_CATEGORIES,
-      ...resources.map(r => r.category === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : r.category)
+      '⚡ Snelkoppelingen',
+      ...PRESET_CATEGORIES.filter(c => c !== '⚡ Snelkoppelingen'),
+      ...resources.map(r => r.category === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : r.category),
+      ...userCreatedCategories,
     ])
   )
 
-  function openNewModal(presetCategory?: string) {
+  function openNewItemModal(presetCategory?: string) {
     setEditingItem(null)
     setLabel('')
     setDescription('')
@@ -224,25 +230,12 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     setIcon('fa-solid fa-file')
     setError('')
 
-    const targetCategory = presetCategory === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : presetCategory || '🏕️ Kamp'
-    if (targetCategory === 'NEW_CATEGORY') {
-      setCategory('CUSTOM')
-      setIsNewCategoryMode(true)
-      setCustomCategory('')
-    } else if (allExistingCategories.includes(targetCategory)) {
-      setCategory(targetCategory)
-      setIsNewCategoryMode(false)
-      setCustomCategory('')
-    } else {
-      setCategory('CUSTOM')
-      setIsNewCategoryMode(true)
-      setCustomCategory(targetCategory)
-    }
-
-    setModalOpen(true)
+    const target = presetCategory === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : presetCategory || '🏕️ Kamp'
+    setCategory(allCategoriesList.includes(target) ? target : '🏕️ Kamp')
+    setItemModalOpen(true)
   }
 
-  function openEditModal(item: PortalResource) {
+  function openEditItemModal(item: PortalResource) {
     setEditingItem(item)
     setLabel(item.label)
     setDescription(item.description)
@@ -251,17 +244,26 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     setError('')
 
     const itemCat = item.category === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : item.category
-    if (allExistingCategories.includes(itemCat)) {
-      setCategory(itemCat)
-      setIsNewCategoryMode(false)
-      setCustomCategory('')
-    } else {
-      setCategory('CUSTOM')
-      setIsNewCategoryMode(true)
-      setCustomCategory(item.category)
-    }
+    setCategory(itemCat)
+    setItemModalOpen(true)
+  }
 
-    setModalOpen(true)
+  function openCategoryModal() {
+    setNewCategoryInput('')
+    setError('')
+    setCategoryModalOpen(true)
+  }
+
+  function handleCreateCategory(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newCategoryInput.trim()) return
+
+    const newCat = newCategoryInput.trim()
+    if (!userCreatedCategories.includes(newCat)) {
+      setUserCreatedCategories(prev => [...prev, newCat])
+    }
+    setCategoryModalOpen(false)
+    setNewCategoryInput('')
   }
 
   async function handleRenameCategory(oldCat: string) {
@@ -280,6 +282,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       if (!res.ok) throw new Error(data.error || 'Fout bij hernoemen van categorie')
 
       setResources(prev => prev.map(r => r.category === rawOld ? { ...r, category: trimmedNew } : r))
+      setUserCreatedCategories(prev => prev.map(c => c === oldCat ? trimmedNew : c))
       router.refresh()
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Fout bij hernoemen van categorie')
@@ -341,23 +344,21 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleItemSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!label.trim()) return
 
     setSubmitting(true)
     setError('')
 
-    let finalCategory = isNewCategoryMode || category === 'CUSTOM' ? customCategory.trim() : category
-    if (finalCategory === '⚡ Snelkoppelingen') finalCategory = 'Snelkoppelingen'
-
-    const itemType = finalCategory === 'Snelkoppelingen' ? 'quicklink' : 'document'
+    const rawCategory = category === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : category
+    const itemType = rawCategory === 'Snelkoppelingen' ? 'quicklink' : 'document'
 
     const payload = {
       type: itemType,
       label: label.trim(),
       description: description.trim(),
-      category: finalCategory || 'Algemeen',
+      category: rawCategory || 'Algemeen',
       url: url.trim(),
       icon,
       sort_order: editingItem?.sort_order ?? 10,
@@ -388,7 +389,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
         setResources(prev => [...prev, data])
       }
 
-      setModalOpen(false)
+      setItemModalOpen(false)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Er is een fout ingetreden')
@@ -420,11 +421,22 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const quicklinks = resources.filter(r => r.type === 'quicklink' || r.category === 'Snelkoppelingen')
   const documentItems = resources.filter(r => r.type === 'document' && r.category !== 'Snelkoppelingen')
 
-  // Group document items by category
-  const categoriesMap = documentItems.reduce((acc, item) => {
-    const cat = item.category || 'Algemeen'
-    if (!acc[cat]) acc[cat] = []
-    acc[cat].push(item)
+  // Group document items by category (including empty user-created categories)
+  const categoryNames = Array.from(
+    new Set([
+      ...Object.keys(
+        documentItems.reduce((acc, item) => {
+          const cat = item.category || 'Algemeen'
+          acc[cat] = true
+          return acc
+        }, {} as Record<string, boolean>)
+      ),
+      ...userCreatedCategories.filter(c => c !== '⚡ Snelkoppelingen' && c !== 'Snelkoppelingen'),
+    ])
+  )
+
+  const categoriesMap = categoryNames.reduce((acc, cat) => {
+    acc[cat] = documentItems.filter(r => r.category === cat)
     return acc
   }, {} as Record<string, PortalResource[]>)
 
@@ -433,7 +445,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   return (
     <div style={{ padding: '28px 24px', maxWidth: 1100, margin: '0 auto' }}>
 
-      {/* Header with Title & Action Button */}
+      {/* Header with Title & Action Buttons */}
       <header style={{ marginBottom: 28, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
         <div>
           <h1 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.8rem', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -471,7 +483,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
             {editMode && (
               <>
                 <button
-                  onClick={() => openNewModal('NEW_CATEGORY')}
+                  onClick={openCategoryModal}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -490,11 +502,11 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                   className="action-card-hover"
                 >
                   <i className="fa-solid fa-folder-plus"></i>
-                  <span>Nieuwe Categorie Maken</span>
+                  <span>Nieuwe Categorie</span>
                 </button>
 
                 <button
-                  onClick={() => openNewModal()}
+                  onClick={() => openNewItemModal()}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -564,7 +576,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               key={link.id}
               item={link}
               showEditControls={showEditControls}
-              onEdit={openEditModal}
+              onEdit={openEditItemModal}
               onDelete={handleDelete}
               isDeleting={deletingId === link.id}
               onDragStart={(e) => {
@@ -579,7 +591,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
           {/* Skeleton Add Card for Quicklinks in Edit Mode */}
           {showEditControls && (
             <div
-              onClick={() => openNewModal('⚡ Snelkoppelingen')}
+              onClick={() => openNewItemModal('⚡ Snelkoppelingen')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -626,145 +638,199 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
 
       {/* Documenten & Sjablonen per Categorie */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-        {Object.entries(categoriesMap).map(([catName, items]) => (
-          <section
-            key={catName}
-            style={{
-              padding: dragOverCat === catName ? '12px' : '0px',
-              borderRadius: 18,
-              border: dragOverCat === catName ? '2px dashed #1A3D2A' : '2px solid transparent',
-              background: dragOverCat === catName ? 'rgba(238, 245, 241, 0.6)' : 'transparent',
-              transition: 'all 0.15s ease',
-            }}
-            onDragOver={(e) => {
-              if (!showEditControls) return
-              e.preventDefault()
-              e.dataTransfer.dropEffect = 'move'
-              if (dragOverCat !== catName) setDragOverCat(catName)
-            }}
-            onDragLeave={(e) => {
-              if (!showEditControls) return
-              if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+        {Object.entries(categoriesMap).map(([catName, items]) => {
+          if (items.length === 0 && !showEditControls) return null
+
+          return (
+            <section
+              key={catName}
+              style={{
+                padding: dragOverCat === catName ? '12px' : '0px',
+                borderRadius: 18,
+                border: dragOverCat === catName ? '2px dashed #1A3D2A' : '2px solid transparent',
+                background: dragOverCat === catName ? 'rgba(238, 245, 241, 0.6)' : 'transparent',
+                transition: 'all 0.15s ease',
+              }}
+              onDragOver={(e) => {
+                if (!showEditControls) return
+                e.preventDefault()
+                e.dataTransfer.dropEffect = 'move'
+                if (dragOverCat !== catName) setDragOverCat(catName)
+              }}
+              onDragLeave={(e) => {
+                if (!showEditControls) return
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                  setDragOverCat(null)
+                }
+              }}
+              onDrop={(e) => {
+                if (!showEditControls) return
+                e.preventDefault()
                 setDragOverCat(null)
-              }
-            }}
-            onDrop={(e) => {
-              if (!showEditControls) return
-              e.preventDefault()
-              setDragOverCat(null)
-              setDraggedId(null)
-              const resId = e.dataTransfer.getData('text/plain') || draggedId
-              if (resId) handleDropToCategory(resId, catName)
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A3D2A', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span>{catName}</span>
-                {showEditControls && (
-                  <button
-                    onClick={() => handleRenameCategory(catName)}
-                    title="Categorienaam bewerken"
-                    style={{
-                      background: '#F0ECE4',
-                      border: 'none',
-                      borderRadius: 6,
-                      padding: '3px 8px',
-                      fontSize: '.75rem',
-                      color: '#1A3D2A',
-                      cursor: 'pointer',
-                      fontWeight: 700,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      marginLeft: 4,
+                setDraggedId(null)
+                const resId = e.dataTransfer.getData('text/plain') || draggedId
+                if (resId) handleDropToCategory(resId, catName)
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A3D2A', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span>{catName}</span>
+                  {showEditControls && (
+                    <button
+                      onClick={() => handleRenameCategory(catName)}
+                      title="Categorienaam bewerken"
+                      style={{
+                        background: '#F0ECE4',
+                        border: 'none',
+                        borderRadius: 6,
+                        padding: '3px 8px',
+                        fontSize: '.75rem',
+                        color: '#1A3D2A',
+                        cursor: 'pointer',
+                        fontWeight: 700,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        marginLeft: 4,
+                      }}
+                    >
+                      <i className="fa-solid fa-pen-to-square"></i> Categorie bewerken
+                    </button>
+                  )}
+                </h2>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
+                {items.map(item => (
+                  <ResourceCard
+                    key={item.id}
+                    item={item}
+                    showEditControls={showEditControls}
+                    onEdit={openEditItemModal}
+                    onDelete={handleDelete}
+                    isDeleting={deletingId === item.id}
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData('text/plain', item.id)
+                      setDraggedId(item.id)
                     }}
-                  >
-                    <i className="fa-solid fa-pen-to-square"></i> Categorie bewerken
-                  </button>
-                )}
-              </h2>
-            </div>
+                    onDragEnd={() => setDraggedId(null)}
+                    isDragging={draggedId === item.id}
+                  />
+                ))}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
-              {items.map(item => (
-                <ResourceCard
-                  key={item.id}
-                  item={item}
-                  showEditControls={showEditControls}
-                  onEdit={openEditModal}
-                  onDelete={handleDelete}
-                  isDeleting={deletingId === item.id}
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('text/plain', item.id)
-                    setDraggedId(item.id)
-                  }}
-                  onDragEnd={() => setDraggedId(null)}
-                  isDragging={draggedId === item.id}
-                />
-              ))}
-
-              {/* Skeleton Add Card at the end of Category in Edit Mode */}
-              {showEditControls && (
-                <div
-                  onClick={() => openNewModal(catName)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    padding: '16px 18px',
-                    borderRadius: 16,
-                    border: '2px dashed #C2D9C9',
-                    background: 'rgba(238, 245, 241, 0.45)',
-                    color: '#1A3D2A',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                  }}
-                  className="action-card-hover"
-                >
+                {/* Skeleton Add Card at the end of Category in Edit Mode */}
+                {showEditControls && (
                   <div
+                    onClick={() => openNewItemModal(catName)}
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 12,
-                      background: '#fff',
-                      border: '1.5px dashed #1A3D2A',
-                      color: '#1A3D2A',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '1.1rem',
-                      flexShrink: 0,
+                      gap: 12,
+                      padding: '16px 18px',
+                      borderRadius: 16,
+                      border: '2px dashed #C2D9C9',
+                      background: 'rgba(238, 245, 241, 0.45)',
+                      color: '#1A3D2A',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
                     }}
+                    className="action-card-hover"
                   >
-                    <i className="fa-solid fa-plus"></i>
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 12,
+                        background: '#fff',
+                        border: '1.5px dashed #1A3D2A',
+                        color: '#1A3D2A',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.1rem',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <i className="fa-solid fa-plus"></i>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <strong style={{ fontSize: '.9rem', fontWeight: 800, color: '#1A3D2A', display: 'block' }}>
+                        Item toevoegen
+                      </strong>
+                      <span style={{ fontSize: '.78rem', color: '#6A8A75' }}>
+                        Toevoegen aan {catName}
+                      </span>
+                    </div>
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <strong style={{ fontSize: '.9rem', fontWeight: 800, color: '#1A3D2A', display: 'block' }}>
-                      Item toevoegen
-                    </strong>
-                    <span style={{ fontSize: '.78rem', color: '#6A8A75' }}>
-                      Toevoegen aan {catName}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-        ))}
+                )}
+              </div>
+            </section>
+          )
+        })}
       </div>
 
-      {/* Modal for Adding / Editing Resource (Unified 1-Page Form) */}
-      {modalOpen && (
+      {/* Dedicated Modal for Creating a New Category */}
+      {categoryModalOpen && (
+        <div className="portaal-modal-overlay">
+          <div className="portaal-modal-card" style={{ maxWidth: 440 }}>
+            <div className="portaal-modal-header">
+              <h3 className="portaal-modal-title">📁 Nieuwe Categorie Maken</h3>
+              <button className="portaal-modal-close" onClick={() => setCategoryModalOpen(false)}>&times;</button>
+            </div>
+
+            <form onSubmit={handleCreateCategory}>
+              <div className="portaal-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                  <label className="form-label" htmlFor="new_cat_input">Categorienaam *</label>
+                  <input
+                    type="text"
+                    id="new_cat_input"
+                    className="form-control"
+                    placeholder="bijv. ⛺ Vlottenbouw & Technieken"
+                    value={newCategoryInput}
+                    onChange={(e) => setNewCategoryInput(e.target.value)}
+                    required
+                    autoFocus
+                  />
+                  <span style={{ fontSize: '.75rem', color: '#6A8A75', marginTop: 6, display: 'block' }}>
+                    Tip: Gebruik een emoji aan het begin voor een mooie uitstraling.
+                  </span>
+                </div>
+              </div>
+
+              <div className="portaal-modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => setCategoryModalOpen(false)}
+                >
+                  Annuleren
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-secondary"
+                  disabled={!newCategoryInput.trim()}
+                >
+                  Categorie Aanmaken
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Adding / Editing a Resource Item */}
+      {itemModalOpen && (
         <div className="portaal-modal-overlay">
           <div className="portaal-modal-card" style={{ maxWidth: 540 }}>
             <div className="portaal-modal-header">
               <h3 className="portaal-modal-title">
                 {editingItem ? '✏️ Item Bewerken' : '➕ Nieuw Item Toevoegen'}
               </h3>
-              <button className="portaal-modal-close" onClick={() => setModalOpen(false)}>&times;</button>
+              <button className="portaal-modal-close" onClick={() => setItemModalOpen(false)}>&times;</button>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleItemSubmit}>
               <div className="portaal-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {error && (
                   <div className="portaal-modal-alert error">
@@ -799,56 +865,19 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                   />
                 </div>
 
-                {/* 3. Category Selection with Direct 'Nieuwe Categorie' */}
+                {/* 3. Category Selection */}
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <label className="form-label" htmlFor="res_cat" style={{ margin: 0 }}>Categorie *</label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsNewCategoryMode(!isNewCategoryMode)
-                        if (!isNewCategoryMode) {
-                          setCategory('CUSTOM')
-                          setCustomCategory('')
-                        }
-                      }}
-                      style={{ background: 'none', border: 'none', color: '#1A3D2A', fontWeight: 700, fontSize: '.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
-                    >
-                      <i className={isNewCategoryMode ? 'fa-solid fa-list' : 'fa-solid fa-folder-plus'}></i>
-                      <span>{isNewCategoryMode ? 'Kies uit lijst' : '➕ Nieuwe categorie maken'}</span>
-                    </button>
-                  </div>
-
-                  {!isNewCategoryMode ? (
-                    <select
-                      id="res_cat"
-                      className="form-control"
-                      value={category}
-                      onChange={(e) => {
-                        if (e.target.value === 'CUSTOM') {
-                          setIsNewCategoryMode(true)
-                          setCategory('CUSTOM')
-                          setCustomCategory('')
-                        } else {
-                          setCategory(e.target.value)
-                        }
-                      }}
-                    >
-                      {allExistingCategories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                      <option value="CUSTOM">➕ Nieuwe categorie maken…</option>
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Nieuwe categorienaam (bijv. ⛺ Vlottenbouw & Technieken)"
-                      value={customCategory}
-                      onChange={(e) => setCustomCategory(e.target.value)}
-                      required
-                    />
-                  )}
+                  <label className="form-label" htmlFor="res_cat">Categorie *</label>
+                  <select
+                    id="res_cat"
+                    className="form-control"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                  >
+                    {allCategoriesList.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* 4. URL / Link / File Upload */}
@@ -930,7 +959,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 <button
                   type="button"
                   className="btn btn-outline"
-                  onClick={() => setModalOpen(false)}
+                  onClick={() => setItemModalOpen(false)}
                   disabled={submitting}
                 >
                   Annuleren
