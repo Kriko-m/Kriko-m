@@ -192,7 +192,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
   const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false)
 
-  // Custom In-Page Confirm Modal state (No native Chrome popups)
+  // Custom In-Page Confirm Modal state (Rendered at top z-index: 1200)
   const [confirmModalOpen, setConfirmModalOpen] = useState(false)
   const [confirmTitle, setConfirmTitle] = useState('')
   const [confirmMessage, setConfirmMessage] = useState('')
@@ -852,50 +852,9 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
         })}
       </div>
 
-      {/* Custom In-Page Confirmation Modal (Replaces native browser Chrome confirm) */}
-      {confirmModalOpen && (
-        <div className="portaal-modal-overlay">
-          <div className="portaal-modal-card" style={{ maxWidth: 440 }}>
-            <div className="portaal-modal-header">
-              <h3 className="portaal-modal-title">{confirmTitle}</h3>
-              <button className="portaal-modal-close" onClick={() => setConfirmModalOpen(false)}>&times;</button>
-            </div>
-
-            <div className="portaal-modal-body" style={{ padding: '16px 20px' }}>
-              <p style={{ margin: 0, fontSize: '.95rem', color: '#1A3D2A', lineHeight: 1.5 }}>
-                {confirmMessage}
-              </p>
-            </div>
-
-            <div className="portaal-modal-footer">
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => setConfirmModalOpen(false)}
-              >
-                Annuleren
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ background: '#B91C1C', borderColor: '#B91C1C', color: '#fff' }}
-                onClick={async () => {
-                  if (confirmAction) {
-                    await confirmAction()
-                  }
-                  setConfirmModalOpen(false)
-                }}
-              >
-                {confirmBtnText}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Dedicated Modal for Creating a New Category */}
       {categoryModalOpen && (
-        <div className="portaal-modal-overlay">
+        <div className="portaal-modal-overlay" style={{ zIndex: 1100 }}>
           <div className="portaal-modal-card" style={{ maxWidth: 440 }}>
             <div className="portaal-modal-header">
               <h3 className="portaal-modal-title">📁 Nieuwe Categorie Maken</h3>
@@ -945,7 +904,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
 
       {/* Dedicated Modal for Editing / Renaming / Deleting a Category */}
       {editCategoryModalOpen && (
-        <div className="portaal-modal-overlay">
+        <div className="portaal-modal-overlay" style={{ zIndex: 1100 }}>
           <div className="portaal-modal-card" style={{ maxWidth: 460 }}>
             <div className="portaal-modal-header">
               <h3 className="portaal-modal-title">⚙️ Categorie Bewerken</h3>
@@ -1022,7 +981,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
 
       {/* Modal for Adding / Editing a Resource Item */}
       {itemModalOpen && (
-        <div className="portaal-modal-overlay">
+        <div className="portaal-modal-overlay" style={{ zIndex: 1100 }}>
           <div className="portaal-modal-card" style={{ maxWidth: 540 }}>
             <div className="portaal-modal-header">
               <h3 className="portaal-modal-title">
@@ -1174,6 +1133,47 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Custom In-Page Confirmation Modal (Rendered at top layer z-index: 1200) */}
+      {confirmModalOpen && (
+        <div className="portaal-modal-overlay" style={{ zIndex: 1200 }}>
+          <div className="portaal-modal-card" style={{ maxWidth: 440 }}>
+            <div className="portaal-modal-header">
+              <h3 className="portaal-modal-title">{confirmTitle}</h3>
+              <button className="portaal-modal-close" onClick={() => setConfirmModalOpen(false)}>&times;</button>
+            </div>
+
+            <div className="portaal-modal-body" style={{ padding: '16px 20px' }}>
+              <p style={{ margin: 0, fontSize: '.95rem', color: '#1A3D2A', lineHeight: 1.5 }}>
+                {confirmMessage}
+              </p>
+            </div>
+
+            <div className="portaal-modal-footer">
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setConfirmModalOpen(false)}
+              >
+                Annuleren
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ background: '#B91C1C', borderColor: '#B91C1C', color: '#fff' }}
+                onClick={async () => {
+                  if (confirmAction) {
+                    await confirmAction()
+                  }
+                  setConfirmModalOpen(false)
+                }}
+              >
+                {confirmBtnText}
+              </button>
+            </div>
           </div>
         </div>
       )}
