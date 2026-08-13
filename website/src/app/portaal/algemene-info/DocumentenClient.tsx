@@ -48,107 +48,123 @@ function ResourceCard({
   onDelete: (id: string) => void
   isDeleting: boolean
 }) {
+  const handleClick = () => {
+    if (item.url) {
+      window.open(item.url, '_blank', 'noopener,noreferrer')
+    }
+  }
+
   return (
     <div
+      onClick={handleClick}
       style={{
+        position: 'relative',
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        gap: 16,
-        padding: '20px',
+        alignItems: 'center',
+        gap: 14,
+        padding: '16px 18px',
         borderRadius: 16,
         background: '#fff',
         border: showEditControls ? '2px solid #1A3D2A' : '1.5px solid #C2D9C9',
-        boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
-        transition: 'transform 0.15s, border-color 0.15s, box-shadow 0.15s',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+        cursor: item.url ? 'pointer' : 'default',
+        transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
       }}
       className="action-card-hover"
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: '#EEF5F1', color: '#1A3D2A', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', flexShrink: 0 }}>
-          <i className={item.icon}></i>
-        </div>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <strong style={{ fontSize: '1rem', fontWeight: 800, color: '#1A3D2A', display: 'block', lineHeight: 1.3, marginBottom: 4 }}>
+      <div
+        style={{
+          width: 42,
+          height: 42,
+          borderRadius: 12,
+          background: '#EEF5F1',
+          color: '#1A3D2A',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '1.2rem',
+          flexShrink: 0,
+        }}
+      >
+        <i className={item.icon}></i>
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0, paddingRight: showEditControls ? 64 : 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <strong style={{ fontSize: '.95rem', fontWeight: 800, color: '#1A3D2A', lineHeight: 1.3 }}>
             {item.label}
           </strong>
-          <p style={{ margin: 0, fontSize: '.85rem', color: '#6A8A75', lineHeight: 1.45 }}>
+          {item.url && (
+            <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '.72rem', color: '#6A8A75', flexShrink: 0 }}></i>
+          )}
+        </div>
+        {item.description && (
+          <p style={{ margin: '3px 0 0', fontSize: '.82rem', color: '#6A8A75', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
             {item.description}
           </p>
-        </div>
+        )}
       </div>
 
-      {/* Bottom Actions Row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingTop: 12, borderTop: '1px solid #EEF5F1' }}>
-        {item.url ? (
-          <a
-            href={item.url}
-            target="_blank"
-            rel="noreferrer"
+      {showEditControls && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'absolute',
+            right: 10,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            display: 'flex',
+            gap: 4,
+            background: '#fff',
+            padding: '3px 5px',
+            borderRadius: 8,
+            border: '1px solid #C2D9C9',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
+          }}
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit(item)
+            }}
+            title="Bewerken"
             style={{
+              background: 'none',
+              border: 'none',
+              borderRadius: 6,
+              padding: '4px 6px',
+              fontSize: '.78rem',
+              color: '#1A3D2A',
+              cursor: 'pointer',
+              fontWeight: 700,
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 6,
-              fontSize: '.85rem',
-              fontWeight: 700,
-              color: '#1A3D2A',
-              textDecoration: 'none',
-              background: '#EEF5F1',
-              padding: '7px 14px',
-              borderRadius: 10,
-              transition: 'background-color 0.15s',
+              gap: 4,
             }}
-            className="action-card-hover"
           >
-            <span>Openen</span>
-            <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '.78rem' }}></i>
-          </a>
-        ) : (
-          <span style={{ fontSize: '.82rem', color: '#888', fontStyle: 'italic' }}>
-            Geen link ingesteld
-          </span>
-        )}
-
-        {showEditControls && (
-          <div style={{ display: 'flex', gap: 6 }}>
-            <button
-              onClick={() => onEdit(item)}
-              title="Bewerken"
-              style={{
-                background: '#F0ECE4',
-                border: 'none',
-                borderRadius: 8,
-                padding: '7px 12px',
-                fontSize: '.82rem',
-                color: '#1A3D2A',
-                cursor: 'pointer',
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
-            >
-              <i className="fa-solid fa-pen-to-square"></i> Bewerken
-            </button>
-            <button
-              onClick={() => onDelete(item.id)}
-              disabled={isDeleting}
-              title="Verwijderen"
-              style={{
-                background: '#FEE2E2',
-                border: 'none',
-                borderRadius: 8,
-                padding: '7px 10px',
-                fontSize: '.82rem',
-                color: '#B91C1C',
-                cursor: 'pointer',
-              }}
-            >
-              <i className="fa-solid fa-trash-can"></i>
-            </button>
-          </div>
-        )}
-      </div>
+            <i className="fa-solid fa-pen-to-square"></i>
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onDelete(item.id)
+            }}
+            disabled={isDeleting}
+            title="Verwijderen"
+            style={{
+              background: 'none',
+              border: 'none',
+              borderRadius: 6,
+              padding: '4px 6px',
+              fontSize: '.78rem',
+              color: '#B91C1C',
+              cursor: 'pointer',
+            }}
+          >
+            <i className="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -338,22 +354,22 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
         </div>
 
         {isGroepsleiding && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
               onClick={() => setEditMode(!editMode)}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 8,
-                padding: '10px 18px',
-                borderRadius: 12,
+                gap: 6,
+                padding: '6px 14px',
+                borderRadius: 10,
                 background: editMode ? '#1A3D2A' : '#fff',
                 color: editMode ? '#fff' : '#1A3D2A',
-                border: '2px solid #1A3D2A',
+                border: '1.5px solid #1A3D2A',
                 fontWeight: 700,
-                fontSize: '.9rem',
+                fontSize: '.82rem',
                 cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(26,61,42,0.1)',
+                boxShadow: '0 2px 8px rgba(26,61,42,0.08)',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -367,16 +383,16 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: 8,
-                  padding: '10px 18px',
-                  borderRadius: 12,
+                  gap: 6,
+                  padding: '6px 14px',
+                  borderRadius: 10,
                   background: '#C9963A',
                   color: '#fff',
                   border: 'none',
                   fontWeight: 700,
-                  fontSize: '.9rem',
+                  fontSize: '.82rem',
                   cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(201,150,58,0.2)',
+                  boxShadow: '0 2px 8px rgba(201,150,58,0.18)',
                   transition: 'transform 0.15s, background-color 0.15s',
                 }}
                 className="action-card-hover"
@@ -398,14 +414,14 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
           {showEditControls && (
             <button
               onClick={() => openNewModal('quicklink')}
-              style={{ background: 'none', border: 'none', color: '#1A3D2A', fontWeight: 700, fontSize: '.84rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+              style={{ background: 'none', border: 'none', color: '#1A3D2A', fontWeight: 700, fontSize: '.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
             >
               <i className="fa-solid fa-plus-circle"></i> Snelkoppeling toevoegen
             </button>
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
           {quicklinks.map(link => (
             <ResourceCard
               key={link.id}
@@ -427,7 +443,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               {catName}
             </h2>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
               {items.map(item => (
                 <ResourceCard
                   key={item.id}
