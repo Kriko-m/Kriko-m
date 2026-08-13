@@ -10,7 +10,7 @@ interface Props {
 }
 
 const PRESET_CATEGORIES = [
-  'Snelkoppelingen',
+  '⚡ Snelkoppelingen',
   '🏕️ Kamp',
   '💶 Financieel',
   '🎲 Spel & Activiteiten',
@@ -193,15 +193,14 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [dragOverCat, setDragOverCat] = useState<string | null>(null)
 
-  // Form states
-  const [type, setType] = useState<'quicklink' | 'document'>('document')
+  // Form states (Unified 1-page form)
   const [label, setLabel] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('🏕️ Kamp')
   const [customCategory, setCustomCategory] = useState('')
+  const [isNewCategoryMode, setIsNewCategoryMode] = useState(false)
   const [url, setUrl] = useState('')
   const [icon, setIcon] = useState('fa-solid fa-file')
-  const [sortOrder, setSortOrder] = useState<number>(10)
 
   // UI states
   const [submitting, setSubmitting] = useState(false)
@@ -209,48 +208,64 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const [error, setError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  function openNewModal(defaultType: 'quicklink' | 'document' = 'document', presetCategory?: string) {
+  // Build dynamic categories list (preset + existing active categories)
+  const allExistingCategories = Array.from(
+    new Set([
+      ...PRESET_CATEGORIES,
+      ...resources.map(r => r.category === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : r.category)
+    ])
+  )
+
+  function openNewModal(presetCategory?: string) {
     setEditingItem(null)
-    setType(defaultType)
     setLabel('')
     setDescription('')
+    setUrl('')
+    setIcon('fa-solid fa-file')
+    setError('')
 
-    const targetCategory = presetCategory || (defaultType === 'quicklink' ? 'Snelkoppelingen' : '🏕️ Kamp')
-    if (PRESET_CATEGORIES.includes(targetCategory)) {
+    const targetCategory = presetCategory === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : presetCategory || '🏕️ Kamp'
+    if (targetCategory === 'NEW_CATEGORY') {
+      setCategory('CUSTOM')
+      setIsNewCategoryMode(true)
+      setCustomCategory('')
+    } else if (allExistingCategories.includes(targetCategory)) {
       setCategory(targetCategory)
+      setIsNewCategoryMode(false)
       setCustomCategory('')
     } else {
       setCategory('CUSTOM')
+      setIsNewCategoryMode(true)
       setCustomCategory(targetCategory)
     }
 
-    setUrl('')
-    setIcon(defaultType === 'quicklink' ? 'fa-brands fa-google-drive' : 'fa-solid fa-file')
-    setSortOrder(defaultType === 'quicklink' ? 5 : 10)
-    setError('')
     setModalOpen(true)
   }
 
   function openEditModal(item: PortalResource) {
     setEditingItem(item)
-    setType(item.type)
     setLabel(item.label)
     setDescription(item.description)
-    if (PRESET_CATEGORIES.includes(item.category)) {
-      setCategory(item.category)
+    setUrl(item.url)
+    setIcon(item.icon)
+    setError('')
+
+    const itemCat = item.category === 'Snelkoppelingen' ? '⚡ Snelkoppelingen' : item.category
+    if (allExistingCategories.includes(itemCat)) {
+      setCategory(itemCat)
+      setIsNewCategoryMode(false)
       setCustomCategory('')
     } else {
       setCategory('CUSTOM')
+      setIsNewCategoryMode(true)
       setCustomCategory(item.category)
     }
-    setUrl(item.url)
-    setIcon(item.icon)
-    setSortOrder(item.sort_order)
-    setError('')
+
     setModalOpen(true)
   }
 
   async function handleRenameCategory(oldCat: string) {
+    const rawOld = oldCat === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : oldCat
     const newName = window.prompt(`Voer een nieuwe naam in voor categorie "${oldCat}":`, oldCat)
     if (!newName || !newName.trim() || newName.trim() === oldCat) return
 
@@ -259,12 +274,12 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       const res = await fetch('/api/admin/portal-resources/rename-category', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ oldCategory: oldCat, newCategory: trimmedNew }),
+        body: JSON.stringify({ oldCategory: rawOld, newCategory: trimmedNew }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Fout bij hernoemen van categorie')
 
-      setResources(prev => prev.map(r => r.category === oldCat ? { ...r, category: trimmedNew } : r))
+      setResources(prev => prev.map(r => r.category === rawOld ? { ...r, category: trimmedNew } : r))
       router.refresh()
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Fout bij hernoemen van categorie')
@@ -273,19 +288,20 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
 
   async function handleDropToCategory(resourceId: string, targetCat: string) {
     setDraggedId(null)
+    const rawTarget = targetCat === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : targetCat
     const item = resources.find(r => r.id === resourceId)
-    if (!item || item.category === targetCat) return
+    if (!item || item.category === rawTarget) return
 
-    const targetType = targetCat === 'Snelkoppelingen' ? 'quicklink' : 'document'
+    const targetType = rawTarget === 'Snelkoppelingen' ? 'quicklink' : 'document'
 
     // Optimistic update
-    setResources(prev => prev.map(r => r.id === resourceId ? { ...r, category: targetCat, type: targetType } : r))
+    setResources(prev => prev.map(r => r.id === resourceId ? { ...r, category: rawTarget, type: targetType } : r))
 
     try {
       const res = await fetch(`/api/admin/portal-resources/${resourceId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: targetCat, type: targetType }),
+        body: JSON.stringify({ category: rawTarget, type: targetType }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Fout bij verplaatsen')
@@ -332,16 +348,19 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     setSubmitting(true)
     setError('')
 
-    const finalCategory = category === 'CUSTOM' ? customCategory.trim() : category
+    let finalCategory = isNewCategoryMode || category === 'CUSTOM' ? customCategory.trim() : category
+    if (finalCategory === '⚡ Snelkoppelingen') finalCategory = 'Snelkoppelingen'
+
+    const itemType = finalCategory === 'Snelkoppelingen' ? 'quicklink' : 'document'
 
     const payload = {
-      type,
+      type: itemType,
       label: label.trim(),
       description: description.trim(),
       category: finalCategory || 'Algemeen',
       url: url.trim(),
       icon,
-      sort_order: sortOrder,
+      sort_order: editingItem?.sort_order ?? 10,
     }
 
     try {
@@ -398,8 +417,8 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     }
   }
 
-  const quicklinks = resources.filter(r => r.type === 'quicklink')
-  const documentItems = resources.filter(r => r.type === 'document')
+  const quicklinks = resources.filter(r => r.type === 'quicklink' || r.category === 'Snelkoppelingen')
+  const documentItems = resources.filter(r => r.type === 'document' && r.category !== 'Snelkoppelingen')
 
   // Group document items by category
   const categoriesMap = documentItems.reduce((acc, item) => {
@@ -450,28 +469,53 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
             </button>
 
             {editMode && (
-              <button
-                onClick={() => openNewModal('document')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '6px 14px',
-                  borderRadius: 10,
-                  background: '#C9963A',
-                  color: '#fff',
-                  border: 'none',
-                  fontWeight: 700,
-                  fontSize: '.82rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(201,150,58,0.18)',
-                  transition: 'transform 0.15s, background-color 0.15s',
-                }}
-                className="action-card-hover"
-              >
-                <i className="fa-solid fa-plus"></i>
-                <span>Nieuwe Categorie / Item</span>
-              </button>
+              <>
+                <button
+                  onClick={() => openNewModal('NEW_CATEGORY')}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '6px 14px',
+                    borderRadius: 10,
+                    background: '#1A3D2A',
+                    color: '#fff',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '.82rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(26,61,42,0.15)',
+                    transition: 'transform 0.15s, background-color 0.15s',
+                  }}
+                  className="action-card-hover"
+                >
+                  <i className="fa-solid fa-folder-plus"></i>
+                  <span>Nieuwe Categorie Maken</span>
+                </button>
+
+                <button
+                  onClick={() => openNewModal()}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '6px 14px',
+                    borderRadius: 10,
+                    background: '#C9963A',
+                    color: '#fff',
+                    border: 'none',
+                    fontWeight: 700,
+                    fontSize: '.82rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(201,150,58,0.18)',
+                    transition: 'transform 0.15s, background-color 0.15s',
+                  }}
+                  className="action-card-hover"
+                >
+                  <i className="fa-solid fa-plus"></i>
+                  <span>Nieuw Item</span>
+                </button>
+              </>
             )}
           </div>
         )}
@@ -481,17 +525,17 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       <section
         style={{
           marginBottom: 36,
-          padding: dragOverCat === 'Snelkoppelingen' ? '12px' : '0px',
+          padding: dragOverCat === '⚡ Snelkoppelingen' ? '12px' : '0px',
           borderRadius: 18,
-          border: dragOverCat === 'Snelkoppelingen' ? '2px dashed #1A3D2A' : '2px solid transparent',
-          background: dragOverCat === 'Snelkoppelingen' ? 'rgba(238, 245, 241, 0.6)' : 'transparent',
+          border: dragOverCat === '⚡ Snelkoppelingen' ? '2px dashed #1A3D2A' : '2px solid transparent',
+          background: dragOverCat === '⚡ Snelkoppelingen' ? 'rgba(238, 245, 241, 0.6)' : 'transparent',
           transition: 'all 0.15s ease',
         }}
         onDragOver={(e) => {
           if (!showEditControls) return
           e.preventDefault()
           e.dataTransfer.dropEffect = 'move'
-          if (dragOverCat !== 'Snelkoppelingen') setDragOverCat('Snelkoppelingen')
+          if (dragOverCat !== '⚡ Snelkoppelingen') setDragOverCat('⚡ Snelkoppelingen')
         }}
         onDragLeave={(e) => {
           if (!showEditControls) return
@@ -503,8 +547,9 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
           if (!showEditControls) return
           e.preventDefault()
           setDragOverCat(null)
+          setDraggedId(null)
           const resId = e.dataTransfer.getData('text/plain') || draggedId
-          if (resId) handleDropToCategory(resId, 'Snelkoppelingen')
+          if (resId) handleDropToCategory(resId, '⚡ Snelkoppelingen')
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -534,7 +579,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
           {/* Skeleton Add Card for Quicklinks in Edit Mode */}
           {showEditControls && (
             <div
-              onClick={() => openNewModal('quicklink', 'Snelkoppelingen')}
+              onClick={() => openNewModal('⚡ Snelkoppelingen')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -607,6 +652,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               if (!showEditControls) return
               e.preventDefault()
               setDragOverCat(null)
+              setDraggedId(null)
               const resId = e.dataTransfer.getData('text/plain') || draggedId
               if (resId) handleDropToCategory(resId, catName)
             }}
@@ -660,7 +706,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               {/* Skeleton Add Card at the end of Category in Edit Mode */}
               {showEditControls && (
                 <div
-                  onClick={() => openNewModal('document', catName)}
+                  onClick={() => openNewModal(catName)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -707,7 +753,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
         ))}
       </div>
 
-      {/* Modal for Adding / Editing Resource */}
+      {/* Modal for Adding / Editing Resource (Unified 1-Page Form) */}
       {modalOpen && (
         <div className="portaal-modal-overlay">
           <div className="portaal-modal-card" style={{ maxWidth: 540 }}>
@@ -726,49 +772,21 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                   </div>
                 )}
 
-                {/* Type Selection */}
-                <div style={{ display: 'flex', gap: 16 }}>
-                  <label style={{ flex: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, border: type === 'document' ? '2px solid #1A3D2A' : '1px solid #C2D9C9', background: type === 'document' ? '#EEF5F1' : '#fff' }}>
-                    <input
-                      type="radio"
-                      name="res_type"
-                      checked={type === 'document'}
-                      onChange={() => {
-                        setType('document')
-                        if (category === 'Snelkoppelingen') setCategory('🏕️ Kamp')
-                      }}
-                    />
-                    <strong style={{ fontSize: '.9rem', color: '#1A3D2A' }}>📄 Document / Sjabloon</strong>
-                  </label>
-                  <label style={{ flex: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 10, border: type === 'quicklink' ? '2px solid #1A3D2A' : '1px solid #C2D9C9', background: type === 'quicklink' ? '#EEF5F1' : '#fff' }}>
-                    <input
-                      type="radio"
-                      name="res_type"
-                      checked={type === 'quicklink'}
-                      onChange={() => {
-                        setType('quicklink')
-                        setCategory('Snelkoppelingen')
-                      }}
-                    />
-                    <strong style={{ fontSize: '.9rem', color: '#1A3D2A' }}>⚡ Snelkoppeling</strong>
-                  </label>
-                </div>
-
-                {/* Title / Label */}
+                {/* 1. Title / Label */}
                 <div>
                   <label className="form-label" htmlFor="res_label">Titel / Naam *</label>
                   <input
                     type="text"
                     id="res_label"
                     className="form-control"
-                    placeholder="bijv. Kampgids 2026 of Kasboek Sjabloon"
+                    placeholder="bijv. Kampgids 2026 of Groepsadmin link"
                     value={label}
                     onChange={(e) => setLabel(e.target.value)}
                     required
                   />
                 </div>
 
-                {/* Description */}
+                {/* 2. Description */}
                 <div>
                   <label className="form-label" htmlFor="res_desc">Korte Beschrijving</label>
                   <input
@@ -781,39 +799,61 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                   />
                 </div>
 
-                {/* Category Selection */}
-                {type === 'document' && (
-                  <div>
-                    <label className="form-label" htmlFor="res_cat">Categorie</label>
+                {/* 3. Category Selection with Direct 'Nieuwe Categorie' */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <label className="form-label" htmlFor="res_cat" style={{ margin: 0 }}>Categorie *</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsNewCategoryMode(!isNewCategoryMode)
+                        if (!isNewCategoryMode) {
+                          setCategory('CUSTOM')
+                          setCustomCategory('')
+                        }
+                      }}
+                      style={{ background: 'none', border: 'none', color: '#1A3D2A', fontWeight: 700, fontSize: '.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                    >
+                      <i className={isNewCategoryMode ? 'fa-solid fa-list' : 'fa-solid fa-folder-plus'}></i>
+                      <span>{isNewCategoryMode ? 'Kies uit lijst' : '➕ Nieuwe categorie maken'}</span>
+                    </button>
+                  </div>
+
+                  {!isNewCategoryMode ? (
                     <select
                       id="res_cat"
                       className="form-control"
                       value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      onChange={(e) => {
+                        if (e.target.value === 'CUSTOM') {
+                          setIsNewCategoryMode(true)
+                          setCategory('CUSTOM')
+                          setCustomCategory('')
+                        } else {
+                          setCategory(e.target.value)
+                        }
+                      }}
                     >
-                      {PRESET_CATEGORIES.filter(c => c !== 'Snelkoppelingen').map(cat => (
+                      {allExistingCategories.map(cat => (
                         <option key={cat} value={cat}>{cat}</option>
                       ))}
-                      <option value="CUSTOM">+ Nieuwe categorie toevoegen…</option>
+                      <option value="CUSTOM">➕ Nieuwe categorie maken…</option>
                     </select>
+                  ) : (
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Nieuwe categorienaam (bijv. ⛺ Vlottenbouw & Technieken)"
+                      value={customCategory}
+                      onChange={(e) => setCustomCategory(e.target.value)}
+                      required
+                    />
+                  )}
+                </div>
 
-                    {category === 'CUSTOM' && (
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Nieuwe categorienaam (bijv. 📁 EHBO & Veiligheid)"
-                        value={customCategory}
-                        onChange={(e) => setCustomCategory(e.target.value)}
-                        style={{ marginTop: 8 }}
-                        required
-                      />
-                    )}
-                  </div>
-                )}
-
-                {/* URL / Link / File Upload */}
+                {/* 4. URL / Link / File Upload */}
                 <div>
-                  <label className="form-label" htmlFor="res_url">Link / URL (Google Drive of website)</label>
+                  <label className="form-label" htmlFor="res_url">Link / URL (Google Drive, website of bestand)</label>
                   <div style={{ display: 'flex', gap: 8 }}>
                     <input
                       type="url"
@@ -854,7 +894,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                   </span>
                 </div>
 
-                {/* Icon Selection */}
+                {/* 5. Icon Selection */}
                 <div>
                   <label className="form-label">Icoontje</label>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 110, overflowY: 'auto', padding: 4, border: '1px solid #C2D9C9', borderRadius: 10 }}>
