@@ -30,6 +30,17 @@ export default async function DocumentenPage() {
 
     if (!dbError && data && data.length > 0) {
       resources = data as PortalResource[]
+    } else {
+      // Auto-seed default resources into DB if table is empty
+      const seedItems = DEFAULT_RESOURCES.map(({ id, ...rest }) => rest)
+      const { data: seededData, error: seedError } = await admin
+        .from('portal_resources')
+        .insert(seedItems)
+        .select()
+
+      if (!seedError && seededData && seededData.length > 0) {
+        resources = seededData as PortalResource[]
+      }
     }
   } catch (err) {
     console.error('Error loading resources in server component:', err)

@@ -44,11 +44,22 @@ export async function GET() {
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true })
 
-    if (error || !data || data.length === 0) {
-      return NextResponse.json(DEFAULT_RESOURCES)
+    if (!error && data && data.length > 0) {
+      return NextResponse.json(data)
     }
 
-    return NextResponse.json(data)
+    // Auto-seed default resources into DB if empty
+    const seedItems = DEFAULT_RESOURCES.map(({ id, ...rest }) => rest)
+    const { data: seededData, error: seedError } = await admin
+      .from('portal_resources')
+      .insert(seedItems)
+      .select()
+
+    if (!seedError && seededData && seededData.length > 0) {
+      return NextResponse.json(seededData)
+    }
+
+    return NextResponse.json(DEFAULT_RESOURCES)
   } catch (err) {
     console.error('Error fetching portal_resources:', err)
     return NextResponse.json(DEFAULT_RESOURCES)
