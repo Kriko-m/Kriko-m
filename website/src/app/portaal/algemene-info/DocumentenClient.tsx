@@ -272,6 +272,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   }
 
   async function handleDropToCategory(resourceId: string, targetCat: string) {
+    setDraggedId(null)
     const item = resources.find(r => r.id === resourceId)
     if (!item || item.category === targetCat) return
 
