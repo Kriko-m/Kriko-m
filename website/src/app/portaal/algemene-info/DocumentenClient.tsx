@@ -37,13 +37,13 @@ const ICON_OPTIONS = [
 
 function ResourceCard({
   item,
-  isGroepsleiding,
+  showEditControls,
   onEdit,
   onDelete,
   isDeleting,
 }: {
   item: PortalResource
-  isGroepsleiding: boolean
+  showEditControls: boolean
   onEdit: (item: PortalResource) => void
   onDelete: (id: string) => void
   isDeleting: boolean
@@ -58,7 +58,7 @@ function ResourceCard({
         padding: '20px',
         borderRadius: 16,
         background: '#fff',
-        border: '1.5px solid #C2D9C9',
+        border: showEditControls ? '2px solid #1A3D2A' : '1.5px solid #C2D9C9',
         boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
         transition: 'transform 0.15s, border-color 0.15s, box-shadow 0.15s',
       }}
@@ -109,7 +109,7 @@ function ResourceCard({
           </span>
         )}
 
-        {isGroepsleiding && (
+        {showEditControls && (
           <div style={{ display: 'flex', gap: 6 }}>
             <button
               onClick={() => onEdit(item)}
@@ -156,6 +156,7 @@ function ResourceCard({
 export default function DocumentenClient({ initialResources, isGroepsleiding }: Props) {
   const router = useRouter()
   const [resources, setResources] = useState<PortalResource[]>(initialResources)
+  const [editMode, setEditMode] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<PortalResource | null>(null)
 
@@ -320,6 +321,8 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     return acc
   }, {} as Record<string, PortalResource[]>)
 
+  const showEditControls = isGroepsleiding && editMode
+
   return (
     <div style={{ padding: '28px 24px', maxWidth: 1100, margin: '0 auto' }}>
 
@@ -335,28 +338,54 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
         </div>
 
         {isGroepsleiding && (
-          <button
-            onClick={() => openNewModal('document')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 18px',
-              borderRadius: 12,
-              background: '#1A3D2A',
-              color: '#fff',
-              border: 'none',
-              fontWeight: 700,
-              fontSize: '.9rem',
-              cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(26,61,42,0.15)',
-              transition: 'transform 0.15s, background-color 0.15s',
-            }}
-            className="action-card-hover"
-          >
-            <i className="fa-solid fa-plus"></i>
-            <span>Nieuw Item Toevoegen</span>
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button
+              onClick={() => setEditMode(!editMode)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 18px',
+                borderRadius: 12,
+                background: editMode ? '#1A3D2A' : '#fff',
+                color: editMode ? '#fff' : '#1A3D2A',
+                border: '2px solid #1A3D2A',
+                fontWeight: 700,
+                fontSize: '.9rem',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(26,61,42,0.1)',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <i className={editMode ? 'fa-solid fa-check' : 'fa-solid fa-pen-to-square'}></i>
+              <span>{editMode ? 'Klaar met bewerken' : 'Bewerken'}</span>
+            </button>
+
+            {editMode && (
+              <button
+                onClick={() => openNewModal('document')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '10px 18px',
+                  borderRadius: 12,
+                  background: '#C9963A',
+                  color: '#fff',
+                  border: 'none',
+                  fontWeight: 700,
+                  fontSize: '.9rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(201,150,58,0.2)',
+                  transition: 'transform 0.15s, background-color 0.15s',
+                }}
+                className="action-card-hover"
+              >
+                <i className="fa-solid fa-plus"></i>
+                <span>Nieuw Item Toevoegen</span>
+              </button>
+            )}
+          </div>
         )}
       </header>
 
@@ -366,7 +395,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
           <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#1A3D2A', margin: 0 }}>
             ⚡ Snelkoppelingen
           </h2>
-          {isGroepsleiding && (
+          {showEditControls && (
             <button
               onClick={() => openNewModal('quicklink')}
               style={{ background: 'none', border: 'none', color: '#1A3D2A', fontWeight: 700, fontSize: '.84rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
@@ -381,7 +410,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
             <ResourceCard
               key={link.id}
               item={link}
-              isGroepsleiding={isGroepsleiding}
+              showEditControls={showEditControls}
               onEdit={openEditModal}
               onDelete={handleDelete}
               isDeleting={deletingId === link.id}
@@ -403,7 +432,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 <ResourceCard
                   key={item.id}
                   item={item}
-                  isGroepsleiding={isGroepsleiding}
+                  showEditControls={showEditControls}
                   onEdit={openEditModal}
                   onDelete={handleDelete}
                   isDeleting={deletingId === item.id}
