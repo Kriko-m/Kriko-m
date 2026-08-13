@@ -19,6 +19,8 @@ const PRESET_CATEGORIES = [
 ]
 
 const ICON_OPTIONS = [
+  { label: 'Scouts Lelie', icon: 'fa-solid fa-fleur-de-lis' },
+  { label: 'Scoutsklaver', icon: 'fa-solid fa-clover' },
   { label: 'Map / Bestanden', icon: 'fa-brands fa-google-drive' },
   { label: 'Tent / Kamp', icon: 'fa-solid fa-tent' },
   { label: 'Checklist', icon: 'fa-solid fa-clipboard-check' },
@@ -1086,20 +1088,20 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 {/* 5. Icon Selection */}
                 <div>
                   <label className="form-label">Icoontje</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 110, overflowY: 'auto', padding: 4, border: '1px solid #C2D9C9', borderRadius: 10 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 120, overflowY: 'auto', padding: 6, border: '1px solid #C2D9C9', borderRadius: 10, background: '#FAFDFB' }}>
                     {ICON_OPTIONS.map(opt => (
                       <button
                         key={opt.icon}
                         type="button"
                         onClick={() => setIcon(opt.icon)}
                         style={{
-                          width: 36,
-                          height: 36,
+                          width: 38,
+                          height: 38,
                           borderRadius: 8,
                           border: icon === opt.icon ? '2px solid #1A3D2A' : '1px solid #E0E0E0',
                           background: icon === opt.icon ? '#EEF5F1' : '#fff',
                           color: '#1A3D2A',
-                          fontSize: '1.1rem',
+                          fontSize: '1.15rem',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
