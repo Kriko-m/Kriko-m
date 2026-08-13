@@ -48,7 +48,7 @@ function ResourceCard({
   item: PortalResource
   showEditControls: boolean
   onEdit: (item: PortalResource) => void
-  onDelete: (id: string) => void
+  onDelete: (item: PortalResource) => void
   isDeleting: boolean
   onDragStart: (e: React.DragEvent) => void
   onDragEnd: () => void
@@ -160,7 +160,7 @@ function ResourceCard({
           <button
             onClick={(e) => {
               e.stopPropagation()
-              onDelete(item.id)
+              onDelete(item)
             }}
             disabled={isDeleting}
             title="Verwijderen"
@@ -191,6 +191,13 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const [itemModalOpen, setItemModalOpen] = useState(false)
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
   const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false)
+
+  // Custom In-Page Confirm Modal state (No native Chrome popups)
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false)
+  const [confirmTitle, setConfirmTitle] = useState('')
+  const [confirmMessage, setConfirmMessage] = useState('')
+  const [confirmBtnText, setConfirmBtnText] = useState('Verwijderen')
+  const [confirmAction, setConfirmAction] = useState<(() => Promise<void> | void) | null>(null)
 
   const [newCategoryInput, setNewCategoryInput] = useState('')
   const [editingCategoryName, setEditingCategoryName] = useState('')
@@ -226,6 +233,14 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       ...userCreatedCategories,
     ])
   )
+
+  function showConfirmDialog(title: string, message: string, btnText: string, action: () => Promise<void> | void) {
+    setConfirmTitle(title)
+    setConfirmMessage(message)
+    setConfirmBtnText(btnText)
+    setConfirmAction(() => action)
+    setConfirmModalOpen(true)
+  }
 
   function openNewItemModal(presetCategory?: string) {
     setEditingItem(null)
@@ -313,39 +328,43 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     }
   }
 
-  async function handleDeleteCategory() {
+  function requestDeleteCategory() {
     if (!editingCategoryName) return
-    const count = resources.filter(r => r.category === (editingCategoryName === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : editingCategoryName)).length
+    const rawCategory = editingCategoryName === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : editingCategoryName
+    const count = resources.filter(r => r.category === rawCategory).length
 
     const confirmMsg = count > 0
-      ? `Weet je zeker dat je de categorie "${editingCategoryName}" en alle ${count} items daarin wilt verwijderen?`
+      ? `Weet je zeker dat je de categorie "${editingCategoryName}" én alle ${count} items daarin wilt verwijderen?`
       : `Weet je zeker dat je de categorie "${editingCategoryName}" wilt verwijderen?`
 
-    if (!confirm(confirmMsg)) return
+    showConfirmDialog(
+      '⚠️ Categorie Verwijderen',
+      confirmMsg,
+      'Ja, Categorie Verwijderen',
+      async () => {
+        setIsDeletingCategory(true)
+        setError('')
+        try {
+          const res = await fetch('/api/admin/portal-resources/delete-category', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ category: rawCategory }),
+          })
 
-    setIsDeletingCategory(true)
-    setError('')
-    const rawCategory = editingCategoryName === '⚡ Snelkoppelingen' ? 'Snelkoppelingen' : editingCategoryName
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Fout bij verwijderen van categorie')
 
-    try {
-      const res = await fetch('/api/admin/portal-resources/delete-category', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: rawCategory }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Fout bij verwijderen van categorie')
-
-      setResources(prev => prev.filter(r => r.category !== rawCategory))
-      setUserCreatedCategories(prev => prev.filter(c => c !== editingCategoryName && c !== rawCategory))
-      setEditCategoryModalOpen(false)
-      router.refresh()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Verwijderen mislukt')
-    } finally {
-      setIsDeletingCategory(false)
-    }
+          setResources(prev => prev.filter(r => r.category !== rawCategory))
+          setUserCreatedCategories(prev => prev.filter(c => c !== editingCategoryName && c !== rawCategory))
+          setEditCategoryModalOpen(false)
+          router.refresh()
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Verwijderen mislukt')
+        } finally {
+          setIsDeletingCategory(false)
+        }
+      }
+    )
   }
 
   async function handleDropToCategory(resourceId: string, targetCat: string) {
@@ -369,7 +388,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       if (!res.ok) throw new Error(data.error || 'Fout bij verplaatsen')
       router.refresh()
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Verplaatsen mislukt')
+      setError(err instanceof Error ? err.message : 'Verplaatsen mislukt')
       // Revert state
       setResources(prev => prev.map(r => r.id === resourceId ? item : r))
     }
@@ -457,24 +476,29 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Weet je zeker dat je dit item wilt verwijderen?')) return
+  function requestDeleteItem(item: PortalResource) {
+    showConfirmDialog(
+      '⚠️ Item Verwijderen',
+      `Weet je zeker dat je "${item.label}" wilt verwijderen?`,
+      'Ja, Verwijderen',
+      async () => {
+        setDeletingId(item.id)
+        try {
+          const res = await fetch(`/api/admin/portal-resources/${item.id}`, {
+            method: 'DELETE',
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Fout bij verwijderen')
 
-    setDeletingId(id)
-    try {
-      const res = await fetch(`/api/admin/portal-resources/${id}`, {
-        method: 'DELETE',
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Fout bij verwijderen')
-
-      setResources(prev => prev.filter(r => r.id !== id))
-      router.refresh()
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Verwijderen mislukt')
-    } finally {
-      setDeletingId(null)
-    }
+          setResources(prev => prev.filter(r => r.id !== item.id))
+          router.refresh()
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Verwijderen mislukt')
+        } finally {
+          setDeletingId(null)
+        }
+      }
+    )
   }
 
   const quicklinks = resources.filter(r => r.type === 'quicklink' || r.category === 'Snelkoppelingen')
@@ -636,7 +660,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               item={link}
               showEditControls={showEditControls}
               onEdit={openEditItemModal}
-              onDelete={handleDelete}
+              onDelete={requestDeleteItem}
               isDeleting={deletingId === link.id}
               onDragStart={(e) => {
                 e.dataTransfer.setData('text/plain', link.id)
@@ -766,7 +790,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                     item={item}
                     showEditControls={showEditControls}
                     onEdit={openEditItemModal}
-                    onDelete={handleDelete}
+                    onDelete={requestDeleteItem}
                     isDeleting={deletingId === item.id}
                     onDragStart={(e) => {
                       e.dataTransfer.setData('text/plain', item.id)
@@ -827,6 +851,47 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
           )
         })}
       </div>
+
+      {/* Custom In-Page Confirmation Modal (Replaces native browser Chrome confirm) */}
+      {confirmModalOpen && (
+        <div className="portaal-modal-overlay">
+          <div className="portaal-modal-card" style={{ maxWidth: 440 }}>
+            <div className="portaal-modal-header">
+              <h3 className="portaal-modal-title">{confirmTitle}</h3>
+              <button className="portaal-modal-close" onClick={() => setConfirmModalOpen(false)}>&times;</button>
+            </div>
+
+            <div className="portaal-modal-body" style={{ padding: '16px 20px' }}>
+              <p style={{ margin: 0, fontSize: '.95rem', color: '#1A3D2A', lineHeight: 1.5 }}>
+                {confirmMessage}
+              </p>
+            </div>
+
+            <div className="portaal-modal-footer">
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() => setConfirmModalOpen(false)}
+              >
+                Annuleren
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                style={{ background: '#B91C1C', borderColor: '#B91C1C', color: '#fff' }}
+                onClick={async () => {
+                  if (confirmAction) {
+                    await confirmAction()
+                  }
+                  setConfirmModalOpen(false)
+                }}
+              >
+                {confirmBtnText}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dedicated Modal for Creating a New Category */}
       {categoryModalOpen && (
@@ -912,7 +977,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               <div className="portaal-modal-footer" style={{ justifyContent: 'space-between' }}>
                 <button
                   type="button"
-                  onClick={handleDeleteCategory}
+                  onClick={requestDeleteCategory}
                   disabled={isDeletingCategory || submitting}
                   style={{
                     background: '#FEE2E2',
