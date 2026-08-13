@@ -39,10 +39,23 @@ export async function PATCH(
     if (!gl) return NextResponse.json({ error: 'Enkel groepsleiding kan publieke events bewerken.' }, { status: 403 })
   }
 
+  const STRING_NOT_NULL_KEYS = new Set([
+    'time', 'location', 'description',
+    'facebook_event_url', 'facebook_post_url', 'external_link_url',
+    'document_url', 'banner_image'
+  ])
+
   const update: Record<string, unknown> = {}
-  for (const key of ['title', 'date', 'datum_tot', 'time', 'location', 'description', 'facebook_event_url', 'facebook_post_url', 'external_link_url', 'document_url', 'banner_image', 'icon']) {
-    if (key in body) update[key] = body[key] ?? null
+  for (const key of ['title', 'date', 'time', 'location', 'description', 'facebook_event_url', 'facebook_post_url', 'external_link_url', 'document_url', 'banner_image', 'icon']) {
+    if (key in body) {
+      if (STRING_NOT_NULL_KEYS.has(key)) {
+        update[key] = body[key] ?? ''
+      } else {
+        update[key] = body[key] ?? null
+      }
+    }
   }
+  if ('datum_tot' in body) update.datum_tot = body.datum_tot || null
   if ('audience' in body) update.audience = [...new Set(resultingAudience)]
   if ('is_evenement' in body) update.is_evenement = resultingEvenement
 

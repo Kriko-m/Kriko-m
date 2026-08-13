@@ -9,21 +9,20 @@ interface InfoTabbedContentProps {
   address: string
 }
 
-type TabType = 'praktisch' | 'takken' | 'uniform' | 'op-maat' | 'faq'
+type TabType = 'praktisch' | 'takken' | 'uniform' | 'op-maat'
 
 export default function InfoTabbedContent({ email, address }: InfoTabbedContentProps) {
   const [activeTab, setActiveTab] = useState<TabType>('praktisch')
-  const [openFaq, setOpenFaq] = useState<number | null>(0)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       const tabParam = params.get('tab') as TabType | null
-      if (tabParam && ['praktisch', 'takken', 'uniform', 'op-maat', 'faq'].includes(tabParam)) {
+      if (tabParam && ['praktisch', 'takken', 'uniform', 'op-maat'].includes(tabParam)) {
         setActiveTab(tabParam)
       } else if (window.location.hash) {
         const hash = window.location.hash.replace('#', '') as TabType
-        if (['praktisch', 'takken', 'uniform', 'op-maat', 'faq'].includes(hash)) {
+        if (['praktisch', 'takken', 'uniform', 'op-maat'].includes(hash)) {
           setActiveTab(hash)
         }
       }
@@ -44,43 +43,23 @@ export default function InfoTabbedContent({ email, address }: InfoTabbedContentP
     { id: 'takken', label: 'Onze Takken', icon: 'fa-users' },
     { id: 'uniform', label: 'Uniform & Webshop', icon: 'fa-shirt' },
     { id: 'op-maat', label: 'Scouting op Maat', icon: 'fa-hand-holding-heart' },
-    { id: 'faq', label: 'Veelgestelde Vragen', icon: 'fa-circle-question' },
-  ]
-
-  const faqItems = [
-    {
-      q: 'Wanneer vallen de vergaderingen?',
-      a: 'Elke zondagochtend van 9:45 tot 12:30 aan ons lokaal op het VP-plein in Sint-Niklaas.'
-    },
-    {
-      q: 'Mag mijn kind eerst eens komen proberen?',
-      a: 'Absoluut! Nieuwe leden mogen 3 keer gratis proberen voor ze definitief inschrijven.'
-    },
-    {
-      q: 'Wat moet mijn kind meebrengen naar de vergadering?',
-      a: 'Kledij die vuil mag worden, stevige schoenen (of laarzen bij regen) en speelkleren die passen bij het weer.'
-    },
-    {
-      q: 'Waar vind ik het maandprogramma?',
-      a: 'In de Kriko Echo (het maandelijkse programmaboekje)! Download de nieuwste editie op de Kriko Echo pagina.'
-    }
   ]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       
-      {/* Horizontal Navigation Tabs */}
+      {/* Horizontal Navigation Tabs (Spread over full width) */}
       <div 
         style={{
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: 8,
           backgroundColor: 'var(--color-bg-white)',
           padding: 8,
           borderRadius: 'var(--border-radius-lg)',
           border: '1px solid var(--color-border)',
           boxShadow: 'var(--shadow-sm)',
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
+          width: '100%',
         }}
       >
         {tabs.map((tab) => {
@@ -93,8 +72,9 @@ export default function InfoTabbedContent({ email, address }: InfoTabbedContentP
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: 8,
-                padding: '10px 16px',
+                padding: '12px 16px',
                 borderRadius: 'var(--border-radius-md)',
                 border: 'none',
                 backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
@@ -105,6 +85,7 @@ export default function InfoTabbedContent({ email, address }: InfoTabbedContentP
                 whiteSpace: 'nowrap',
                 transition: 'all 0.2s ease',
                 outline: 'none',
+                width: '100%',
               }}
             >
               <i className={`fa-solid ${tab.icon}`} style={{ color: isActive ? '#ffffff' : 'var(--color-secondary)' }}></i>
@@ -119,98 +100,65 @@ export default function InfoTabbedContent({ email, address }: InfoTabbedContentP
         
         {/* TAB 1: Praktisch & Werking */}
         {activeTab === 'praktisch' && (
-          <div style={{ animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 24, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
+            
             <div>
-              <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}>
-                Waarom Kriko-M?
+              <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 12, fontWeight: 800 }}>
+                Welkom bij Scouts Kriko-M
               </h2>
-              <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0 }}>
-                Wij zijn <strong>Scouts Kriko-M</strong>, een kleine en gezellige scoutsgroep uit Sint-Niklaas. Onze super geëngageerde leidingsploeg staat elk weekend klaar om uw kleine of iets grotere schavuit de tijd van hun leven te bezorgen. Van een zoektocht naar een verloren piratenschat tot een grote kom soep koken, niets is te zot en iedereen is welkom!
+              <p style={{ margin: '0 0 16px 0' }}>
+                Wij zijn <strong>Scouts Kriko-M</strong>, een gezellige en betrokken scoutsgroep uit Sint-Niklaas voor jongens én meisjes. Onze enthousiaste leidingsploeg staat elke week klaar om van de zondag een onvergetelijke dag te maken: samen spelen, ravotten, uitdagingen aangaan en hechte vriendschappen opbouwen voor het leven!
+              </p>
+              <p style={{ margin: 0 }}>
+                Naast onze wekelijkse activiteiten op zondag organiseren we doorheen het jaar ook heel wat gezellige <strong>evenementen voor de hele familie</strong> — zoals onze jaarlijkse barbecue, ouderavonden en feestelijke bijeenkomsten. Nieuwsgierig naar wat er op de planning staat? Alle evenementen en data kan je terugvinden op onze <Link href="/kalender" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'underline' }}>kalenderpagina</Link>.
               </p>
             </div>
 
-            {/* 4 Praktische Kernpunten */}
-            <div style={{ backgroundColor: 'var(--color-bg-linen)', borderRadius: 'var(--border-radius-md)', padding: 24, border: '1px solid var(--color-border)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-              <div>
-                <h4 style={{ fontSize: '1.05rem', color: 'var(--color-primary-dark)', marginBottom: 6 }}>
-                  Wanneer?
-                </h4>
-                <p style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                  Elke zondagochtend van <strong>9:45 tot 12:30</strong> stipt.
-                </p>
-              </div>
-              <div>
-                <h4 style={{ fontSize: '1.05rem', color: 'var(--color-primary-dark)', marginBottom: 6 }}>
-                  Waar?
-                </h4>
-                <p style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                  Op ons VP-plein (Industriepark-Noord 33, naast drankenhandel De Vidts).
-                </p>
-              </div>
-              <div>
-                <h4 style={{ fontSize: '1.05rem', color: 'var(--color-primary-dark)', marginBottom: 6 }}>
-                  Weekends &amp; Kamp
-                </h4>
-                <p style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                  2x per jaar op weekend (herfst- &amp; paasvakantie). Kamp in het eerste deel van augustus!
-                </p>
-              </div>
-              <div>
-                <h4 style={{ fontSize: '1.05rem', color: 'var(--color-primary-dark)', marginBottom: 6 }}>
-                  Eens proberen?
-                </h4>
-                <p style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)', margin: 0 }}>
-                  Nieuwe leden mogen <strong>3 keer gratis proberen</strong> voor definitieve inschrijving.
-                </p>
-              </div>
-            </div>
-
-            {/* Inschrijven vanaf & Leeftijdsvoorwaarde */}
-            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
-              <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', marginBottom: 8 }}>
-                Vanaf welke leeftijd kan mijn kind lid worden?
+            <div>
+              <h3 style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}>
+                Vanaf welke leeftijd?
               </h3>
-              <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0 }}>
-                Iedereen die <strong>6 jaar wordt vóór 1 januari</strong> van het lopende scoutsjaar of reeds in het <strong>eerste leerjaar</strong> zit, kan lid worden van onze scouts. Alle eerstejaars kapoenen zijn dus geboren voor 31 december van dat geboortejaar en/of zitten in het eerste leerjaar.
+              <p style={{ margin: 0 }}>
+                Iedereen die <strong>6 jaar wordt vóór 1 januari</strong> van het lopende scoutsjaar of reeds in het <strong>eerste leerjaar</strong> zit, kan lid worden van onze scouts. Nieuwe leden mogen bovendien altijd <strong>3 keer gratis komen proberen</strong> vooraleer ze definitief inschrijven!
               </p>
             </div>
 
-            {/* Lidgeld & Financiële Steun */}
-            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
-              <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', marginBottom: 8 }}>
-                Lidgeld &amp; Verzekering
+            <div>
+              <h3 style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}>
+                Waar vind je wat?
               </h3>
-              <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0 }}>
-                Één jaar scouts kost <strong>€45 per kind</strong>. Dit bedrag gaat rechtstreeks naar de verzekering van uw zoon/dochter en onze wekelijkse werkingskosten. We vinden dat geld voor niemand een reden mag zijn om thuis te blijven. Heb je het financieel wat moeilijker? Dan bieden we met ons <strong>Verminderd Lidgeld (€10 per jaar)</strong> of het <strong>Fonds op Maat</strong> graag steun. Bekijk de mogelijkheden onder het tabblad <em>Scouting op Maat</em>.
+              <p style={{ margin: '0 0 12px 0' }}>
+                Omdat we alle praktische zaken al overzichtelijk elders op de website tonen, sturen we je graag door naar de juiste plek:
               </p>
+              <ul style={{ margin: 0, paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <li>
+                  📅 <strong><Link href="/kalender" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Kalender</Link>:</strong> Bekijk wanneer de vergaderingen vallen en wanneer onze familie-evenementen plaatsvinden.
+                </li>
+                <li>
+                  📖 <strong><Link href="/kriko-echo" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Kriko Echo</Link>:</strong> Ons maandelijkse programmaboekje met het concrete programma en uren per tak.
+                </li>
+                <li>
+                  ⚜️ <strong><button type="button" onClick={() => handleTabChange('takken')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Onze Takken</button>:</strong> Ontdek alle leeftijdsgroepen en hoe lang je in dezelfde tak blijft.
+                </li>
+                <li>
+                  📝 <strong><Link href="/inschrijven" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Inschrijven &amp; Lidgeld</Link>:</strong> Alle info over de inschrijvingsfiche, steekkaart en het jaarlijks lidgeld.
+                </li>
+                <li>
+                  💚 <strong><button type="button" onClick={() => handleTabChange('op-maat')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Scouting op Maat</button>:</strong> Alles over verminderd lidgeld (€10), Fonds op Maat en kortingen via het ziekenfonds.
+                </li>
+                <li>
+                  👔 <strong><button type="button" onClick={() => handleTabChange('uniform')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Uniform &amp; Webshop</button>:</strong> Info over onze das, kledij en bestellen via de shop.
+                </li>
+              </ul>
             </div>
 
-            {/* Hoe lang zit je bij een tak? */}
-            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
-              <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', marginBottom: 8 }}>
-                Hoe lang zit je in dezelfde tak?
+            <div>
+              <h3 style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}>
+                Heb je nog vragen?
               </h3>
-              <p style={{ fontSize: '1rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0 }}>
-                Leden blijven in principe <strong>drie jaar bij elke tak</strong> (welpen, jonggivers en givers). Uitzondering op deze regel zijn de <strong>kapoenen</strong>: in deze allerjongste tak zit je <strong>twee jaar</strong> (1e &amp; 2e leerjaar).
+              <p style={{ margin: 0 }}>
+                Heb je specifieke vragen over onze scouts of wil je een keertje komen proberen? Neem dan gerust een kijkje op onze <Link href="/contact" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'underline' }}>contactpagina</Link> om een berichtje te sturen of een van de leiding aan te spreken!
               </p>
-            </div>
-
-            {/* Benieuwd / Sluit je aan */}
-            <div style={{ backgroundColor: 'rgba(101,11,25,0.05)', padding: 24, borderRadius: 'var(--border-radius-md)', borderLeft: '5px solid var(--color-primary)', display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', margin: 0 }}>
-                De smaak te pakken of benieuwd?
-              </h3>
-              <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', margin: 0 }}>
-                Klinkt dit je als muziek in de oren? Sluit je gerust aan bij onze scouts! Stuur een mailtje met de naam en geboortedatum van je kind naar <CopyButton text={email}>{email}</CopyButton>. Wij laten je meteen weten wanneer de volgende vergadering is!
-              </p>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 4 }}>
-                <Link href="/inschrijven" className="btn btn-secondary" style={{ fontSize: '0.9rem' }}>
-                  Inschrijven &raquo;
-                </Link>
-                <button type="button" onClick={() => handleTabChange('op-maat')} className="btn btn-outline" style={{ fontSize: '0.9rem' }}>
-                  Lees meer over Scouting op Maat &raquo;
-                </button>
-              </div>
             </div>
 
           </div>
@@ -226,6 +174,11 @@ export default function InfoTabbedContent({ email, address }: InfoTabbedContentP
               <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0 }}>
                 Bij Scouts Kriko-M speel je niet in één grote groep, maar worden de leden opgedeeld volgens leeftijd. Dat noemen we <strong>takken</strong>. Zo sluiten de spelletjes, uitdagingen, technieken en kamplengte naadloos aan bij de leefwereld van elk kind.
               </p>
+            </div>
+
+            {/* Takduur toelichting */}
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: '16px 20px', borderRadius: 'var(--border-radius-md)', borderLeft: '4px solid var(--color-secondary)', fontSize: '0.96rem', lineHeight: 1.6, color: 'var(--color-text-dark)' }}>
+              <strong>Hoe lang zit je in een tak?</strong> Leden blijven in principe <strong>drie jaar bij elke tak</strong> (Welpen, Jonggivers en Givers). Uitzondering zijn onze allerjongste leden, de <strong>Kapoenen</strong>: in deze tak zit je <strong>twee jaar</strong> (1e &amp; 2e leerjaar).
             </div>
 
             {/* Grid van 4 Takken Kaarten */}
@@ -500,70 +453,6 @@ export default function InfoTabbedContent({ email, address }: InfoTabbedContentP
               </p>
             </div>
 
-          </div>
-        )}
-
-        {/* TAB 5: Veelgestelde Vragen (Accordion) */}
-        {activeTab === 'faq' && (
-          <div style={{ animation: 'fadeIn 0.25s ease' }}>
-            <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 16 }}>
-              Veelgestelde Vragen
-            </h2>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {faqItems.map((item, idx) => {
-                const isOpen = openFaq === idx
-                return (
-                  <div 
-                    key={idx}
-                    style={{
-                      backgroundColor: 'var(--color-bg-linen)',
-                      borderRadius: 'var(--border-radius-md)',
-                      border: '1px solid var(--color-border)',
-                      overflow: 'hidden',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <button
-                      onClick={() => setOpenFaq(isOpen ? null : idx)}
-                      type="button"
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '16px 20px',
-                        backgroundColor: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        outline: 'none',
-                      }}
-                    >
-                      <span style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--color-primary-dark)' }}>
-                        {item.q}
-                      </span>
-                      <i 
-                        className={`fa-solid fa-chevron-down`}
-                        style={{
-                          color: 'var(--color-text-muted)',
-                          transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                          transition: 'transform 0.25s ease',
-                        }}
-                      ></i>
-                    </button>
-
-                    {isOpen && (
-                      <div style={{ padding: '0 20px 18px 20px', borderTop: '1px solid var(--color-border)', marginTop: -4, paddingTop: 12 }}>
-                        <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--color-text-muted)', margin: 0 }}>
-                          {item.a}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
           </div>
         )}
 

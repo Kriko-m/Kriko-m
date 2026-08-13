@@ -13,7 +13,6 @@ export default async function KalenderPage() {
   // Datum als string vergelijken (vermijdt UTC-verschuiving).
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
   const upcoming = events.filter((e: CalendarEvent) => (e.datum_tot || e.date) >= todayStr)
-  const topEvents = upcoming.slice(0, 3)
 
   return (
     <>
@@ -38,16 +37,13 @@ export default async function KalenderPage() {
                   buttonClassName="btn btn-outline cal-sub-action-btn"
                   buttonText="Kalender synchroniseren"
                 />
-                <a href="/api/kalender/ics?download=true" className="btn btn-outline cal-sub-action-btn">
-                  <i className="fa-solid fa-download"></i> .ics downloaden
-                </a>
               </div>
             </div>
 
-            {/* Column 2: Top Upcoming Events */}
+            {/* Column 2: All Upcoming Events */}
             <div className="cal-col-sidebar">
               <div className="cal-sidebar-events">
-                {topEvents.map((event, index) => (
+                {upcoming.map((event, index) => (
                   <UpcomingEvent
                     key={event.id}
                     event={event}

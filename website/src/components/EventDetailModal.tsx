@@ -302,19 +302,19 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
 
       <div className="event-card-v2-content">
         <div className="event-card-v2-top">
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, minWidth: 0, flex: 1 }}>
-            <div className="event-card-v2-datebox" aria-hidden="true">
-              <span className="event-card-v2-day">{day}</span>
-              <span className="event-card-v2-month">{month}</span>
-            </div>
-            <div className="event-card-v2-header-info">
-              <div className="event-card-v2-weekday">{weekday}</div>
-              <h3 className="event-card-v2-title" style={{ fontSize: featured ? '1.3rem' : '1.15rem' }}>{event.title}</h3>
-            </div>
+          <div className="event-card-v2-datebox" aria-hidden="true">
+            <span className="event-card-v2-day">{day}</span>
+            <span className="event-card-v2-month">{month}</span>
           </div>
-          <span className={`event-card-v2-badge ${event.is_evenement ? 'badge-star' : isNoMeeting ? 'badge-neutral' : 'badge-primary'}`} style={{ flexShrink: 0, marginTop: 2 }}>
-            <i className="fa-regular fa-clock"></i> {countdown}
-          </span>
+          <div className="event-card-v2-header-info">
+            <div className="event-card-v2-header-top">
+              <span className="event-card-v2-weekday">{weekday}</span>
+              <span className={`event-card-v2-badge ${event.is_evenement ? 'badge-star' : isNoMeeting ? 'badge-neutral' : 'badge-primary'}`}>
+                <i className="fa-regular fa-clock"></i> {countdown}
+              </span>
+            </div>
+            <h3 className="event-card-v2-title" style={{ fontSize: featured ? '1.3rem' : '1.15rem' }}>{event.title}</h3>
+          </div>
         </div>
 
         <div className="event-card-v2-meta">

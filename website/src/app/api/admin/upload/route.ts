@@ -199,6 +199,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ url: pub.publicUrl })
     }
 
+    if (uploadType === 'portal-document') {
+      const filename = `doc-${Date.now()}.${ext}`
+
+      const { error: storageError } = await admin.storage
+        .from('kamp-bestanden')
+        .upload(filename, buffer, { contentType: file.type, upsert: true })
+
+      if (storageError) throw storageError
+
+      const { data: pub } = admin.storage.from('kamp-bestanden').getPublicUrl(filename)
+      return NextResponse.json({ url: pub.publicUrl })
+    }
+
     return NextResponse.json({ error: 'Ongeldig uploadtype' }, { status: 400 })
   } catch (err) {
     console.error('Upload API error:', err)

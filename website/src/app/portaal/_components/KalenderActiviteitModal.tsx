@@ -116,12 +116,12 @@ export default function KalenderActiviteitModal({
       time: [form.timeStart, form.timeEnd].filter(Boolean).join(' - '),
       location: form.location, description: form.description,
       audience: form.audience, is_evenement: form.is_evenement,
-      banner_image: form.banner_image || null,
+      banner_image: form.banner_image || '',
       icon: form.icon || null,
-      facebook_event_url: form.facebook_event_url || null,
-      facebook_post_url: form.facebook_post_url || null,
-      external_link_url: form.external_link_url || null,
-      document_url: form.document_url || null,
+      facebook_event_url: form.facebook_event_url || '',
+      facebook_post_url: form.facebook_post_url || '',
+      external_link_url: form.external_link_url || '',
+      document_url: form.document_url || '',
     }
     const isNew = !editEvent
     const url = editEvent ? `/api/admin/calendar/${editEvent.id}` : '/api/admin/calendar'

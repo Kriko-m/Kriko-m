@@ -39,7 +39,16 @@ export default async function VerhuurPage() {
           <p className="vh-lead">
             Ons verwarmde lokaal met ruime keuken en groot omheind terrein in Sint-Niklaas staat te huur voor groepen:
             ideaal voor weekends, kampen, vergaderingen en familiefeesten. Bekijk de beschikbaarheid en boek meteen
-            online via <strong>KAMPAS</strong>.
+            online via{' '}
+            <a
+              href={KAMPAS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--color-primary)', textDecoration: 'underline', fontWeight: 700 }}
+            >
+              <strong>KAMPAS</strong>
+            </a>
+            .
           </p>
         </div>
 
@@ -52,10 +61,36 @@ export default async function VerhuurPage() {
           <h3 className="vh-block-title">In één oogopslag</h3>
           <div className="vh-specs">
             {[
-              { icon: 'fa-people-roof', title: 'Capaciteit', text: 'Tot 100 gasten overdag in onze verwarmde polyvalente zaal van 165 m² — eten, spelen of vergaderen.' },
-              { icon: 'fa-location-dot', title: 'Locatie', text: `${address}, met 3.500 m² volledig omheind terrein om te ravotten.` },
-              { icon: 'fa-utensils', title: 'Keuken', text: 'Volledig uitgerust: vijf industriële gasbranders, oven, microgolf, koelkast én diepvries.' },
-              { icon: 'fa-bed', title: 'Slaapplaatsen', text: "'s Nachts slaapplaats voor 50 à 60 personen, met een aparte leidingsruimte erbij." },
+              {
+                icon: 'fa-people-roof',
+                title: 'Capaciteit',
+                text: 'Tot 100 personen overdag in onze verwarmde polyvalente zaal van 165 m² — ideaal voor weekends of kampen.',
+              },
+              {
+                icon: 'fa-bed',
+                title: 'Slaapplaatsen',
+                text: 'Slaapruimte binnen voor 50 à 60 leden (zonder bedden) + aparte leidingsruimte tot 20 personen. Buiten plaats voor tenten.',
+              },
+              {
+                icon: 'fa-utensils',
+                title: 'Keuken',
+                text: 'Volledig ingerichte keuken met 5 industriële gasbranders, oven, microgolf, koelkast én diepvries.',
+              },
+              {
+                icon: 'fa-shower',
+                title: 'Sanitair',
+                text: 'Recent vernieuwd sanitair blok uitgerust met 3 toiletten en 3 douches.',
+              },
+              {
+                icon: 'fa-tree',
+                title: 'Speelterrein',
+                text: `3.500 m² omheind terrein op ${address} met verhard deel, groot grasveld en schaduwrijke bomen.`,
+              },
+              {
+                icon: 'fa-shield-halved',
+                title: 'Afspraken & Regels',
+                text: 'Bestemd voor jeugdverenigingen (Scouts, Chiro, etc.). Geen fuiven en geen studentenverenigingen toegelaten.',
+              },
             ].map(({ icon, title, text }) => (
               <article key={title} className="vh-feature">
                 <div className="vh-feature-icon"><i className={`fas ${icon}`}></i></div>
