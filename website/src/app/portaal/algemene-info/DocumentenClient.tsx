@@ -38,33 +38,13 @@ const ICON_OPTIONS = [
 ]
 
 function RenderIcon({ icon }: { icon: string }) {
-  if (icon === 'scouts-lelie' || icon === 'fa-solid fa-fleur-de-lis') {
+  if (icon === 'scouts-lelie' || icon === 'fa-solid fa-fleur-de-lis' || icon === '/images/scouts-lelie.png') {
     return (
-      <svg width="24" height="24" viewBox="0 0 100 100" fill="#1A3D2A" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-        {/* Top Central Leaf */}
-        <path d="M50 5 C52 16 66 26 66 46 H34 C34 26 48 16 50 5 Z" />
-        {/* Split line on central leaf */}
-        <path d="M50 7 V44" stroke="#EEF5F1" strokeWidth="2.5" strokeLinecap="round" />
-
-        {/* Left Outer Petal */}
-        <path d="M37 45 C24 45 13 36 15 21 C16 11 28 15 35 26 C38 31 40 39 40 45 Z" />
-        {/* Left Star Cutout */}
-        <polygon points="23,24 25,29 30,29 26,32 28,37 23,34 18,37 20,32 16,29 21,29" fill="#EEF5F1" />
-
-        {/* Right Outer Petal */}
-        <path d="M63 45 C76 45 87 36 85 21 C84 11 72 15 65 26 C62 31 60 39 60 45 Z" />
-        {/* Right Star Cutout */}
-        <polygon points="77,24 79,29 84,29 80,32 82,37 77,34 72,37 74,32 70,29 75,29" fill="#EEF5F1" />
-
-        {/* Horizontal Tie Ring */}
-        <ellipse cx="50" cy="51" rx="16" ry="3.8" fill="#1A3D2A" />
-        <ellipse cx="50" cy="51" rx="13" ry="1.6" fill="#EEF5F1" />
-
-        {/* Bottom Petals */}
-        <path d="M33 55 C29 65 35 75 43 72 C43 65 39 58 39 55 Z" />
-        <path d="M67 55 C71 65 65 75 57 72 C57 65 61 58 61 55 Z" />
-        <path d="M46 54 L50 82 L54 54 Z" />
-      </svg>
+      <img
+        src="/images/scouts-lelie.png"
+        alt="Scouts Lelie"
+        style={{ width: 24, height: 24, objectFit: 'contain' }}
+      />
     )
   }
 
