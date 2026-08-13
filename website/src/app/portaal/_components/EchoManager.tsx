@@ -28,7 +28,16 @@ export default function EchoManager({ initialEchos }: Props) {
     setTimeout(() => setFlash(''), 3000)
   }
 
-  const takEchos = echos.filter(e => e.tak === activeTak)
+  const takEchos = echos
+    .filter(e => e.tak === activeTak)
+    .sort((a, b) => {
+      if (b.year !== a.year) return b.year - a.year
+      if (b.month !== a.month) return b.month - a.month
+      const aTime = (a as any).created_at || a.uploaded_at || ''
+      const bTime = (b as any).created_at || b.uploaded_at || ''
+      if (aTime && bTime) return bTime.localeCompare(aTime)
+      return 0
+    })
 
   // KE warning: past the 20th and next month's echo not yet uploaded for this tak
   const echoWarnActive = (() => {
@@ -102,7 +111,7 @@ export default function EchoManager({ initialEchos }: Props) {
     <div style={{ padding: '28px 24px', maxWidth: 1000, margin: '0 auto' }}>
       <header style={{ marginBottom: 24 }}>
         <h1 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.8rem' }}>
-          🗞️ Kriko Echo Upload
+          🗞️ Kriko Echo
         </h1>
         <p style={{ margin: '6px 0 0', color: '#6A8A75', fontSize: '.95rem' }}>
           Upload en beheer hier eenvoudig het maandblad per tak.

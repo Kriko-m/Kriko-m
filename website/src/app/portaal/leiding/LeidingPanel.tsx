@@ -18,7 +18,7 @@ export default function LeidingPanel() {
       {/* 3 Main Action Buttons Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
         
-        {/* Card 1: Echo Upload */}
+        {/* Card 1: Echo */}
         <Link
           href="/portaal/echos"
           style={{
@@ -41,7 +41,7 @@ export default function LeidingPanel() {
             🗞️
           </div>
           <strong style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: 8, color: '#1A3D2A' }}>
-            Kriko Echo Upload
+            Kriko Echo
           </strong>
           <span style={{ fontSize: '.88rem', color: '#6A8A75', lineHeight: 1.45 }}>
             Upload en beheer de maandelijkse Kriko Echo per tak.

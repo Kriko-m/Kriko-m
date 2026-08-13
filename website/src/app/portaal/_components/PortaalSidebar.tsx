@@ -27,7 +27,7 @@ export default function PortaalSidebar({ role: _role }: Props) {
         className={`portaal-sidebar-link${pathname === '/portaal/echos' ? ' active' : ''}`}
       >
         <i className="fa-solid fa-newspaper" style={{ width: 18, textAlign: 'center', fontSize: '0.9rem' }}></i>
-        <span>Kriko Echo Upload</span>
+        <span>Kriko Echo</span>
       </Link>
 
       {/* 3. Documenten & Links */}

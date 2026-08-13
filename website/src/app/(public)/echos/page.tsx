@@ -23,7 +23,12 @@ export default async function EchosPage() {
     (e.month === curM && e.year === curY) || (e.month === nxtM && e.year === nxtY)
 
   const echosByTak: Record<string, Echo[]> = Object.fromEntries(
-    TAKKEN_KEYS.map(k => [k, (allEchos as Echo[]).filter((e: Echo) => e.tak === k && isVisible(e))])
+    TAKKEN_KEYS.map(k => [
+      k,
+      (allEchos as Echo[])
+        .filter((e: Echo) => e.tak === k && isVisible(e))
+        .sort((a, b) => (b.year !== a.year ? b.year - a.year : b.month - a.month))
+    ])
   )
 
   return (

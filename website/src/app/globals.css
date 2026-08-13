@@ -4391,9 +4391,18 @@ body.portal-theme .portaal-nav {
     align-items: flex-start;
 }
 
+.portal-agenda-left-column {
+    position: sticky;
+    top: 80px;
+    z-index: 10;
+}
+
 @media (max-width: 992px) {
     .portal-agenda-layout {
         grid-template-columns: 1fr;
+    }
+    .portal-agenda-left-column {
+        position: static;
     }
 }
 
@@ -6276,7 +6285,7 @@ body.portal-theme .portaal-nav {
 }
 
 .cal-grid-weekday {
-    padding: 4px 0;
+    padding: 8px 0;
     min-width: 0;
     overflow: hidden;
 }
@@ -6290,8 +6299,8 @@ body.portal-theme .portaal-nav {
 }
 
 .cal-grid-cell {
-    min-height: 82px;
-    padding: 6px 8px;
+    min-height: 98px;
+    padding: 8px 10px;
     min-width: 0;
     border-right: 1px solid rgba(0, 0, 0, 0.05);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -6315,6 +6324,12 @@ body.portal-theme .portaal-nav {
 .cal-grid-cell--today {
     background: #fdfbf7;
     border-top: 2px solid var(--color-accent) !important;
+}
+
+.cal-grid-cell--selected {
+    background: #eef5f1 !important;
+    outline: 2px solid var(--color-primary-dark, #1A3D2A);
+    outline-offset: -2px;
 }
 
 .cal-grid-cell-top {

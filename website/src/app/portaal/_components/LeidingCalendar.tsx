@@ -9,7 +9,7 @@ import ConfirmDialog from './ConfirmDialog'
 import KalenderActiviteitModal from './KalenderActiviteitModal'
 import { EventDetailDialog } from '@/components/EventDetailModal'
 
-const MAANDEN = ['', 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
+const MAANDEN = ['', 'Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December']
 const MAANDEN_KORT = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
 const DAG_LETTERS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
 
@@ -165,31 +165,57 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
 
     return (
       <div style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', overflow: 'hidden', boxShadow: '0 4px 20px rgba(26,61,42,0.06)' }}>
-        {/* Month navigation header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: '#1A3D2A', color: '#fff' }}>
-          <button onClick={prevMonth} style={{ background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', fontSize: '1.1rem', cursor: 'pointer', padding: '4px 10px', borderRadius: 8, lineHeight: 1, transition: 'all 0.15s' }}>‹</button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontWeight: 900, fontSize: '1.15rem', fontFamily: 'var(--font-heading, Nunito, sans-serif)', letterSpacing: '0.2px' }}>
-              {MAANDEN[calMonth + 1]} {calYear}
-            </span>
-            <button onClick={goToToday} style={{ background: 'rgba(255,255,255,.18)', border: '1px solid rgba(255,255,255,.3)', color: '#fff', fontSize: '.72rem', fontWeight: 800, cursor: 'pointer', padding: '4px 11px', borderRadius: 14 }}>
+        {/* Dark green header bar with new public title style */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 24px', background: '#1A3D2A', color: '#fff', flexWrap: 'wrap', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <h2 className="cal-grid-month-title" style={{ color: '#fff', fontSize: '2.2rem' }}>
+              <i className="fa-regular fa-calendar-days" style={{ fontSize: '1.8rem' }}></i> {MAANDEN[calMonth + 1]} {calYear}
+            </h2>
+          </div>
+
+          <div className="cal-grid-nav">
+            <button
+              type="button"
+              className="cal-grid-nav-btn"
+              onClick={prevMonth}
+              aria-label="Vorige maand"
+              title="Vorige maand"
+              style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', borderColor: 'rgba(255,255,255,0.25)' }}
+            >
+              <i className="fa-solid fa-chevron-left"></i>
+            </button>
+            <button
+              type="button"
+              className="cal-grid-today-btn"
+              onClick={goToToday}
+              style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', borderColor: 'rgba(255,255,255,0.3)' }}
+            >
               Vandaag
             </button>
+            <button
+              type="button"
+              className="cal-grid-nav-btn"
+              onClick={nextMonth}
+              aria-label="Volgende maand"
+              title="Volgende maand"
+              style={{ background: 'rgba(255,255,255,0.15)', color: '#fff', borderColor: 'rgba(255,255,255,0.25)' }}
+            >
+              <i className="fa-solid fa-chevron-right"></i>
+            </button>
           </div>
-          <button onClick={nextMonth} style={{ background: 'rgba(255,255,255,0.12)', border: 'none', color: '#fff', fontSize: '1.1rem', cursor: 'pointer', padding: '4px 10px', borderRadius: 8, lineHeight: 1, transition: 'all 0.15s' }}>›</button>
         </div>
 
-        {/* Day-of-week headers */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #E8F0EA', background: '#F4F7F5' }}>
+        {/* Days of week header */}
+        <div className="cal-grid-weekdays">
           {DAG_LETTERS.map(d => (
-            <div key={d} style={{ textAlign: 'center', padding: '10px 2px', fontSize: '.75rem', fontWeight: 800, color: '#4A6B56', textTransform: 'uppercase', letterSpacing: '.06em' }}>
+            <div key={d} className="cal-grid-weekday">
               {d}
             </div>
           ))}
         </div>
 
-        {/* Day cells */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
+        {/* Month Days Grid */}
+        <div className="cal-grid-days">
           {calGrid.map((cell) => {
             const isCurrentMonth = cell.date!.getMonth() === calMonth
             const dateStr = toLocalDateStr(cell.date!)
@@ -201,91 +227,68 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
             return (
               <div
                 key={cell.key}
-                style={{
-                  minHeight: 92,
-                  padding: '7px 5px',
-                  borderRight: '1px solid #E8F0EA',
-                  borderBottom: '1px solid #E8F0EA',
-                  background: isSelected ? '#EBF5EF' : isToday ? '#F0F7F2' : isCurrentMonth ? '#fff' : '#FAFCFA',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 4,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  transition: 'background 0.15s ease',
+                className={`cal-grid-cell ${
+                  !isCurrentMonth ? 'cal-grid-cell--out' : ''
+                } ${isToday ? 'cal-grid-cell--today' : ''} ${
+                  isSelected ? 'cal-grid-cell--selected' : ''
+                } ${hasEvents ? 'cal-grid-cell--has-events' : ''}`}
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  setSelectedDate(prev => prev === dateStr ? null : dateStr)
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginBottom: 2 }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!isCurrentMonth) return
-                      setSelectedDate(prev => prev === dateStr ? null : dateStr)
-                    }}
-                    style={{
-                      background: isToday ? '#1A3D2A' : 'transparent',
-                      color: isToday ? '#fff' : isCurrentMonth ? '#1A3D2A' : '#BDD0C3',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: 24,
-                      height: 24,
-                      fontSize: '.78rem',
-                      fontWeight: isToday ? 800 : 700,
-                      cursor: isCurrentMonth ? 'pointer' : 'default',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: isToday ? '0 2px 6px rgba(26,61,42,0.25)' : 'none',
-                    }}
-                    title={hasEvents ? `${dayEvents.length} activiteit(en) op ${dateStr}` : undefined}
-                  >
-                    {cell.date!.getDate()}
-                  </button>
+                <div className="cal-grid-cell-top">
+                  <span className="cal-grid-day-number">{cell.date!.getDate()}</span>
+                  {isToday && <span className="cal-grid-today-tag">Vandaag</span>}
                 </div>
 
                 {/* Render event pills inside cell */}
-                {hasEvents && isCurrentMonth && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3, overflowY: 'auto', maxHeight: 62 }}>
+                {hasEvents && (
+                  <div className="cal-grid-cell-events">
                     {dayEvents.map(ev => {
                       const primaryTag = ev.audience[0] as AudienceTag
                       const isImportant = ev.is_evenement
+                      const isNoMeeting = ev.title.toLowerCase().includes('geen vergadering')
+                      const iconClass = getEventIcon(ev)
                       const tagColor = isImportant ? '#D6AB42' : AUDIENCE_KLEUREN[primaryTag] || '#1A3D2A'
+
+                      let pillClass = 'pill-primary'
+                      let pillStyle: React.CSSProperties = {}
+
+                      if (isImportant) {
+                        pillClass = 'pill-featured'
+                      } else if (isNoMeeting) {
+                        pillClass = 'pill-nomeeting'
+                      } else if (tagColor) {
+                        pillStyle = {
+                          background: `${tagColor}1E`,
+                          color: '#1A3D2A',
+                          borderLeft: `3.5px solid ${tagColor}`
+                        }
+                      }
+
+                      if (!isCurrentMonth) {
+                        pillStyle = {
+                          ...pillStyle,
+                          opacity: 0.75,
+                          filter: 'grayscale(0.35)'
+                        }
+                      }
 
                       return (
                         <button
                           key={ev.id}
                           type="button"
+                          className={`cal-event-pill ${pillClass}`}
+                          style={Object.keys(pillStyle).length > 0 ? pillStyle : undefined}
                           onClick={(e) => {
                             e.stopPropagation()
                             setActiveViewEvent(ev)
                           }}
                           title={`${ev.title} (${ev.time || 'Hele dag'})`}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 5,
-                            width: '100%',
-                            padding: '3px 6px',
-                            borderRadius: 6,
-                            borderLeft: `3.5px solid ${tagColor}`,
-                            background: isImportant ? '#FFF8E7' : `${tagColor}15`,
-                            color: '#1A3D2A',
-                            fontSize: '.72rem',
-                            fontWeight: 700,
-                            textAlign: 'left',
-                            cursor: 'pointer',
-                            lineHeight: 1.25,
-                            overflow: 'hidden',
-                            borderTop: 'none',
-                            borderRight: 'none',
-                            borderBottom: 'none',
-                            fontFamily: 'inherit',
-                            transition: 'all 0.12s ease',
-                          }}
                         >
-                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {ev.title}
-                          </span>
+                          {iconClass && <i className={`fa-solid ${iconClass} pill-icon`} />}
+                          <span className="cal-event-pill-title">{ev.title}</span>
                         </button>
                       )
                     })}
@@ -295,18 +298,6 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
             )
           })}
         </div>
-
-        {/* Legend */}
-        {filter.size === 0 && (
-          <div style={{ padding: '12px 16px', borderTop: '1px solid #E8F0EA', display: 'flex', gap: 14, flexWrap: 'wrap', background: '#FAFCFA' }}>
-            {AUDIENCE_TAGS.map(tag => (
-              <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: '.72rem', color: '#4A6B56', fontWeight: 700 }}>
-                <span style={{ width: 9, height: 9, borderRadius: '50%', background: AUDIENCE_KLEUREN[tag], display: 'inline-block' }} />
-                {AUDIENCE_NAMEN[tag]}
-              </span>
-            ))}
-          </div>
-        )}
       </div>
     )
   }
@@ -455,18 +446,10 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
       </div>
     )
   }
-
-  // ─── Render ───────────────────────────────────────────────────────────────
-  return (
-    <div>
-      {flash && !showForm && (
-        <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 16px', borderRadius: 10, marginBottom: 14, fontWeight: 600 }}>
-          {flash}
-        </div>
-      )}
-
-      {/* Top bar: tag filters + actions */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
+  // ─── Filter Bar Component ───────────────────────────────────────────────
+  function FilterBar() {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: '.75rem', fontWeight: 700, color: '#6A8A75', marginRight: 2 }}>Filter:</span>
           {(['groep', 'leiding'] as const).map(tag => (
@@ -498,12 +481,24 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
           buttonStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#fff', border: '1.5px solid #1A3D2A', borderRadius: 8, color: '#1A3D2A', fontSize: '.8rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
         />
       </div>
+    )
+  }
+
+  // ─── Render ───────────────────────────────────────────────────────────────
+  return (
+    <div>
+      {flash && !showForm && (
+        <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 16px', borderRadius: 10, marginBottom: 14, fontWeight: 600 }}>
+          {flash}
+        </div>
+      )}
 
       {twoColumn ? (
-        // Two-column: calendar grid left, activity list right
+        // Two-column: filter bar + calendar grid left (sticky), activity list right
         <div className="portal-agenda-layout">
-          {/* Left: calendar grid */}
-          <div>
+          {/* Left: filter bar + calendar grid */}
+          <div className="portal-agenda-left-column">
+            {FilterBar()}
             {CalendarGrid()}
             {selectedDate && (
               <div style={{ marginTop: 10, padding: '6px 12px', background: '#EEF5F1', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
@@ -535,6 +530,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
       ) : (
         // Single-column layout (dashboard widget etc.)
         <div>
+          {FilterBar()}
           {!readOnly && (
             <button onClick={() => { setEditId(null); setShowForm(true) }}
               style={{ marginBottom: 16, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>

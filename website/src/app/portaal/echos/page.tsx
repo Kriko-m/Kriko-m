@@ -3,7 +3,7 @@ import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import EchoManager from '../_components/EchoManager'
 import { Echo } from '@/lib/types'
 
-export const metadata = { title: 'Kriko Echo Upload — Portaal' }
+export const metadata = { title: 'Kriko Echo — Portaal' }
 
 export default async function EchosPortaalPage() {
   const supabase = await createServerSupabaseClient()

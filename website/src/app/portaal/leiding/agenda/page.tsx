@@ -29,9 +29,6 @@ export default async function FullAgendaPage() {
   return (
     <div style={{ background: '#FFFFFF', padding: '32px 24px', minHeight: '100vh' }}>
       <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.6rem', fontWeight: 900, color: '#1A3D2A', fontFamily: 'var(--font-heading, Nunito, sans-serif)', marginBottom: 20 }}>
-          📅 Volledige Agenda
-        </h2>
         <LeidingCalendar
           initialCalendar={calendarEvents}
           canPublish={canPublish}
