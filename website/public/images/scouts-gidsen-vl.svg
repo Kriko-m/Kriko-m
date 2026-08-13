@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Outer Shield Background -->
+  <path d="M100 10 L175 45 V110 C175 155 100 190 100 190 C100 190 25 155 25 110 V45 Z" fill="#E86C1F" />
+  <!-- Inner Shield -->
+  <path d="M100 24 L160 52 V104 C160 142 100 172 100 172 C100 172 40 142 40 104 V52 Z" fill="#1A3D2A" />
+  <!-- Scoutsklaver / Fleur-de-lis Symbol -->
+  <g fill="#FFFFFF">
+    <!-- Center Leaf -->
+    <path d="M100 45 C107 65 122 75 122 92 C122 104 112 114 100 114 C88 114 78 104 78 92 C78 75 93 65 100 45 Z" />
+    <!-- Left Leaf -->
+    <path d="M85 85 C68 78 52 88 55 105 C57 116 68 122 80 117 C92 112 94 98 85 85 Z" />
+    <!-- Right Leaf -->
+    <path d="M115 85 C132 78 148 88 145 105 C143 116 132 122 120 117 C108 112 106 98 115 85 Z" />
+    <!-- Fleur-de-lis Ring Base -->
+    <rect x="75" y="118" width="50" height="8" rx="4" fill="#C9963A" />
+    <!-- Base Stem -->
+    <path d="M92 126 C92 138 100 145 100 145 C100 145 108 138 108 126 Z" fill="#C9963A" />
+    <!-- Compass Star / Five Point Star -->
+    <path d="M100 62 L103 72 L112 72 L105 77 L108 87 L100 81 L92 87 L95 77 L88 72 L97 72 Z" fill="#E86C1F" />
+  </g>
+</svg>

@@ -19,7 +19,11 @@ const PRESET_CATEGORIES = [
 ]
 
 const ICON_OPTIONS = [
-  { label: 'Map / Bestanden', icon: 'fa-brands fa-google-drive' },
+  { label: 'Scouts & Gidsen VL Emblem', icon: '/images/scouts-gidsen-vl.svg' },
+  { label: 'Scoutsgroep Kriko-M Logo', icon: '/images/logo.png' },
+  { label: 'Scoutsklaver', icon: 'fa-solid fa-clover' },
+  { label: 'Groepsadmin / Bestuur', icon: 'fa-solid fa-users-gear' },
+  { label: 'Map / Google Drive', icon: 'fa-brands fa-google-drive' },
   { label: 'Tent / Kamp', icon: 'fa-solid fa-tent' },
   { label: 'Checklist', icon: 'fa-solid fa-clipboard-check' },
   { label: 'Rekenmachine', icon: 'fa-solid fa-calculator' },
@@ -29,11 +33,26 @@ const ICON_OPTIONS = [
   { label: 'Ideeën / Lamp', icon: 'fa-solid fa-lightbulb' },
   { label: 'Medisch', icon: 'fa-solid fa-notes-medical' },
   { label: 'Telefoon / Nood', icon: 'fa-solid fa-phone-volume' },
-  { label: 'Administratie / Tandwiel', icon: 'fa-solid fa-users-gear' },
   { label: 'Kompas', icon: 'fa-solid fa-compass-drafting' },
   { label: 'Facebook', icon: 'fa-brands fa-facebook' },
   { label: 'Standaard Bestand', icon: 'fa-solid fa-file' },
 ]
+
+function RenderIcon({ icon, label }: { icon: string; label?: string }) {
+  if (!icon) return <i className="fa-solid fa-file"></i>
+
+  if (icon.startsWith('/') || icon.startsWith('http://') || icon.startsWith('https://')) {
+    return (
+      <img
+        src={icon}
+        alt={label || 'Icoon'}
+        style={{ width: 26, height: 26, objectFit: 'contain' }}
+      />
+    )
+  }
+
+  return <i className={icon}></i>
+}
 
 function ResourceCard({
   item,
@@ -96,7 +115,7 @@ function ResourceCard({
           flexShrink: 0,
         }}
       >
-        <i className={item.icon}></i>
+        <RenderIcon icon={item.icon} label={item.label} />
       </div>
 
       <div style={{ flex: 1, minWidth: 0, paddingRight: showEditControls ? 64 : 12 }}>
@@ -220,6 +239,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   // UI states
   const [submitting, setSubmitting] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingIcon, setUploadingIcon] = useState(false)
   const [error, setError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [isDeletingCategory, setIsDeletingCategory] = useState(false)
@@ -419,6 +439,34 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
       setError(err instanceof Error ? err.message : 'Bestand kon niet geüpload worden')
     } finally {
       setUploading(false)
+    }
+  }
+
+  async function handleIconUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingIcon(true)
+    setError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('type', 'portal-document')
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Fout bij uploaden van icoon')
+
+      setIcon(data.url)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Icoon kon niet geüpload worden')
+    } finally {
+      setUploadingIcon(false)
     }
   }
 
@@ -1083,19 +1131,47 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                   </span>
                 </div>
 
-                {/* 5. Icon Selection */}
+                {/* 5. Icon Selection & Custom Upload */}
                 <div>
-                  <label className="form-label">Icoontje</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 110, overflowY: 'auto', padding: 4, border: '1px solid #C2D9C9', borderRadius: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <label className="form-label" style={{ margin: 0 }}>Icoontje</label>
+                    <label
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 5,
+                        fontSize: '.76rem',
+                        fontWeight: 700,
+                        color: '#1A3D2A',
+                        background: '#EEF5F1',
+                        padding: '3px 10px',
+                        borderRadius: 8,
+                        border: '1px solid #C2D9C9',
+                        cursor: uploadingIcon ? 'wait' : 'pointer',
+                      }}
+                    >
+                      <i className={uploadingIcon ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-image'}></i>
+                      <span>{uploadingIcon ? 'Uploaden...' : 'Eigen logo / icoon uploaden'}</span>
+                      <input
+                        type="file"
+                        onChange={handleIconUpload}
+                        disabled={uploadingIcon}
+                        style={{ display: 'none' }}
+                        accept=".png,.jpg,.jpeg,.svg,.webp"
+                      />
+                    </label>
+                  </div>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 130, overflowY: 'auto', padding: 6, border: '1px solid #C2D9C9', borderRadius: 10, background: '#FAFDFB' }}>
                     {ICON_OPTIONS.map(opt => (
                       <button
                         key={opt.icon}
                         type="button"
                         onClick={() => setIcon(opt.icon)}
                         style={{
-                          width: 36,
-                          height: 36,
-                          borderRadius: 8,
+                          width: 40,
+                          height: 40,
+                          borderRadius: 10,
                           border: icon === opt.icon ? '2px solid #1A3D2A' : '1px solid #E0E0E0',
                           background: icon === opt.icon ? '#EEF5F1' : '#fff',
                           color: '#1A3D2A',
@@ -1104,13 +1180,23 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          transition: 'all 0.15s ease',
                         }}
                         title={opt.label}
                       >
-                        <i className={opt.icon}></i>
+                        <RenderIcon icon={opt.icon} label={opt.label} />
                       </button>
                     ))}
                   </div>
+
+                  {icon && (icon.startsWith('/') || icon.startsWith('http')) && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8, fontSize: '.76rem', color: '#6A8A75' }}>
+                      <span>Actief icoon URL:</span>
+                      <code style={{ background: '#F0F4F1', padding: '2px 6px', borderRadius: 4, overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 280 }}>
+                        {icon}
+                      </code>
+                    </div>
+                  )}
                 </div>
 
               </div>
