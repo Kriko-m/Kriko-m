@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import sharp from 'sharp'
 import { createAdminClient } from '@/lib/supabase'
 import { requireLeiding } from '@/lib/auth'
 import { getActiveWerkjaar } from '@/lib/db'
@@ -17,6 +18,51 @@ const ALLOWED_MIME: Record<string, string> = {
 }
 // Omslagfoto's: enkel afbeeldingen.
 const IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp'])
+
+/**
+ * Optimaliseert een afbeelding met sharp:
+ * - Draait de foto automatisch op basis van EXIF (smartphone stand)
+ * - Herschaalt naar max 1920x1920px (behoud verhouding)
+ * - Comprimeert naar WebP (kwaliteit 82) voor maximale besparing op bestandsgrootte
+ */
+async function optimizeImageBuffer(
+  buffer: Buffer,
+  mimeType: string
+): Promise<{ buffer: Buffer; contentType: string; ext: string }> {
+  if (!IMAGE_MIME.has(mimeType)) {
+    return {
+      buffer,
+      contentType: mimeType,
+      ext: ALLOWED_MIME[mimeType] || 'bin',
+    }
+  }
+
+  try {
+    const optimizedBuffer = await sharp(buffer)
+      .rotate() // Automatische EXIF-oriëntatie correctie
+      .resize({
+        width: 1920,
+        height: 1920,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 82 })
+      .toBuffer()
+
+    return {
+      buffer: optimizedBuffer,
+      contentType: 'image/webp',
+      ext: 'webp',
+    }
+  } catch (err) {
+    console.error('Fout bij verwerken afbeelding met sharp, valt terug op origineel:', err)
+    return {
+      buffer,
+      contentType: mimeType,
+      ext: ALLOWED_MIME[mimeType] || 'jpg',
+    }
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,20 +83,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Bestand is te groot (max. 10 MB).' }, { status: 400 })
     }
 
-    const ext = ALLOWED_MIME[file.type]
-    if (!ext) {
+    const initialExt = ALLOWED_MIME[file.type]
+    if (!initialExt) {
       return NextResponse.json({ error: 'Bestandstype niet toegestaan. Enkel PDF, JPG, PNG of WebP.' }, { status: 400 })
     }
     if (uploadType === 'kamp-foto' && !IMAGE_MIME.has(file.type)) {
       return NextResponse.json({ error: 'Omslagfoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
     }
     // PPTX is enkel zinvol als kamp-bijlage (presentatie), nergens anders.
-    if (ext === 'pptx' && uploadType !== 'kamp-bestand') {
+    if (initialExt === 'pptx' && uploadType !== 'kamp-bestand') {
       return NextResponse.json({ error: 'PowerPoint-bestanden kunnen enkel als kampbijlage worden geüpload.' }, { status: 400 })
     }
 
     const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
+    const rawBuffer = Buffer.from(arrayBuffer)
+
+    // Automatische compressie en herschaling via sharp indien het een foto betreft
+    const { buffer, contentType, ext } = await optimizeImageBuffer(rawBuffer, file.type)
 
     const admin = createAdminClient()
 
@@ -63,7 +112,7 @@ export async function POST(req: NextRequest) {
       // Upload naar storage
       const { error: storageError } = await admin.storage
         .from('kamp-fotos')
-        .upload(filename, buffer, { contentType: file.type, upsert: true })
+        .upload(filename, buffer, { contentType, upsert: true })
 
       if (storageError) throw storageError
 
@@ -95,7 +144,7 @@ export async function POST(req: NextRequest) {
       // Upload naar storage
       const { error: storageError } = await admin.storage
         .from('kamp-bestanden')
-        .upload(filename, buffer, { contentType: file.type, upsert: true })
+        .upload(filename, buffer, { contentType, upsert: true })
 
       if (storageError) throw storageError
 
@@ -118,20 +167,17 @@ export async function POST(req: NextRequest) {
     }
 
     if (uploadType === 'evenement-cover' || uploadType === 'evenement-banner' || uploadType === 'evenement-document') {
-      // Evenement-media (enkel groepsleiding maakt evenementen aan; requireLeiding
-      // volstaat hier voor de upload zelf — koppeling gebeurt via de calendar-API).
       const isImageType = uploadType === 'evenement-cover' || uploadType === 'evenement-banner'
       if (isImageType && !IMAGE_MIME.has(file.type)) {
         return NextResponse.json({ error: 'Afbeelding moet een JPG, PNG of WebP zijn.' }, { status: 400 })
       }
-      // Afbeeldingen → publieke kamp-fotos bucket; document → publieke kamp-bestanden bucket.
       const bucket = isImageType ? 'kamp-fotos' : 'kamp-bestanden'
       const prefix = uploadType === 'evenement-cover' ? 'ev-cover' : uploadType === 'evenement-banner' ? 'ev-banner' : 'ev-doc'
       const filename = `${prefix}-${Date.now()}.${ext}`
 
       const { error: storageError } = await admin.storage
         .from(bucket)
-        .upload(filename, buffer, { contentType: file.type, upsert: true })
+        .upload(filename, buffer, { contentType, upsert: true })
       if (storageError) throw storageError
 
       const { data: pub } = admin.storage.from(bucket).getPublicUrl(filename)
@@ -154,7 +200,7 @@ export async function POST(req: NextRequest) {
       // Upload naar storage
       const { error: storageError } = await admin.storage
         .from('echos')
-        .upload(filename, buffer, { contentType: file.type, upsert: true })
+        .upload(filename, buffer, { contentType, upsert: true })
 
       if (storageError) throw storageError
 
@@ -191,7 +237,7 @@ export async function POST(req: NextRequest) {
 
       const { error: storageError } = await admin.storage
         .from('kamp-fotos')
-        .upload(filename, buffer, { contentType: file.type, upsert: true })
+        .upload(filename, buffer, { contentType, upsert: true })
 
       if (storageError) throw storageError
 
@@ -204,7 +250,7 @@ export async function POST(req: NextRequest) {
 
       const { error: storageError } = await admin.storage
         .from('kamp-bestanden')
-        .upload(filename, buffer, { contentType: file.type, upsert: true })
+        .upload(filename, buffer, { contentType, upsert: true })
 
       if (storageError) throw storageError
 
@@ -220,7 +266,7 @@ export async function POST(req: NextRequest) {
 
       const { error: storageError } = await admin.storage
         .from('kamp-fotos')
-        .upload(filename, buffer, { contentType: file.type, upsert: true })
+        .upload(filename, buffer, { contentType, upsert: true })
 
       if (storageError) throw storageError
 
@@ -236,7 +282,7 @@ export async function POST(req: NextRequest) {
 
       const { error: storageError } = await admin.storage
         .from('kamp-fotos')
-        .upload(filename, buffer, { contentType: file.type, upsert: true })
+        .upload(filename, buffer, { contentType, upsert: true })
 
       if (storageError) throw storageError
 
@@ -250,3 +296,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Serverfout bij uploaden' }, { status: 500 })
   }
 }
+
