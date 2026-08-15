@@ -1,7 +1,9 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { getSettings } from '@/lib/db'
+import { getSettings, getSiteContent } from '@/lib/db'
 import PhotoGallery from '@/components/PhotoGallery'
+import EditableBlock from '@/components/editing/EditableBlock'
 
 export const metadata: Metadata = { title: 'Verhuur lokaal | Scouts Kriko-M' }
 
@@ -9,14 +11,21 @@ const PHOTOS = Array.from({length: 8}, (_,i) => `/images/verhuur/lokaal-0${i+1}.
 const KAMPAS_URL = 'https://www.kampas.be/nl/domein/scouts-kriko-m-lokaal-terrein'
 
 export default async function VerhuurPage() {
-  const settings = await getSettings()
+  const [settings, siteContent] = await Promise.all([
+    getSettings(),
+    getSiteContent(),
+  ])
+
   const address = settings?.contact_address ?? 'Industriepark-Noord 33, 9100 Sint-Niklaas'
+  const vhBlock = siteContent['verhuur.intro_title'] || {}
+  const vhTitle = vhBlock.title || 'Huur ons lokaal voor jouw groep'
+  const vhContent = vhBlock.content || 'Ons verwarmde lokaal met ruime keuken en groot omheind terrein in Sint-Niklaas staat te huur voor groepen: ideaal voor weekends, kampen, vergaderingen en familiefeesten.'
 
   return (
     <>
       <section className="verhuur-hero" style={{ position: 'relative', overflow: 'hidden' }}>
         <Image
-          src="/images/verhuur/lokaal-04.jpg"
+          src={vhBlock.image_url || "/images/verhuur/lokaal-04.jpg"}
           alt="Scouts Kriko-M Lokaal"
           className="verhuur-hero-img"
           fill
@@ -33,24 +42,33 @@ export default async function VerhuurPage() {
 
       <section className="section container vh-page section--no-top">
 
-        <div className="vh-intro">
-          <span className="vh-eyebrow">Verhuur lokaal &amp; terrein</span>
-          <h2 className="vh-intro-title">Huur ons lokaal voor jouw groep</h2>
-          <p className="vh-lead">
-            Ons verwarmde lokaal met ruime keuken en groot omheind terrein in Sint-Niklaas staat te huur voor groepen:
-            ideaal voor weekends, kampen, vergaderingen en familiefeesten. Bekijk de beschikbaarheid en boek meteen
-            online via{' '}
-            <a
-              href={KAMPAS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'var(--color-primary)', textDecoration: 'underline', fontWeight: 700 }}
-            >
-              <strong>KAMPAS</strong>
-            </a>
-            .
-          </p>
-        </div>
+        <Suspense fallback={null}>
+          <EditableBlock
+            blockKey="verhuur.intro_title"
+            page="verhuur"
+            section="intro"
+            initialTitle={vhTitle}
+            initialContent={vhContent}
+          >
+            <div className="vh-intro">
+              <span className="vh-eyebrow">Verhuur lokaal &amp; terrein</span>
+              <h2 className="vh-intro-title">{vhTitle}</h2>
+              <p className="vh-lead" style={{ whiteSpace: 'pre-line' }}>
+                {vhContent}{' '}
+                Bekijk de beschikbaarheid en boek meteen online via{' '}
+                <a
+                  href={KAMPAS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: 'var(--color-primary)', textDecoration: 'underline', fontWeight: 700 }}
+                >
+                  <strong>KAMPAS</strong>
+                </a>
+                .
+              </p>
+            </div>
+          </EditableBlock>
+        </Suspense>
 
         <div className="vh-block">
           <h3 className="vh-block-title">In beeld</h3>
@@ -105,3 +123,4 @@ export default async function VerhuurPage() {
     </>
   )
 }
+

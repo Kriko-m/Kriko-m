@@ -1,12 +1,21 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { getSettings } from '@/lib/db'
+import { getSettings, getSiteContent } from '@/lib/db'
 import ContactForm from './ContactForm'
 import CopyButton from '@/components/CopyButton'
+import EditableBlock from '@/components/editing/EditableBlock'
 
 export const metadata: Metadata = { title: 'Contact | Scouts Kriko-M' }
 
 export default async function ContactPage() {
-  const settings = await getSettings()
+  const [settings, siteContent] = await Promise.all([
+    getSettings(),
+    getSiteContent(),
+  ])
+
+  const vergaderingBlock = siteContent['contact.vergaderingen'] || {}
+  const vergaderingTitle = vergaderingBlock.title || 'Vergaderingen'
+  const vergaderingText = vergaderingBlock.content || 'Elke zondag van 9:45 tot 12:30 op het VP-plein (Industriepark-Noord 33, Sint-Niklaas).'
 
   return (
     <>
@@ -70,12 +79,22 @@ export default async function ContactPage() {
               </ul>
             </div>
 
-            <div className="side-card">
-              <h3>Vergaderingen</h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginTop: 8 }}>
-                Elke <strong>zondag van 9:45 tot 12:30</strong> op het VP-plein (Industriepark-Noord 33, Sint-Niklaas).
-              </p>
-            </div>
+            <Suspense fallback={null}>
+              <EditableBlock
+                blockKey="contact.vergaderingen"
+                page="contact"
+                section="vergaderingen"
+                initialTitle={vergaderingTitle}
+                initialContent={vergaderingText}
+              >
+                <div className="side-card">
+                  <h3>{vergaderingTitle}</h3>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginTop: 8, whiteSpace: 'pre-line' }}>
+                    {vergaderingText}
+                  </p>
+                </div>
+              </EditableBlock>
+            </Suspense>
           </div>
 
         </div>
@@ -83,3 +102,4 @@ export default async function ContactPage() {
     </>
   )
 }
+

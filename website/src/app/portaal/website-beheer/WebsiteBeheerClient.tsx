@@ -327,271 +327,36 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
 
       {/* TAB 1: TAKKEN & LEIDING */}
       {activeTab === 'takken' && (
-        <div>
-          {/* Tak Sub-selector */}
-          <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-            {TAKKEN.map(tak => (
-              <button
-                key={tak}
-                onClick={() => setSelectedTak(tak)}
-                type="button"
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: 24,
-                  fontWeight: 800,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  border: selectedTak === tak ? `2.5px solid ${TAK_KLEUREN[tak]}` : '1.5px solid #C2D9C9',
-                  backgroundColor: selectedTak === tak ? '#EEF5F1' : '#fff',
-                  color: '#1A3D2A',
-                  boxShadow: selectedTak === tak ? '0 4px 12px rgba(0,0,0,0.06)' : 'none',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {TAK_NAMEN[tak]}
-              </button>
-            ))}
-          </div>
+        <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 32, textAlign: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+          <h3 style={{ margin: '0 0 10px', color: '#1A3D2A', fontSize: '1.4rem', fontWeight: 900 }}>
+            ⚜️ Takpagina&apos;s &amp; Leiding Beheer
+          </h3>
+          <p style={{ margin: '0 0 24px', color: '#6A8A75', fontSize: '0.98rem', maxWidth: 600, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+            Het bewerken van takbeschrijvingen, leidingploegen, foto&apos;s en tradities gebeurt voortaan rechtstreeks live op de website in de <strong>Live Bewerkmodus</strong>.
+          </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'start' }}>
-            
-            {/* Kolom 1: Tak Leidingsfoto & Contact */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              
-              {/* Tak Leidingsfoto Card */}
-              <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-                <h3 style={{ margin: '0 0 4px', color: '#1A3D2A', fontSize: '1.15rem', fontWeight: 900 }}>
-                  📷 Leidingsfoto ({TAK_NAMEN[selectedTak]})
-                </h3>
-                <p style={{ margin: '0 0 16px', color: '#6A8A75', fontSize: '0.84rem' }}>
-                  Deze schuine foto staat op de publieke takpagina van de {TAK_NAMEN[selectedTak]}.
-                </p>
-
-                <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', borderRadius: 12, overflow: 'hidden', backgroundColor: '#F0ECE4', border: '1px solid #E2C58D', marginBottom: 16 }}>
-                  {currentTakData.photo ? (
-                    <Image
-                      src={currentTakData.photo}
-                      alt={`Leidingsfoto ${TAK_NAMEN[selectedTak]}`}
-                      fill
-                      unoptimized
-                      style={{ objectFit: 'cover' }}
-                    />
-                  ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#6A8A75', fontSize: '0.9rem' }}>
-                      Geen foto ingesteld
-                    </div>
-                  )}
-                </div>
-
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <label
-                    style={{
-                      flex: 1,
-                      textAlign: 'center',
-                      padding: '10px 14px',
-                      backgroundColor: '#EEF5F1',
-                      border: '1.5px dashed #1A3D2A',
-                      borderRadius: 10,
-                      color: '#1A3D2A',
-                      fontWeight: 800,
-                      fontSize: '0.85rem',
-                      cursor: uploading ? 'wait' : 'pointer',
-                    }}
-                  >
-                    {uploading === 'tak-leiding-foto' ? 'Uploaden...' : '📷 Nieuwe foto uploaden'}
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      style={{ display: 'none' }}
-                      disabled={uploading === 'tak-leiding-foto'}
-                      onChange={e => {
-                        const file = e.target.files?.[0]
-                        if (file) handleFileUpload(file, 'tak-leiding-foto')
-                      }}
-                    />
-                  </label>
-                </div>
-              </div>
-
-              {/* Tak Contact & WhatsApp */}
-              <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-                <h3 style={{ margin: '0 0 16px', color: '#1A3D2A', fontSize: '1.15rem', fontWeight: 900 }}>
-                  ✉️ Contact &amp; WhatsApp
-                </h3>
-
-                <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                    E-mailadres takleiding
-                  </label>
-                  <input
-                    type="email"
-                    value={currentTakData.email}
-                    onChange={e => updateTakField('email', e.target.value)}
-                    placeholder={`${selectedTak}leiding@kriko-m.be`}
-                    style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontFamily: 'inherit', fontSize: '0.9rem' }}
-                  />
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                    WhatsApp Ouders-groep Link
-                  </label>
-                  <input
-                    type="url"
-                    value={currentTakData.whatsapp_url}
-                    onChange={e => updateTakField('whatsapp_url', e.target.value)}
-                    placeholder="https://chat.whatsapp.com/..."
-                    style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontFamily: 'inherit', fontSize: '0.9rem' }}
-                  />
-                </div>
-              </div>
-
-            </div>
-
-            {/* Kolom 2: Leidingsploeg Beheer */}
-            <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <div>
-                  <h3 style={{ margin: 0, color: '#1A3D2A', fontSize: '1.15rem', fontWeight: 900 }}>
-                    👥 Leidingsploeg {TAK_NAMEN[selectedTak]}
-                  </h3>
-                  <p style={{ margin: '2px 0 0', color: '#6A8A75', fontSize: '0.82rem' }}>
-                    Beheer de namen, totems, rollen en telefoonnummers.
-                  </p>
-                </div>
-                <button
-                  onClick={addLeader}
-                  type="button"
-                  style={{
-                    padding: '8px 14px',
-                    backgroundColor: '#EEF5F1',
-                    border: '1.5px solid #1A3D2A',
-                    borderRadius: 8,
-                    color: '#1A3D2A',
-                    fontWeight: 800,
-                    fontSize: '0.82rem',
-                    cursor: 'pointer',
-                  }}
-                >
-                  + Leid(st)er Toevoegen
-                </button>
-              </div>
-
-              {currentTakData.leaders.length === 0 ? (
-                <div style={{ padding: '24px 0', textAlign: 'center', color: '#6A8A75', fontSize: '0.9rem', fontStyle: 'italic' }}>
-                  Nog geen leiding voor {TAK_NAMEN[selectedTak]} toegevoegd.
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  {currentTakData.leaders.map((leader, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        padding: 16,
-                        borderRadius: 12,
-                        backgroundColor: '#F9FBF9',
-                        border: '1px solid #E8F0EB',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 10,
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 900, color: '#1A3D2A', backgroundColor: '#EEF5F1', padding: '2px 8px', borderRadius: 6 }}>
-                          Leider #{i + 1}
-                        </span>
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <button
-                            onClick={() => moveLeader(i, 'up')}
-                            disabled={i === 0}
-                            type="button"
-                            title="Omhoog bewegen"
-                            style={{ border: 'none', background: 'none', cursor: i === 0 ? 'default' : 'pointer', opacity: i === 0 ? 0.3 : 0.8, fontSize: '0.9rem' }}
-                          >
-                            ⬆️
-                          </button>
-                          <button
-                            onClick={() => moveLeader(i, 'down')}
-                            disabled={i === currentTakData.leaders.length - 1}
-                            type="button"
-                            title="Omlaag bewegen"
-                            style={{ border: 'none', background: 'none', cursor: i === currentTakData.leaders.length - 1 ? 'default' : 'pointer', opacity: i === currentTakData.leaders.length - 1 ? 0.3 : 0.8, fontSize: '0.9rem' }}
-                          >
-                            ⬇️
-                          </button>
-                          <button
-                            onClick={() => removeLeader(i)}
-                            type="button"
-                            title="Verwijder"
-                            style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#B23A4D', fontSize: '1rem', marginLeft: 6 }}
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75', textTransform: 'uppercase', marginBottom: 2 }}>
-                            Naam *
-                          </label>
-                          <input
-                            type="text"
-                            value={leader.name}
-                            onChange={e => updateLeader(i, 'name', e.target.value)}
-                            placeholder="Voornaam Achternaam"
-                            style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem' }}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75', textTransform: 'uppercase', marginBottom: 2 }}>
-                            Rol
-                          </label>
-                          <input
-                            type="text"
-                            value={leader.role || ''}
-                            onChange={e => updateLeader(i, 'role', e.target.value)}
-                            placeholder="Takleiding / Leider / Leidster"
-                            style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem' }}
-                          />
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75', textTransform: 'uppercase', marginBottom: 2 }}>
-                            Totem
-                          </label>
-                          <input
-                            type="text"
-                            value={leader.totem || ''}
-                            onChange={e => updateLeader(i, 'totem', e.target.value)}
-                            placeholder="e.g. Blijmoedige Beo"
-                            style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem' }}
-                          />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75', textTransform: 'uppercase', marginBottom: 2 }}>
-                            Telefoonnummer
-                          </label>
-                          <input
-                            type="tel"
-                            value={leader.phone || ''}
-                            onChange={e => updateLeader(i, 'phone', e.target.value)}
-                            placeholder="+32 470 00 00 00"
-                            style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem' }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-          </div>
+          <Link
+            href="/takken?edit=true"
+            style={{
+              padding: '14px 28px',
+              backgroundColor: '#C9963A',
+              color: '#1A3D2A',
+              border: 'none',
+              borderRadius: 12,
+              fontWeight: 900,
+              fontSize: '1rem',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 10,
+              boxShadow: '0 4px 14px rgba(201, 150, 58, 0.3)',
+            }}
+          >
+            ✏️ Naar Takken Live Bewerkmodus
+          </Link>
         </div>
       )}
+
 
       {/* TAB 2: STARTPAGINA & BANNER */}
       {activeTab === 'home' && (
