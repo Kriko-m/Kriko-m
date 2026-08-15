@@ -101,10 +101,40 @@ export default function LeidingPanel() {
             📁
           </div>
           <strong style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: 8, color: '#1A3D2A' }}>
-            Documenten & Links
+            Documenten &amp; Links
           </strong>
           <span style={{ fontSize: '.88rem', color: '#6A8A75', lineHeight: 1.45 }}>
-            Handige sjablonen, checklists, formulieren & nuttige snelkoppelingen.
+            Handige sjablonen, checklists, formulieren &amp; nuttige snelkoppelingen.
+          </span>
+        </Link>
+
+        {/* Card 4: Website Beheer */}
+        <Link
+          href="/portaal/website-beheer"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
+            padding: '36px 24px',
+            borderRadius: 22,
+            background: '#fff',
+            border: '2px solid #C2D9C9',
+            textDecoration: 'none',
+            color: '#1A3D2A',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
+            transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+          }}
+          className="action-card-hover"
+        >
+          <div style={{ width: 64, height: 64, borderRadius: 18, background: '#EEF5F1', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', marginBottom: 16 }}>
+            🌐
+          </div>
+          <strong style={{ fontSize: '1.25rem', fontWeight: 900, marginBottom: 8, color: '#1A3D2A' }}>
+            Website Beheer
+          </strong>
+          <span style={{ fontSize: '.88rem', color: '#6A8A75', lineHeight: 1.45 }}>
+            Beheer leiding per tak, takfoto&apos;s, startpaginafoto, meldingsbalk &amp; lidgeld.
           </span>
         </Link>
 

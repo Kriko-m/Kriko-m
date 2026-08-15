@@ -9,7 +9,7 @@ interface InfoTabbedContentProps {
   address: string
 }
 
-type TabType = 'praktisch' | 'takken' | 'uniform' | 'op-maat'
+type TabType = 'praktisch' | 'takken' | 'uniform' | 'op-maat' | 'oudertak'
 
 export default function InfoTabbedContent({ email, address: _address }: InfoTabbedContentProps) {
   const [activeTab, setActiveTab] = useState<TabType>('praktisch')
@@ -18,11 +18,11 @@ export default function InfoTabbedContent({ email, address: _address }: InfoTabb
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       const tabParam = params.get('tab') as TabType | null
-      if (tabParam && ['praktisch', 'takken', 'uniform', 'op-maat'].includes(tabParam)) {
+      if (tabParam && ['praktisch', 'takken', 'uniform', 'op-maat', 'oudertak'].includes(tabParam)) {
         setActiveTab(tabParam)
       } else if (window.location.hash) {
         const hash = window.location.hash.replace('#', '') as TabType
-        if (['praktisch', 'takken', 'uniform', 'op-maat'].includes(hash)) {
+        if (['praktisch', 'takken', 'uniform', 'op-maat', 'oudertak'].includes(hash)) {
           setActiveTab(hash)
         }
       }
@@ -43,6 +43,7 @@ export default function InfoTabbedContent({ email, address: _address }: InfoTabb
     { id: 'takken', label: 'Onze Takken', icon: 'fa-users' },
     { id: 'uniform', label: 'Uniform & Webshop', icon: 'fa-shirt' },
     { id: 'op-maat', label: 'Scouting op Maat', icon: 'fa-hand-holding-heart' },
+    { id: 'oudertak', label: 'Oudertak', icon: 'fa-people-group' },
   ]
 
   return (
@@ -148,6 +149,9 @@ export default function InfoTabbedContent({ email, address: _address }: InfoTabb
                 </li>
                 <li>
                   👔 <strong><button type="button" onClick={() => handleTabChange('uniform')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Uniform &amp; Webshop</button>:</strong> Info over onze das, kledij en bestellen via de shop.
+                </li>
+                <li>
+                  👨‍👩‍👧‍👦 <strong><button type="button" onClick={() => handleTabChange('oudertak')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Oudertak</button>:</strong> De kritische vriend van onze groep: hoe ouders en oud-leiding Kriko-M ondersteunen.
                 </li>
               </ul>
             </div>
@@ -452,6 +456,132 @@ export default function InfoTabbedContent({ email, address: _address }: InfoTabb
               <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0 }}>
                 Ook een uniform kan daarnaast ook een grote uitgave zijn. Wij verwachten dan ook niet dat iedereen het volledige scoutsuniform aankoopt. Bij de kapoenen en welpen, vragen we een das van onze scouts aan te kopen. Vanaf de jonggivers vragen we ook een T-shirt aan te kopen, daarnaast bieden we ook truien aan vanaf deze leeftijd. Deze kleren bieden we ook tweedehands aan. Als je meer wilt weten over de maten die we momenteel beschikbaar hebben, stuur gerust een mailtje naar <CopyButton text={email}>{email}</CopyButton>.
               </p>
+            </div>
+
+          </div>
+        )}
+
+        {/* TAB 5: Oudertak */}
+        {activeTab === 'oudertak' && (
+          <div style={{ animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div>
+              <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 6, fontWeight: 800 }}>
+                Oudertak
+              </h2>
+              <p style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Help Kriko-M grenzeloos groeien
+              </p>
+            </div>
+
+            {/* Introductie box */}
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', borderLeft: '5px solid var(--color-primary)', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}>
+                Wat is de Oudertak?
+              </h3>
+              <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0 }}>
+                De <strong>oudertak</strong> is de &ldquo;kritische vriend&rdquo; van onze scoutsgroep. Ouders en oudleiding ondersteunen de leiding en groepsleiding, en zetten samen hun schouders onder Kriko-M. Gezamenlijk helpen ze evenementen op poten te zetten en zoeken ze naar oplossingen voor praktische zaken.
+              </p>
+              <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0 }}>
+                Daarnaast is de oudertak een belangrijke <strong>communicatietool</strong>: verschillende werkgroepen brengen elkaar op de hoogte van hun vooruitgang en ouders geven waardevolle feedback over de werking van onze groep. Zo bouwen we met z&apos;n allen aan een nóg mooiere toekomst voor Kriko-M!
+              </p>
+            </div>
+
+            {/* Concrete taken grid */}
+            <div>
+              <h3 style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 16, fontWeight: 700 }}>
+                Wat doet de Oudertak concreet?
+              </h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                {[
+                  {
+                    icon: 'fa-comments',
+                    title: 'Vergaderingen & overleg',
+                    desc: 'Enkele keren per jaar samenkomen om terug te blikken op wat is gebeurd en vooruit te kijken naar wat er te wachten staat.',
+                  },
+                  {
+                    icon: 'fa-calendar-check',
+                    title: 'Hulp bij evenementen',
+                    desc: 'Praktische voorbereiding en ondersteuning bij grote evenementen zoals onze BBQ, Souphé, Bidong en feestelijke bijeenkomsten.',
+                  },
+                  {
+                    icon: 'fa-wrench',
+                    title: 'Onderhoud van lokaal & terrein',
+                    desc: 'Actief mee de handen uit de mouwen steken voor het onderhoud van onze scoutslokalen en het terrein op het VP-plein.',
+                  },
+                  {
+                    icon: 'fa-hammer',
+                    title: 'Bouwen aan de toekomst',
+                    desc: 'Meedenken, plannen en meebouwen aan de vernieuwing en toekomst van onze scoutslokalen (Ploegje Bouw).',
+                  },
+                  {
+                    icon: 'fa-user-graduate',
+                    title: 'Ouders in leiding (Examens)',
+                    desc: 'Om de studerende leiding te ontlasten tijdens de examenperiode, bokst de oudertak 1 keer per jaar zelf een vergadering in elkaar!',
+                  },
+                  {
+                    icon: 'fa-heart',
+                    title: 'Een dikke merci!',
+                    desc: 'Zonder de inzet, hulp en het enthousiasme van al onze fantastische ouders en oud-leiding zou Kriko-M niet staan waar het nu staat. Bedankt!',
+                  },
+                ].map((item, idx) => (
+                  <div 
+                    key={idx} 
+                    style={{ 
+                      backgroundColor: 'var(--color-bg-linen)', 
+                      padding: 20, 
+                      borderRadius: 'var(--border-radius-md)', 
+                      border: '1px solid var(--color-border)',
+                      display: 'flex',
+                      gap: 16,
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <div style={{ 
+                      width: 44, 
+                      height: 44, 
+                      borderRadius: '50%', 
+                      backgroundColor: 'rgba(26, 61, 42, 0.1)', 
+                      color: 'var(--color-primary)', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      fontSize: '1.2rem',
+                      flexShrink: 0,
+                    }}>
+                      <i className={`fa-solid ${item.icon}`}></i>
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '1.05rem', color: 'var(--color-primary-dark)', margin: '0 0 6px 0', fontWeight: 700 }}>
+                        {item.title}
+                      </h4>
+                      <p style={{ fontSize: '0.94rem', lineHeight: 1.6, color: 'var(--color-text-dark)', margin: 0 }}>
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Call to action box */}
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '2px solid var(--color-primary)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+              <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}>
+                Interesse om aan te sluiten of mee te helpen?
+              </h3>
+              <p style={{ fontSize: '0.98rem', lineHeight: 1.6, color: 'var(--color-text-dark)', margin: 0 }}>
+                Wil je ook je steentje bijdragen aan de oudertak, helpen op evenementen of bij het onderhoud? Wij verwelkomen alle enthousiaste ouders en oud-leiding met open armen! Contacteer ons gerust via de groepsleiding:
+              </p>
+              <div style={{ marginTop: 4 }}>
+                <CopyButton
+                  text="groepsleiding@kriko-m.be"
+                  variant="button"
+                  className="btn btn-secondary"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: '0.95rem' }}
+                >
+                  groepsleiding@kriko-m.be <i className="fa-regular fa-copy" style={{ fontSize: '0.85em', opacity: 0.7 }}></i>
+                </CopyButton>
+              </div>
             </div>
 
           </div>

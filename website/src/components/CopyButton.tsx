@@ -40,6 +40,13 @@ export default function CopyButton({ text, variant, className, style, children }
     }
   }
 
+  // Separate shorthand background property from style to prevent React style conflict warnings during rerenders
+  const { background, ...cleanedStyle } = style ?? {}
+  const rawBg = cleanedStyle.backgroundColor ?? background
+  const customBg: string | undefined = typeof rawBg === 'string'
+    ? (rawBg === 'none' ? 'transparent' : rawBg)
+    : undefined
+
   if (isButton) {
     const buttonClass = className ?? 'btn btn-secondary'
     return (
@@ -49,7 +56,8 @@ export default function CopyButton({ text, variant, className, style, children }
         style={{
           cursor: 'pointer',
           transition: 'all 0.2s ease',
-          ...style,
+          ...(customBg ? { backgroundColor: customBg } : {}),
+          ...cleanedStyle,
         }}
         type="button"
         title="Klik om te kopiëren"
@@ -79,7 +87,7 @@ export default function CopyButton({ text, variant, className, style, children }
     padding: '2px 8px',
     margin: '0 2px',
     borderRadius: '4px',
-    backgroundColor: state === 'ok' ? 'var(--color-primary, #650b19)' : 'transparent',
+    backgroundColor: state === 'ok' ? 'var(--color-primary, #650b19)' : (customBg ?? 'transparent'),
     color: state === 'ok' ? '#ffffff' : 'var(--color-primary-dark, #650b19)',
     border: state === 'ok' ? '1px solid var(--color-primary)' : '1px solid rgba(101, 11, 25, 0.35)',
     fontSize: '0.9em',
@@ -89,7 +97,7 @@ export default function CopyButton({ text, variant, className, style, children }
     transition: 'all 0.15s ease',
     textDecoration: 'none',
     boxShadow: 'none',
-    ...style,
+    ...cleanedStyle,
   }
 
   return (

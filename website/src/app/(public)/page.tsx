@@ -1,12 +1,16 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { getPublicCalendarEvents } from '@/lib/db'
+import { getPublicCalendarEvents, getSettings } from '@/lib/db'
 import HeroCTA from '@/components/HeroCTA'
 import UpcomingEvent from '@/components/EventDetailModal'
 import { CalendarEvent } from '@/lib/types'
 
 export default async function HomePage() {
-  const allEvents = (await getPublicCalendarEvents()) as CalendarEvent[]
+  const [allEvents, settings] = await Promise.all([
+    getPublicCalendarEvents() as Promise<CalendarEvent[]>,
+    getSettings(),
+  ])
+  const homeLeidingFoto = settings?.home_leiding_foto || '/images/leiding_25-26.jpg'
   // Toon enkel aankomende activiteiten (vanaf vandaag), max. 3.
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -79,7 +83,7 @@ export default async function HomePage() {
           {/* Rechter kolom: Foto */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Image
-              src="/images/leiding_25-26.jpg"
+              src={homeLeidingFoto}
               alt="Scouts Kriko-M Leiding"
               width={800}
               height={533}

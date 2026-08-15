@@ -5,18 +5,34 @@ import { revalidateTag } from 'next/cache'
 import { TAKKEN } from '@/lib/constants'
 
 // Welke publieke tak-velden de website-content-editor mag aanpassen.
-const TAK_EDITABLE_FIELDS = ['email', 'whatsapp_url', 'description', 'uniform'] as const
+const TAK_EDITABLE_FIELDS = ['email', 'whatsapp_url', 'description', 'uniform', 'photo'] as const
 
 export async function PATCH(req: NextRequest) {
   const user = await requireGroepsleiding()
   if (!user) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const body = await req.json()
-  const allowed = ['scouts_year', 'bank_iban', 'bank_bic', 'bank_holder', 'contact_email', 'contact_phone', 'contact_address', 'alert_message', 'alert_active']
+  const allowed = [
+    'scouts_year',
+    'bank_iban',
+    'bank_bic',
+    'bank_holder',
+    'alert_message',
+    'alert_active',
+    'reg_fee_first',
+    'reg_fee_extra',
+    'home_leiding_foto',
+  ]
   const update: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) {
-      update[key] = key === 'alert_active' ? body[key] === 'true' || body[key] === true : String(body[key]).slice(0, 500)
+      if (key === 'alert_active') {
+        update[key] = body[key] === 'true' || body[key] === true
+      } else if (key === 'reg_fee_first' || key === 'reg_fee_extra') {
+        update[key] = Number(body[key]) || 0
+      } else {
+        update[key] = String(body[key]).slice(0, 1000)
+      }
     }
   }
 
@@ -43,7 +59,9 @@ export async function PATCH(req: NextRequest) {
           .filter(l => l && typeof l === 'object')
           .map(l => ({
             name: String((l as Record<string, unknown>).name ?? '').slice(0, 120),
+            totem: String((l as Record<string, unknown>).totem ?? '').slice(0, 200),
             role: String((l as Record<string, unknown>).role ?? '').slice(0, 120),
+            phone: String((l as Record<string, unknown>).phone ?? '').slice(0, 60),
           }))
           .filter(l => l.name)
       }

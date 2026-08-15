@@ -212,6 +212,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ url: pub.publicUrl })
     }
 
+    if (uploadType === 'tak-leiding-foto') {
+      if (!IMAGE_MIME.has(file.type)) {
+        return NextResponse.json({ error: 'Leidingsfoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
+      }
+      const filename = `tak-leiding-${Date.now()}.${ext}`
+
+      const { error: storageError } = await admin.storage
+        .from('kamp-fotos')
+        .upload(filename, buffer, { contentType: file.type, upsert: true })
+
+      if (storageError) throw storageError
+
+      const { data: pub } = admin.storage.from('kamp-fotos').getPublicUrl(filename)
+      return NextResponse.json({ url: pub.publicUrl, filename })
+    }
+
+    if (uploadType === 'home-leiding-foto') {
+      if (!IMAGE_MIME.has(file.type)) {
+        return NextResponse.json({ error: 'Startpaginafoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
+      }
+      const filename = `home-leiding-${Date.now()}.${ext}`
+
+      const { error: storageError } = await admin.storage
+        .from('kamp-fotos')
+        .upload(filename, buffer, { contentType: file.type, upsert: true })
+
+      if (storageError) throw storageError
+
+      const { data: pub } = admin.storage.from('kamp-fotos').getPublicUrl(filename)
+      return NextResponse.json({ url: pub.publicUrl, filename })
+    }
+
     return NextResponse.json({ error: 'Ongeldig uploadtype' }, { status: 400 })
   } catch (err) {
     console.error('Upload API error:', err)

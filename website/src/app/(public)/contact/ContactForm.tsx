@@ -50,6 +50,9 @@ export default function ContactForm() {
       {status === 'error' && (
         <p style={{ color: 'var(--color-error)', marginBottom: 16 }}>Er ging iets mis. Probeer het opnieuw of stuur een e-mail.</p>
       )}
+      <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: 16 }}>
+        Door dit formulier te versturen ga je akkoord met onze <a href="/privacy" target="_blank" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>privacyverklaring</a>.
+      </p>
       <button type="submit" className="btn btn-secondary" disabled={status === 'sending'} style={{ width: '100%' }}>
         {status === 'sending' ? 'Bezig…' : 'Verstuur bericht'}
       </button>

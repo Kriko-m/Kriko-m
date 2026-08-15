@@ -35,7 +35,7 @@ export default async function ContactPage() {
                   <CopyButton
                     text={settings?.contact_email ?? ''}
                     style={{
-                      background: 'none',
+                      backgroundColor: 'transparent',
                       border: 'none',
                       color: 'var(--color-primary)',
                       fontWeight: 600,

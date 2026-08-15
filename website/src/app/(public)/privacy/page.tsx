@@ -20,6 +20,7 @@ export default function PrivacyPage() {
             { title: '4. Hoe lang bewaren wij je gegevens?', text: 'Gegevens worden bewaard zolang noodzakelijk voor de afhandeling van je kampdeelname of webshopbestelling, en worden daarna verwijderd. Je kan op elk moment vragen om je gegevens te verwijderen.' },
             { title: '5. Jouw rechten', text: 'Je hebt recht op inzage, correctie en verwijdering van je persoonsgegevens. Contacteer ons via groepsleiding@kriko-m.be.' },
             { title: '6. Cookies', text: 'Wij gebruiken enkel functionele cookies (winkelmandje, voorkeurinstellingen). Er worden geen tracking- of analytische cookies gebruikt.' },
+            { title: '7. Verhuur lokaal', text: 'Reserveringen en de verwerking van verhuuraanvragen voor ons lokaal verlopen via het externe platform Kampas (Kampas.be). Bij het boeken gelden de privacyvoorwaarden van Kampas.' },
           ].map(({ title, text }) => (
             <div key={title} style={{ marginBottom: 24 }}>
               <h3 style={{ fontSize: '1.15rem', marginBottom: 8 }}>{title}</h3>

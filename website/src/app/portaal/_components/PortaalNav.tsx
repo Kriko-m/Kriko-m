@@ -127,6 +127,9 @@ export default function PortaalNav({ naam }: Props) {
                     <Link href="/portaal/home" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
                       <span>🏠 Startpagina</span>
                     </Link>
+                    <Link href="/portaal/website-beheer" className="portaal-dropdown-item" onClick={() => setDropdownOpen(false)}>
+                      <span>🌐 Website Beheer</span>
+                    </Link>
                     <button
                       onClick={() => {
                         setDropdownOpen(false)

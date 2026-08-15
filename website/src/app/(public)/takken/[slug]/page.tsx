@@ -221,18 +221,22 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
   const tak = settings?.takken?.[slug]
   if (!tak) notFound()
 
-  // Combineren van leidinggegevens met totems en telefoonnummers
-  const staticLeaders = TAK_LEADERS[slug] ?? []
+  // Leidinggegevens uit settings (of fallback naar statische lijst)
   const dbLeaders: Leader[] = tak.leaders ?? []
-  const leadersToDisplay: Leader[] = staticLeaders.map(sl => {
-    const dbMatch = dbLeaders.find((dbl: Leader) => dbl.name.toLowerCase() === sl.name.toLowerCase())
-    return {
-      name: sl.name,
-      role: dbMatch?.role ?? sl.role ?? 'Leid(st)er',
-      totem: sl.totem,
-      phone: sl.phone,
-    }
-  })
+  const staticLeaders = TAK_LEADERS[slug] ?? []
+  
+  const leadersToDisplay: Leader[] = dbLeaders.length > 0 
+    ? dbLeaders 
+    : staticLeaders.map(sl => ({
+        name: sl.name,
+        role: sl.role ?? 'Leid(st)er',
+        totem: sl.totem,
+        phone: sl.phone,
+      }))
+
+  const takPhotoSrc = tak.photo && tak.photo.trim() !== '' 
+    ? tak.photo 
+    : `/images/leiding_${slug}.jpg`
 
   // 2 meest recente echos voor deze tak (huidige + volgende maand)
   const now = new Date()
@@ -346,7 +350,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                 }}>
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', borderRadius: 5, overflow: 'hidden' }}>
                     <Image
-                      src={`/images/leiding_${slug}.jpg`}
+                      src={takPhotoSrc}
                       alt={`Leidingsploeg ${tak.name}`}
                       fill
                       style={{ objectFit: 'cover' }}

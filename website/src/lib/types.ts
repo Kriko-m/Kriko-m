@@ -27,6 +27,7 @@ export interface Settings {
   alert_active: boolean
   reg_fee_first: number
   reg_fee_extra: number
+  home_leiding_foto?: string
   takken: Record<string, TakConfig>
   // Geheim token voor de private leiding-ICS-feed (zie /api/leiding/ics).
   leiding_ics_token?: string
@@ -42,6 +43,7 @@ export interface TakConfig {
   class: string
   description?: string
   uniform?: string
+  photo?: string
   leaders?: Leader[]
   whatsapp_url?: string
 }
