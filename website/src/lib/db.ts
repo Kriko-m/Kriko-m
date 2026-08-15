@@ -120,21 +120,31 @@ export const getVerslagen = unstable_cache(
 
 export const getSiteContent = unstable_cache(
   async () => {
-    const supabase = createAdminClient()
-    const { data } = await supabase.from('site_content').select('*')
-    const contentMap: Record<string, { title?: string; content?: string; image_url?: string }> = {}
-    if (data) {
-      for (const row of data) {
-        contentMap[row.key] = {
-          title: row.title || '',
-          content: row.content || '',
-          image_url: row.image_url || '',
+    try {
+      const supabase = createAdminClient()
+      const { data, error } = await supabase.from('site_content').select('*')
+      if (error) {
+        console.error('getSiteContent error:', error.message)
+        return {}
+      }
+      const contentMap: Record<string, { title?: string; content?: string; image_url?: string }> = {}
+      if (data) {
+        for (const row of data) {
+          contentMap[row.key] = {
+            title: row.title || '',
+            content: row.content || '',
+            image_url: row.image_url || '',
+          }
         }
       }
+      return contentMap
+    } catch (err) {
+      console.error('getSiteContent exception:', err)
+      return {}
     }
-    return contentMap
   },
   ['site-content-cache'],
   { revalidate: 300, tags: ['site-content'] }
 )
+
 
