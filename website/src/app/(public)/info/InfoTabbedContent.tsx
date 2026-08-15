@@ -1,18 +1,22 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
+import EditableBlock from '@/components/editing/EditableBlock'
+
 
 interface InfoTabbedContentProps {
   email: string
   address: string
+  siteContent?: Record<string, { title?: string; content?: string; image_url?: string }>
 }
 
 type TabType = 'praktisch' | 'takken' | 'uniform' | 'op-maat' | 'oudertak'
 
-export default function InfoTabbedContent({ email, address: _address }: InfoTabbedContentProps) {
+export default function InfoTabbedContent({ email, address: _address, siteContent = {} }: InfoTabbedContentProps) {
   const [activeTab, setActiveTab] = useState<TabType>('praktisch')
+
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -103,17 +107,27 @@ export default function InfoTabbedContent({ email, address: _address }: InfoTabb
         {activeTab === 'praktisch' && (
           <div style={{ animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 24, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
             
-            <div>
-              <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 12, fontWeight: 800 }}>
-                Welkom bij Scouts Kriko-M
-              </h2>
-              <p style={{ margin: '0 0 16px 0' }}>
-                Wij zijn <strong>Scouts Kriko-M</strong>, een gezellige en betrokken scoutsgroep uit Sint-Niklaas voor jongens én meisjes. Onze enthousiaste leidingsploeg staat elke week klaar om van de zondag een onvergetelijke dag te maken: samen spelen, ravotten, uitdagingen aangaan en hechte vriendschappen opbouwen voor het leven!
-              </p>
-              <p style={{ margin: 0 }}>
-                Naast onze wekelijkse activiteiten op zondag organiseren we doorheen het jaar ook heel wat gezellige <strong>evenementen voor de hele familie</strong> — zoals onze jaarlijkse barbecue, ouderavonden en feestelijke bijeenkomsten. Nieuwsgierig naar wat er op de planning staat? Alle evenementen en data kan je terugvinden op onze <Link href="/kalender" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'underline' }}>kalenderpagina</Link>.
-              </p>
-            </div>
+            <Suspense fallback={null}>
+              <EditableBlock
+                blockKey="info.welcome"
+                page="info"
+                section="welcome"
+                initialTitle={siteContent['info.welcome']?.title || 'Welkom bij Scouts Kriko-M'}
+                initialContent={siteContent['info.welcome']?.content || 'Wij zijn Scouts Kriko-M, een gezellige en betrokken scoutsgroep uit Sint-Niklaas voor jongens én meisjes. Onze enthousiaste leidingsploeg staat elke week klaar om van de zondag een onvergetelijke dag te maken!'}
+              >
+                <div>
+                  <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 12, fontWeight: 800 }}>
+                    {siteContent['info.welcome']?.title || 'Welkom bij Scouts Kriko-M'}
+                  </h2>
+                  <p style={{ margin: '0 0 16px 0', whiteSpace: 'pre-line' }}>
+                    {siteContent['info.welcome']?.content || 'Wij zijn Scouts Kriko-M, een gezellige en betrokken scoutsgroep uit Sint-Niklaas voor jongens én meisjes. Onze enthousiaste leidingsploeg staat elke week klaar om van de zondag een onvergetelijke dag te maken: samen spelen, ravotten, uitdagingen aangaan en hechte vriendschappen opbouwen voor het leven!'}
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    Naast onze wekelijkse activiteiten op zondag organiseren we doorheen het jaar ook heel wat gezellige <strong>evenementen voor de hele familie</strong> — zoals onze jaarlijkse barbecue, ouderavonden en feestelijke bijeenkomsten. Nieuwsgierig naar wat er op de planning staat? Alle evenementen en data kan je terugvinden op onze <Link href="/kalender" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'underline' }}>kalenderpagina</Link>.
+                  </p>
+                </div>
+              </EditableBlock>
+            </Suspense>
 
             <div>
               <h3 style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}>

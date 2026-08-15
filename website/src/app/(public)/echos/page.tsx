@@ -1,6 +1,8 @@
-import { getEchos, getSettings } from '@/lib/db'
+import { Suspense } from 'react'
+import { getEchos, getSettings, getSiteContent } from '@/lib/db'
 import type { Metadata } from 'next'
 import { Echo } from '@/lib/types'
+import EditableBlock from '@/components/editing/EditableBlock'
 
 export const metadata: Metadata = { title: "Kriko Echo | Scouts Kriko-M" }
 
@@ -12,8 +14,16 @@ const MONTHS_NL: Record<number, string> = {
 const TAKKEN_KEYS = ['kapoenen', 'welpen', 'jonggivers', 'givers']
 
 export default async function EchosPage() {
-  const [allEchos, settings] = await Promise.all([getEchos(), getSettings()])
+  const [allEchos, settings, siteContent] = await Promise.all([
+    getEchos(),
+    getSettings(),
+    getSiteContent(),
+  ])
+
   const takkenData = settings?.takken ?? {}
+  const heroBlock = siteContent['echos.hero'] || {}
+  const heroTitle = heroBlock.title || 'Kriko Echo'
+  const heroContent = heroBlock.content || 'Onze maandelijkse programmaboekjes per tak.'
 
   const now = new Date()
   const curM = now.getMonth() + 1, curY = now.getFullYear()
@@ -35,9 +45,21 @@ export default async function EchosPage() {
     <>
       <section className="tak-hero primair hero-echos">
         <div className="container">
-          <h1 className="tak-hero-title">Kriko Echo</h1>
+          <Suspense fallback={null}>
+            <EditableBlock
+              blockKey="echos.hero"
+              page="echos"
+              section="hero"
+              initialTitle={heroTitle}
+              initialContent={heroContent}
+            >
+              <h1 className="tak-hero-title">{heroTitle}</h1>
+              <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '1.1rem', marginTop: 10 }}>{heroContent}</p>
+            </EditableBlock>
+          </Suspense>
         </div>
       </section>
+
 
       <div className="echo-page-wrap">
         <div className="echo-grid-wrap">

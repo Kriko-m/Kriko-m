@@ -1,11 +1,15 @@
 import type { Metadata } from 'next'
-import { getSettings } from '@/lib/db'
+import { getSettings, getSiteContent } from '@/lib/db'
 import InfoTabbedContent from './InfoTabbedContent'
 
 export const metadata: Metadata = { title: 'Algemene Info | Scouts Kriko-M' }
 
 export default async function InfoPage() {
-  const settings = await getSettings()
+  const [settings, siteContent] = await Promise.all([
+    getSettings(),
+    getSiteContent(),
+  ])
+
   const email = settings?.contact_email ?? 'groepsleiding@kriko-m.be'
   const address = settings?.contact_address ?? 'Industriepark-Noord 33, 9100 Sint-Niklaas'
 
@@ -18,9 +22,10 @@ export default async function InfoPage() {
       </section>
 
       <section className="section container section--no-top">
-        <InfoTabbedContent email={email} address={address} />
+        <InfoTabbedContent email={email} address={address} siteContent={siteContent} />
       </section>
     </>
   )
 }
+
 

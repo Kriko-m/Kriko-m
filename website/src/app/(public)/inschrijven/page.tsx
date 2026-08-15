@@ -1,6 +1,8 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { getSettings } from '@/lib/db'
+import { getSettings, getSiteContent } from '@/lib/db'
 import CopyButton from '@/components/CopyButton'
+import EditableBlock from '@/components/editing/EditableBlock'
 import InschrijvenClient from './InschrijvenClient'
 
 export const metadata: Metadata = {
@@ -9,11 +11,19 @@ export const metadata: Metadata = {
 }
 
 export default async function InschrijvenPage() {
-  const settings = await getSettings()
+  const [settings, siteContent] = await Promise.all([
+    getSettings(),
+    getSiteContent(),
+  ])
+
   const fee1 = settings?.reg_fee_first ?? 50
   const fee2 = settings?.reg_fee_extra ?? 45
   const year = settings?.scouts_year ?? '2026-2027'
   const email = settings?.contact_email ?? 'groepsleiding@kriko-m.be'
+
+  const heroBlock = siteContent['inschrijven.hero'] || {}
+  const heroTitle = heroBlock.title || 'Inschrijven bij Kriko-M'
+  const heroContent = heroBlock.content || 'Welkom bij de Kriko-M familie! Hieronder vind je een heel duidelijk en overzichtelijk stappenplan om je kind in te schrijven of te herinschrijven.'
 
   return (
     <>
@@ -34,19 +44,31 @@ export default async function InschrijvenPage() {
             >
               SCHRIJF JE NU IN
             </span>
-            <h1 className="tak-hero-title" style={{ marginTop: 0 }}>
-              Inschrijven bij Kriko-M
-            </h1>
-            <p
-              style={{
-                fontSize: '1.15rem',
-                lineHeight: '1.6',
-                color: 'rgba(255, 255, 255, 0.95)',
-                marginTop: '12px',
-              }}
-            >
-              <strong>Welkom bij de Kriko-M familie!</strong> Hieronder vind je een heel duidelijk en overzichtelijk stappenplan om je kind in te schrijven of te herinschrijven via de Groepsadministratie van Scouts &amp; Gidsen Vlaanderen.
-            </p>
+
+            <Suspense fallback={null}>
+              <EditableBlock
+                blockKey="inschrijven.hero"
+                page="inschrijven"
+                section="hero"
+                initialTitle={heroTitle}
+                initialContent={heroContent}
+              >
+                <h1 className="tak-hero-title" style={{ marginTop: 0 }}>
+                  {heroTitle}
+                </h1>
+                <p
+                  style={{
+                    fontSize: '1.15rem',
+                    lineHeight: '1.6',
+                    color: 'rgba(255, 255, 255, 0.95)',
+                    marginTop: '12px',
+                    whiteSpace: 'pre-line',
+                  }}
+                >
+                  {heroContent}
+                </p>
+              </EditableBlock>
+            </Suspense>
           </div>
         </div>
       </section>
@@ -56,7 +78,7 @@ export default async function InschrijvenPage() {
         <div className="register-layout">
           
           {/* Main Left Column (Interactive Stappenplan) */}
-          <InschrijvenClient fee1={fee1} fee2={fee2} year={year} email={email} />
+          <InschrijvenClient fee1={fee1} fee2={fee2} year={year} email={email} siteContent={siteContent} />
 
           {/* Right Sidebar */}
           <div>
@@ -142,3 +164,4 @@ export default async function InschrijvenPage() {
     </>
   )
 }
+

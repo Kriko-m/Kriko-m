@@ -1,60 +1,77 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
+import EditableBlock from '@/components/editing/EditableBlock'
+
 
 interface Props {
   fee1: number
   fee2: number
   year: string
   email: string
+  siteContent?: Record<string, { title?: string; content?: string; image_url?: string }>
 }
 
-export default function InschrijvenClient({ fee1, fee2, year, email }: Props) {
+export default function InschrijvenClient({ fee1, fee2, year, email, siteContent = {} }: Props) {
   const [activeTab, setActiveTab] = useState<'nieuw' | 'bestaand'>('nieuw')
+
+  const proefTitle = siteContent['inschrijven.proef']?.title || 'Eerst 3 keer gratis proberen?'
+  const proefContent = siteContent['inschrijven.proef']?.content || 'Twijfel je nog? Nieuwe leden mogen altijd 3 keer gratis proberen vooraleer in te schrijven! Kom gerust eens langs op zondagochtend om 9:45 stipt bij ons lokaal op het VP-plein (Industriepark-Noord 33, Sint-Niklaas).'
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
 
       {/* Proefproberen highlight card */}
-      <div
-        style={{
-          backgroundColor: 'rgba(101, 11, 25, 0.04)',
-          border: '1px solid rgba(101, 11, 25, 0.15)',
-          borderLeft: '5px solid var(--color-primary)',
-          borderRadius: 'var(--border-radius-md)',
-          padding: '20px 24px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: 16,
-        }}
-      >
-        <div
-          style={{
-            width: 44,
-            height: 44,
-            borderRadius: '50%',
-            backgroundColor: 'var(--color-primary)',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '1.2rem',
-            flexShrink: 0,
-          }}
+      <Suspense fallback={null}>
+        <EditableBlock
+          blockKey="inschrijven.proef"
+          page="inschrijven"
+          section="proef"
+          initialTitle={proefTitle}
+          initialContent={proefContent}
         >
-          <i className="fa-solid fa-star"></i>
-        </div>
-        <div>
-          <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-primary-dark)' }}>
-            Eerst 3 keer gratis proberen?
-          </h4>
-          <p style={{ margin: '6px 0 0 0', fontSize: '0.95rem', color: 'var(--color-text-dark)', lineHeight: 1.5 }}>
-            Twijfel je nog? Nieuwe leden mogen altijd <strong>3 keer gratis proberen</strong> vooraleer in te schrijven! Kom gerust eens langs op zondagochtend om <strong>9:45 stipt</strong> bij ons lokaal op het VP-plein (Industriepark-Noord 33, Sint-Niklaas).
-          </p>
-        </div>
-      </div>
+          <div
+            style={{
+              backgroundColor: 'rgba(101, 11, 25, 0.04)',
+              border: '1px solid rgba(101, 11, 25, 0.15)',
+              borderLeft: '5px solid var(--color-primary)',
+              borderRadius: 'var(--border-radius-md)',
+              padding: '20px 24px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 16,
+            }}
+          >
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                backgroundColor: 'var(--color-primary)',
+                color: '#fff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.2rem',
+                flexShrink: 0,
+              }}
+            >
+              <i className="fa-solid fa-star"></i>
+            </div>
+            <div>
+              <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-primary-dark)' }}>
+                {proefTitle}
+              </h4>
+              <p style={{ margin: '6px 0 0 0', fontSize: '0.95rem', color: 'var(--color-text-dark)', lineHeight: 1.5, whiteSpace: 'pre-line' }}>
+                {proefContent}
+              </p>
+            </div>
+          </div>
+        </EditableBlock>
+      </Suspense>
+
 
       {/* Selector: Nieuw Lid vs Bestaand Lid */}
       <div>
