@@ -30,24 +30,22 @@ export default function EditableBlock({
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const [isLeiding, setIsLeiding] = useState(false)
+  const [isGroepsleiding, setIsGroepsleiding] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     const editQuery = searchParams.get('edit') === 'true'
-    const storedEdit = localStorage.getItem('kriko_edit_mode') === 'true'
-    setIsEditMode(editQuery || storedEdit)
+    setIsEditMode(editQuery)
 
-    fetch('/api/admin/portal-resources')
-      .then(res => {
-        if (res.ok) setIsLeiding(true)
-      })
-      .catch(() => setIsLeiding(false))
+    fetch('/api/admin/check-groepsleiding')
+      .then(res => res.json())
+      .then(data => setIsGroepsleiding(Boolean(data.isGroepsleiding)))
+      .catch(() => setIsGroepsleiding(false))
   }, [searchParams])
 
-  const canEdit = isLeiding && isEditMode
+  const canEdit = isGroepsleiding && isEditMode
 
   return (
     <div
@@ -81,15 +79,15 @@ export default function EditableBlock({
             color: '#C9963A',
             border: '1.5px solid #C9963A',
             borderRadius: '50%',
-            width: 34,
-            height: 34,
+            width: 36,
+            height: 36,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '0.95rem',
+            fontSize: '1rem',
             cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-            opacity: isHovered ? 1 : 0.7,
+            boxShadow: '0 4px 14px rgba(0,0,0,0.3)',
+            opacity: isHovered ? 1 : 0.8,
             transition: 'all 0.15s ease',
           }}
         >

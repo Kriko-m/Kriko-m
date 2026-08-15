@@ -202,28 +202,51 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
           </p>
         </div>
 
-        <button
-          onClick={handleSaveAll}
-          disabled={saving}
-          type="button"
-          style={{
-            padding: '12px 28px',
-            backgroundColor: '#1A3D2A',
-            color: '#fff',
-            border: 'none',
-            borderRadius: 12,
-            fontWeight: 800,
-            fontSize: '0.95rem',
-            cursor: saving ? 'wait' : 'pointer',
-            boxShadow: '0 4px 14px rgba(26, 61, 42, 0.25)',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            transition: 'transform 0.15s ease, background-color 0.15s ease',
-          }}
-        >
-          {saving ? 'Opslaan...' : '💾 Alles Opslaan'}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <Link
+            href="/?edit=true"
+            style={{
+              padding: '12px 22px',
+              backgroundColor: '#C9963A',
+              color: '#1A3D2A',
+              border: 'none',
+              borderRadius: 12,
+              fontWeight: 900,
+              fontSize: '0.95rem',
+              textDecoration: 'none',
+              boxShadow: '0 4px 14px rgba(201, 150, 58, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            ✏️ Live Site Bewerken
+          </Link>
+
+          <button
+            onClick={handleSaveAll}
+            disabled={saving}
+            type="button"
+            style={{
+              padding: '12px 28px',
+              backgroundColor: '#1A3D2A',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 12,
+              fontWeight: 800,
+              fontSize: '0.95rem',
+              cursor: saving ? 'wait' : 'pointer',
+              boxShadow: '0 4px 14px rgba(26, 61, 42, 0.25)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              transition: 'transform 0.15s ease, background-color 0.15s ease',
+            }}
+          >
+            {saving ? 'Opslaan...' : '💾 Alles Opslaan'}
+          </button>
+        </div>
+
       </div>
 
       {/* Notification toast */}

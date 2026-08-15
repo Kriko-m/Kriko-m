@@ -9,98 +9,92 @@ export default function EditModeBar() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [isLeiding, setIsLeiding] = useState(false)
+  const [isGroepsleiding, setIsGroepsleiding] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
 
   useEffect(() => {
-    // Check edit query param or localStorage state
+    // Check edit query param explicitly
     const editQuery = searchParams.get('edit') === 'true'
-    const storedEdit = localStorage.getItem('kriko_edit_mode') === 'true'
-    const active = editQuery || storedEdit
-    setIsEditMode(active)
+    setIsEditMode(editQuery)
 
-    // Check if user is logged in as leiding via browser cookie / session endpoint
-    fetch('/api/admin/portal-resources')
-      .then(res => {
-        if (res.ok) setIsLeiding(true)
-      })
-      .catch(() => setIsLeiding(false))
+    // Check if user has strictly groepsleiding / admin role
+    fetch('/api/admin/check-groepsleiding')
+      .then(res => res.json())
+      .then(data => setIsGroepsleiding(Boolean(data.isGroepsleiding)))
+      .catch(() => setIsGroepsleiding(false))
   }, [searchParams])
 
-  function toggleEditMode() {
-    const nextState = !isEditMode
-    setIsEditMode(nextState)
-    localStorage.setItem('kriko_edit_mode', String(nextState))
-    
-    if (nextState) {
-      router.push(`${pathname}?edit=true`)
-    } else {
-      router.push(pathname)
-    }
+  function handleStopEditing() {
+    setIsEditMode(false)
+    try { localStorage.removeItem('kriko_edit_mode') } catch {}
+    router.push(pathname)
   }
 
-  if (!isLeiding) return null
+  // Toon de balk ENKEL en ALLEEN als de gebruiker groepsleiding is én de bewerkmodus actief is
+  if (!isGroepsleiding || !isEditMode) return null
 
   return (
     <div style={{
       position: 'sticky',
       top: 0,
       zIndex: 99999,
-      backgroundColor: '#1A3D2A',
+      backgroundColor: '#650B19',
       color: '#fff',
-      padding: '8px 16px',
+      padding: '10px 20px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      fontSize: '0.86rem',
-
+      fontSize: '0.88rem',
       fontWeight: 700,
       fontFamily: 'var(--font-body, Outfit, sans-serif)',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+      boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
       flexWrap: 'wrap',
-      gap: 10,
+      gap: 12,
+      borderBottom: '2px solid #C9963A',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ backgroundColor: '#C9963A', color: '#1A3D2A', padding: '2px 8px', borderRadius: 6, fontSize: '0.76rem', fontWeight: 900 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <span style={{ backgroundColor: '#C9963A', color: '#1A3D2A', padding: '3px 10px', borderRadius: 6, fontSize: '0.76rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '.05em' }}>
           GROEPSLEIDING
         </span>
-        <span>
-          {isEditMode ? '✏️ Live Bewerkmodus is ACTIEF (Hover over onderdelen om ze te bewerken)' : '👁️ Je bekijkt de site als Bezoeker'}
+        <span style={{ fontSize: '0.92rem' }}>
+          ✏️ <strong>Live Bewerkmodus Actief</strong> — Hover over titels, teksten of foto&apos;s om ze aan te passen.
         </span>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button
-          onClick={toggleEditMode}
-          type="button"
-          style={{
-            backgroundColor: isEditMode ? '#C9963A' : 'rgba(255,255,255,0.15)',
-            color: isEditMode ? '#1A3D2A' : '#fff',
-            border: 'none',
-            padding: '6px 14px',
-            borderRadius: 8,
-            fontWeight: 800,
-            cursor: 'pointer',
-            fontSize: '0.82rem',
-            transition: 'all 0.15s ease',
-          }}
-        >
-          {isEditMode ? '👁️ Bekijk als Bezoeker' : '✏️ Schakel Bewerkmodus In'}
-        </button>
-
         <Link
-          href="/portaal/home"
+          href="/portaal/website-beheer"
           style={{
-            color: 'rgba(255,255,255,0.85)',
+            color: 'rgba(255,255,255,0.9)',
             textDecoration: 'none',
-            fontSize: '0.82rem',
+            fontSize: '0.84rem',
+            fontWeight: 700,
             display: 'flex',
             alignItems: 'center',
             gap: 4,
           }}
         >
-          &larr; Leidingsportaal
+          &larr; Naar Website Beheer
         </Link>
+
+        <button
+          onClick={handleStopEditing}
+          type="button"
+          style={{
+            backgroundColor: '#C9963A',
+            color: '#1A3D2A',
+            border: 'none',
+            padding: '7px 16px',
+            borderRadius: 8,
+            fontWeight: 900,
+            cursor: 'pointer',
+            fontSize: '0.84rem',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            transition: 'transform 0.15s ease',
+          }}
+        >
+          ✕ Sluiten &amp; Bekijken als Bezoeker
+        </button>
       </div>
     </div>
   )
