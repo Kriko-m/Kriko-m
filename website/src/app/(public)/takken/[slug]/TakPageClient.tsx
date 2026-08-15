@@ -15,7 +15,6 @@ const MONTHS_NL: Record<number, string> = {
   7:'juli',8:'augustus',9:'september',10:'oktober',11:'november',12:'december',
 }
 
-
 const TAK_TRADITIES: Record<string, { wetTitle: string; wet: string; extraTitle?: string; extra?: React.ReactNode }> = {
   kapoenen: {
     wetTitle: 'De Kapoenenwet',
@@ -81,54 +80,51 @@ const TAK_TRADITIES: Record<string, { wetTitle: string; wet: string; extraTitle?
   },
 }
 
-const TAK_DETAILS: Record<string, { title: string; content: React.ReactNode }> = {
+const FULL_TAK_DETAILS_TEXT: Record<string, { title: string; defaultContent: string }> = {
   kapoenen: {
     title: 'Wat is een kapoen?',
-    content: (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
-        <p>Kapoenen zijn onze jongste leden van 6 tot 8 jaar. Ze ontdekken al spelend wat het is om scout of gids te zijn.</p>
-        <p>Het leven van een kapoen is vol spel en fantasie. De leiding bedenkt spelen op maat van kapoenen.</p>
-        <p>Samen met hun leeftijdsgenootjes leren ze al spelenderwijs omgaan met elkaar, leren ze winnen en verliezen.</p>
-        <p>Op het einde van het jaar gaan ze begin augustus gedurende vijf dagen samen op kamp.</p>
-      </div>
-    ),
+    defaultContent: `Kapoenen zijn onze jongste leden van 6 tot 8 jaar. Ze ontdekken al spelend wat het is om scout of gids te zijn.
+
+Het leven van een kapoen is vol spel en fantasie. De leiding bedenkt spelen op maat van kapoenen. Wat vinden ze leuk en wat kunnen ze al op die leeftijd?
+
+Samen met hun leeftijdsgenootjes leren ze al spelenderwijs omgaan met elkaar, leren ze winnen en verliezen. Maar we zetten hen ook aan om buiten te spelen en te genieten van de natuur in al zijn aspecten.
+
+Op het einde van het jaar gaan ze begin augustus gedurende vijf dagen samen op kamp. Hier leven de kinderen samen in hun groep en leren met zichzelf en anderen omgaan.`,
   },
   welpen: {
     title: 'Wat is een welp?',
-    content: (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
-        <p style={{ margin: 0 }}>Een welp:</p>
-        <ul style={{ paddingLeft: 24, margin: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <li>is tussen 8 en 11 jaar,</li>
-          <li>zit meestal in 3e, 4e of 5e leerjaar,</li>
-          <li>groeit een millimeter per week,</li>
-          <li>krijgt er op een jaar drie tanden bij,</li>
-          <li>wordt elke week 5 gram zwaarder.</li>
-        </ul>
-        <p>Welpen hebben veel energie. Hun enthousiasme kent soms geen grenzen. Ze bouwen graag kampen, verzinnen een geheime taal en halen kattenkwaad uit.</p>
-        <p>Op het einde van het jaar gaan ze begin augustus gedurende zeven dagen samen op kamp.</p>
-      </div>
-    ),
+    defaultContent: `Een welp:
+• is tussen 8 en 11 jaar,
+• zit meestal in 3e, 4e of 5e leerjaar,
+• groeit een millimeter per week,
+• krijgt er op een jaar drie tanden bij,
+• wordt elke week 5 gram zwaarder.
+
+Welpen hebben veel energie. Hun enthousiasme kent soms geen grenzen. Ze bouwen graag kampen, verzinnen een geheime taal en halen kattenkwaad uit. Hun vrienden staan centraal.
+
+Samen met hun vrienden ontdekken ze al ravottend hun eigen kunnen en ontwikkelen ze hun vaardigheden. De vaste gewoontes en gebruiken van onze groep versterken het gevoel van verbondenheid met elkaar.
+
+Op het einde van het jaar gaan ze begin augustus gedurende zeven dagen samen op kamp. Hier leven de kinderen samen in hun groep en leren met zichzelf en anderen omgaan.`,
   },
   jonggivers: {
     title: 'Wat is een jonggiver?',
-    content: (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
-        <p>Jonggivers zijn tussen 11 en 13 jaar oud.</p>
-        <p>Jonggivers houden van avontuur en steken graag de handen uit de mouwen. Ze vinden het leuk om inspraak te hebben en gaan graag nieuwe uitdagingen aan.</p>
-        <p>Op het einde van het jaar gaan ze begin augustus gedurende elf dagen samen op kamp.</p>
-      </div>
-    ),
+    defaultContent: `Jonggivers zijn tussen 11 en 13 jaar oud.
+
+Jonggivers houden van avontuur en steken graag de handen uit de mouwen. Ze vinden het leuk om inspraak te hebben en gaan graag nieuwe uitdagingen aan: vlottentocht, koken op houtvuur, slapen in patrouilletenten. Jonggivers leren samenwerken, engagement tonen en zich inzetten voor anderen. Zo ontdekken ze stilaan wat scouting echt inhoudt en leggen hun belofte met trots af.
+
+Jonggivers zitten op de wip tussen kind en puber. Hun leefwereld verandert razendsnel en wordt plots veel complexer. Al die veranderingen zijn soms overweldigend.
+
+Op geen enkele leeftijd verschillen kinderen zo fel van elkaar als bij de jonggivers. Bovendien hebben ze vaak schrik om anders te zijn. Vrienden, hun plaats in de groep en de ontwikkeling van hun eigen identiteit en stijl zijn voor jonggivers belangrijk.
+
+Op het einde van het jaar gaan ze begin augustus gedurende elf dagen samen op kamp. Hier leven de jongeren samen in hun groep, slapen in tenten en leren stilaan de vaardigheden en technieken van een echte scout.`,
   },
   givers: {
     title: 'Wat is een giver?',
-    content: (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
-        <p>De givers zijn de oudste leden van onze scouts en zijn 14 tot 17 jaar oud.</p>
-        <p>Als leiding proberen we toegang te krijgen tot hun leefwereld. En hen zo bij te staan tijdens deze soms moeilijke maar belangrijke periode.</p>
-        <p>Giver zijn houdt meer in dan enkel activiteiten op zondag, we gaan 1 keer in de drie jaar op buitenlands kamp.</p>
-      </div>
-    ),
+    defaultContent: `De givers zijn de oudste leden van onze scouts en zijn 14 tot 17 jaar oud. Zelf vinden ze hun eigen leefwereld vaak nogal verwarrend, verrassend, moeilijk te vatten… en dat is meteen ook één van de kenmerken van deze jongeren.
+
+Als leiding proberen we toegang te krijgen tot hun leefwereld. En hen zo bij te staan tijdens deze soms moeilijke maar belangrijke periode in hun ontwikkeling tot volwassene.
+
+Giver zijn houdt meer in dan enkel activiteiten op zondag, we gaan 1 keer in de drie jaar op buitenlands kamp, organiseren activiteiten om onze kas te spijzen, enz. maar zijn ook al mee verantwoordelijk voor de werking van onze scouts. Giverhulp wordt bijvoorbeeld verwacht op onze eetfestijnen. Maar giver zijn is vooral ook plezier maken met je vrienden, samen leuke ervaringen delen en groeien in de scouts.`,
   },
 }
 
@@ -155,7 +151,7 @@ interface Props {
 function TakPageClientContent({
   slug,
   takName,
-  takDescription,
+  takDescription: _takDescription,
   takEmail,
   takWhatsapp,
   takPhotoSrc,
@@ -185,10 +181,11 @@ function TakPageClientContent({
 
   const canEdit = isGroepsleiding && isEditMode
 
-  // Dynamic overrides from siteContent
+  // Dynamic overrides from siteContent with FULL DEFAULT TEXT fallback
   const descBlock = siteContent[`takken.${slug}.description`]
-  const customTitle = descBlock?.title || TAK_DETAILS[slug]?.title || `Wat is een ${takName}?`
-  const customContent = descBlock?.content || takDescription
+  const fallbackInfo = FULL_TAK_DETAILS_TEXT[slug] || { title: `Wat is een ${takName}?`, defaultContent: '' }
+  const customTitle = descBlock?.title || fallbackInfo.title
+  const customContent = descBlock?.content || fallbackInfo.defaultContent
 
   const tradBlock = siteContent[`takken.${slug}.traditie`]
   const wetTitle = tradBlock?.title || TAK_TRADITIES[slug]?.wetTitle || 'De Scoutswet'
@@ -225,7 +222,7 @@ function TakPageClientContent({
           {/* Linker kolom */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
 
-            {/* 1. Beschrijving Block */}
+            {/* 1. Beschrijving Block (FULL EDITABLE TEXT) */}
             <EditableBlock
               blockKey={`takken.${slug}.description`}
               page="takken"
@@ -238,17 +235,9 @@ function TakPageClientContent({
                 <h3 style={{ fontSize: '1.8rem', marginBottom: 18, color: 'var(--color-primary-dark)', textTransform: 'uppercase' }}>
                   {customTitle}
                 </h3>
-                {descBlock?.content ? (
-                  <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 0, whiteSpace: 'pre-line' }}>
-                    {descBlock.content}
-                  </p>
-                ) : (
-                  TAK_DETAILS[slug]?.content ?? (
-                    <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 0 }}>
-                      {takDescription}
-                    </p>
-                  )
-                )}
+                <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 0, whiteSpace: 'pre-line' }}>
+                  {customContent}
+                </p>
               </div>
             </EditableBlock>
 
@@ -549,4 +538,3 @@ export default function TakPageClient(props: Props) {
     </Suspense>
   )
 }
-
