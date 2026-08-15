@@ -1,16 +1,30 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getPublicCalendarEvents, getSettings } from '@/lib/db'
+import { getPublicCalendarEvents, getSettings, getSiteContent } from '@/lib/db'
 import HeroCTA from '@/components/HeroCTA'
 import UpcomingEvent from '@/components/EventDetailModal'
+import EditableBlock from '@/components/editing/EditableBlock'
 import { CalendarEvent } from '@/lib/types'
 
 export default async function HomePage() {
-  const [allEvents, settings] = await Promise.all([
+  const [allEvents, settings, siteContent] = await Promise.all([
     getPublicCalendarEvents() as Promise<CalendarEvent[]>,
     getSettings(),
+    getSiteContent(),
   ])
-  const homeLeidingFoto = settings?.home_leiding_foto || '/images/leiding_25-26.jpg'
+
+  const welcomeBlock = siteContent['home.welcome_title'] || {}
+  const joinBlock = siteContent['home.join_title'] || {}
+
+  const welcomeTitle = welcomeBlock.title || 'Welkom bij Kriko-M!'
+  const welcomeContent = welcomeBlock.content || 'Wat fijn dat je een kijkje komt nemen! Bij Kriko-M draait alles om avontuur, vriendschap en samen ontdekken. Elke week staat onze enthousiaste leidingsploeg klaar om onze leden een onvergetelijke tijd vol uitdagende spelen, bosrafels en fantastische herinneringen te bezorgen.'
+
+  const joinTitle = joinBlock.title || 'Zin om mee te doen?'
+  const joinContent = joinBlock.content || 'Wil je lid worden of kom je graag een keertje proberen? Neem een kijkje op onze inschrijvingspagina om je aan te melden! Benieuwd waar en wanneer jouw tak afspreekt? De maandelijkse planningen en verzamelplekken vind je overzichtelijk in onze Kriko Echo.'
+
+  const homeLeidingFoto = welcomeBlock.image_url || settings?.home_leiding_foto || ''
+
   // Toon enkel aankomende activiteiten (vanaf vandaag), max. 3.
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -47,55 +61,90 @@ export default async function HomePage() {
           
           {/* Linker kolom: Welkomsttekst */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <h2 style={{
-              fontSize: '2.4rem',
-              marginBottom: 16,
-              color: 'var(--color-primary-dark)',
-              fontWeight: 800,
-              lineHeight: 1.2,
-              letterSpacing: '-0.5px'
-            }}>
-              Welkom bij Kriko-M!
-            </h2>
+            <Suspense fallback={null}>
+              <EditableBlock
+                blockKey="home.welcome_title"
+                page="home"
+                section="welcome"
+                initialTitle={welcomeTitle}
+                initialContent={welcomeContent}
+              >
+                <h2 style={{
+                  fontSize: '2.4rem',
+                  marginBottom: 16,
+                  color: 'var(--color-primary-dark)',
+                  fontWeight: 800,
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.5px'
+                }}>
+                  {welcomeTitle}
+                </h2>
 
-            <p style={{ marginBottom: 20, fontSize: '1.05rem', color: '#2B2B2B', lineHeight: 1.65 }}>
-              Wat fijn dat je een kijkje komt nemen! Bij Kriko-M draait alles om avontuur, vriendschap en samen ontdekken. Elke week staat onze enthousiaste leidingsploeg klaar om onze leden een onvergetelijke tijd vol uitdagende spelen, bosrafels en fantastische herinneringen te bezorgen. Of je nu voor het eerst komt proeven van scouting of al jaren meegaat: bij ons is iedereen welkom!
-            </p>
+                <p style={{ marginBottom: 20, fontSize: '1.05rem', color: '#2B2B2B', lineHeight: 1.65, whiteSpace: 'pre-line' }}>
+                  {welcomeContent}
+                </p>
+              </EditableBlock>
+            </Suspense>
 
-            <div>
-              <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', fontWeight: 800, marginBottom: 6 }}>
-                Zin om mee te doen?
-              </h3>
-              <p style={{ marginBottom: 20, fontSize: '1.05rem', color: '#2B2B2B', lineHeight: 1.65 }}>
-                Wil je lid worden of kom je graag een keertje proberen? Neem een kijkje op onze inschrijvingspagina om je aan te melden! Benieuwd waar en wanneer jouw tak afspreekt? De maandelijkse planningen en verzamelplekken vind je overzichtelijk in onze Kriko Echo.
-              </p>
-              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                <Link href="/inschrijven" className="btn btn-secondary" style={{ padding: '10px 20px', fontWeight: 700 }}>
-                  Naar de Inschrijvingen
-                </Link>
-                <Link href="/echos" className="btn btn-outline" style={{ padding: '10px 20px', fontWeight: 700 }}>
-                  Bekijk de Kriko Echo
-                </Link>
-              </div>
-            </div>
+            <Suspense fallback={null}>
+              <EditableBlock
+                blockKey="home.join_title"
+                page="home"
+                section="join"
+                initialTitle={joinTitle}
+                initialContent={joinContent}
+              >
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', fontWeight: 800, marginBottom: 6 }}>
+                    {joinTitle}
+                  </h3>
+                  <p style={{ marginBottom: 20, fontSize: '1.05rem', color: '#2B2B2B', lineHeight: 1.65, whiteSpace: 'pre-line' }}>
+                    {joinContent}
+                  </p>
+                  <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+                    <Link href="/inschrijven" className="btn btn-secondary" style={{ padding: '10px 20px', fontWeight: 700 }}>
+                      Naar de Inschrijvingen
+                    </Link>
+                    <Link href="/echos" className="btn btn-outline" style={{ padding: '10px 20px', fontWeight: 700 }}>
+                      Bekijk de Kriko Echo
+                    </Link>
+                  </div>
+                </div>
+              </EditableBlock>
+            </Suspense>
           </div>
 
           {/* Rechter kolom: Foto */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Image
-              src={homeLeidingFoto}
-              alt="Scouts Kriko-M Leiding"
-              width={800}
-              height={533}
-              style={{
-                width: '100%',
-                height: 'auto',
-                borderRadius: 'var(--border-radius-lg)',
-                boxShadow: 'var(--shadow-md)',
-                border: '1px solid rgba(101, 11, 25, 0.12)',
-                display: 'block'
-              }}
-            />
+            <Suspense fallback={null}>
+              <EditableBlock
+                blockKey="home.welcome_title"
+                page="home"
+                section="welcome"
+                initialImageUrl={homeLeidingFoto}
+              >
+                {homeLeidingFoto ? (
+                  <Image
+                    src={homeLeidingFoto}
+                    alt="Scouts Kriko-M Leiding"
+                    width={800}
+                    height={533}
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      borderRadius: 'var(--border-radius-lg)',
+                      boxShadow: 'var(--shadow-md)',
+                      border: '1px solid rgba(101, 11, 25, 0.12)',
+                      display: 'block'
+                    }}
+                  />
+                ) : (
+                  <div style={{ padding: 40, backgroundColor: 'var(--color-bg-linen)', borderRadius: 'var(--border-radius-lg)', textAlign: 'center', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                    Geen groepsfoto ingesteld
+                  </div>
+                )}
+              </EditableBlock>
+            </Suspense>
           </div>
         </div>
       </section>
@@ -159,3 +208,4 @@ export default async function HomePage() {
     </>
   )
 }
+

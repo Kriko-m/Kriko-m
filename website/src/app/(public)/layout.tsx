@@ -1,8 +1,10 @@
+import { Suspense } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import CartProvider from '@/components/shop/CartProvider'
 import ScrollRestorer from '@/components/ScrollRestorer'
 import ScrollTopButton from '@/components/ScrollTopButton'
+import EditModeBar from '@/components/editing/EditModeBar'
 import { getSettings } from '@/lib/db'
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -11,6 +13,9 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <CartProvider>
       <ScrollRestorer />
+      <Suspense fallback={null}>
+        <EditModeBar />
+      </Suspense>
       <Header
         alertActive={settings?.alert_active ?? false}
         alertMessage={settings?.alert_message ?? ''}
@@ -27,3 +32,4 @@ export default async function PublicLayout({ children }: { children: React.React
     </CartProvider>
   )
 }
+

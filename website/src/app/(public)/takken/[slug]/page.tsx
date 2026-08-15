@@ -221,22 +221,12 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
   const tak = settings?.takken?.[slug]
   if (!tak) notFound()
 
-  // Leidinggegevens uit settings (of fallback naar statische lijst)
+  // Leidinggegevens enkel uit settings (geen hardcoded fallbacks meer)
   const dbLeaders: Leader[] = tak.leaders ?? []
-  const staticLeaders = TAK_LEADERS[slug] ?? []
-  
-  const leadersToDisplay: Leader[] = dbLeaders.length > 0 
-    ? dbLeaders 
-    : staticLeaders.map(sl => ({
-        name: sl.name,
-        role: sl.role ?? 'Leid(st)er',
-        totem: sl.totem,
-        phone: sl.phone,
-      }))
+  const leadersToDisplay: Leader[] = dbLeaders
 
-  const takPhotoSrc = tak.photo && tak.photo.trim() !== '' 
-    ? tak.photo 
-    : `/images/leiding_${slug}.jpg`
+  const takPhotoSrc = tak.photo && tak.photo.trim() !== '' ? tak.photo : ''
+
 
   // 2 meest recente echos voor deze tak (huidige + volgende maand)
   const now = new Date()
@@ -371,61 +361,68 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 24 }}>
-                {leadersToDisplay.map((leader: Leader) => (
-                  <div
-                    key={leader.name}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '16px 20px',
-                      backgroundColor: 'var(--color-bg-linen)',
-                      borderRadius: 'var(--border-radius-md)',
-                      border: '1px solid var(--color-border)',
-                      gap: 16,
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <div>
-                      <h4 style={{ fontSize: '1.15rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}>
-                        {leader.name}
-                      </h4>
-                      {leader.totem && (
-                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dark)', fontStyle: 'italic', margin: '4px 0 0 0' }}>
-                          {leader.totem}
-                        </p>
+                {leadersToDisplay.length === 0 ? (
+                  <p style={{ color: 'var(--color-text-muted)', fontStyle: 'italic', margin: 0, padding: '12px 0' }}>
+                    Er is momenteel geen leiding ingesteld voor deze tak.
+                  </p>
+                ) : (
+                  leadersToDisplay.map((leader: Leader) => (
+                    <div
+                      key={leader.name}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '16px 20px',
+                        backgroundColor: 'var(--color-bg-linen)',
+                        borderRadius: 'var(--border-radius-md)',
+                        border: '1px solid var(--color-border)',
+                        gap: 16,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <div>
+                        <h4 style={{ fontSize: '1.15rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}>
+                          {leader.name}
+                        </h4>
+                        {leader.totem && (
+                          <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dark)', fontStyle: 'italic', margin: '4px 0 0 0' }}>
+                            {leader.totem}
+                          </p>
+                        )}
+                      </div>
+
+                      {leader.phone ? (
+                        <a
+                          href={`tel:${leader.phone.replace(/\s+/g, '')}`}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            fontSize: '0.92rem',
+                            fontWeight: 700,
+                            color: 'var(--color-primary)',
+                            backgroundColor: '#fff',
+                            padding: '8px 16px',
+                            borderRadius: 'var(--border-radius-md)',
+                            border: '1px solid var(--color-border)',
+                            textDecoration: 'none',
+                            boxShadow: 'var(--shadow-sm)',
+                          }}
+                        >
+                          <i className="fa-solid fa-phone" style={{ color: 'var(--color-secondary)' }}></i>
+                          {leader.phone}
+                        </a>
+                      ) : (
+                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                          -
+                        </span>
                       )}
                     </div>
-
-                    {leader.phone ? (
-                      <a
-                        href={`tel:${leader.phone.replace(/\s+/g, '')}`}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 8,
-                          fontSize: '0.92rem',
-                          fontWeight: 700,
-                          color: 'var(--color-primary)',
-                          backgroundColor: '#fff',
-                          padding: '8px 16px',
-                          borderRadius: 'var(--border-radius-md)',
-                          border: '1px solid var(--color-border)',
-                          textDecoration: 'none',
-                          boxShadow: 'var(--shadow-sm)',
-                        }}
-                      >
-                        <i className="fa-solid fa-phone" style={{ color: 'var(--color-secondary)' }}></i>
-                        {leader.phone}
-                      </a>
-                    ) : (
-                      <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
-                        -
-                      </span>
-                    )}
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
+
             </div>
           </div>
 
