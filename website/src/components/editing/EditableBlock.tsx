@@ -2,12 +2,13 @@
 
 import { useState, useEffect, ReactNode } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import EditBlockModal from './EditBlockModal'
+import EditBlockModal, { BlockType } from './EditBlockModal'
 
 interface Props {
   blockKey: string
   page: string
   section: string
+  blockType?: BlockType
   initialTitle?: string
   initialContent?: string
   initialImageUrl?: string
@@ -20,6 +21,7 @@ export default function EditableBlock({
   blockKey,
   page,
   section,
+  blockType,
   initialTitle = '',
   initialContent = '',
   initialImageUrl = '',
@@ -103,6 +105,7 @@ export default function EditableBlock({
           blockKey={blockKey}
           page={page}
           section={section}
+          blockType={blockType}
           initialTitle={initialTitle}
           initialContent={initialContent}
           initialImageUrl={initialImageUrl}
