@@ -53,6 +53,7 @@ export default function EditLeidingModal({
       const formData = new FormData()
       formData.append('file', file)
       formData.append('type', 'home-leiding-foto')
+      if (photo) formData.append('oldUrl', photo)
 
       const res = await fetch('/api/admin/upload', {
         method: 'POST',

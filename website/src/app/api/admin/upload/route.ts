@@ -102,10 +102,39 @@ export async function POST(req: NextRequest) {
     const { buffer, contentType, ext } = await optimizeImageBuffer(rawBuffer, file.type)
 
     const admin = createAdminClient()
+    const oldUrl = formData.get('oldUrl') as string | null
+
+    /**
+     * Verwijdert het oude bestand uit de storage bucket als oldUrl is meegegeven
+     */
+    async function cleanupOldFile(bucket: string, url: string | null) {
+      if (!url) return
+      try {
+        const cleanUrl = url.split('?')[0]
+        const urlParts = cleanUrl.split('/')
+        const filename = urlParts[urlParts.length - 1]
+        if (filename && !filename.startsWith('http') && filename.length > 3) {
+          await admin.storage.from(bucket).remove([filename])
+        }
+      } catch (err) {
+        console.error('Fout bij automatisch opruimen oud bestand:', err)
+      }
+    }
 
     if (uploadType === 'kamp-foto') {
       const kampId = formData.get('kampId') as string | null
       if (!kampId) return NextResponse.json({ error: 'kampId is verplicht' }, { status: 400 })
+
+      // Oude foto ophalen uit de database en uit storage verwijderen
+      const { data: oldKamp } = await admin
+        .from('kampen')
+        .select('foto')
+        .eq('id', kampId)
+        .single()
+
+      if (oldKamp?.foto) {
+        await admin.storage.from('kamp-fotos').remove([oldKamp.foto])
+      }
 
       const filename = `kf-${kampId}-${Date.now()}.${ext}`
 
@@ -139,6 +168,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'kampId, bestandType en bestandNaam zijn verplicht' }, { status: 400 })
       }
 
+      await cleanupOldFile('kamp-bestanden', oldUrl)
       const filename = `kb-${kampId}-${bestandType}-${Date.now()}.${ext}`
 
       // Upload naar storage
@@ -172,6 +202,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Afbeelding moet een JPG, PNG of WebP zijn.' }, { status: 400 })
       }
       const bucket = isImageType ? 'kamp-fotos' : 'kamp-bestanden'
+      await cleanupOldFile(bucket, oldUrl)
+
       const prefix = uploadType === 'evenement-cover' ? 'ev-cover' : uploadType === 'evenement-banner' ? 'ev-banner' : 'ev-doc'
       const filename = `${prefix}-${Date.now()}.${ext}`
 
@@ -193,6 +225,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'echoTak, echoMonth en echoYear zijn verplicht' }, { status: 400 })
       }
 
+      await cleanupOldFile('echos', oldUrl)
       const filename = `echo-${echoYear}-${echoMonth}-${echoTak}-${Date.now()}.${ext}`
       const capitalizedTak = echoTak.charAt(0).toUpperCase() + echoTak.slice(1)
       const title = `Kriko Echo ${capitalizedTak} ${echoMonth}/${echoYear}`
@@ -233,6 +266,7 @@ export async function POST(req: NextRequest) {
       const tak = formData.get('tak') as string | null
       if (!tak) return NextResponse.json({ error: 'tak is verplicht' }, { status: 400 })
 
+      await cleanupOldFile('kamp-fotos', oldUrl)
       const filename = `portal-bg-${tak}-${Date.now()}.${ext}`
 
       const { error: storageError } = await admin.storage
@@ -246,6 +280,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (uploadType === 'portal-document') {
+      await cleanupOldFile('kamp-bestanden', oldUrl)
       const filename = `doc-${Date.now()}.${ext}`
 
       const { error: storageError } = await admin.storage
@@ -262,6 +297,8 @@ export async function POST(req: NextRequest) {
       if (!IMAGE_MIME.has(file.type)) {
         return NextResponse.json({ error: 'Leidingsfoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
       }
+
+      await cleanupOldFile('kamp-fotos', oldUrl)
       const filename = `tak-leiding-${Date.now()}.${ext}`
 
       const { error: storageError } = await admin.storage
@@ -278,6 +315,8 @@ export async function POST(req: NextRequest) {
       if (!IMAGE_MIME.has(file.type)) {
         return NextResponse.json({ error: 'Startpaginafoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
       }
+
+      await cleanupOldFile('kamp-fotos', oldUrl)
       const filename = `home-leiding-${Date.now()}.${ext}`
 
       const { error: storageError } = await admin.storage

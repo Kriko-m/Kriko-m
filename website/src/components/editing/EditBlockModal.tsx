@@ -86,6 +86,7 @@ export default function EditBlockModal({
       const formData = new FormData()
       formData.append('file', file)
       formData.append('type', 'home-leiding-foto')
+      if (imageUrl) formData.append('oldUrl', imageUrl)
 
       const res = await fetch('/api/admin/upload', {
         method: 'POST',
