@@ -20,12 +20,15 @@ export default async function VerhuurPage() {
   const vhBlock = siteContent['verhuur.intro_title'] || {}
   const vhTitle = vhBlock.title || 'Huur ons lokaal voor jouw groep'
   const vhContent = vhBlock.content || 'Ons verwarmde lokaal met ruime keuken en groot omheind terrein in Sint-Niklaas staat te huur voor groepen: ideaal voor weekends, kampen, vergaderingen en familiefeesten.'
+  const heroImage = (vhBlock.image_url && vhBlock.image_url !== '/images/lokaal.jpg')
+    ? vhBlock.image_url
+    : '/images/verhuur/lokaal-04.jpg'
 
   return (
     <>
       <section className="verhuur-hero" style={{ position: 'relative', overflow: 'hidden' }}>
         <Image
-          src={vhBlock.image_url || "/images/verhuur/lokaal-04.jpg"}
+          src={heroImage}
           alt="Scouts Kriko-M Lokaal"
           className="verhuur-hero-img"
           fill
@@ -46,9 +49,11 @@ export default async function VerhuurPage() {
           <EditableBlock
             blockKey="verhuur.intro_title"
             page="verhuur"
-            section="intro"
+            section="hero"
+            blockType="text_image"
             initialTitle={vhTitle}
             initialContent={vhContent}
+            initialImageUrl={heroImage}
           >
             <div className="vh-intro">
               <span className="vh-eyebrow">Verhuur lokaal &amp; terrein</span>

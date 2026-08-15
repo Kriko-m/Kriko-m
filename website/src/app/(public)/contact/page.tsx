@@ -21,7 +21,6 @@ export default async function ContactPage() {
     <>
       <section className="tak-hero primair hero-contact">
         <div className="container">
-          <span className="hero-eyebrow">Scouts Kriko-M</span>
           <h1 className="tak-hero-title">Contact</h1>
         </div>
       </section>

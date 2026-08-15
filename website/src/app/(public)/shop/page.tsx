@@ -26,11 +26,7 @@ export default async function ShopPage() {
     <>
       <section className="tak-hero primair hero-webshop">
         <div className="container">
-          <span className="hero-eyebrow">Draag met trots</span>
           <h2 className="tak-hero-title">Onze Scouts Webshop</h2>
-          <p style={{ fontSize: '1.2rem', color: 'hsla(0,0%,100%,0.9)', marginTop: 8 }}>
-            Kriko-M truien, t-shirts, dassen en kentekens.
-          </p>
         </div>
       </section>
 

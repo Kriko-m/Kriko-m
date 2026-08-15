@@ -32,7 +32,6 @@ export default async function TakkenOverzicht() {
               initialContent={heroContent}
             >
               <h1 className="tak-hero-title">{heroTitle}</h1>
-              <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '1.1rem', marginTop: 10 }}>{heroContent}</p>
             </EditableBlock>
           </Suspense>
         </div>

@@ -37,13 +37,13 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit }: { event: 
       />
       <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2001, padding: '16px', pointerEvents: 'none' }}>
         <div
-          style={{ position: 'relative', pointerEvents: 'auto', background: '#fff', borderRadius: 22, boxShadow: '0 40px 100px rgba(58,7,16,0.26), 0 0 0 1px rgba(0,0,0,0.04)', width: '100%', maxWidth: 822, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
+          style={{ position: 'relative', pointerEvents: 'auto', background: '#fff', borderRadius: 22, boxShadow: '0 40px 100px rgba(58,7,16,0.26), 0 0 0 1px rgba(0,0,0,0.04)', width: '95%', maxWidth: 960, maxHeight: '90vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Banner / Cover Image */}
           {event.banner_image && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={event.banner_image} alt={event.title} style={{ width: '100%', maxHeight: 260, objectFit: 'cover', borderRadius: '22px 22px 0 0', display: 'block' }} />
+            <img src={event.banner_image} alt={event.title} style={{ width: '100%', maxHeight: 290, objectFit: 'cover', borderRadius: '22px 22px 0 0', display: 'block' }} />
           )}
 
           {/* Edit button for leiding */}
@@ -88,7 +88,7 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit }: { event: 
             ✕
           </button>
 
-          <div style={{ padding: '32px 36px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ padding: '36px 44px', display: 'flex', flexDirection: 'column', gap: 22 }}>
             {/* Title, Audience Tags & Countdown Badge */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingRight: onEdit ? 120 : 40 }}>
               {event.audience && event.audience.length > 0 && (

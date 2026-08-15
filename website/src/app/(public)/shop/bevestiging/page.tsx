@@ -39,11 +39,7 @@ export default function BevestigingPage() {
     <>
       <section className="tak-hero primair hero-checkout">
         <div className="container">
-          <span className="hero-eyebrow">Bestelling geplaatst!</span>
           <h2 className="tak-hero-title">Bedankt voor je bestelling</h2>
-          <p style={{ fontSize: '1.2rem', color: 'hsla(0,0%,100%,0.9)', marginTop: 8 }}>
-            We verwerken je bestelling zodra de overschrijving ontvangen is.
-          </p>
         </div>
       </section>
 
