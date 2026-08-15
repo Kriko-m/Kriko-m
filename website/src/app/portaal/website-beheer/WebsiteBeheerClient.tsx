@@ -1,26 +1,18 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
-import { TAKKEN, TAK_NAMEN, TAK_KLEUREN } from '@/lib/constants'
-import { Settings, Leader } from '@/lib/types'
+import { Settings } from '@/lib/types'
 
 interface Props {
   initialSettings: Settings
 }
 
-type TabType = 'takken' | 'home' | 'bank'
-
 export default function WebsiteBeheerClient({ initialSettings }: Props) {
-  const [activeTab, setActiveTab] = useState<TabType>('takken')
-  const [selectedTak, setSelectedTak] = useState<string>(TAKKEN[0])
   const [saving, setSaving] = useState(false)
-  const [uploading, setUploading] = useState<string | null>(null)
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  // Form states
-  const [homeLeidingFoto, setHomeLeidingFoto] = useState<string>(initialSettings.home_leiding_foto || '/images/leiding_25-26.jpg')
+  // System settings (Bank, Lidgeld, Alert Banner)
   const [alertActive, setAlertActive] = useState<boolean>(initialSettings.alert_active ?? false)
   const [alertMessage, setAlertMessage] = useState<string>(initialSettings.alert_message || '')
   
@@ -31,128 +23,15 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
   const [regFeeFirst, setRegFeeFirst] = useState<number>(initialSettings.reg_fee_first || 50.0)
   const [regFeeExtra, setRegFeeExtra] = useState<number>(initialSettings.reg_fee_extra || 45.0)
 
-  // Takken state
-  const [takkenData, setTakkenData] = useState<Record<string, {
-    email: string
-    whatsapp_url: string
-    photo: string
-    leaders: Leader[]
-  }>>(() => {
-    const init: Record<string, { email: string; whatsapp_url: string; photo: string; leaders: Leader[] }> = {}
-    for (const tak of TAKKEN) {
-      const c = initialSettings.takken?.[tak] || {}
-      init[tak] = {
-        email: c.email || '',
-        whatsapp_url: c.whatsapp_url || '',
-        photo: c.photo || `/images/leiding_${tak}.jpg`,
-        leaders: Array.isArray(c.leaders) && c.leaders.length > 0
-          ? c.leaders.map(l => ({ name: l.name || '', totem: l.totem || '', role: l.role || 'Leid(st)er', phone: l.phone || '' }))
-          : []
-      }
-    }
-    return init
-  })
-
-  const currentTakData = takkenData[selectedTak] || { email: '', whatsapp_url: '', photo: `/images/leiding_${selectedTak}.jpg`, leaders: [] }
-
   function showNotification(type: 'success' | 'error', text: string) {
     setFlashMessage({ type, text })
     setTimeout(() => setFlashMessage(null), 4000)
   }
 
-  // --- Tak handlers ---
-  function updateTakField(field: 'email' | 'whatsapp_url' | 'photo', value: string) {
-    setTakkenData(prev => ({
-      ...prev,
-      [selectedTak]: { ...prev[selectedTak], [field]: value }
-    }))
-  }
-
-  function updateLeader(index: number, field: keyof Leader, value: string) {
-    setTakkenData(prev => {
-      const updatedLeaders = [...prev[selectedTak].leaders]
-      updatedLeaders[index] = { ...updatedLeaders[index], [field]: value }
-      return {
-        ...prev,
-        [selectedTak]: { ...prev[selectedTak], leaders: updatedLeaders }
-      }
-    })
-  }
-
-  function addLeader() {
-    setTakkenData(prev => ({
-      ...prev,
-      [selectedTak]: {
-        ...prev[selectedTak],
-        leaders: [...prev[selectedTak].leaders, { name: '', totem: '', role: 'Leid(st)er', phone: '' }]
-      }
-    }))
-  }
-
-  function removeLeader(index: number) {
-    setTakkenData(prev => ({
-      ...prev,
-      [selectedTak]: {
-        ...prev[selectedTak],
-        leaders: prev[selectedTak].leaders.filter((_, i) => i !== index)
-      }
-    }))
-  }
-
-  function moveLeader(index: number, direction: 'up' | 'down') {
-    setTakkenData(prev => {
-      const leaders = [...prev[selectedTak].leaders]
-      const targetIndex = direction === 'up' ? index - 1 : index + 1
-      if (targetIndex < 0 || targetIndex >= leaders.length) return prev
-      const temp = leaders[index]
-      leaders[index] = leaders[targetIndex]
-      leaders[targetIndex] = temp
-      return {
-        ...prev,
-        [selectedTak]: { ...prev[selectedTak], leaders }
-      }
-    })
-  }
-
-  // --- Upload handlers ---
-  async function handleFileUpload(file: File, type: 'tak-leiding-foto' | 'home-leiding-foto') {
-    setUploading(type)
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('type', type)
-
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Upload mislukt')
-      }
-
-      const data = await res.json()
-      if (type === 'tak-leiding-foto') {
-        updateTakField('photo', data.url)
-        showNotification('success', `Foto voor ${TAK_NAMEN[selectedTak]} succesvol geüpload!`)
-      } else {
-        setHomeLeidingFoto(data.url)
-        showNotification('success', 'Startpagina groepsfoto succesvol geüpload!')
-      }
-    } catch (err: unknown) {
-      showNotification('error', err instanceof Error ? err.message : 'Upload mislukt')
-    } finally {
-      setUploading(null)
-    }
-  }
-
-  // --- Save Handler ---
-  async function handleSaveAll() {
+  async function handleSaveSystemSettings() {
     setSaving(true)
     try {
       const payload = {
-        home_leiding_foto: homeLeidingFoto,
         alert_active: alertActive,
         alert_message: alertMessage,
         bank_iban: bankIban,
@@ -161,7 +40,6 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
         scouts_year: scoutsYear,
         reg_fee_first: regFeeFirst,
         reg_fee_extra: regFeeExtra,
-        takken: takkenData,
       }
 
       const res = await fetch('/api/admin/settings', {
@@ -175,7 +53,7 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
         throw new Error(err.error || 'Opslaan mislukt')
       }
 
-      showNotification('success', 'Alle wijzigingen succesvol opgeslagen op de website!')
+      showNotification('success', 'Systeeminstellingen succesvol opgeslagen!')
     } catch (err: unknown) {
       showNotification('error', err instanceof Error ? err.message : 'Fout bij opslaan')
     } finally {
@@ -184,72 +62,22 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
   }
 
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto', padding: '32px 20px', fontFamily: 'var(--font-body, Outfit, sans-serif)' }}>
+    <div style={{ maxWidth: 880, margin: '0 auto', padding: '36px 20px', fontFamily: 'var(--font-body, Outfit, sans-serif)' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Link href="/portaal/home" style={{ color: '#6A8A75', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
-              &larr; Terug naar portaal
-            </Link>
-          </div>
-          <h1 style={{ margin: '6px 0 0', color: '#1A3D2A', fontWeight: 900, fontSize: '2rem', letterSpacing: '-0.02em' }}>
-            🌐 Website Beheer
-          </h1>
-          <p style={{ margin: '4px 0 0', color: '#6A8A75', fontSize: '0.95rem' }}>
-            Beheer leiding, takfoto&apos;s, de startpaginafoto, meldingsbalk en bankgegevens van Scouts Kriko-M.
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <Link
-            href="/?edit=true"
-            style={{
-              padding: '12px 22px',
-              backgroundColor: '#C9963A',
-              color: '#1A3D2A',
-              border: 'none',
-              borderRadius: 12,
-              fontWeight: 900,
-              fontSize: '0.95rem',
-              textDecoration: 'none',
-              boxShadow: '0 4px 14px rgba(201, 150, 58, 0.3)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            ✏️ Live Site Bewerken
-          </Link>
-
-          <button
-            onClick={handleSaveAll}
-            disabled={saving}
-            type="button"
-            style={{
-              padding: '12px 28px',
-              backgroundColor: '#1A3D2A',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 12,
-              fontWeight: 800,
-              fontSize: '0.95rem',
-              cursor: saving ? 'wait' : 'pointer',
-              boxShadow: '0 4px 14px rgba(26, 61, 42, 0.25)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'transform 0.15s ease, background-color 0.15s ease',
-            }}
-          >
-            {saving ? 'Opslaan...' : '💾 Alles Opslaan'}
-          </button>
-        </div>
-
+      <div style={{ marginBottom: 32 }}>
+        <Link href="/portaal/home" style={{ color: '#6A8A75', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 600 }}>
+          &larr; Terug naar portaal
+        </Link>
+        <h1 style={{ margin: '8px 0 4px', color: '#1A3D2A', fontWeight: 900, fontSize: '2.2rem', letterSpacing: '-0.02em' }}>
+          🌐 Website Beheer
+        </h1>
+        <p style={{ margin: 0, color: '#6A8A75', fontSize: '1rem' }}>
+          Beheer alle inhoud, teksten en foto&apos;s rechtstreeks live op de website.
+        </p>
       </div>
 
-      {/* Notification toast */}
+      {/* Notification Toast */}
       {flashMessage && (
         <div style={{
           padding: '14px 20px',
@@ -270,270 +98,128 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
         </div>
       )}
 
-      {/* Main Tabs */}
-      <div style={{ display: 'flex', gap: 10, borderBottom: '2px solid #E8F0EB', marginBottom: 28 }}>
-        <button
-          onClick={() => setActiveTab('takken')}
-          type="button"
+      {/* Main Live Edit Action Card */}
+      <div style={{
+        backgroundColor: '#1A3D2A',
+        borderRadius: 20,
+        padding: '36px 32px',
+        color: '#fff',
+        marginBottom: 36,
+        boxShadow: '0 8px 24px rgba(26, 61, 42, 0.2)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        gap: 16,
+      }}>
+        <div style={{ fontSize: '2.8rem' }}>✨</div>
+        <h2 style={{ margin: 0, fontSize: '1.75rem', fontWeight: 900, color: '#fff' }}>
+          Live Website Bewerken
+        </h2>
+        <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: '1rem', maxWidth: 560, lineHeight: 1.6 }}>
+          Surfe rechtstreeks op de website als groepsleider. Bij hover over titels, alinea&apos;s, tradities, leidingploegen en foto&apos;s verschijnt een potloodje ✏️ waarmee je de inhoud direct live aanpast.
+        </p>
+        <Link
+          href="/?edit=true"
           style={{
-            padding: '12px 20px',
-            border: 'none',
-            background: 'none',
-            borderBottom: activeTab === 'takken' ? '3px solid #1A3D2A' : '3px solid transparent',
-            color: activeTab === 'takken' ? '#1A3D2A' : '#6A8A75',
-            fontWeight: activeTab === 'takken' ? 900 : 700,
-            fontSize: '1rem',
-            cursor: 'pointer',
-            marginBottom: -2,
+            marginTop: 8,
+            padding: '14px 32px',
+            backgroundColor: '#C9963A',
+            color: '#1A3D2A',
+            borderRadius: 14,
+            fontWeight: 900,
+            fontSize: '1.05rem',
+            textDecoration: 'none',
+            boxShadow: '0 4px 16px rgba(201, 150, 58, 0.4)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 10,
+            transition: 'transform 0.15s ease',
           }}
         >
-          ⚜️ Takken &amp; Leiding
-        </button>
-        <button
-          onClick={() => setActiveTab('home')}
-          type="button"
-          style={{
-            padding: '12px 20px',
-            border: 'none',
-            background: 'none',
-            borderBottom: activeTab === 'home' ? '3px solid #1A3D2A' : '3px solid transparent',
-            color: activeTab === 'home' ? '#1A3D2A' : '#6A8A75',
-            fontWeight: activeTab === 'home' ? 900 : 700,
-            fontSize: '1rem',
-            cursor: 'pointer',
-            marginBottom: -2,
-          }}
-        >
-          🏠 Startpagina &amp; Banner
-        </button>
-        <button
-          onClick={() => setActiveTab('bank')}
-          type="button"
-          style={{
-            padding: '12px 20px',
-            border: 'none',
-            background: 'none',
-            borderBottom: activeTab === 'bank' ? '3px solid #1A3D2A' : '3px solid transparent',
-            color: activeTab === 'bank' ? '#1A3D2A' : '#6A8A75',
-            fontWeight: activeTab === 'bank' ? 900 : 700,
-            fontSize: '1rem',
-            cursor: 'pointer',
-            marginBottom: -2,
-          }}
-        >
-          💳 Bank &amp; Lidgeld
-        </button>
+          ✏️ Start Live Website Bewerken
+        </Link>
       </div>
 
-      {/* TAB 1: TAKKEN & LEIDING */}
-      {activeTab === 'takken' && (
-        <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 32, textAlign: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-          <h3 style={{ margin: '0 0 10px', color: '#1A3D2A', fontSize: '1.4rem', fontWeight: 900 }}>
-            ⚜️ Takpagina&apos;s &amp; Leiding Beheer
+      {/* System Settings Section (Alert Banner, Bank & Lidgeld) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 24, alignItems: 'start' }}>
+        
+        {/* Alert Banner Setting */}
+        <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+          <h3 style={{ margin: '0 0 4px', color: '#1A3D2A', fontSize: '1.15rem', fontWeight: 900 }}>
+            📢 Meldingsbalk (Alert Banner)
           </h3>
-          <p style={{ margin: '0 0 24px', color: '#6A8A75', fontSize: '0.98rem', maxWidth: 600, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
-            Het bewerken van takbeschrijvingen, leidingploegen, foto&apos;s en tradities gebeurt voortaan rechtstreeks live op de website in de <strong>Live Bewerkmodus</strong>.
+          <p style={{ margin: '0 0 16px', color: '#6A8A75', fontSize: '0.84rem' }}>
+            Toon of verberg een opvallende melding bovenaan elke pagina.
           </p>
 
-          <Link
-            href="/takken?edit=true"
-            style={{
-              padding: '14px 28px',
-              backgroundColor: '#C9963A',
-              color: '#1A3D2A',
-              border: 'none',
-              borderRadius: 12,
-              fontWeight: 900,
-              fontSize: '1rem',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 10,
-              boxShadow: '0 4px 14px rgba(201, 150, 58, 0.3)',
-            }}
-          >
-            ✏️ Naar Takken Live Bewerkmodus
-          </Link>
-        </div>
-      )}
-
-
-      {/* TAB 2: STARTPAGINA & BANNER */}
-      {activeTab === 'home' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, alignItems: 'start' }}>
-          
-          {/* Startpagina Leidingsfoto */}
-          <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-            <h3 style={{ margin: '0 0 4px', color: '#1A3D2A', fontSize: '1.15rem', fontWeight: 900 }}>
-              📸 Startpagina Groepsfoto
-            </h3>
-            <p style={{ margin: '0 0 16px', color: '#6A8A75', fontSize: '0.84rem' }}>
-              Deze groepsfoto staat prominent op de homepage van de website naast het welkomstbericht.
-            </p>
-
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '16/10', borderRadius: 12, overflow: 'hidden', backgroundColor: '#F0ECE4', border: '1px solid #E2C58D', marginBottom: 16 }}>
-              {homeLeidingFoto ? (
-                <Image
-                  src={homeLeidingFoto}
-                  alt="Startpagina groepsfoto"
-                  fill
-                  unoptimized
-                  style={{ objectFit: 'cover' }}
-                />
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#6A8A75', fontSize: '0.9rem' }}>
-                  Geen foto ingesteld
-                </div>
-              )}
-            </div>
-
-            <label
-              style={{
-                display: 'block',
-                textAlign: 'center',
-                padding: '12px 14px',
-                backgroundColor: '#EEF5F1',
-                border: '1.5px dashed #1A3D2A',
-                borderRadius: 10,
-                color: '#1A3D2A',
-                fontWeight: 800,
-                fontSize: '0.88rem',
-                cursor: uploading ? 'wait' : 'pointer',
-              }}
-            >
-              {uploading === 'home-leiding-foto' ? 'Uploaden...' : '📷 Nieuwe startpaginafoto uploaden'}
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                style={{ display: 'none' }}
-                disabled={uploading === 'home-leiding-foto'}
-                onChange={e => {
-                  const file = e.target.files?.[0]
-                  if (file) handleFileUpload(file, 'home-leiding-foto')
-                }}
-              />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: 12, backgroundColor: '#F9FBF9', borderRadius: 10, border: '1px solid #E8F0EB' }}>
+            <input
+              type="checkbox"
+              id="alert_active"
+              checked={alertActive}
+              onChange={e => setAlertActive(e.target.checked)}
+              style={{ width: 20, height: 20, accentColor: '#1A3D2A', cursor: 'pointer' }}
+            />
+            <label htmlFor="alert_active" style={{ fontSize: '0.9rem', fontWeight: 800, color: '#1A3D2A', cursor: 'pointer' }}>
+              {alertActive ? '✅ Meldingsbalk Actief' : '❌ Meldingsbalk Inactief'}
             </label>
           </div>
 
-          {/* Meldingsbalk / Alert Banner */}
-          <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-            <h3 style={{ margin: '0 0 4px', color: '#1A3D2A', fontSize: '1.15rem', fontWeight: 900 }}>
-              📢 Meldingsbalk (Alert Banner)
-            </h3>
-            <p style={{ margin: '0 0 16px', color: '#6A8A75', fontSize: '0.84rem' }}>
-              Schakel een opvallende meldingsbalk in of uit bovenaan elke pagina van de website.
-            </p>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, padding: 14, backgroundColor: '#F9FBF9', borderRadius: 12, border: '1px solid #E8F0EB' }}>
-              <input
-                type="checkbox"
-                id="alert_active"
-                checked={alertActive}
-                onChange={e => setAlertActive(e.target.checked)}
-                style={{ width: 22, height: 22, accentColor: '#1A3D2A', cursor: 'pointer' }}
-              />
-              <label htmlFor="alert_active" style={{ fontSize: '0.95rem', fontWeight: 800, color: '#1A3D2A', cursor: 'pointer' }}>
-                {alertActive ? '✅ Meldingsbalk is ACTIEF (Zichtbaar op site)' : '❌ Meldingsbalk is INACTIEF (Verborgen)'}
-              </label>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 6 }}>
-                Bericht in de meldingsbalk
-              </label>
-              <textarea
-                value={alertMessage}
-                onChange={e => setAlertMessage(e.target.value)}
-                rows={3}
-                placeholder="bv. Welkom op de nieuwe website van Scouts Kriko-M! De inschrijvingen zijn geopend."
-                style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontFamily: 'inherit', fontSize: '0.9rem', resize: 'vertical' }}
-              />
-            </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+              Bericht
+            </label>
+            <textarea
+              value={alertMessage}
+              onChange={e => setAlertMessage(e.target.value)}
+              rows={2}
+              placeholder="bv. De inschrijvingen voor het nieuwe werkjaar zijn geopend!"
+              style={{ width: '100%', padding: '8px 10px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', fontFamily: 'inherit', resize: 'vertical' }}
+            />
           </div>
-
         </div>
-      )}
 
-      {/* TAB 3: BANK & LIDGELD */}
-      {activeTab === 'bank' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, alignItems: 'start' }}>
-          
-          {/* Bankgegevens */}
-          <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-            <h3 style={{ margin: '0 0 4px', color: '#1A3D2A', fontSize: '1.15rem', fontWeight: 900 }}>
-              🏦 Bankrekening Gegevens
-            </h3>
-            <p style={{ margin: '0 0 16px', color: '#6A8A75', fontSize: '0.84rem' }}>
-              Deze gegevens worden getoond op bestelbevestigingen van de webshop.
-            </p>
+        {/* Bank & Lidgeld Settings */}
+        <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+          <h3 style={{ margin: '0 0 4px', color: '#1A3D2A', fontSize: '1.15rem', fontWeight: 900 }}>
+            💳 Bank &amp; Lidgelden
+          </h3>
+          <p style={{ margin: '0 0 16px', color: '#6A8A75', fontSize: '0.84rem' }}>
+            Bankgegevens voor webshop bestellingen en inschrijfbedragen.
+          </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                  IBAN Rekeningnummer
+                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 2 }}>
+                  IBAN
                 </label>
                 <input
                   type="text"
                   value={bankIban}
                   onChange={e => setBankIban(e.target.value)}
                   placeholder="BE76 1234 5678 9012"
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.9rem' }}
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.86rem' }}
                 />
               </div>
-
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                  BIC Code
-                </label>
-                <input
-                  type="text"
-                  value={bankBic}
-                  onChange={e => setBankBic(e.target.value)}
-                  placeholder="KRIKOBE2B"
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.9rem' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                  Naam Rekeninghouder
-                </label>
-                <input
-                  type="text"
-                  value={bankHolder}
-                  onChange={e => setBankHolder(e.target.value)}
-                  placeholder="Scouts Kriko-M vzw"
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.9rem' }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Lidgelden & Werkjaar */}
-          <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', padding: 24, boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
-            <h3 style={{ margin: '0 0 4px', color: '#1A3D2A', fontSize: '1.15rem', fontWeight: 900 }}>
-              💶 Lidgeld &amp; Werkjaar
-            </h3>
-            <p style={{ margin: '0 0 16px', color: '#6A8A75', fontSize: '0.84rem' }}>
-              Pas de inschrijvingsbedragen en het actieve werkjaar aan.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                  Actief Scoutsjaar
+                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 2 }}>
+                  Scoutsjaar
                 </label>
                 <input
                   type="text"
                   value={scoutsYear}
                   onChange={e => setScoutsYear(e.target.value)}
                   placeholder="2026-2027"
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.9rem' }}
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.86rem' }}
                 />
               </div>
+            </div>
 
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 2 }}>
                   Lidgeld 1e kind (€)
                 </label>
                 <input
@@ -541,51 +227,46 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
                   step="0.50"
                   value={regFeeFirst}
                   onChange={e => setRegFeeFirst(parseFloat(e.target.value) || 0)}
-                  placeholder="50.00"
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.9rem' }}
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.86rem' }}
                 />
               </div>
-
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                  Lidgeld extra kind (€)
+                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 2 }}>
+                  Extra kind (€)
                 </label>
                 <input
                   type="number"
                   step="0.50"
                   value={regFeeExtra}
                   onChange={e => setRegFeeExtra(parseFloat(e.target.value) || 0)}
-                  placeholder="45.00"
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.9rem' }}
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.86rem' }}
                 />
               </div>
             </div>
           </div>
-
         </div>
-      )}
 
-      {/* Floating Save Footer */}
-      <div style={{ marginTop: 36, padding: '16px 24px', backgroundColor: '#fff', borderRadius: 16, border: '1.5px solid #C2D9C9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
-        <span style={{ fontSize: '0.88rem', color: '#6A8A75' }}>
-          Vergeet niet om je wijzigingen op te slaan!
-        </span>
+      </div>
+
+      {/* Save Button for System Settings */}
+      <div style={{ marginTop: 24, textAlign: 'right' }}>
         <button
-          onClick={handleSaveAll}
+          onClick={handleSaveSystemSettings}
           disabled={saving}
           type="button"
           style={{
-            padding: '12px 28px',
+            padding: '12px 24px',
             backgroundColor: '#1A3D2A',
             color: '#fff',
             border: 'none',
-            borderRadius: 10,
+            borderRadius: 12,
             fontWeight: 800,
-            fontSize: '0.95rem',
+            fontSize: '0.92rem',
             cursor: saving ? 'wait' : 'pointer',
+            boxShadow: '0 4px 12px rgba(26, 61, 42, 0.2)',
           }}
         >
-          {saving ? 'Opslaan...' : '💾 Alles Opslaan'}
+          {saving ? 'Opslaan...' : '💾 Systeeminstellingen Opslaan'}
         </button>
       </div>
 

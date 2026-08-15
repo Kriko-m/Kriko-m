@@ -13,11 +13,17 @@ export default function EditModeBar() {
   const [isEditMode, setIsEditMode] = useState(false)
 
   useEffect(() => {
-    // Check edit query param explicitly
+    // Sync edit mode state with URL parameter and localStorage persistence
     const editQuery = searchParams.get('edit') === 'true'
-    setIsEditMode(editQuery)
+    if (editQuery) {
+      try { localStorage.setItem('kriko_edit_mode', 'true') } catch {}
+    }
 
-    // Check if user has strictly groepsleiding / admin role
+    const storedEdit = Boolean(typeof window !== 'undefined' && localStorage.getItem('kriko_edit_mode') === 'true')
+    const active = editQuery || storedEdit
+    setIsEditMode(active)
+
+    // Check strictly if user is groepsleiding / admin
     fetch('/api/admin/check-groepsleiding')
       .then(res => res.json())
       .then(data => setIsGroepsleiding(Boolean(data.isGroepsleiding)))
@@ -30,7 +36,7 @@ export default function EditModeBar() {
     router.push(pathname)
   }
 
-  // Toon de balk ENKEL en ALLEEN als de gebruiker groepsleiding is én de bewerkmodus actief is
+  // Toon de topbalk ENKEL als de gebruiker groepsleiding is én bewerkmodus actief is
   if (!isGroepsleiding || !isEditMode) return null
 
   return (
@@ -57,7 +63,7 @@ export default function EditModeBar() {
           GROEPSLEIDING
         </span>
         <span style={{ fontSize: '0.92rem' }}>
-          ✏️ <strong>Live Bewerkmodus Actief</strong> — Hover over titels, teksten of foto&apos;s om ze aan te passen.
+          ✏️ <strong>Live Bewerkmodus Actief</strong> — Surfen op de site blijft bewerkbaar tot je afsluit.
         </span>
       </div>
 
@@ -74,7 +80,7 @@ export default function EditModeBar() {
             gap: 4,
           }}
         >
-          &larr; Naar Website Beheer
+          &larr; Naar Portaal
         </Link>
 
         <button
