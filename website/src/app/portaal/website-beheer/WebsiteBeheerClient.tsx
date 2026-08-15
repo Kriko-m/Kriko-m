@@ -205,6 +205,33 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 2 }}>
+                  BIC
+                </label>
+                <input
+                  type="text"
+                  value={bankBic}
+                  onChange={e => setBankBic(e.target.value)}
+                  placeholder="KREDBEBB"
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.86rem' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 2 }}>
+                  Rekeninghouder
+                </label>
+                <input
+                  type="text"
+                  value={bankHolder}
+                  onChange={e => setBankHolder(e.target.value)}
+                  placeholder="Scouts Kriko-M"
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #C2D9C9', borderRadius: 8, fontSize: '0.86rem' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 2 }}>
                   Scoutsjaar
                 </label>
                 <input
