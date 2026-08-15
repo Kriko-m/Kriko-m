@@ -160,11 +160,34 @@ export default function EditLeidingModal({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {/* SECTIE 1: Groepsfoto van de Leidingsploeg */}
           <div style={{ backgroundColor: '#F9FBF9', padding: 18, borderRadius: 12, border: '1px solid #C2D9C9' }}>
-            <h4 style={{ margin: '0 0 10px 0', color: '#1A3D2A', fontSize: '1rem', fontWeight: 800 }}>
-              📷 Leidingsfoto ({takName})
-            </h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <h4 style={{ margin: 0, color: '#1A3D2A', fontSize: '1rem', fontWeight: 800 }}>
+                📷 Leidingsfoto ({takName})
+              </h4>
+              {photo ? (
+                <button
+                  type="button"
+                  onClick={() => setPhoto('')}
+                  style={{
+                    backgroundColor: '#FDF0F2',
+                    color: '#B23A4D',
+                    border: '1px solid #E0C0C4',
+                    borderRadius: 6,
+                    padding: '4px 10px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  🗑️ Geen foto gebruiken
+                </button>
+              ) : null}
+            </div>
 
-            {photo ? (
+            {photo && photo.trim() !== '' ? (
               <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 10, overflow: 'hidden', backgroundColor: '#F0ECE4', marginBottom: 12, border: '1px solid #E2C58D' }}>
                 <Image
                   src={photo}
@@ -175,18 +198,19 @@ export default function EditLeidingModal({
                 />
               </div>
             ) : (
-              <div style={{ padding: 16, backgroundColor: '#FFF', borderRadius: 8, border: '1px dashed #C2D9C9', color: '#6A8A75', fontSize: '0.88rem', fontStyle: 'italic', marginBottom: 12 }}>
-                Nog geen leidingsfoto ingesteld. Upload er een hieronder!
+              <div style={{ padding: 14, backgroundColor: '#FFF', borderRadius: 8, border: '1px dashed #C2D9C9', color: '#6A8A75', fontSize: '0.88rem', fontStyle: 'italic', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>🚫</span>
+                <span>Geen foto ingesteld. Het geplakte foto-element wordt <strong>niet getoond</strong> op de publieke takpagina.</span>
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: 10 }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
               <input
                 type="text"
                 value={photo}
                 onChange={e => setPhoto(e.target.value)}
                 placeholder="Foto URL (of upload hiernaast)"
-                style={{ flex: 1, padding: '8px 10px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.85rem' }}
+                style={{ flex: 1, minWidth: 200, padding: '8px 10px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.85rem' }}
               />
 
               <label style={{
@@ -214,6 +238,22 @@ export default function EditLeidingModal({
                     if (f) handleFileUpload(f)
                   }}
                 />
+              </label>
+            </div>
+
+            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <label style={{ fontSize: '0.85rem', color: '#1A3D2A', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
+                <input
+                  type="checkbox"
+                  checked={!photo || photo.trim() === ''}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setPhoto('')
+                    }
+                  }}
+                  style={{ accentColor: '#1A3D2A', width: 16, height: 16 }}
+                />
+                <span>Geen foto tonen op publieke takpagina</span>
               </label>
             </div>
           </div>
