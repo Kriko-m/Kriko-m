@@ -219,13 +219,11 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
 
   const [settings, allEchos] = await Promise.all([getSettings(), getEchos()])
   const tak = settings?.takken?.[slug]
-  if (!tak) notFound()
-
-  // Leidinggegevens enkel uit settings (geen hardcoded fallbacks meer)
   const dbLeaders: Leader[] = tak.leaders ?? []
   const leadersToDisplay: Leader[] = dbLeaders
+  const takPhotoSrc = tak.photo && tak.photo.trim() !== '' ? tak.photo : null
 
-  const takPhotoSrc = tak.photo && tak.photo.trim() !== '' ? tak.photo : ''
+
 
 
   // 2 meest recente echos voor deze tak (huidige + volgende maand)
@@ -307,51 +305,53 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
             <div className="leaders-section" style={{ position: 'relative', overflow: 'visible' }}>
               
               {/* Schuine Foto aan de RECHTER BOVENHOEK van de Leidingkaart */}
-              <div style={{
-                position: 'absolute',
-                top: 10,
-                right: -130,
-                zIndex: 10,
-                transform: 'rotate(7deg)',
-                width: 220,
-                transition: 'transform 0.3s ease',
-              }}>
-                {/* Plakband/Tape Effect */}
+              {takPhotoSrc && (
                 <div style={{
                   position: 'absolute',
-                  top: -10,
-                  left: '50%',
-                  transform: 'translateX(-50%) rotate(-4deg)',
-                  width: 70,
-                  height: 22,
-                  backgroundColor: 'rgba(240, 230, 210, 0.85)',
-                  border: '1px solid rgba(200, 190, 170, 0.5)',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
-                  zIndex: 12,
-                  backdropFilter: 'blur(2px)'
-                }} />
-
-                <div style={{
-                  backgroundColor: '#fff',
-                  padding: 6,
-                  borderRadius: 8,
-                  boxShadow: '0 12px 28px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
-                  border: '1px solid var(--color-border)',
+                  top: 10,
+                  right: -130,
+                  zIndex: 10,
+                  transform: 'rotate(7deg)',
+                  width: 220,
+                  transition: 'transform 0.3s ease',
                 }}>
-                  <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', borderRadius: 5, overflow: 'hidden' }}>
-                    <Image
-                      src={takPhotoSrc}
-                      alt={`Leidingsploeg ${tak.name}`}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      sizes="220px"
-                    />
+                  {/* Plakband/Tape Effect */}
+                  <div style={{
+                    position: 'absolute',
+                    top: -10,
+                    left: '50%',
+                    transform: 'translateX(-50%) rotate(-4deg)',
+                    width: 70,
+                    height: 22,
+                    backgroundColor: 'rgba(240, 230, 210, 0.85)',
+                    border: '1px solid rgba(200, 190, 170, 0.5)',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
+                    zIndex: 12,
+                    backdropFilter: 'blur(2px)'
+                  }} />
+
+                  <div style={{
+                    backgroundColor: '#fff',
+                    padding: 6,
+                    borderRadius: 8,
+                    boxShadow: '0 12px 28px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
+                    border: '1px solid var(--color-border)',
+                  }}>
+                    <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', borderRadius: 5, overflow: 'hidden' }}>
+                      <Image
+                        src={takPhotoSrc}
+                        alt={`Leidingsploeg ${tak.name}`}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        sizes="220px"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Titel en Introductie met vette insprong rechts zodat tekst nooit achter de foto verdwijnt */}
-              <div style={{ paddingRight: 120 }}>
+              <div style={{ paddingRight: takPhotoSrc ? 120 : 0 }}>
                 <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>
                   De Leiding
                 </h3>
@@ -359,6 +359,7 @@ export default async function TakPage({ params }: { params: Promise<{ slug: stri
                   Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of bel de leiding!
                 </p>
               </div>
+
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 24 }}>
                 {leadersToDisplay.length === 0 ? (
