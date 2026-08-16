@@ -13,13 +13,19 @@ export default function EditModeBar() {
   const [isEditMode, setIsEditMode] = useState(false)
 
   useEffect(() => {
-    // Sync edit mode state with URL parameter and localStorage persistence
+    // Sync edit mode state with URL parameter and sessionStorage persistence
     const editQuery = searchParams.get('edit') === 'true'
     if (editQuery) {
-      try { localStorage.setItem('kriko_edit_mode', 'true') } catch {}
+      try {
+        sessionStorage.setItem('kriko_edit_mode', 'true')
+        localStorage.removeItem('kriko_edit_mode')
+      } catch {}
     }
 
-    const storedEdit = Boolean(typeof window !== 'undefined' && localStorage.getItem('kriko_edit_mode') === 'true')
+    const storedEdit = Boolean(
+      typeof window !== 'undefined' &&
+      (sessionStorage.getItem('kriko_edit_mode') === 'true' || localStorage.getItem('kriko_edit_mode') === 'true')
+    )
     const active = editQuery || storedEdit
     setIsEditMode(active)
 
@@ -32,7 +38,10 @@ export default function EditModeBar() {
 
   function handleStopEditing() {
     setIsEditMode(false)
-    try { localStorage.removeItem('kriko_edit_mode') } catch {}
+    try {
+      sessionStorage.removeItem('kriko_edit_mode')
+      localStorage.removeItem('kriko_edit_mode')
+    } catch {}
     router.push(pathname)
   }
 

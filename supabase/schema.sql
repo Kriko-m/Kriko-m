@@ -175,52 +175,7 @@ CREATE TABLE kamp_bestanden (
 CREATE INDEX kamp_bestanden_kamp_idx ON kamp_bestanden(kamp_id);
 
 
--- ── 8. KAMPINSCHRIJVINGEN ───────────────────────────────────
--- Privacyprincipe: enkel ga_id opslaan, nooit naam/geboortedatum/medische info.
--- Die worden live opgehaald uit de S&G Groepsadmin API.
-
-CREATE TABLE kampinschrijvingen (
-  id               TEXT    PRIMARY KEY DEFAULT 'ins_' || gen_random_uuid(),
-  kamp_id          TEXT    NOT NULL REFERENCES kampen(id) ON DELETE CASCADE,
-  ga_id            TEXT    NOT NULL,
-  opmerking        TEXT    NOT NULL DEFAULT '',
-  ingeschreven_op  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  door             TEXT    NOT NULL DEFAULT '',
-  UNIQUE (kamp_id, ga_id)
-);
-
-CREATE INDEX inschrijvingen_kamp_idx  ON kampinschrijvingen(kamp_id);
-CREATE INDEX inschrijvingen_ga_idx    ON kampinschrijvingen(ga_id);
-
-
--- ── 9. OUDER-PROFIELEN ──────────────────────────────────────
--- Uitbreiding op Supabase Auth (auth.users).
-
-CREATE TABLE ouder_profiles (
-  id         UUID    PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  naam       TEXT    NOT NULL DEFAULT '',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-
--- ── 10. GEKOPPELDE KINDEREN ─────────────────────────────────
--- Koppelt een ouder-account aan S&G-leden (ga_id).
-
-CREATE TABLE parent_children (
-  id         TEXT    PRIMARY KEY DEFAULT gen_random_uuid()::text,
-  parent_id  UUID    NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  ga_id      TEXT    NOT NULL,
-  voornaam   TEXT    NOT NULL DEFAULT '',
-  tak        TEXT    NOT NULL DEFAULT '',
-  added_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE (parent_id, ga_id)
-);
-
-CREATE INDEX parent_children_parent_idx ON parent_children(parent_id);
-CREATE INDEX parent_children_ga_idx     ON parent_children(ga_id);
-
-
--- ── 11. CONTACTBERICHTEN ────────────────────────────────────
+-- ── 8. CONTACTBERICHTEN ────────────────────────────────────
 
 CREATE TABLE messages (
   id         TEXT    PRIMARY KEY DEFAULT 'msg_' || gen_random_uuid(),
@@ -233,7 +188,7 @@ CREATE TABLE messages (
 );
 
 
--- ── 12. VERSLAGEN ───────────────────────────────────────────
+-- ── 9. VERSLAGEN ───────────────────────────────────────────
 
 CREATE TABLE verslagen (
   id          TEXT    PRIMARY KEY DEFAULT 'vers_' || gen_random_uuid(),
@@ -258,9 +213,6 @@ ALTER TABLE shop_products      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE kampen             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE kamp_bestanden     ENABLE ROW LEVEL SECURITY;
-ALTER TABLE kampinschrijvingen ENABLE ROW LEVEL SECURITY;
-ALTER TABLE ouder_profiles     ENABLE ROW LEVEL SECURITY;
-ALTER TABLE parent_children    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE verslagen          ENABLE ROW LEVEL SECURITY;
 
@@ -272,41 +224,9 @@ CREATE POLICY "Publiek: shop lezen"          ON shop_products FOR SELECT USING (
 CREATE POLICY "Publiek: kampen lezen"        ON kampen        FOR SELECT USING (true);
 CREATE POLICY "Publiek: kamp bestanden"      ON kamp_bestanden FOR SELECT USING (true);
 
--- Ouders: eigen data
-CREATE POLICY "Ouder: eigen profiel lezen"   ON ouder_profiles   FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Ouder: eigen profiel schrijven" ON ouder_profiles FOR INSERT WITH CHECK (auth.uid() = id);
-CREATE POLICY "Ouder: eigen profiel updaten" ON ouder_profiles   FOR UPDATE USING (auth.uid() = id);
-
-CREATE POLICY "Ouder: eigen kinderen lezen"  ON parent_children  FOR SELECT USING (auth.uid() = parent_id);
-CREATE POLICY "Ouder: kind toevoegen"        ON parent_children  FOR INSERT WITH CHECK (auth.uid() = parent_id);
-CREATE POLICY "Ouder: kind verwijderen"      ON parent_children  FOR DELETE USING (auth.uid() = parent_id);
-
-CREATE POLICY "Ouder: eigen bestellingen"    ON orders           FOR SELECT USING (auth.uid() = parent_id);
-
-CREATE POLICY "Ouder: eigen inschrijvingen"  ON kampinschrijvingen FOR SELECT
-  USING (door = auth.uid()::text OR EXISTS (
-    SELECT 1 FROM parent_children pc
-    WHERE pc.parent_id = auth.uid() AND pc.ga_id = kampinschrijvingen.ga_id
-  ));
-
-CREATE POLICY "Ouder: inschrijving toevoegen" ON kampinschrijvingen FOR INSERT
-  WITH CHECK (
-    door = auth.uid()::text AND EXISTS (
-      SELECT 1 FROM parent_children pc
-      WHERE pc.parent_id = auth.uid() AND pc.ga_id = kampinschrijvingen.ga_id
-    )
-  );
-
-CREATE POLICY "Ouder: inschrijving verwijderen" ON kampinschrijvingen FOR DELETE
-  USING (
-    door = auth.uid()::text OR EXISTS (
-      SELECT 1 FROM parent_children pc
-      WHERE pc.parent_id = auth.uid() AND pc.ga_id = kampinschrijvingen.ga_id
-    )
-  );
-
 -- Contactberichten: iedereen mag schrijven (anoniem contactformulier)
 CREATE POLICY "Iedereen mag contact sturen"  ON messages FOR INSERT WITH CHECK (true);
 
 -- Alles wat hierboven niet gedekt is, verloopt via de service_role key
 -- (server-side API routes) — die bypassen RLS automatisch.
+

@@ -39,7 +39,10 @@ export default function EditableBlock({
 
   useEffect(() => {
     const editQuery = searchParams.get('edit') === 'true'
-    const storedEdit = Boolean(typeof window !== 'undefined' && localStorage.getItem('kriko_edit_mode') === 'true')
+    const storedEdit = Boolean(
+      typeof window !== 'undefined' &&
+      (sessionStorage.getItem('kriko_edit_mode') === 'true' || localStorage.getItem('kriko_edit_mode') === 'true')
+    )
     setIsEditMode(editQuery || storedEdit)
 
     fetch('/api/admin/check-groepsleiding')

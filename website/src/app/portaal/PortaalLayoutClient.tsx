@@ -52,12 +52,32 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
     }
   }
 
+  // Clear website edit mode whenever navigating inside the portal
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem('kriko_edit_mode')
+      localStorage.removeItem('kriko_edit_mode')
+    } catch {}
+  }, [])
+
+  const activeColor = (customBgStyle.backgroundColor as string) || (isHomePage ? '#1A3D2A' : '#2A5A40')
+
   useEffect(() => {
     if (!showNav) return
-    const activeColor = (customBgStyle.backgroundColor as string) || (isHomePage ? '#1A3D2A' : '#2A5A40')
     document.body.style.backgroundColor = activeColor
     document.documentElement.style.backgroundColor = activeColor
-  }, [showNav, isHomePage, customBgStyle.backgroundColor])
+    if (customBgStyle.backgroundImage) {
+      document.body.style.backgroundImage = customBgStyle.backgroundImage as string
+      document.body.style.backgroundSize = (customBgStyle.backgroundSize as string) || 'cover'
+      document.body.style.backgroundPosition = (customBgStyle.backgroundPosition as string) || 'center center'
+      document.body.style.backgroundAttachment = (customBgStyle.backgroundAttachment as string) || 'fixed'
+    } else {
+      document.body.style.backgroundImage = ''
+    }
+    return () => {
+      document.body.style.backgroundImage = ''
+    }
+  }, [showNav, activeColor, customBgStyle.backgroundImage, customBgStyle.backgroundSize, customBgStyle.backgroundPosition, customBgStyle.backgroundAttachment])
 
   useEffect(() => {
     if (!showNav) return
@@ -110,6 +130,7 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
         <div
           className="portaal-page-layout portaal-page-layout--no-sidebar"
           style={{
+            backgroundColor: activeColor,
             height: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? 'calc(100vh - 76px)' : undefined,
             overflow: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? 'hidden' : undefined,
           }}
@@ -122,7 +143,7 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
               minHeight: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '100%' : 'calc(100vh - 76px)',
               maxHeight: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '100%' : undefined,
               overflow: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? 'hidden' : undefined,
-              backgroundColor: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '#1A3D2A' : undefined,
+              backgroundColor: activeColor,
               ...customBgStyle,
             }}
           >
