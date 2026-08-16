@@ -128,21 +128,15 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
       {showNav && <PortaalNav naam={naam} role={role} />}
       {showNav ? (
         <div
-          className="portaal-page-layout portaal-page-layout--no-sidebar"
+          className={`portaal-page-layout portaal-page-layout--no-sidebar${isHomePage ? ' portaal-page-layout--home' : ''}`}
           style={{
             backgroundColor: activeColor,
-            height: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? 'calc(100vh - 76px)' : undefined,
-            overflow: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? 'hidden' : undefined,
           }}
         >
           <main
-            className="portaal-page-main portaal-page-main--anchor"
+            className={`portaal-page-main portaal-page-main--anchor${isHomePage ? ' portaal-page-main--home' : ''}`}
             style={{
               width: '100%',
-              height: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '100%' : undefined,
-              minHeight: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '100%' : 'calc(100vh - 76px)',
-              maxHeight: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '100%' : undefined,
-              overflow: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? 'hidden' : undefined,
               backgroundColor: activeColor,
               ...customBgStyle,
             }}

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
 import { requireGroepsleiding } from '@/lib/auth'
 import { revalidateTag } from 'next/cache'
-import { TAKKEN } from '@/lib/constants'
+import { TAKKEN, PORTAAL_TAKKEN } from '@/lib/constants'
 import { normalizeSettings } from '@/lib/db'
 
 // Welke publieke tak-velden de website-content-editor mag aanpassen.
@@ -80,13 +80,13 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
-  // Takken-content (publieke takpagina's): veilige per-tak merge op de
+  // Takken-content (publieke takpagina's + groepsleiding): veilige per-tak merge op de
   // bestaande JSONB zodat we nooit andere takken/velden overschrijven.
   if (body.takken && typeof body.takken === 'object') {
     const merged: Record<string, Record<string, unknown>> = { ...(currentSettings?.takken ?? {}) }
 
     for (const [tak, incoming] of Object.entries(body.takken as Record<string, unknown>)) {
-      if (!(TAKKEN as readonly string[]).includes(tak)) continue
+      if (!(PORTAAL_TAKKEN as readonly string[]).includes(tak)) continue
       if (!incoming || typeof incoming !== 'object') continue
       const src = incoming as Record<string, unknown>
       const target = { ...(merged[tak] ?? {}) }

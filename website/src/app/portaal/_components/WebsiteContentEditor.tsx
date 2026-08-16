@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { TAKKEN, TAK_NAMEN, TAK_KLEUREN } from '@/lib/constants'
+import { TAKKEN, PORTAAL_TAKKEN, TAK_NAMEN, TAK_KLEUREN } from '@/lib/constants'
 
 interface Leader { name: string; role: string }
 interface TakForm { email: string; whatsapp_url: string; leaders: Leader[] }
@@ -18,7 +18,7 @@ export default function WebsiteContentEditor({
 }) {
   const [forms, setForms] = useState<Record<string, TakForm>>(() => {
     const init: Record<string, TakForm> = {}
-    for (const tak of TAKKEN) {
+    for (const tak of PORTAAL_TAKKEN) {
       const c = takConfigs[tak] ?? {}
       init[tak] = {
         email: c.email ?? '',
@@ -28,7 +28,7 @@ export default function WebsiteContentEditor({
     }
     return init
   })
-  const [activeTak, setActiveTak] = useState<string>(TAKKEN[0])
+  const [activeTak, setActiveTak] = useState<string>(PORTAAL_TAKKEN[0])
   const [saving, setSaving] = useState(false)
   const [flash, setFlash] = useState('')
   const [error, setError] = useState('')
@@ -50,7 +50,7 @@ export default function WebsiteContentEditor({
     setSaving(true); setError(''); setFlash('')
     // Stuur enkel de bewerkbare velden; server merge't veilig op de bestaande config.
     const payload: Record<string, TakForm> = {}
-    for (const tak of TAKKEN) {
+    for (const tak of PORTAAL_TAKKEN) {
       payload[tak] = {
         email: forms[tak].email,
         whatsapp_url: forms[tak].whatsapp_url,
@@ -90,7 +90,7 @@ export default function WebsiteContentEditor({
 
           {/* Tak tabs */}
           <div style={{ display: 'flex', gap: 6, padding: '12px 24px 0', flexWrap: 'wrap' }}>
-            {TAKKEN.map(tak => (
+            {PORTAAL_TAKKEN.map(tak => (
               <button
                 key={tak}
                 onClick={() => setActiveTak(tak)}
@@ -127,7 +127,7 @@ export default function WebsiteContentEditor({
                 {f.leaders.map((l, i) => (
                   <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 8, alignItems: 'center' }}>
                     <input style={inputStyle} value={l.name} onChange={e => patchLeader(activeTak, i, { name: e.target.value })} placeholder="Naam" />
-                    <input style={inputStyle} value={l.role} onChange={e => patchLeader(activeTak, i, { role: e.target.value })} placeholder="Rol (bv. Takleiding)" />
+                    <input style={inputStyle} value={l.role} onChange={e => patchLeader(activeTak, i, { role: e.target.value })} placeholder="Rol" />
                     <button onClick={() => removeLeader(activeTak, i)} type="button" title="Verwijder" style={{ width: 32, height: 32, border: '1.5px solid #e0c0c4', borderRadius: 8, background: 'none', color: '#B23A4D', cursor: 'pointer', flexShrink: 0 }}>✕</button>
                   </div>
                 ))}

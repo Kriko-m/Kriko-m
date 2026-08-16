@@ -154,8 +154,8 @@ function TakPageClientContent({
   takDescription: _takDescription,
   takEmail,
   takWhatsapp,
-  takPhotoSrc,
-  leadersToDisplay,
+  takPhotoSrc: initialTakPhotoSrc,
+  leadersToDisplay: initialLeadersToDisplay,
   recentEchos,
   dark,
   siteContent = {},
@@ -164,9 +164,19 @@ function TakPageClientContent({
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  const [leadersToDisplay, setLeadersToDisplay] = useState<Leader[]>(initialLeadersToDisplay)
+  const [takPhotoSrc, setTakPhotoSrc] = useState<string | null>(initialTakPhotoSrc)
   const [isGroepsleiding, setIsGroepsleiding] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLeidingModalOpen, setIsLeidingModalOpen] = useState(false)
+
+  useEffect(() => {
+    setLeadersToDisplay(initialLeadersToDisplay)
+  }, [initialLeadersToDisplay])
+
+  useEffect(() => {
+    setTakPhotoSrc(initialTakPhotoSrc)
+  }, [initialTakPhotoSrc])
 
   useEffect(() => {
     const editQuery = searchParams.get('edit') === 'true'
@@ -308,29 +318,9 @@ function TakPageClientContent({
 
               {/* Schuine Foto aan de RECHTER BOVENHOEK van de Leidingkaart */}
               {takPhotoSrc && (
-                <div style={{
-                  position: 'absolute',
-                  top: 10,
-                  right: -130,
-                  zIndex: 10,
-                  transform: 'rotate(7deg)',
-                  width: 220,
-                  transition: 'transform 0.3s ease',
-                }}>
+                <div className="tak-leader-photo-wrap">
                   {/* Tape Effect */}
-                  <div style={{
-                    position: 'absolute',
-                    top: -10,
-                    left: '50%',
-                    transform: 'translateX(-50%) rotate(-4deg)',
-                    width: 70,
-                    height: 22,
-                    backgroundColor: 'rgba(240, 230, 210, 0.85)',
-                    border: '1px solid rgba(200, 190, 170, 0.5)',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.06)',
-                    zIndex: 12,
-                    backdropFilter: 'blur(2px)'
-                  }} />
+                  <div className="tak-photo-tape" />
 
                   <div style={{
                     backgroundColor: '#fff',
@@ -354,7 +344,7 @@ function TakPageClientContent({
               )}
 
               {/* Titel en Introductie */}
-              <div style={{ paddingRight: takPhotoSrc ? 120 : 0 }}>
+              <div className={`tak-leaders-header-info${takPhotoSrc ? ' has-photo' : ''}`}>
                 <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>
                   De Leiding
                 </h3>
@@ -525,7 +515,9 @@ function TakPageClientContent({
           initialPhoto={takPhotoSrc}
           initialLeaders={leadersToDisplay}
           onClose={() => setIsLeidingModalOpen(false)}
-          onSaved={() => {
+          onSaved={(savedLeaders, savedPhoto) => {
+            setLeadersToDisplay(savedLeaders)
+            setTakPhotoSrc(savedPhoto)
             router.refresh()
           }}
         />

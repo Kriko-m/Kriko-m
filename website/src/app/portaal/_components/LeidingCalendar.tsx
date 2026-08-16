@@ -148,16 +148,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
 
   function TagChips({ tags, compact = false }: { tags: AudienceTag[]; compact?: boolean }) {
     return (
-      <span style={{
-        display: 'inline-flex',
-        gap: 4,
-        flexWrap: 'wrap',
-        maxWidth: 240,
-        maxHeight: 44,
-        overflow: 'hidden',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-      }}>
+      <span className="cal-tag-chips-wrap">
         {tags.map(t => (
           <span key={t} style={{
             padding: compact ? '2px 7px' : '2px 9px',
@@ -403,6 +394,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
           return (
             <div
               key={ev.id}
+              className={`portal-activity-card${highlighted ? ' highlighted' : ''}`}
               style={{
                 background: '#fff',
                 borderRadius: 14,
@@ -414,12 +406,12 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
               }}
               onClick={() => setActiveViewEvent(ev)}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div className="portal-activity-card-inner">
                 <DateBox date={ev.date} datumTot={ev.datum_tot || undefined} isImportant={isImportant} />
                 
                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <strong style={{
-                    fontSize: '1.25rem',
+                    fontSize: '1.15rem',
                     fontWeight: 900,
                     color: '#1A3D2A',
                     fontFamily: 'var(--font-heading, Nunito, sans-serif)',
@@ -429,10 +421,10 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                     lineHeight: 1.25,
                   }}>
                     {iconClass ? <i className={`fa-solid ${iconClass}`} style={{ color: '#1A3D2A', fontSize: '1.05rem', flexShrink: 0 }}></i> : null}
-                    <span>{ev.title}</span>
+                    <span style={{ wordBreak: 'break-word' }}>{ev.title}</span>
                   </strong>
                   {((!isMultiDay && ev.time) || ev.location) && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 3, fontSize: '.78rem', color: '#5A7E68', fontWeight: 600 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 3, fontSize: '.78rem', color: '#5A7E68', fontWeight: 600, flexWrap: 'wrap' }}>
                       {!isMultiDay && ev.time && (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                           <i className="fa-regular fa-clock" style={{ fontSize: '.72rem', color: '#5A7E68' }}></i> {ev.time}
@@ -447,7 +439,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                   )}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                <div className="portal-activity-card-actions">
                   <TagChips tags={ev.audience} compact />
 
                   {!readOnly && !(!canPublish && ev.audience.includes('groep')) && (

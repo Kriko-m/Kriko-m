@@ -155,7 +155,7 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
   const currentBg = pageBgs[activeBgTab]
 
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto', padding: '36px 36px 48px', width: '100%', minHeight: 'calc(100vh - 76px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxSizing: 'border-box', fontFamily: 'var(--font-body, Outfit, sans-serif)' }}>
+    <div style={{ maxWidth: 1000, margin: '0 auto', width: '100%', minHeight: 'calc(100vh - 76px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxSizing: 'border-box', fontFamily: 'var(--font-body, Outfit, sans-serif)' }} className="portaal-page-container">
 
       {/* Notification Toast Outside Modal */}
       {flashMessage && (
@@ -447,7 +447,7 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
                 </div>
 
                 {/* Background Type Toggle */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+                <div className="beheer-toggle-grid" style={{ display: 'grid', gap: 10, marginBottom: 16 }}>
                   <button
                     type="button"
                     onClick={() => updateActivePageBg('type', 'photo')}

@@ -266,7 +266,7 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
             </Suspense>
 
             {/* Grid van 4 Takken Kaarten (VOLLEDIG GEPASTE SCHERMING MET TAK_CARD FIELDS) */}
-            <div className="info-takken-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
+            <div className="info-takken-grid info-two-col-grid">
               {[
                 { slug: 'kapoenen', defaultName: 'Kapoenen', defaultAge: '6 tot 8 jaar (1e & 2e leerjaar)', color: 'var(--color-kapoenen, #eab308)', bgTint: 'rgba(234, 179, 8, 0.08)', border: 'rgba(234, 179, 8, 0.4)', defaultImg: '/images/tak_kapoenen.jpg', defaultKamp: '5 dagen kamp (in een gebouw)', defaultSfeer: 'Spel, fantasie & de allereerste scoutservaring.', defaultUitleg: 'Bij de kapoenen staat verbeelding en samen spelen centraal. Alles kan en niets moet! Van een zoektocht naar een verloren piratenschat tot knutselen of verkleden.' },
                 { slug: 'welpen', defaultName: 'Welpen', defaultAge: '8 tot 11 jaar (3e, 4e & 5e leerjaar)', color: 'var(--color-welpen, #16a34a)', bgTint: 'rgba(22, 163, 74, 0.08)', border: 'rgba(22, 163, 74, 0.4)', defaultImg: '/images/tak_welpen.jpg', defaultKamp: '7 dagen kamp (in een gebouw)', defaultSfeer: 'Ravotten in het bos, nesten & scoutstechnieken.', defaultUitleg: 'Welpen duiken vol avontuur het bos in. Ze spelen in kleine groepjes (nesten) en leren samenwerken, geheime geheimtalen ontcijferen en bosspelen spelen.' },
@@ -405,7 +405,7 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
               </EditableBlock>
             </Suspense>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+            <div className="info-two-col-grid">
               {/* Block 3.3: Webshop Card (SPECIFIEKE WEBSHOP VELDEN) */}
               <Suspense fallback={null}>
                 <EditableBlock

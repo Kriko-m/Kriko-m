@@ -133,9 +133,9 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit }: { event: 
             ✕
           </button>
 
-          <div style={{ padding: '36px 44px', display: 'flex', flexDirection: 'column', gap: 22 }}>
+          <div className="cal-modal-content-inner">
             {/* Title, Audience Tags & Countdown Badge */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingRight: onEdit ? 120 : 40 }}>
+            <div className={`cal-modal-title-wrap${onEdit ? ' has-edit' : ''}`}>
               {event.audience && event.audience.length > 0 && (
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                   {event.audience.map((tag) => (

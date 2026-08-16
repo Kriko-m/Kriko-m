@@ -26,6 +26,7 @@ export default function PortaalNav({ naam, role }: Props) {
   const isHomePage = pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/'
 
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showAccountsModal, setShowAccountsModal] = useState(false)
   const [displayName, setDisplayName] = useState(naam)
   
@@ -38,6 +39,11 @@ export default function PortaalNav({ naam, role }: Props) {
   const [savingAccount, setSavingAccount] = useState(false)
   const [modalError, setModalError] = useState('')
   const [modalSuccess, setModalSuccess] = useState('')
+
+  useEffect(() => {
+    setDropdownOpen(false)
+    setMobileMenuOpen(false)
+  }, [pathname])
 
   useEffect(() => {
     setDisplayName(naam)
@@ -65,6 +71,19 @@ export default function PortaalNav({ naam, role }: Props) {
     window.addEventListener('click', closeMenu)
     return () => window.removeEventListener('click', closeMenu)
   }, [dropdownOpen])
+
+  // Click outside listener for mobile nav menu
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const closeMobileMenu = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target.closest('.portaal-mobile-menu-container')) {
+        setMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener('click', closeMobileMenu)
+    return () => window.removeEventListener('click', closeMobileMenu)
+  }, [mobileMenuOpen])
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -140,24 +159,39 @@ export default function PortaalNav({ naam, role }: Props) {
     }
   }
 
+  const mobileDropdownItemStyle: React.CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    padding: '12px 14px',
+    borderRadius: 10,
+    textDecoration: 'none',
+    color: '#1A3D2A',
+    fontWeight: 600,
+    fontSize: '0.9rem',
+  }
+
   return (
     <>
       <header className="portaal-nav">
         <div className="portaal-nav-container">
           
-          {/* Left: Clean Brand Title */}
+          {/* Left: Clean Brand Title & Icon */}
           <Link
             href="/portaal/home"
             style={{
               display: 'flex',
               alignItems: 'center',
+              gap: 10,
               textDecoration: 'none',
               flexShrink: 0,
               padding: '4px 0',
             }}
-            title="Leidingportaal"
+            title="Leidingportaal Home"
           >
-            <span style={{
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/logo-finaal.png" alt="Kriko-M" width={34} height={34} style={{ objectFit: 'contain', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' }} />
+            <span className="portaal-brand-title" style={{
               fontFamily: 'var(--font-heading, Nunito, sans-serif)',
               fontSize: '1.35rem',
               fontWeight: 900,
@@ -171,9 +205,9 @@ export default function PortaalNav({ naam, role }: Props) {
             </span>
           </Link>
 
-          {/* Center: Centered Nav Tabs (Hidden on Home Page to prevent duplication with main cards) */}
+          {/* Center: Centered Nav Tabs (Desktop only) */}
           {!isHomePage && (
-            <nav className="portaal-nav-center-tabs">
+            <nav className="portaal-nav-center-tabs desktop-only-tabs">
               {/* 1. Kriko Echo */}
               <Link
                 href="/portaal/echos"
@@ -214,29 +248,95 @@ export default function PortaalNav({ naam, role }: Props) {
             </nav>
           )}
 
-          {/* Right: Actions & User Button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-            {/* Duidelijke Terug naar website knop */}
+          {/* Right: Actions, Mobile Nav Dropdown & User Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+            
+            {/* Desktop Terug naar website knop */}
             <Link
               href="/"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '8px 14px',
-                borderRadius: 12,
-                background: 'rgba(255, 255, 255, 0.14)',
-                color: '#ffffff',
-                textDecoration: 'none',
-                fontSize: '0.86rem',
-                fontWeight: 700,
-                transition: 'background 0.15s ease',
-              }}
+              className="portaal-back-link desktop-only-back"
               title="Terug naar de publieke website"
             >
               <i className="fa-solid fa-arrow-left"></i>
-              <span>Terug naar website</span>
+              <span className="portaal-back-text">Terug naar website</span>
             </Link>
+
+            {/* Mobile Navigation Dropdown Menu (Mobile Only) */}
+            <div className="portaal-mobile-menu-container portaal-mobile-only" style={{ position: 'relative' }}>
+              <button
+                onClick={() => setMobileMenuOpen(prev => !prev)}
+                title="Menu opties"
+                aria-label="Menu opties"
+                aria-expanded={mobileMenuOpen}
+                style={{
+                  height: 40,
+                  padding: '0 14px',
+                  borderRadius: 20,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: mobileMenuOpen ? 'rgba(255, 255, 255, 0.28)' : 'rgba(255, 255, 255, 0.14)',
+                  color: '#ffffff',
+                  border: '1.5px solid rgba(255, 255, 255, 0.35)',
+                  cursor: 'pointer',
+                  fontSize: '0.88rem',
+                  fontWeight: 800,
+                  transition: 'all 0.15s ease',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                }}
+              >
+                <i className="fa-solid fa-bars"></i>
+                <span>Menu</span>
+              </button>
+
+              {mobileMenuOpen && (
+                <div
+                  className="portaal-mobile-dropdown"
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 10px)',
+                    right: 0,
+                    width: 220,
+                    background: '#ffffff',
+                    borderRadius: 16,
+                    boxShadow: '0 12px 32px rgba(26,61,42,0.25)',
+                    border: '1.5px solid #C2D9C9',
+                    overflow: 'hidden',
+                    zIndex: 110,
+                    padding: 6,
+                    animation: 'dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                >
+                  <Link href="/portaal/home" className={`portaal-dropdown-item${pathname === '/portaal/home' || pathname === '/portaal/leiding' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                    <i className="fa-solid fa-house" style={{ color: '#6A8A75' }}></i>
+                    <span>Portaal Home</span>
+                  </Link>
+                  <Link href="/portaal/echos" className={`portaal-dropdown-item${pathname === '/portaal/echos' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                    <i className="fa-solid fa-newspaper" style={{ color: '#6A8A75' }}></i>
+                    <span>Kriko Echo</span>
+                  </Link>
+                  <Link href="/portaal/algemene-info" className={`portaal-dropdown-item${pathname === '/portaal/algemene-info' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                    <i className="fa-solid fa-folder-open" style={{ color: '#6A8A75' }}></i>
+                    <span>Documenten &amp; Links</span>
+                  </Link>
+                  <Link href="/portaal/leiding/agenda" className={`portaal-dropdown-item${pathname === '/portaal/leiding/agenda' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                    <i className="fa-solid fa-calendar-days" style={{ color: '#6A8A75' }}></i>
+                    <span>Kalender</span>
+                  </Link>
+                  {isGroepsleiding && (
+                    <Link href="/portaal/website-beheer" className={`portaal-dropdown-item${pathname === '/portaal/website-beheer' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                      <i className="fa-solid fa-globe" style={{ color: '#6A8A75' }}></i>
+                      <span>Website Beheer</span>
+                    </Link>
+                  )}
+                  <div style={{ height: 1, background: '#C2D9C9', margin: '4px 6px' }} />
+                  <Link href="/" className="portaal-dropdown-item" style={{ ...mobileDropdownItemStyle, color: '#1A3D2A', fontWeight: 800 }}>
+                    <i className="fa-solid fa-arrow-left" style={{ color: '#C9963A' }}></i>
+                    <span>Terug naar website</span>
+                  </Link>
+                </div>
+              )}
+            </div>
 
             {/* Account Profile Dropdown */}
             <div className="portaal-profile-container" style={{ position: 'relative' }}>

@@ -24,6 +24,14 @@ export default function Header() {
     }
   }
 
+  const handleTakkenClick = (e: React.MouseEvent) => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 992) {
+      e.preventDefault()
+      e.stopPropagation()
+      setTakkenOpen((prev) => !prev)
+    }
+  }
+
   return (
     <>
       <LoadingScreen />
@@ -39,10 +47,18 @@ export default function Header() {
               <li><Link href="/info" className={isActive('/info') ? 'nav-active' : ''}>INFO</Link></li>
               <li
                 className={`has-dropdown${takkenOpen ? ' open' : ''}`}
-                onClick={() => setTakkenOpen(!takkenOpen)}
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.innerWidth <= 992) {
+                    setTakkenOpen((prev) => !prev)
+                  }
+                }}
               >
-                <Link href="/takken" className={isActive('/takken') ? 'nav-active' : ''}>
-                  TAKKEN <span className="arrow">▼</span>
+                <Link
+                  href="/takken"
+                  className={isActive('/takken') ? 'nav-active' : ''}
+                  onClick={handleTakkenClick}
+                >
+                  TAKKEN <span className="arrow">{takkenOpen ? '▲' : '▼'}</span>
                 </Link>
                 <ul className="dropdown">
                   <li><Link href="/takken/kapoenen">Kapoenen</Link></li>

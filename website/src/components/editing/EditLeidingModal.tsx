@@ -10,7 +10,7 @@ interface Props {
   initialPhoto: string | null
   initialLeaders: Leader[]
   onClose: () => void
-  onSaved: () => void
+  onSaved: (savedLeaders: Leader[], savedPhoto: string) => void
 }
 
 export default function EditLeidingModal({
@@ -22,11 +22,7 @@ export default function EditLeidingModal({
   onSaved,
 }: Props) {
   const [photo, setPhoto] = useState<string>(initialPhoto || '')
-  const [leaders, setLeaders] = useState<Leader[]>(
-    initialLeaders.length > 0
-      ? initialLeaders
-      : [{ name: '', totem: '', phone: '' }]
-  )
+  const [leaders, setLeaders] = useState<Leader[]>(initialLeaders)
 
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -100,7 +96,7 @@ export default function EditLeidingModal({
         throw new Error(errData.error || 'Opslaan mislukt')
       }
 
-      onSaved()
+      onSaved(cleanedLeaders, photo)
       onClose()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Fout bij opslaan')
@@ -287,26 +283,30 @@ export default function EditLeidingModal({
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {leaders.map((leader, index) => (
-                <div
-                  key={index}
-                  style={{
-                    backgroundColor: '#F9FBF9',
-                    padding: 14,
-                    borderRadius: 12,
-                    border: '1px solid #E8F0EB',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                    position: 'relative',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase' }}>
-                      Leiding #{index + 1}
-                    </span>
+              {leaders.length === 0 ? (
+                <div style={{ padding: 16, backgroundColor: '#FFF', borderRadius: 8, border: '1px dashed #C2D9C9', color: '#6A8A75', fontSize: '0.88rem', fontStyle: 'italic', textAlign: 'center' }}>
+                  Er zijn momenteel geen leidingsleden. Klik op '➕ Leider/Leidster Toevoegen' om iemand toe te voegen.
+                </div>
+              ) : (
+                leaders.map((leader, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      backgroundColor: '#F9FBF9',
+                      padding: 14,
+                      borderRadius: 12,
+                      border: '1px solid #E8F0EB',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                      position: 'relative',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase' }}>
+                        Leiding #{index + 1}
+                      </span>
 
-                    {leaders.length > 1 && (
                       <button
                         onClick={() => handleRemoveLeader(index)}
                         type="button"
@@ -323,8 +323,7 @@ export default function EditLeidingModal({
                       >
                         🗑️ Verwijderen
                       </button>
-                    )}
-                  </div>
+                    </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                     <div>
@@ -335,7 +334,7 @@ export default function EditLeidingModal({
                         type="text"
                         value={leader.name}
                         onChange={e => handleLeaderChange(index, 'name', e.target.value)}
-                        placeholder="bv. Marthe Isik"
+                        placeholder=""
                         style={{ width: '100%', padding: '7px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.88rem' }}
                       />
                     </div>
@@ -348,7 +347,7 @@ export default function EditLeidingModal({
                         type="text"
                         value={leader.phone || ''}
                         onChange={e => handleLeaderChange(index, 'phone', e.target.value)}
-                        placeholder="bv. +32 470 34 37 20"
+                        placeholder=""
                         style={{ width: '100%', padding: '7px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.88rem' }}
                       />
                     </div>
@@ -362,12 +361,13 @@ export default function EditLeidingModal({
                       type="text"
                       value={leader.totem || ''}
                       onChange={e => handleLeaderChange(index, 'totem', e.target.value)}
-                      placeholder="bv. Dageraad rode doortastende Drongo"
+                      placeholder=""
                       style={{ width: '100%', padding: '7px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.88rem' }}
                     />
                   </div>
                 </div>
-              ))}
+              ))
+            )}
             </div>
           </div>
         </div>

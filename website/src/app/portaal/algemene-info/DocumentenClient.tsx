@@ -603,7 +603,7 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const showEditControls = isGroepsleiding && editMode
 
   return (
-    <div style={{ padding: '36px 36px 32px', maxWidth: 1440, margin: '0 auto', width: '100%' }}>
+    <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }} className="portaal-page-container">
 
       {/* Documenten & Sjablonen per Categorie */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>

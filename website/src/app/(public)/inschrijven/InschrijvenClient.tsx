@@ -56,7 +56,7 @@ export default function InschrijvenClient({ email, year }: Props) {
       </div>
 
       {/* Main Layout: 2 Columns on Desktop */}
-      <div className="register-layout" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2.2fr) minmax(0, 1fr)', gap: 32 }}>
+      <div className="register-layout">
         
         {/* Left Column: Interactive Stappenplan & Details */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>

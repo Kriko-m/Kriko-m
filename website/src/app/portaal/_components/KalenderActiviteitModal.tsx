@@ -264,7 +264,7 @@ export default function KalenderActiviteitModal({
                 </div>
 
                 {/* Date & Time */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.4fr', gap: 16 }}>
+                <div className="cal-modal-datetime-grid" style={{ display: 'grid', gap: 16 }}>
                   <div>
                     <label style={labelStyle}>Tijdstip (van – tot)</label>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center', ...errorOutline('time') }}>

@@ -123,7 +123,7 @@ export default function EchoManager({ initialEchos }: Props) {
   const labelStyle = { display: 'block', fontSize: '.88rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }
 
   return (
-    <div style={{ padding: '48px 36px 32px', maxWidth: 1440, margin: '0 auto', width: '100%' }}>
+    <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }} className="portaal-page-container">
       {flash && (
         <div style={{ background: '#FFFFFF', border: '2px solid #3F7D5A', color: '#1A3D2A', padding: '14px 20px', borderRadius: 14, marginBottom: 28, fontWeight: 700, boxShadow: '0 6px 20px rgba(0,0,0,0.15)' }}>
           {flash}
@@ -131,7 +131,7 @@ export default function EchoManager({ initialEchos }: Props) {
       )}
 
       {/* Tak selection tabs - CENTERED and wider buttons */}
-      <div style={{ display: 'flex', gap: 16, marginBottom: 36, flexWrap: 'wrap', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 36, flexWrap: 'wrap', justifyContent: 'center' }} className="echo-tak-selector-row">
         {TAKKEN.map(tak => {
           const isActive = activeTak === tak
           const takColor = TAK_KLEUREN[tak] || '#1A3D2A'
@@ -139,6 +139,7 @@ export default function EchoManager({ initialEchos }: Props) {
             <button
               key={tak}
               type="button"
+              className="echo-tak-btn"
               onClick={() => {
                 setActiveTak(tak)
                 setEchoDroppedFile(null)
@@ -165,15 +166,10 @@ export default function EchoManager({ initialEchos }: Props) {
       </div>
 
       {/* Grid: Wide Central Upload Column (Left) + Compact Side Column (Right) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) 340px',
-        gap: 32,
-        alignItems: 'start',
-      }} className="echo-manager-grid">
+      <div className="echo-manager-grid">
         
         {/* Main Central Column (Wide): Upload Form Card */}
-        <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 22, padding: 36, boxShadow: '0 8px 28px rgba(0,0,0,0.1)', borderTop: `6px solid ${kleur}` }}>
+        <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 22, padding: 36, boxShadow: '0 8px 28px rgba(0,0,0,0.1)', borderTop: `6px solid ${kleur}` }} className="echo-upload-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, flexWrap: 'wrap', gap: 14 }}>
             <div>
               <h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900, color: '#1A3D2A', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
@@ -189,8 +185,8 @@ export default function EchoManager({ initialEchos }: Props) {
             )}
           </div>
 
-          <form onSubmit={handleUploadEcho} style={{ background: '#FAFBF9', border: '2px dashed #C2D9C9', borderRadius: 18, padding: 32 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
+          <form onSubmit={handleUploadEcho} style={{ background: '#FAFBF9', border: '2px dashed #C2D9C9', borderRadius: 18, padding: 32 }} className="echo-upload-form">
+            <div className="echo-form-row" style={{ display: 'grid', gap: 20, marginBottom: 24 }}>
               <div>
                 <label style={labelStyle}>Maand</label>
                 <select name="echoMonth" required defaultValue={String(new Date().getMonth() + 1)} style={inputStyle}>
@@ -221,6 +217,7 @@ export default function EchoManager({ initialEchos }: Props) {
                   else showFlash('Enkel PDF bestanden zijn toegestaan.')
                 }}
                 onClick={() => echoFileInputRef.current?.click()}
+                className="echo-dropzone"
                 style={{
                   border: `2px dashed ${echoDragOver ? '#1A3D2A' : '#C2D9C9'}`,
                   borderRadius: 18,

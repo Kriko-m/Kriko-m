@@ -31,17 +31,7 @@ export default function LeidingPanel({ isGroepsleiding = false, settings }: Prop
       }
 
   return (
-    <div style={{
-      height: '100%',
-      maxHeight: '100%',
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px 24px 32px',
-      boxSizing: 'border-box',
-      overflow: 'hidden',
+    <div className="portaal-home-wrapper" style={{
       fontFamily: 'var(--font-body, Outfit, sans-serif)',
       backgroundColor: '#1A3D2A',
       ...backgroundStyle,
@@ -80,13 +70,12 @@ export default function LeidingPanel({ isGroepsleiding = false, settings }: Prop
       )}
 
       {/* Main Action Grid */}
-      <div style={{
+      <div className="portaal-home-cards-grid" style={{
         display: 'grid',
         gridTemplateColumns: isGroepsleiding ? 'repeat(auto-fit, minmax(210px, 1fr))' : 'repeat(auto-fit, minmax(230px, 1fr))',
         gap: isGroepsleiding ? 36 : 48,
         width: '100%',
         maxWidth: isGroepsleiding ? 1160 : 980,
-        marginTop: 68,
       }}>
         
         {/* Card 1: Kriko Echo */}
