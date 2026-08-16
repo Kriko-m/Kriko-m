@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, Nunito, Rubik_Dirt } from "next/font/google";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ThemeSynchronizer from "@/components/ThemeSynchronizer";
