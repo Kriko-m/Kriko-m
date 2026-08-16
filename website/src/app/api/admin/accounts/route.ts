@@ -18,8 +18,8 @@ export async function GET() {
 
     const users = usersData?.users || []
 
-    let leiding = users.find(u => u.app_metadata?.role === 'leiding' || u.email === 'leiding@kriko-m.be')
-    let groepsleiding = users.find(u => u.app_metadata?.role === 'groepsleiding' || u.app_metadata?.role === 'admin' || u.email === 'groepsleiding@kriko-m.be')
+    const leiding = users.find(u => u.app_metadata?.role === 'leiding' || u.email === 'leiding@kriko-m.be')
+    const groepsleiding = users.find(u => u.app_metadata?.role === 'groepsleiding' || u.app_metadata?.role === 'admin' || u.email === 'groepsleiding@kriko-m.be')
 
     return NextResponse.json({
       accounts: [
@@ -37,8 +37,8 @@ export async function GET() {
         },
       ]
     })
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || 'Server fout' }, { status: 500 })
+  } catch (err: unknown) {
+    return NextResponse.json({ error: (err as Error)?.message || 'Server fout' }, { status: 500 })
   }
 }
 
@@ -60,13 +60,13 @@ export async function POST(request: Request) {
     const { data: usersData } = await admin.auth.admin.listUsers()
     const users = usersData?.users || []
 
-    let targetUser = users.find(u =>
+    const targetUser = users.find(u =>
       role === 'leiding'
         ? (u.app_metadata?.role === 'leiding' || u.email === 'leiding@kriko-m.be')
         : (u.app_metadata?.role === 'groepsleiding' || u.app_metadata?.role === 'admin' || u.email === 'groepsleiding@kriko-m.be')
     )
 
-    const updatePayload: Record<string, any> = {}
+    const updatePayload: Record<string, unknown> = {}
 
     if (newName && newName.trim()) {
       updatePayload.user_metadata = {
@@ -89,7 +89,7 @@ export async function POST(request: Request) {
     if (!targetUser) {
       // Create user if not existing yet
       const email = role === 'leiding' ? 'leiding@kriko-m.be' : 'groepsleiding@kriko-m.be'
-      const { data: newUser, error: createError } = await admin.auth.admin.createUser({
+      const { error: createError } = await admin.auth.admin.createUser({
         email,
         password: newPassword?.trim() || 'test123',
         email_confirm: true,
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
     if (updateError) throw updateError
 
     return NextResponse.json({ success: true, message: 'Account succesvol bijgewerkt!' })
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || 'Server fout bij bijwerken van account' }, { status: 500 })
+  } catch (err: unknown) {
+    return NextResponse.json({ error: (err as Error)?.message || 'Server fout bij bijwerken van account' }, { status: 500 })
   }
 }

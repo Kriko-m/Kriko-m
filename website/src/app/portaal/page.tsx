@@ -66,7 +66,7 @@ function PortaalContent() {
       }
 
       if (!loginSuccess) {
-        setError('Ongeldig wachtwoord voor gekozen rol.')
+        setError(lastError || 'Ongeldig wachtwoord voor gekozen rol.')
         setStatus('idle')
       } else {
         router.push(redirectTo)

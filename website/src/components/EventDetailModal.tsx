@@ -297,8 +297,6 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
   const d = new Date(yy, (mm ?? 1) - 1, dd ?? 1)
   const day = String(d.getDate()).padStart(2, '0')
   const month = MONTHS_SHORT[d.getMonth() + 1]
-  const weekday = WEEKDAYS[d.getDay()]
-  const dateInfo = getEventDateDetails(event)
 
   const diff = Math.round((d.getTime() - todayMs) / 86400000)
   const countdown = diff === 0 ? 'Vandaag' : diff === 1 ? 'Morgen' : diff > 1 ? `${diff} dagen` : 'Afgelopen'

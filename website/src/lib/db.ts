@@ -1,6 +1,7 @@
 import { unstable_cache } from 'next/cache'
 import { createAdminClient } from './supabase'
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export function normalizeSettings(data: any): any {
   if (!data) return data
   const pb = (data.portal_backgrounds ?? {}) as Record<string, any>

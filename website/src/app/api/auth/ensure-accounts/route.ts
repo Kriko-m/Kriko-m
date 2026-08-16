@@ -49,8 +49,8 @@ export async function POST() {
     }
 
     return NextResponse.json({ success: true })
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Failed to ensure accounts:', err)
-    return NextResponse.json({ error: err?.message || 'Server error' }, { status: 500 })
+    return NextResponse.json({ error: (err as Error)?.message || 'Server error' }, { status: 500 })
   }
 }

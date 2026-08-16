@@ -75,6 +75,7 @@ function RenderIcon({ icon }: { icon: string }) {
 
   if (icon === 'kampas' || icon === 'kampas-logo' || icon === '/images/kampas-logo.svg') {
     return (
+      /* eslint-disable-next-line @next/next/no-img-element */
       <img
         src="/images/kampas-logo.svg"
         alt="Kampas Logo"
@@ -92,6 +93,7 @@ function RenderIcon({ icon }: { icon: string }) {
     icon === '/images/scouts-gidsen-vl.svg'
   ) {
     return (
+      /* eslint-disable-next-line @next/next/no-img-element */
       <img
         src="/images/scouts-gidsen-vl.svg"
         alt="Scouts & Gidsen Vlaanderen Logo"
@@ -129,9 +131,6 @@ function ResourceCard({
       window.open(item.url, '_blank', 'noopener,noreferrer')
     }
   }
-
-  const isDriveOrExt = item.url.includes('drive.google') || item.url.includes('docs.google') || (item.url.startsWith('http') && !item.url.includes('/upload/'))
-  const isFileDownload = item.url.includes('/upload/') || item.url.match(/\.(pdf|docx?|xlsx?|zip|png|jpe?g)$/i)
 
   return (
     <div
