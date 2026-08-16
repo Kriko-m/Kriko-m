@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Outfit, Nunito, Rubik_Dirt } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ThemeSynchronizer from "@/components/ThemeSynchronizer";
@@ -49,6 +50,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         <ThemeSynchronizer />
         {children}
+        <Analytics />
       </body>
     </html>
   );
