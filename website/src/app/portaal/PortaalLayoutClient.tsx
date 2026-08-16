@@ -1,22 +1,63 @@
 'use client'
 
-import { Suspense, useEffect, useTransition } from 'react'
+import { useEffect, useTransition } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import PortaalNav from './_components/PortaalNav'
-import PortaalSidebar from './_components/PortaalSidebar'
 
 interface Props {
   children: React.ReactNode
   naam: string
   role?: string
+  settings?: import('@/lib/types').Settings | null
 }
 
-export default function PortaalLayoutClient({ children, naam, role }: Props) {
+export default function PortaalLayoutClient({ children, naam, role, settings }: Props) {
   const pathname = usePathname()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
   const showNav = pathname !== '/portaal' && pathname !== '/portaal/'
+  const isHomePage = pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/'
+
+  // Compute dynamic per-page background
+  let pageBgType: 'photo' | 'color' | undefined
+  let pageBgValue: string | undefined
+
+  if (pathname.includes('/echos')) {
+    pageBgType = settings?.echos_bg_type
+    pageBgValue = settings?.echos_bg_value
+  } else if (pathname.includes('/algemene-info')) {
+    pageBgType = settings?.docs_bg_type
+    pageBgValue = settings?.docs_bg_value
+  } else if (pathname.includes('/agenda')) {
+    pageBgType = settings?.agenda_bg_type
+    pageBgValue = settings?.agenda_bg_value
+  } else if (pathname.includes('/website-beheer')) {
+    pageBgType = settings?.beheer_bg_type
+    pageBgValue = settings?.beheer_bg_value
+  }
+
+  const customBgStyle: React.CSSProperties = {}
+  if (!isHomePage) {
+    if (pageBgType === 'photo' && pageBgValue) {
+      customBgStyle.backgroundColor = '#2A5A40'
+      customBgStyle.backgroundImage = `linear-gradient(rgba(42, 90, 64, 0.86), rgba(42, 90, 64, 0.93)), url(${pageBgValue})`
+      customBgStyle.backgroundSize = 'cover'
+      customBgStyle.backgroundPosition = 'center center'
+      customBgStyle.backgroundAttachment = 'fixed'
+    } else if (pageBgType === 'color' && pageBgValue) {
+      customBgStyle.backgroundColor = pageBgValue
+    } else {
+      customBgStyle.backgroundColor = '#2A5A40'
+    }
+  }
+
+  useEffect(() => {
+    if (!showNav) return
+    const activeColor = (customBgStyle.backgroundColor as string) || (isHomePage ? '#1A3D2A' : '#2A5A40')
+    document.body.style.backgroundColor = activeColor
+    document.documentElement.style.backgroundColor = activeColor
+  }, [showNav, isHomePage, customBgStyle.backgroundColor])
 
   useEffect(() => {
     if (!showNav) return
@@ -64,13 +105,27 @@ export default function PortaalLayoutClient({ children, naam, role }: Props) {
 
   return (
     <>
-      {showNav && <PortaalNav naam={naam} />}
+      {showNav && <PortaalNav naam={naam} role={role} />}
       {showNav ? (
-        <div className="portaal-page-layout">
-          <Suspense fallback={<aside className="portaal-sidebar-nav" />}>
-            <PortaalSidebar role={role} />
-          </Suspense>
-          <main className="portaal-page-main portaal-page-main--anchor">
+        <div
+          className="portaal-page-layout portaal-page-layout--no-sidebar"
+          style={{
+            height: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? 'calc(100vh - 76px)' : undefined,
+            overflow: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? 'hidden' : undefined,
+          }}
+        >
+          <main
+            className="portaal-page-main portaal-page-main--anchor"
+            style={{
+              width: '100%',
+              height: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '100%' : undefined,
+              minHeight: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '100%' : 'calc(100vh - 76px)',
+              maxHeight: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '100%' : undefined,
+              overflow: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? 'hidden' : undefined,
+              backgroundColor: (pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/') ? '#1A3D2A' : undefined,
+              ...customBgStyle,
+            }}
+          >
             {children}
             {isPending && (
               <div style={{

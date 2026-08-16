@@ -37,6 +37,7 @@ const ICON_OPTIONS = [
   { label: 'Medisch', icon: 'fa-solid fa-notes-medical' },
   { label: 'Telefoon / Nood', icon: 'fa-solid fa-phone-volume' },
   { label: 'Administratie / Tandwiel', icon: 'fa-solid fa-users-gear' },
+  { label: 'Scouts & Gidsen VL Logo', icon: 'scouts-gidsen-vl' },
   { label: 'Kompas', icon: 'fa-solid fa-compass-drafting' },
   { label: 'Facebook', icon: 'fa-brands fa-facebook' },
   { label: 'Standaard Bestand', icon: 'fa-solid fa-file' },
@@ -72,14 +73,32 @@ function RenderIcon({ icon }: { icon: string }) {
     )
   }
 
-  if (icon === 'kampas') {
+  if (icon === 'kampas' || icon === 'kampas-logo' || icon === '/images/kampas-logo.svg') {
     return (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-        <circle cx="12" cy="12" r="9" stroke="#1A3D2A" strokeWidth="2" fill="none" />
-        <path d="M12 5L17 14H7L12 5Z" fill="#1A3D2A" />
-        <path d="M12 9L15 14H9L12 9Z" fill="#EEF5F1" />
-        <circle cx="12" cy="12" r="1.5" fill="#C9963A" />
-      </svg>
+      <img
+        src="/images/kampas-logo.svg"
+        alt="Kampas Logo"
+        width={24}
+        height={24}
+        style={{ width: 24, height: 24, objectFit: 'contain', borderRadius: 4, display: 'block', flexShrink: 0 }}
+      />
+    )
+  }
+
+  if (
+    icon === 'scouts-gidsen-vl' ||
+    icon === 'scouts-gidsen-vlaanderen' ||
+    icon === 'fa-solid fa-compass-drafting' ||
+    icon === '/images/scouts-gidsen-vl.svg'
+  ) {
+    return (
+      <img
+        src="/images/scouts-gidsen-vl.svg"
+        alt="Scouts & Gidsen Vlaanderen Logo"
+        width={24}
+        height={24}
+        style={{ width: 24, height: 24, objectFit: 'contain', display: 'block', flexShrink: 0 }}
+      />
     )
   }
 
@@ -111,6 +130,9 @@ function ResourceCard({
     }
   }
 
+  const isDriveOrExt = item.url.includes('drive.google') || item.url.includes('docs.google') || (item.url.startsWith('http') && !item.url.includes('/upload/'))
+  const isFileDownload = item.url.includes('/upload/') || item.url.match(/\.(pdf|docx?|xlsx?|zip|png|jpe?g)$/i)
+
   return (
     <div
       onClick={handleClick}
@@ -121,69 +143,86 @@ function ResourceCard({
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        gap: 14,
-        padding: '16px 18px',
-        borderRadius: 16,
+        gap: 16,
+        padding: '18px 20px',
+        borderRadius: 18,
         background: '#fff',
         border: showEditControls ? '2px solid #1A3D2A' : '1.5px solid #C2D9C9',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+        boxShadow: '0 6px 20px rgba(0,0,0,0.08)',
         cursor: showEditControls ? 'grab' : item.url ? 'pointer' : 'default',
         opacity: isDragging ? 0.4 : 1,
-        transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease',
+        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
       className="action-card-hover"
     >
       <div
         style={{
-          width: 42,
-          height: 42,
-          borderRadius: 12,
-          background: '#EEF5F1',
+          width: 46,
+          height: 46,
+          borderRadius: 14,
+          background: 'linear-gradient(135deg, #EEF5F1 0%, #E3EFE8 100%)',
           color: '#1A3D2A',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '1.2rem',
+          fontSize: '1.25rem',
           flexShrink: 0,
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8)',
         }}
       >
         <RenderIcon icon={item.icon} />
       </div>
 
-      <div style={{ flex: 1, minWidth: 0, paddingRight: showEditControls ? 64 : 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ flex: 1, minWidth: 0, paddingRight: showEditControls ? 64 : 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
           {showEditControls && (
             <i className="fa-solid fa-grip-vertical" style={{ color: '#A0A0A0', fontSize: '.8rem', marginRight: 2, cursor: 'grab' }}></i>
           )}
-          <strong style={{ fontSize: '.95rem', fontWeight: 800, color: '#1A3D2A', lineHeight: 1.3 }}>
+          <strong style={{ fontSize: '.98rem', fontWeight: 800, color: '#1A3D2A', lineHeight: 1.3 }}>
             {item.label}
           </strong>
-          {item.url && (
-            <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '.72rem', color: '#6A8A75', flexShrink: 0 }}></i>
-          )}
         </div>
+
         {item.description && (
-          <p style={{ margin: '3px 0 0', fontSize: '.82rem', color: '#6A8A75', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          <p style={{ margin: '2px 0 0', fontSize: '.82rem', color: '#4A6855', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
             {item.description}
           </p>
         )}
       </div>
+
+      {!showEditControls && item.url && (
+        <div style={{
+          width: 32,
+          height: 32,
+          borderRadius: '50%',
+          background: '#EEF5F1',
+          color: '#1A3D2A',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '0.85rem',
+          flexShrink: 0,
+          transition: 'transform 0.15s ease, background 0.15s ease',
+        }}>
+          <i className="fa-solid fa-chevron-right"></i>
+        </div>
+      )}
 
       {showEditControls && (
         <div
           onClick={(e) => e.stopPropagation()}
           style={{
             position: 'absolute',
-            right: 10,
+            right: 12,
             top: '50%',
             transform: 'translateY(-50%)',
             display: 'flex',
             gap: 4,
             background: '#fff',
-            padding: '3px 5px',
-            borderRadius: 8,
-            border: '1px solid #C2D9C9',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.06)',
+            padding: '4px 6px',
+            borderRadius: 10,
+            border: '1.5px solid #C2D9C9',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
           }}
         >
           <button
@@ -565,99 +604,11 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const showEditControls = isGroepsleiding && editMode
 
   return (
-    <div style={{ padding: '28px 24px', maxWidth: 1100, margin: '0 auto' }}>
-
-      {/* Header with Title & Action Buttons */}
-      <header style={{ marginBottom: 28, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-        <div>
-          <h1 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.8rem', display: 'flex', alignItems: 'center', gap: 10 }}>
-            📁 Documenten & Links
-          </h1>
-          <p style={{ margin: '6px 0 0', color: '#6A8A75', fontSize: '.95rem' }}>
-            Handige sjablonen, checklists, links en formulieren voor de leiding.
-          </p>
-        </div>
-
-        {isGroepsleiding && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button
-              onClick={() => setEditMode(!editMode)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '6px 14px',
-                borderRadius: 10,
-                background: editMode ? '#1A3D2A' : '#fff',
-                color: editMode ? '#fff' : '#1A3D2A',
-                border: '1.5px solid #1A3D2A',
-                fontWeight: 700,
-                fontSize: '.82rem',
-                cursor: 'pointer',
-                boxShadow: '0 2px 8px rgba(26,61,42,0.08)',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <i className={editMode ? 'fa-solid fa-check' : 'fa-solid fa-pen-to-square'}></i>
-              <span>{editMode ? 'Klaar met bewerken' : 'Bewerken'}</span>
-            </button>
-
-            {editMode && (
-              <>
-                <button
-                  onClick={openCategoryModal}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '6px 14px',
-                    borderRadius: 10,
-                    background: '#1A3D2A',
-                    color: '#fff',
-                    border: 'none',
-                    fontWeight: 700,
-                    fontSize: '.82rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(26,61,42,0.15)',
-                    transition: 'transform 0.15s, background-color 0.15s',
-                  }}
-                  className="action-card-hover"
-                >
-                  <i className="fa-solid fa-folder-plus"></i>
-                  <span>Nieuwe Categorie</span>
-                </button>
-
-                <button
-                  onClick={() => openNewItemModal()}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '6px 14px',
-                    borderRadius: 10,
-                    background: '#C9963A',
-                    color: '#fff',
-                    border: 'none',
-                    fontWeight: 700,
-                    fontSize: '.82rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(201,150,58,0.18)',
-                    transition: 'transform 0.15s, background-color 0.15s',
-                  }}
-                  className="action-card-hover"
-                >
-                  <i className="fa-solid fa-plus"></i>
-                  <span>Nieuw Item</span>
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </header>
+    <div style={{ padding: '36px 36px 32px', maxWidth: 1440, margin: '0 auto', width: '100%' }}>
 
       {/* Documenten & Sjablonen per Categorie */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-        {Object.entries(categoriesMap).map(([catName, items]) => {
+        {Object.entries(categoriesMap).map(([catName, items], index) => {
           if (items.length === 0 && !showEditControls) return null
 
           return (
@@ -666,8 +617,8 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               style={{
                 padding: dragOverCat === catName ? '12px' : '0px',
                 borderRadius: 18,
-                border: dragOverCat === catName ? '2px dashed #1A3D2A' : '2px solid transparent',
-                background: dragOverCat === catName ? 'rgba(238, 245, 241, 0.6)' : 'transparent',
+                border: dragOverCat === catName ? '2px dashed #FFFFFF' : '2px solid transparent',
+                background: dragOverCat === catName ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
                 transition: 'all 0.15s ease',
               }}
               onDragOver={(e) => {
@@ -691,32 +642,109 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 if (resId) handleDropToCategory(resId, catName)
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1A3D2A', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#FFFFFF', margin: 0, display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-heading, Nunito, sans-serif)', textShadow: '0 2px 4px rgba(0,0,0,0.15)' }}>
                   <span>{catName}</span>
                   {showEditControls && (
                     <button
                       onClick={() => openEditCategoryModal(catName)}
                       title="Categorie bewerken of verwijderen"
                       style={{
-                        background: '#F0ECE4',
-                        border: 'none',
-                        borderRadius: 6,
-                        padding: '3px 8px',
+                        background: 'rgba(255, 255, 255, 0.2)',
+                        border: '1px solid rgba(255, 255, 255, 0.35)',
+                        borderRadius: 8,
+                        padding: '4px 10px',
                         fontSize: '.75rem',
-                        color: '#1A3D2A',
+                        color: '#FFFFFF',
                         cursor: 'pointer',
                         fontWeight: 700,
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: 4,
-                        marginLeft: 4,
+                        gap: 5,
+                        marginLeft: 6,
+                        backdropFilter: 'blur(4px)',
                       }}
                     >
                       <i className="fa-solid fa-gear"></i> Categorie bewerken
                     </button>
                   )}
                 </h2>
+
+                {index === 0 && isGroepsleiding && (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <button
+                      onClick={() => setEditMode(!editMode)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '7px 16px',
+                        borderRadius: 12,
+                        background: editMode ? '#F5B82E' : '#FFFFFF',
+                        color: editMode ? '#3a2a00' : '#1A3D2A',
+                        border: 'none',
+                        fontWeight: 900,
+                        fontSize: '.84rem',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <i className={editMode ? 'fa-solid fa-check' : 'fa-solid fa-pen-to-square'}></i>
+                      <span>{editMode ? 'Klaar met bewerken' : 'Bewerken'}</span>
+                    </button>
+
+                    {editMode && (
+                      <>
+                        <button
+                          onClick={openCategoryModal}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            padding: '7px 16px',
+                            borderRadius: 12,
+                            background: 'rgba(255, 255, 255, 0.95)',
+                            color: '#1A3D2A',
+                            border: 'none',
+                            fontWeight: 800,
+                            fontSize: '.84rem',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                            transition: 'all 0.15s ease',
+                          }}
+                          className="action-card-hover"
+                        >
+                          <i className="fa-solid fa-folder-plus"></i>
+                          <span>Nieuwe Categorie</span>
+                        </button>
+
+                        <button
+                          onClick={() => openNewItemModal()}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            padding: '7px 16px',
+                            borderRadius: 12,
+                            background: '#C9963A',
+                            color: '#FFFFFF',
+                            border: 'none',
+                            fontWeight: 800,
+                            fontSize: '.84rem',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+                            transition: 'all 0.15s ease',
+                          }}
+                          className="action-card-hover"
+                        >
+                          <i className="fa-solid fa-plus"></i>
+                          <span>Nieuw Item</span>
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
@@ -747,9 +775,9 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                       gap: 12,
                       padding: '16px 18px',
                       borderRadius: 16,
-                      border: '2px dashed #C2D9C9',
-                      background: 'rgba(238, 245, 241, 0.45)',
-                      color: '#1A3D2A',
+                      border: '2px dashed rgba(255, 255, 255, 0.45)',
+                      background: 'rgba(255, 255, 255, 0.12)',
+                      color: '#FFFFFF',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                     }}
@@ -760,9 +788,9 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                         width: 40,
                         height: 40,
                         borderRadius: 12,
-                        background: '#fff',
-                        border: '1.5px dashed #1A3D2A',
-                        color: '#1A3D2A',
+                        background: 'rgba(255, 255, 255, 0.25)',
+                        border: '1.5px dashed #FFFFFF',
+                        color: '#FFFFFF',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

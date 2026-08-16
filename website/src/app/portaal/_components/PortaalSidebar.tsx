@@ -7,8 +7,9 @@ interface Props {
   role?: string
 }
 
-export default function PortaalSidebar({ role: _role }: Props) {
+export default function PortaalSidebar({ role }: Props) {
   const pathname = usePathname()
+  const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
 
   return (
     <aside className="portaal-sidebar-nav">
@@ -39,7 +40,7 @@ export default function PortaalSidebar({ role: _role }: Props) {
         <span>Documenten & Links</span>
       </Link>
 
-      {/* Kalender / Agenda */}
+      {/* 4. Kalender / Agenda */}
       <Link
         href="/portaal/leiding/agenda"
         className={`portaal-sidebar-link${pathname === '/portaal/leiding/agenda' ? ' active' : ''}`}
@@ -47,7 +48,17 @@ export default function PortaalSidebar({ role: _role }: Props) {
         <i className="fa-solid fa-calendar-days" style={{ width: 18, textAlign: 'center', fontSize: '0.9rem' }}></i>
         <span>Kalender</span>
       </Link>
+
+      {/* 5. Website Beheer — Enkel voor Groepsleiding */}
+      {isGroepsleiding && (
+        <Link
+          href="/portaal/website-beheer"
+          className={`portaal-sidebar-link${pathname === '/portaal/website-beheer' ? ' active' : ''}`}
+        >
+          <i className="fa-solid fa-globe" style={{ width: 18, textAlign: 'center', fontSize: '0.9rem' }}></i>
+          <span>Website Beheer</span>
+        </Link>
+      )}
     </aside>
   )
 }
-

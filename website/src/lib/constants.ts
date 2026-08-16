@@ -45,7 +45,7 @@ export const TAK_KLEUREN: Record<string, string> = {
 // Audience-tags voor kalender én kampen (wie de activiteit betreft).
 // 'groep' = de enige tag die iets publiek op de website-kalender zet (enkel
 // groepsleiding mag hem toekennen).
-export const AUDIENCE_TAGS = ['leiding', 'kapoenen', 'welpen', 'jonggivers', 'givers', 'groep'] as const
+export const AUDIENCE_TAGS = ['groep', 'leiding', 'kapoenen', 'welpen', 'jonggivers', 'givers'] as const
 export type AudienceTagConst = (typeof AUDIENCE_TAGS)[number]
 
 export const AUDIENCE_NAMEN: Record<string, string> = {

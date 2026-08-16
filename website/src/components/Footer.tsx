@@ -45,7 +45,6 @@ export default function Footer({
             <li><Link href="/verhuur">Verhuur lokaal</Link></li>
             <li><Link href="/shop">Webshop</Link></li>
             <li><Link href="/inschrijven">Inschrijven</Link></li>
-            <li><Link href="/portaal">Leiding login</Link></li>
           </ul>
         </div>
 
@@ -88,6 +87,8 @@ export default function Footer({
       <div className="site-footer-bottom">
         <span>&copy; {year} Scouts Kriko-M Sint-Niklaas</span>
         <span className="footer-legal-links">
+          <Link href="/portaal">Login</Link>
+          <span aria-hidden="true">&middot;</span>
           <Link href="/privacy">Privacyverklaring</Link>
           <span aria-hidden="true">&middot;</span>
           <Link href="/voorwaarden">Verkoopsvoorwaarden</Link>

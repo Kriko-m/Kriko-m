@@ -225,6 +225,21 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'echoTak, echoMonth en echoYear zijn verplicht' }, { status: 400 })
       }
 
+      // Controleer of er al een Kriko Echo bestaat voor deze maand & jaar voor deze tak (max 1 per maand)
+      const { data: existingEcho } = await admin
+        .from('echos')
+        .select('id')
+        .eq('tak', echoTak)
+        .eq('month', Number(echoMonth))
+        .eq('year', Number(echoYear))
+        .maybeSingle()
+
+      if (existingEcho) {
+        return NextResponse.json({
+          error: `Er bestaat al een Kriko Echo voor deze maand. Verwijder eerst de bestaande Echo als je deze wilt vervangen.`
+        }, { status: 400 })
+      }
+
       await cleanupOldFile('echos', oldUrl)
       const filename = `echo-${echoYear}-${echoMonth}-${echoTak}-${Date.now()}.${ext}`
       const capitalizedTak = echoTak.charAt(0).toUpperCase() + echoTak.slice(1)

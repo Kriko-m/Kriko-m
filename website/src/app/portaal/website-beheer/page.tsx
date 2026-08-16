@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import WebsiteBeheerClient from './WebsiteBeheerClient'
 import { Settings } from '@/lib/types'
+import { normalizeSettings } from '@/lib/db'
 
 export const metadata = { title: 'Website Beheer — Portaal' }
 
@@ -20,5 +21,5 @@ export default async function WebsiteBeheerPage() {
   const admin = createAdminClient()
   const { data: settingsData } = await admin.from('settings').select('*').single()
 
-  return <WebsiteBeheerClient initialSettings={settingsData as Settings} />
+  return <WebsiteBeheerClient initialSettings={normalizeSettings(settingsData) as Settings} />
 }

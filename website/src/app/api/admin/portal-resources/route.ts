@@ -19,7 +19,7 @@ export const DEFAULT_RESOURCES: PortalResource[] = [
   { id: 'res_q1', type: 'quicklink', category: 'Snelkoppelingen', label: 'Groepsadmin', description: 'Leden & leiding administratie', url: 'https://groepsadmin.scoutsengidsenvlaanderen.be/groepsadmin/client/', icon: 'fa-solid fa-users-gear', sort_order: 1 },
   { id: 'res_q2', type: 'quicklink', category: 'Snelkoppelingen', label: 'Google Drive', description: 'Gedeelde mappen & bestanden', url: 'https://drive.google.com', icon: 'fa-brands fa-google-drive', sort_order: 2 },
   { id: 'res_q3', type: 'quicklink', category: 'Snelkoppelingen', label: 'Facebook', description: 'Officiële Kriko-M pagina', url: 'https://www.facebook.com/ScoutsKrikoM', icon: 'fa-brands fa-facebook', sort_order: 3 },
-  { id: 'res_q4', type: 'quicklink', category: 'Snelkoppelingen', label: 'Scouts & Gidsen VL', description: 'Spelaanbod & richtlijnen', url: 'https://www.scoutsengidsenvlaanderen.be', icon: 'fa-solid fa-compass-drafting', sort_order: 4 },
+  { id: 'res_q4', type: 'quicklink', category: 'Snelkoppelingen', label: 'Scouts & Gidsen VL', description: 'Spelaanbod & richtlijnen', url: 'https://www.scoutsengidsenvlaanderen.be', icon: 'scouts-gidsen-vl', sort_order: 4 },
 
   { id: 'res_d1', type: 'document', category: '🏕️ Kamp', label: 'Kampgids & Draaiboek', description: 'Handleiding & stappenplan om een vlekkeloos kamp te organiseren.', url: 'https://drive.google.com', icon: 'fa-solid fa-tent', sort_order: 10 },
   { id: 'res_d2', type: 'document', category: '🏕️ Kamp', label: 'Checklist Kamp', description: 'Overzicht van materialen, veiligheid, EHBO en transport.', url: 'https://drive.google.com', icon: 'fa-solid fa-clipboard-check', sort_order: 11 },

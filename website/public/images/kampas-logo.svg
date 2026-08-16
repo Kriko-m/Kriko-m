@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Kampas Rounded Badge -->
+  <rect x="15" y="15" width="170" height="170" rx="36" fill="#0C4F32" />
+  
+  <!-- Tent / Cabin Roof Shape -->
+  <path d="M100 38 L160 115 H40 Z" fill="#EF5A24" />
+  
+  <!-- Inner Door / Opening -->
+  <path d="M100 62 L136 115 H64 Z" fill="#FFFFFF" />
+  
+  <!-- Compass Star Element in Center -->
+  <polygon points="100,74 105,92 120,92 107,100 112,115 100,105 88,115 93,100 80,92 95,92" fill="#0C4F32" />
+
+  <!-- Text "KAMPAS" at bottom -->
+  <text x="100" y="158" font-family="'Outfit', 'Nunito', 'Arial', sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">KAMPAS</text>
+</svg>

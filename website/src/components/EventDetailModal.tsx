@@ -6,6 +6,60 @@ import { AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
 const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
 const MONTHS_SHORT: Record<number, string> = {1:'Jan',2:'Feb',3:'Mrt',4:'Apr',5:'Mei',6:'Jun',7:'Jul',8:'Aug',9:'Sep',10:'Okt',11:'Nov',12:'Dec'}
 const WEEKDAYS = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag']
+const WEEKDAYS_SHORT = ['zo','ma','di','wo','do','vr','za']
+
+export function getEventDateDetails(event: CalendarEvent) {
+  const [yy, mm, dd] = event.date.split('-').map(Number)
+  const dStart = new Date(yy, (mm ?? 1) - 1, dd ?? 1)
+  const wStart = WEEKDAYS[dStart.getDay()]
+  const dayStart = dStart.getDate()
+  const monthStart = MONTHS_NL[dStart.getMonth()]
+  const yearStart = dStart.getFullYear()
+
+  const isMultiDay = !!(event.datum_tot && event.datum_tot !== event.date)
+
+  if (isMultiDay) {
+    const [tY, tM, tD] = event.datum_tot!.split('-').map(Number)
+    const dEnd = new Date(tY, (tM ?? 1) - 1, tD ?? 1)
+    const wEnd = WEEKDAYS[dEnd.getDay()]
+    const dayEnd = dEnd.getDate()
+    const monthEnd = MONTHS_NL[dEnd.getMonth()]
+
+    const parts = event.time ? event.time.split(/\s*[-–]\s*/) : []
+    const tStart = parts[0]?.trim()
+    const tEnd = parts[1]?.trim()
+
+    const startLine = tStart ? `${tStart} ${wStart} ${dayStart} ${monthStart}` : `${wStart} ${dayStart} ${monthStart}`
+    const endLine = tEnd ? `${tEnd} ${wEnd} ${dayEnd} ${monthEnd}` : `${wEnd} ${dayEnd} ${monthEnd}`
+
+    const wStartShort = WEEKDAYS_SHORT[dStart.getDay()]
+    const mStartShort = MONTHS_SHORT[dStart.getMonth() + 1]
+    const wEndShort = WEEKDAYS_SHORT[dEnd.getDay()]
+    const mEndShort = MONTHS_SHORT[dEnd.getMonth() + 1]
+
+    const cardSummary = tStart && tEnd
+      ? `${tStart} ${wStartShort} ${dayStart} ${mStartShort} - ${tEnd} ${wEndShort} ${dayEnd} ${mEndShort}`
+      : `${wStartShort} ${dayStart} ${mStartShort} - ${wEndShort} ${dayEnd} ${mEndShort}`
+
+    return {
+      isMultiDay: true,
+      startLine,
+      endLine,
+      cardSummary
+    }
+  }
+
+  // Single day
+  const singleDateStr = `${wStart} ${dayStart} ${monthStart} ${yearStart}`
+  const cardSummary = `${wStart} ${dayStart} ${MONTHS_SHORT[dStart.getMonth() + 1]}`
+
+  return {
+    isMultiDay: false,
+    singleDateStr,
+    timeStr: event.time || null,
+    cardSummary
+  }
+}
 
 function googleCalUrl(event: CalendarEvent) {
   const d = event.date.replace(/-/g, '')
@@ -15,16 +69,7 @@ function googleCalUrl(event: CalendarEvent) {
 export function EventDetailDialog({ event, todayMs, onClose, onEdit }: { event: CalendarEvent; todayMs: number; onClose: () => void; onEdit?: () => void }) {
   const [yy, mm, dd] = event.date.split('-').map(Number)
   const d = new Date(yy, (mm ?? 1) - 1, dd ?? 1)
-  const weekday = WEEKDAYS[d.getDay()]
-  const dateStr = `${d.getDate()} ${MONTHS_NL[d.getMonth()]} ${d.getFullYear()}`
-
-  let formattedFullDate = `${weekday} ${dateStr}`
-  if (event.datum_tot && event.datum_tot !== event.date) {
-    const [tY, tM, tD] = event.datum_tot.split('-').map(Number)
-    const dTot = new Date(tY, (tM ?? 1) - 1, tD ?? 1)
-    const endStr = `${dTot.getDate()} ${MONTHS_NL[dTot.getMonth()]} ${dTot.getFullYear()}`
-    formattedFullDate = `${d.getDate()} ${MONTHS_SHORT[d.getMonth() + 1]} - ${endStr}`
-  }
+  const dateInfo = getEventDateDetails(event)
 
   const diff = Math.round((d.getTime() - todayMs) / 86400000)
   const countdown = diff === 0 ? 'Vandaag' : diff === 1 ? 'Morgen' : diff > 1 ? `Nog ${diff} dagen` : 'Afgelopen'
@@ -125,15 +170,30 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit }: { event: 
 
             {/* Key Details Meta Box */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, background: '#faf9f7', border: '1px solid #ede9e1', borderRadius: 14, padding: '16px 20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
-                <i className="fa-regular fa-calendar" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
-                <span style={{ fontWeight: 700 }}>{formattedFullDate}</span>
-              </div>
-              {event.time && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
-                  <i className="fa-regular fa-clock" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
-                  <span><strong>Tijdstip:</strong> {event.time}</span>
-                </div>
+              {dateInfo.isMultiDay ? (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
+                    <i className="fa-regular fa-calendar-check" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
+                    <span style={{ fontWeight: 700 }}>{dateInfo.startLine}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
+                    <i className="fa-solid fa-flag-checkered" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
+                    <span style={{ fontWeight: 700 }}>{dateInfo.endLine}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
+                    <i className="fa-regular fa-calendar" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
+                    <span style={{ fontWeight: 700 }}>{dateInfo.singleDateStr}</span>
+                  </div>
+                  {dateInfo.timeStr && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
+                      <i className="fa-regular fa-clock" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
+                      <span><strong>Tijdstip:</strong> {dateInfo.timeStr}</span>
+                    </div>
+                  )}
+                </>
               )}
               {event.location && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
@@ -238,15 +298,7 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
   const day = String(d.getDate()).padStart(2, '0')
   const month = MONTHS_SHORT[d.getMonth() + 1]
   const weekday = WEEKDAYS[d.getDay()]
-  const dateStr = `${d.getDate()} ${MONTHS_NL[d.getMonth()]} ${d.getFullYear()}`
-  
-  let formattedFullDate = `${weekday} ${dateStr}`
-  if (event.datum_tot && event.datum_tot !== event.date) {
-    const [tY, tM, tD] = event.datum_tot.split('-').map(Number)
-    const dTot = new Date(tY, (tM ?? 1) - 1, tD ?? 1)
-    const endStr = `${dTot.getDate()} ${MONTHS_NL[dTot.getMonth()]} ${dTot.getFullYear()}`
-    formattedFullDate = `${d.getDate()} ${MONTHS_SHORT[d.getMonth() + 1]} - ${endStr}`
-  }
+  const dateInfo = getEventDateDetails(event)
 
   const diff = Math.round((d.getTime() - todayMs) / 86400000)
   const countdown = diff === 0 ? 'Vandaag' : diff === 1 ? 'Morgen' : diff > 1 ? `${diff} dagen` : 'Afgelopen'
@@ -268,15 +320,18 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
       </div>
       <div className="event-card-compact-info">
         <div className="event-card-compact-header">
-          <h4 className="event-card-compact-title">{event.title}</h4>
+          <h4 className="event-card-compact-title" style={{ fontSize: '1.15rem', fontWeight: 900, color: '#1A3D2A', lineHeight: 1.2 }}>{event.title}</h4>
           <span className={`event-card-compact-badge ${event.is_evenement ? 'badge-star' : isNoMeeting ? 'badge-neutral' : 'badge-primary'}`}>
             <i className="fa-regular fa-clock"></i> {countdown}
           </span>
         </div>
-        <div className="event-card-compact-meta">
-          <span><i className="fa-regular fa-calendar"></i> {weekday} {d.getDate()} {month}</span>
-          {event.time && <span><i className="fa-regular fa-clock"></i> {event.time}</span>}
-        </div>
+        {event.location && (
+          <div className="event-card-compact-meta" style={{ marginTop: 2, fontSize: '.73rem', color: '#777', fontWeight: 600 }}>
+            <span>
+              <i className="fa-solid fa-location-dot" style={{ fontSize: '.7rem', color: '#999', marginRight: 4 }}></i> {event.location}
+            </span>
+          </div>
+        )}
       </div>
       <div className="event-card-compact-action">
         <i className="fa-solid fa-chevron-right"></i>
@@ -307,31 +362,29 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
             <span className="event-card-v2-month">{month}</span>
           </div>
           <div className="event-card-v2-header-info">
-            <div className="event-card-v2-header-top">
-              <span className="event-card-v2-weekday">{weekday}</span>
+            <div className="event-card-v2-header-top" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
               <span className={`event-card-v2-badge ${event.is_evenement ? 'badge-star' : isNoMeeting ? 'badge-neutral' : 'badge-primary'}`}>
                 <i className="fa-regular fa-clock"></i> {countdown}
               </span>
             </div>
-            <h3 className="event-card-v2-title" style={{ fontSize: featured ? '1.3rem' : '1.15rem' }}>{event.title}</h3>
+            <h3 className="event-card-v2-title" style={{ fontSize: featured ? '1.55rem' : '1.4rem', fontWeight: 900, marginTop: 0 }}>{event.title}</h3>
           </div>
         </div>
 
-        <div className="event-card-v2-meta">
-          <span className="event-card-v2-meta-item">
-            <i className="fa-regular fa-calendar"></i> {formattedFullDate}
-          </span>
-          {event.time && (
-            <span className="event-card-v2-meta-item">
-              <i className="fa-regular fa-clock"></i> {event.time}
-            </span>
-          )}
-          {event.location && (
-            <span className="event-card-v2-meta-item">
-              <i className="fa-solid fa-location-dot"></i> {event.location}
-            </span>
-          )}
-        </div>
+        {((featured && event.time) || event.location) && (
+          <div className="event-card-v2-meta" style={{ marginTop: 4, marginBottom: 6, fontSize: '.82rem', color: '#777', fontWeight: 600 }}>
+            {featured && event.time && (
+              <span className="event-card-v2-meta-item">
+                <i className="fa-regular fa-clock"></i> {event.time}
+              </span>
+            )}
+            {event.location && (
+              <span className="event-card-v2-meta-item">
+                <i className="fa-solid fa-location-dot" style={{ fontSize: '.78rem', color: '#999' }}></i> {event.location}
+              </span>
+            )}
+          </div>
+        )}
 
         {event.description && (
           <p className="event-card-v2-desc" style={featured ? { WebkitLineClamp: 3 } : undefined}>

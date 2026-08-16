@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase'
 import { requireGroepsleiding } from '@/lib/auth'
 import { revalidateTag } from 'next/cache'
 import { TAKKEN } from '@/lib/constants'
+import { normalizeSettings } from '@/lib/db'
 
 // Welke publieke tak-velden de website-content-editor mag aanpassen.
 const TAK_EDITABLE_FIELDS = ['email', 'whatsapp_url', 'description', 'uniform', 'photo'] as const
@@ -12,23 +13,66 @@ export async function PATCH(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const body = await req.json()
-  const allowed = [
+  const admin = createAdminClient()
+
+  // 1. Fetch current settings (including portal_backgrounds JSONB)
+  const { data: currentSettings, error: fetchError } = await admin
+    .from('settings')
+    .select('*')
+    .eq('id', 1)
+    .single()
+
+  if (fetchError) {
+    return NextResponse.json({ error: fetchError.message }, { status: 500 })
+  }
+
+  const pb: Record<string, unknown> = { ...(currentSettings?.portal_backgrounds ?? {}) }
+
+  const PORTAL_FIELDS = [
+    'home_title_leiding',
+    'home_subtitle_leiding',
+    'home_title_groepsleiding',
+    'home_subtitle_groepsleiding',
+    'home_bg_type',
+    'home_bg_value',
+    'echos_bg_type',
+    'echos_bg_value',
+    'docs_bg_type',
+    'docs_bg_value',
+    'agenda_bg_type',
+    'agenda_bg_value',
+    'beheer_bg_type',
+    'beheer_bg_value',
+  ]
+
+  let pbChanged = false
+  for (const field of PORTAL_FIELDS) {
+    if (field in body) {
+      pb[field] = String(body[field]).slice(0, 1000)
+      pbChanged = true
+    }
+  }
+
+  const update: Record<string, unknown> = {}
+  if (pbChanged) {
+    update.portal_backgrounds = pb
+  }
+
+  const STANDARD_SQL_FIELDS = [
     'scouts_year',
     'bank_iban',
     'bank_bic',
     'bank_holder',
-    'alert_message',
-    'alert_active',
     'reg_fee_first',
     'reg_fee_extra',
     'home_leiding_foto',
+    'home_title',
+    'home_subtitle',
   ]
-  const update: Record<string, unknown> = {}
-  for (const key of allowed) {
+
+  for (const key of STANDARD_SQL_FIELDS) {
     if (key in body) {
-      if (key === 'alert_active') {
-        update[key] = body[key] === 'true' || body[key] === true
-      } else if (key === 'reg_fee_first' || key === 'reg_fee_extra') {
+      if (key === 'reg_fee_first' || key === 'reg_fee_extra') {
         update[key] = Number(body[key]) || 0
       } else {
         update[key] = String(body[key]).slice(0, 1000)
@@ -36,13 +80,10 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
-  const admin = createAdminClient()
-
   // Takken-content (publieke takpagina's): veilige per-tak merge op de
   // bestaande JSONB zodat we nooit andere takken/velden overschrijven.
   if (body.takken && typeof body.takken === 'object') {
-    const { data: current } = await admin.from('settings').select('takken').eq('id', 1).single()
-    const merged: Record<string, Record<string, unknown>> = { ...(current?.takken ?? {}) }
+    const merged: Record<string, Record<string, unknown>> = { ...(currentSettings?.takken ?? {}) }
 
     for (const [tak, incoming] of Object.entries(body.takken as Record<string, unknown>)) {
       if (!(TAKKEN as readonly string[]).includes(tak)) continue
@@ -80,5 +121,7 @@ export async function PATCH(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   revalidateTag('settings', 'max')
-  return NextResponse.json(data)
+
+  const normalized = normalizeSettings(data)
+  return NextResponse.json(normalized)
 }

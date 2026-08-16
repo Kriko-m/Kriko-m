@@ -24,6 +24,8 @@ function PortaalContent() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/portaal/home'
 
+  const [selectedRole, setSelectedRole] = useState<'leiding' | 'groepsleiding'>('leiding')
+  const [password, setPassword] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading'>('idle')
   const [error, setError] = useState('')
 
@@ -31,14 +33,49 @@ function PortaalContent() {
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setStatus('loading'); setError('')
-    const fd = new FormData(e.currentTarget)
-    const { error } = await supabase.auth.signInWithPassword({
-      email: fd.get('email') as string,
-      password: fd.get('password') as string,
-    })
-    if (error) { setError('Ongeldig e-mailadres of wachtwoord.'); setStatus('idle') }
-    else { router.push(redirectTo); router.refresh() }
+    if (!password) {
+      setError('Vul een wachtwoord in.')
+      return
+    }
+
+    setStatus('loading')
+    setError('')
+
+    const emailsToTry = selectedRole === 'leiding' 
+      ? ['leiding@kriko-m.be', 'demo-leiding@kriko-m.be'] 
+      : ['groepsleiding@kriko-m.be', 'demo-groepsleiding@kriko-m.be']
+
+    try {
+      // Ensure accounts exist in Supabase Auth
+      await fetch('/api/auth/ensure-accounts', { method: 'POST' })
+
+      let loginSuccess = false
+      let lastError = ''
+
+      for (const email of emailsToTry) {
+        const { error: authError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+        if (!authError) {
+          loginSuccess = true
+          break
+        } else {
+          lastError = authError.message
+        }
+      }
+
+      if (!loginSuccess) {
+        setError('Ongeldig wachtwoord voor gekozen rol.')
+        setStatus('idle')
+      } else {
+        router.push(redirectTo)
+        router.refresh()
+      }
+    } catch {
+      setError('Er is een fout opgetreden bij het inloggen.')
+      setStatus('idle')
+    }
   }
 
   return (
@@ -57,24 +94,54 @@ function PortaalContent() {
       {/* Card */}
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 460, background: '#fff', borderRadius: 22, boxShadow: '0 24px 60px rgba(0,0,0,0.35)', overflow: 'hidden' }}>
         <div style={{ padding: '36px 40px 38px' }}>
-          <div style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontSize: '1.25rem', fontWeight: 900, color: '#1A3D2A', marginBottom: 6 }}>Inloggen — Leiding</div>
-          <div style={{ fontSize: '.88rem', color: '#6A8A75', marginBottom: 24, lineHeight: 1.55 }}>
-            Deze login is enkel voor leiding. Ouders hoeven niet in te loggen: kampinschrijvingen verlopen via de privélink in de e-mail, en de webshop werkt zonder account.
-          </div>
+          <div style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontSize: '1.35rem', fontWeight: 900, color: '#1A3D2A', marginBottom: 20, textAlign: 'center' }}>Inloggen</div>
 
           {error && <div style={{ padding: '10px 14px', borderRadius: 10, fontSize: '.85rem', fontWeight: 600, textAlign: 'center', marginBottom: 18, background: 'hsla(349,51%,47%,.1)', border: '1.5px solid #B23A4D', color: '#B23A4D' }}>{error}</div>}
 
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             <div>
-              <label style={{ display: 'block', fontSize: '.82rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }}>E-mailadres</label>
-              <input type="email" name="email" required placeholder="naam@kriko-m.be" autoFocus className="form-control" />
+              <label style={{ display: 'block', fontSize: '.82rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }}>
+                Selecteer Account
+              </label>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value as 'leiding' | 'groepsleiding')}
+                className="form-control"
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  borderRadius: 12,
+                  border: '1.5px solid #C2D9C9',
+                  background: '#FAFAFA',
+                  color: '#1A3D2A',
+                  fontWeight: 700,
+                  fontSize: '0.92rem',
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="leiding">Leiding</option>
+                <option value="groepsleiding">Groepsleiding</option>
+              </select>
             </div>
+
             <div>
-              <label style={{ display: 'block', fontSize: '.82rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }}>Wachtwoord</label>
-              <input type="password" name="password" required placeholder="••••••••" className="form-control" />
+              <label style={{ display: 'block', fontSize: '.82rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }}>
+                Wachtwoord
+              </label>
+              <input
+                type="password"
+                name="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="form-control"
+                autoFocus
+              />
             </div>
-            <button type="submit" disabled={status === 'loading'} className="btn btn-secondary" style={{ width: '100%', padding: '14px', marginTop: 8 }}>
-              {status === 'loading' ? 'Bezig…' : 'Inloggen →'}
+
+            <button type="submit" disabled={status === 'loading'} className="btn btn-secondary" style={{ width: '100%', padding: '14px', marginTop: 6 }}>
+              {status === 'loading' ? 'Inloggen…' : `Inloggen als ${selectedRole === 'leiding' ? 'Leiding' : 'Groepsleiding'} →`}
             </button>
           </form>
         </div>

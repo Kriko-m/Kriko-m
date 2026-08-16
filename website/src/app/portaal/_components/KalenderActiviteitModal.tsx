@@ -59,6 +59,7 @@ export default function KalenderActiviteitModal({
   const [facebookLinkOpen, setFacebookLinkOpen] = useState(!!(editEvent?.facebook_event_url || editEvent?.facebook_post_url))
   const [externalLinkOpen, setExternalLinkOpen] = useState(!!(editEvent?.external_link_url))
   const [documentOpen, setDocumentOpen] = useState(!!(editEvent?.document_url))
+  const [isMeerdaags, setIsMeerdaags] = useState(!!(editEvent?.datum_tot))
 
   const selectableTags: AudienceTag[] = canPublish ? [...AUDIENCE_TAGS] : AUDIENCE_TAGS.filter(t => t !== 'groep')
 
@@ -112,7 +113,7 @@ export default function KalenderActiviteitModal({
     setValidationErrors(new Set())
     setLoading(true)
     const payload = {
-      title: form.title, date: form.date, datum_tot: form.datum_tot || null,
+      title: form.title, date: form.date, datum_tot: (isMeerdaags && form.datum_tot) ? form.datum_tot : null,
       time: [form.timeStart, form.timeEnd].filter(Boolean).join(' - '),
       location: form.location, description: form.description,
       audience: form.audience, is_evenement: form.is_evenement,
@@ -278,17 +279,17 @@ export default function KalenderActiviteitModal({
                       <div style={{ flex: 1 }}>
                         <input type="date" style={{ ...inputStyle, width: '100%', ...errorOutline('date') }} value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
                       </div>
-                      {form.datum_tot ? (
+                      {isMeerdaags ? (
                         <>
                           <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
                           <div style={{ flex: 1 }}>
                             <input type="date" style={{ ...inputStyle, width: '100%', background: '#fafaf8', fontSize: '.85rem' }} value={form.datum_tot} onChange={e => setForm(p => ({ ...p, datum_tot: e.target.value }))} />
                           </div>
-                          <button type="button" onClick={() => setForm(p => ({ ...p, datum_tot: '' }))} title="Einddatum verwijderen"
+                          <button type="button" onClick={() => { setIsMeerdaags(false); setForm(p => ({ ...p, datum_tot: '' })) }} title="Einddatum verwijderen"
                             style={{ flexShrink: 0, background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '1rem', padding: '0 4px' }}>×</button>
                         </>
                       ) : (
-                        <button type="button" onClick={() => setForm(p => ({ ...p, datum_tot: p.date || new Date().toISOString().split('T')[0] }))}
+                        <button type="button" onClick={() => { setIsMeerdaags(true); setForm(p => ({ ...p, datum_tot: p.date || new Date().toISOString().split('T')[0] })) }}
                           style={{ flexShrink: 0, background: 'none', border: 'none', color: '#1A3D2A', cursor: 'pointer', fontSize: '.75rem', fontWeight: 700, padding: '5px 8px', whiteSpace: 'nowrap', textDecoration: 'underline' }}>
                           + meerdaags
                         </button>

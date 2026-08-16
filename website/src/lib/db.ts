@@ -1,11 +1,33 @@
 import { unstable_cache } from 'next/cache'
 import { createAdminClient } from './supabase'
 
+export function normalizeSettings(data: any): any {
+  if (!data) return data
+  const pb = (data.portal_backgrounds ?? {}) as Record<string, any>
+  return {
+    ...data,
+    home_title_leiding: data.home_title_leiding ?? pb.home_title_leiding ?? null,
+    home_subtitle_leiding: data.home_subtitle_leiding ?? pb.home_subtitle_leiding ?? null,
+    home_title_groepsleiding: data.home_title_groepsleiding ?? pb.home_title_groepsleiding ?? null,
+    home_subtitle_groepsleiding: data.home_subtitle_groepsleiding ?? pb.home_subtitle_groepsleiding ?? null,
+    home_bg_type: data.home_bg_type ?? pb.home_bg_type ?? null,
+    home_bg_value: data.home_bg_value ?? pb.home_bg_value ?? null,
+    echos_bg_type: data.echos_bg_type ?? pb.echos_bg_type ?? null,
+    echos_bg_value: data.echos_bg_value ?? pb.echos_bg_value ?? null,
+    docs_bg_type: data.docs_bg_type ?? pb.docs_bg_type ?? null,
+    docs_bg_value: data.docs_bg_value ?? pb.docs_bg_value ?? null,
+    agenda_bg_type: data.agenda_bg_type ?? pb.agenda_bg_type ?? null,
+    agenda_bg_value: data.agenda_bg_value ?? pb.agenda_bg_value ?? null,
+    beheer_bg_type: data.beheer_bg_type ?? pb.beheer_bg_type ?? null,
+    beheer_bg_value: data.beheer_bg_value ?? pb.beheer_bg_value ?? null,
+  }
+}
+
 export const getSettings = unstable_cache(
   async () => {
     const supabase = createAdminClient()
     const { data } = await supabase.from('settings').select('*').single()
-    return data
+    return normalizeSettings(data)
   },
   ['settings-cache'],
   { revalidate: 300, tags: ['settings'] }

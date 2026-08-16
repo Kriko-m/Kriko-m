@@ -27,15 +27,13 @@ export default async function FullAgendaPage() {
   const canPublish = role === 'admin' || role === 'groepsleiding'
 
   return (
-    <div style={{ background: '#FFFFFF', padding: '32px 24px', minHeight: '100vh' }}>
-      <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+    <div style={{ padding: '48px 36px 32px', maxWidth: 1440, margin: '0 auto', width: '100%' }}>
         <LeidingCalendar
           initialCalendar={calendarEvents}
           canPublish={canPublish}
           icsToken={icsToken}
           twoColumn={true}
         />
-      </div>
     </div>
   )
 }

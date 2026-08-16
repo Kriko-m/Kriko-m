@@ -16,10 +16,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <Suspense fallback={null}>
         <EditModeBar />
       </Suspense>
-      <Header
-        alertActive={settings?.alert_active ?? false}
-        alertMessage={settings?.alert_message ?? ''}
-      />
+      <Header />
       <div className="public-layout-content">
         {children}
       </div>

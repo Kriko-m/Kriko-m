@@ -6,39 +6,14 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import LoadingScreen from './LoadingScreen'
 
-interface HeaderProps {
-  alertActive?: boolean
-  alertMessage?: string
-}
-
-// Korte stabiele hash van de bannertekst, zodat een nieuwe melding opnieuw
-// verschijnt ook al heeft de bezoeker de vorige weggeklikt.
-function hashMessage(s: string): string {
-  let h = 0
-  for (let i = 0; i < s.length; i++) {
-    h = (h << 5) - h + s.charCodeAt(i)
-    h |= 0
-  }
-  return String(h)
-}
-
-export default function Header({ alertActive, alertMessage }: HeaderProps) {
+export default function Header() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [takkenOpen, setTakkenOpen] = useState(false)
-  const [alertDismissed, setAlertDismissed] = useState(true) // start verborgen, toon pas na check
-
-  const alertHash = alertMessage ? hashMessage(alertMessage) : ''
 
   useEffect(() => {
     setMenuOpen(false)
   }, [pathname])
-
-  useEffect(() => {
-    // Toon de banner tenzij exact deze tekst al is weggeklikt.
-    const dismissedHash = localStorage.getItem('kriko_alert_dismissed')
-    setAlertDismissed(dismissedHash === alertHash && alertHash !== '')
-  }, [alertHash])
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/')
 
@@ -52,21 +27,6 @@ export default function Header({ alertActive, alertMessage }: HeaderProps) {
   return (
     <>
       <LoadingScreen />
-
-      {/* Aankondigingsbanner */}
-      {alertActive && alertMessage && !alertDismissed && (
-        <div className="alert-banner">
-          <div className="container alert-container">
-            <div className="alert-text">
-              <svg style={{ width: 20, height: 20, flexShrink: 0 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
-              </svg>
-              <span>{alertMessage}</span>
-            </div>
-            <button className="alert-close" onClick={() => { localStorage.setItem('kriko_alert_dismissed', alertHash); setAlertDismissed(true) }} aria-label="Melding sluiten">&times;</button>
-          </div>
-        </div>
-      )}
 
       {/* Hoofdnavigatie */}
       <header className="site-header">
