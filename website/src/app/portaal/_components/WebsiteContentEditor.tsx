@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { TAKKEN, PORTAAL_TAKKEN, TAK_NAMEN, TAK_KLEUREN } from '@/lib/constants'
+import { PORTAAL_TAKKEN, TAK_NAMEN, TAK_KLEUREN } from '@/lib/constants'
 
 interface Leader { name: string; role: string }
 interface TakForm { email: string; whatsapp_url: string; leaders: Leader[] }

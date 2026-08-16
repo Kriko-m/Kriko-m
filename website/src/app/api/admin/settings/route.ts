@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
 import { requireGroepsleiding } from '@/lib/auth'
 import { revalidateTag } from 'next/cache'
-import { TAKKEN, PORTAAL_TAKKEN } from '@/lib/constants'
+import { PORTAAL_TAKKEN } from '@/lib/constants'
 import { normalizeSettings } from '@/lib/db'
 
 // Welke publieke tak-velden de website-content-editor mag aanpassen.

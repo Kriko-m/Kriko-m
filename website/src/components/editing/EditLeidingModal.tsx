@@ -285,7 +285,7 @@ export default function EditLeidingModal({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {leaders.length === 0 ? (
                 <div style={{ padding: 16, backgroundColor: '#FFF', borderRadius: 8, border: '1px dashed #C2D9C9', color: '#6A8A75', fontSize: '0.88rem', fontStyle: 'italic', textAlign: 'center' }}>
-                  Er zijn momenteel geen leidingsleden. Klik op '➕ Leider/Leidster Toevoegen' om iemand toe te voegen.
+                  Er zijn momenteel geen leidingsleden. Klik op &apos;➕ Leider/Leidster Toevoegen&apos; om iemand toe te voegen.
                 </div>
               ) : (
                 leaders.map((leader, index) => (
