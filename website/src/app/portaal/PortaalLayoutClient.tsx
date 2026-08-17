@@ -143,17 +143,23 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
           >
             {children}
             {isPending && (
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                backdropFilter: 'blur(6px)',
-                WebkitBackdropFilter: 'blur(6px)',
-                background: 'rgba(240, 236, 228, 0.35)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 50,
-              }}>
+              <div
+                className="portaal-loading-overlay"
+                style={{
+                  position: 'fixed',
+                  top: 76,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backdropFilter: 'blur(6px)',
+                  WebkitBackdropFilter: 'blur(6px)',
+                  background: 'rgba(240, 236, 228, 0.35)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 110,
+                }}
+              >
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/logo-finaal.png" alt="" aria-hidden="true" style={{ width: 64, height: 64, objectFit: 'contain', animation: 'portaal-pulse 1.5s infinite ease-in-out' }} />

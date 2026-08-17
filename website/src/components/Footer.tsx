@@ -23,7 +23,7 @@ export default function Footer({
           <span className="footer-brand-name">Kriko-M</span>
           <span className="footer-brand-sub">Scouts &mdash; Sint-Niklaas</span>
           <div className="footer-brand-divider"></div>
-          <span className="footer-brand-desc">Elke zondag op het VP-plein. Avontuur, vriendschap en buiten zijn — dat is wat we doen.</span>
+          <span className="footer-brand-desc">Elke zondag paraat op het VP-plein!</span>
           <span className="footer-social-label">Volg ons</span>
           <div className="footer-social">
             <a href="https://www.facebook.com/ScoutsKrikoM/" target="_blank" rel="noopener" aria-label="Facebook">

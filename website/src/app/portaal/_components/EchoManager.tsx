@@ -298,11 +298,8 @@ export default function EchoManager({ initialEchos }: Props) {
               takEchos.map(echo => {
                 const pdfUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/echos/${echo.file_name}`
                 return (
-                  <a
+                  <div
                     key={echo.id}
-                    href={pdfUrl}
-                    target="_blank"
-                    rel="noreferrer"
                     className="echo-pill-card"
                     style={{
                       display: 'flex',
@@ -312,16 +309,26 @@ export default function EchoManager({ initialEchos }: Props) {
                       background: '#FAFBF9',
                       border: '1.5px solid #E0E5E1',
                       borderRadius: 14,
-                      textDecoration: 'none',
                       color: '#1A3D2A',
-                      cursor: 'pointer',
                       transition: 'all 0.15s ease',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                    <a
+                      href={pdfUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        minWidth: 0,
+                        flex: 1,
+                        textDecoration: 'none',
+                        color: 'inherit',
+                      }}
+                    >
                       <i className="fa-solid fa-file-pdf" style={{ color: '#B23A4D', fontSize: '1.4rem', flexShrink: 0 }}></i>
                       <div style={{ minWidth: 0 }}>
-                        {/* Title: ONLY date (e.g. "Januari 2026") */}
                         <strong style={{ display: 'block', fontSize: '.95rem', fontWeight: 800, color: '#1A3D2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {MAANDEN[echo.month].charAt(0).toUpperCase() + MAANDEN[echo.month].slice(1)} {echo.year}
                         </strong>
@@ -329,16 +336,11 @@ export default function EchoManager({ initialEchos }: Props) {
                           Bekijk PDF ↗
                         </span>
                       </div>
-                    </div>
+                    </a>
 
-                    {/* Wis knop — stops click propagation to card link */}
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleDeleteEcho(echo.id)
-                      }}
+                      onClick={() => handleDeleteEcho(echo.id)}
                       style={{
                         padding: '6px 12px',
                         border: '1.5px solid #B23A4D',
@@ -350,13 +352,11 @@ export default function EchoManager({ initialEchos }: Props) {
                         cursor: 'pointer',
                         flexShrink: 0,
                         marginLeft: 8,
-                        position: 'relative',
-                        zIndex: 2,
                       }}
                     >
                       Wis
                     </button>
-                  </a>
+                  </div>
                 )
               })
             )}
