@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
-import { requireLeiding } from '@/lib/auth'
+import { requireLeiding, requireGroepsleiding } from '@/lib/auth'
 import { revalidateTag } from 'next/cache'
 
 export async function DELETE(
@@ -35,3 +35,34 @@ export async function DELETE(
     return NextResponse.json({ error: err instanceof Error ? err.message : 'Serverfout bij verwijderen' }, { status: 500 })
   }
 }
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const user = await requireGroepsleiding()
+    if (!user) return NextResponse.json({ error: 'Enkel groepsleiding mag echo\'s goedkeuren' }, { status: 403 })
+
+    const { id } = await params
+    const body = await req.json().catch(() => ({}))
+    const approved = typeof body.approved === 'boolean' ? body.approved : true
+
+    const admin = createAdminClient()
+    const { data, error } = await admin
+      .from('echos')
+      .update({ approved })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+
+    revalidateTag('echos', 'max')
+    return NextResponse.json(data)
+  } catch (err) {
+    console.error('Approve Echo error:', err)
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Serverfout bij goedkeuren' }, { status: 500 })
+  }
+}
+

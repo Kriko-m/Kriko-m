@@ -10,9 +10,10 @@ const TAKKEN = PORTAAL_TAKKEN.filter(t => t !== 'groepsleiding')
 
 interface Props {
   initialEchos: Echo[]
+  isGroepsleiding?: boolean
 }
 
-export default function EchoManager({ initialEchos }: Props) {
+export default function EchoManager({ initialEchos, isGroepsleiding = false }: Props) {
   const [activeTak, setActiveTak] = useState('kapoenen')
   const [echos, setEchos] = useState<Echo[]>(initialEchos)
   const [loading, setLoading] = useState(false)
@@ -25,7 +26,7 @@ export default function EchoManager({ initialEchos }: Props) {
 
   function showFlash(msg: string) {
     setFlash(msg)
-    setTimeout(() => setFlash(''), 3000)
+    setTimeout(() => setFlash(''), 4000)
   }
 
   const takEchos = echos
@@ -38,6 +39,15 @@ export default function EchoManager({ initialEchos }: Props) {
       if (aTime && bTime) return bTime.localeCompare(aTime)
       return 0
     })
+
+  const pendingEchos = takEchos.filter(e => !e.approved)
+  const approvedEchos = takEchos.filter(e => e.approved)
+
+  // Count pending echos per tak for badge indicators
+  const pendingCountByTak = echos.filter(e => !e.approved).reduce((acc, e) => {
+    acc[e.tak] = (acc[e.tak] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
 
   // KE warning: past the 20th and next month's echo not yet uploaded for this tak
   const echoWarnActive = (() => {
@@ -63,7 +73,7 @@ export default function EchoManager({ initialEchos }: Props) {
       return
     }
 
-    // Controleer of er al een Echo voor deze maand & jaar is geüpload voor deze tak (max 1 per maand)
+    // Controleer of er al een geüploade Echo voor deze maand & jaar is (max 1 per maand)
     const alreadyExists = takEchos.some(
       echo => echo.month === Number(month) && echo.year === Number(year)
     )
@@ -89,7 +99,7 @@ export default function EchoManager({ initialEchos }: Props) {
         setEchos(prev => [data, ...prev])
         formEl.reset()
         setEchoDroppedFile(null)
-        showFlash(`Echo geüpload voor ${TAK_NAMEN[activeTak]}!`)
+        showFlash(`Echo geüpload voor ${TAK_NAMEN[activeTak]}! Deze wacht nu op goedkeuring.`)
       } else {
         showFlash(data?.error || 'Fout bij het uploaden van de Echo.')
       }
@@ -98,6 +108,26 @@ export default function EchoManager({ initialEchos }: Props) {
       showFlash('Netwerkfout bij uploaden.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleApproveEcho(id: string) {
+    try {
+      const res = await fetch(`/api/admin/echos/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approved: true }),
+      })
+      const updated = await res.json()
+      if (res.ok && updated && !updated.error) {
+        setEchos(prev => prev.map(e => e.id === id ? { ...e, approved: true } : e))
+        showFlash('Echo goedgekeurd en gepubliceerd op de website!')
+      } else {
+        showFlash(updated?.error || 'Fout bij goedkeuren.')
+      }
+    } catch (err) {
+      console.error('Approve Echo error:', err)
+      showFlash('Netwerkfout bij goedkeuren.')
     }
   }
 
@@ -135,6 +165,8 @@ export default function EchoManager({ initialEchos }: Props) {
         {TAKKEN.map(tak => {
           const isActive = activeTak === tak
           const takColor = TAK_KLEUREN[tak] || '#1A3D2A'
+          const pendingCount = pendingCountByTak[tak] || 0
+
           return (
             <button
               key={tak}
@@ -157,9 +189,27 @@ export default function EchoManager({ initialEchos }: Props) {
                 fontFamily: 'inherit',
                 transition: 'all 0.15s ease',
                 boxShadow: isActive ? '0 6px 20px rgba(0,0,0,0.22)' : '0 3px 10px rgba(0,0,0,0.08)',
+                position: 'relative',
               }}
             >
               {TAK_NAMEN[tak] ?? tak}
+              {pendingCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: -8,
+                  right: -8,
+                  background: '#C9963A',
+                  color: '#fff',
+                  fontSize: '.74rem',
+                  fontWeight: 900,
+                  borderRadius: 10,
+                  padding: '2px 8px',
+                  border: '2px solid #fff',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
+                }}>
+                  {pendingCount}
+                </span>
+              )}
             </button>
           )
         })}
@@ -282,85 +332,225 @@ export default function EchoManager({ initialEchos }: Props) {
           </form>
         </div>
 
-        {/* Compact Right Side Column: Geüploade Echo's List */}
-        <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 22, padding: 24, boxShadow: '0 6px 24px rgba(0,0,0,0.04)' }}>
-          <h3 style={{ margin: '0 0 16px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>📚</span>
-            <span>Geüploade Echo&apos;s</span>
-          </h3>
+        {/* Compact Right Side Column: Te Goedkeuren & Goedgekeurde Echo's */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          
+          {/* Sectie 1: Nog goed te keuren Echo's */}
+          <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 22, padding: 24, boxShadow: '0 6px 24px rgba(0,0,0,0.04)', borderTop: '6px solid #C9963A' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>⏳</span>
+              <span>Nog goed te keuren</span>
+              {pendingEchos.length > 0 && (
+                <span style={{ background: '#C9963A', color: '#fff', fontSize: '.75rem', fontWeight: 800, padding: '2px 8px', borderRadius: 12, marginLeft: 'auto' }}>
+                  {pendingEchos.length}
+                </span>
+              )}
+            </h3>
+            <p style={{ margin: '0 0 16px', fontSize: '.82rem', color: '#4A6855', fontWeight: 600 }}>
+              {isGroepsleiding ? 'Geüploade Echo\'s die wachten op jouw goedkeuring.' : 'Echo\'s in afwachting van goedkeuring door groepsleiding.'}
+            </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {takEchos.length === 0 ? (
-              <div style={{ padding: '24px 16px', background: '#FAFBF9', border: '1.5px solid #E0E5E1', borderRadius: 12, textAlign: 'center', color: '#6A8A75', fontSize: '.88rem' }}>
-                Nog geen Echo&apos;s geüpload voor deze tak.
-              </div>
-            ) : (
-              takEchos.map(echo => {
-                const pdfUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/echos/${echo.file_name}`
-                return (
-                  <div
-                    key={echo.id}
-                    className="echo-pill-card"
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '14px 16px',
-                      background: '#FAFBF9',
-                      border: '1.5px solid #E0E5E1',
-                      borderRadius: 14,
-                      color: '#1A3D2A',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <a
-                      href={pdfUrl}
-                      target="_blank"
-                      rel="noreferrer"
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {pendingEchos.length === 0 ? (
+                <div style={{ padding: '20px 16px', background: '#FAFBF9', border: '1.5px dashed #D0D9D3', borderRadius: 14, textAlign: 'center', color: '#6A8A75', fontSize: '.88rem' }}>
+                  Geen te goedkeuren Echo&apos;s voor deze tak.
+                </div>
+              ) : (
+                pendingEchos.map(echo => {
+                  const pdfUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/echos/${echo.file_name}`
+                  return (
+                    <div
+                      key={echo.id}
+                      style={{
+                        padding: '14px 16px',
+                        background: '#FFFDF9',
+                        border: '1.5px solid #E6D7B8',
+                        borderRadius: 14,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 10,
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <a
+                          href={pdfUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, textDecoration: 'none', color: 'inherit' }}
+                        >
+                          <i className="fa-solid fa-file-pdf" style={{ color: '#B23A4D', fontSize: '1.4rem', flexShrink: 0 }}></i>
+                          <div style={{ minWidth: 0 }}>
+                            <strong style={{ display: 'block', fontSize: '.95rem', fontWeight: 800, color: '#1A3D2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {MAANDEN[echo.month].charAt(0).toUpperCase() + MAANDEN[echo.month].slice(1)} {echo.year}
+                            </strong>
+                            <span style={{ fontSize: '.76rem', color: '#C9963A', fontWeight: 700 }}>
+                              Bekijk PDF ↗
+                            </span>
+                          </div>
+                        </a>
+                      </div>
+
+                      {/* Control buttons for groepsleiding or status badge for leiding */}
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end', paddingTop: 8, borderTop: '1px dashed #E6D7B8' }}>
+                        {isGroepsleiding ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteEcho(echo.id)}
+                              title="Afkeuren en verwijderen"
+                              style={{
+                                padding: '6px 12px',
+                                border: '1.5px solid #B23A4D',
+                                borderRadius: 8,
+                                background: '#FFF',
+                                color: '#B23A4D',
+                                fontSize: '.8rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 4,
+                              }}
+                            >
+                              ✕ Afkeuren
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleApproveEcho(echo.id)}
+                              title="Goedkeuren en op website publiceren"
+                              style={{
+                                padding: '6px 14px',
+                                border: 'none',
+                                borderRadius: 8,
+                                background: '#1A3D2A',
+                                color: '#FFF',
+                                fontSize: '.8rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 4,
+                                boxShadow: '0 2px 6px rgba(26,61,42,0.2)',
+                              }}
+                            >
+                              ✓ Goedkeuren
+                            </button>
+                          </>
+                        ) : (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                            <span style={{ fontSize: '.78rem', color: '#856404', background: '#FFF3CD', padding: '4px 10px', borderRadius: 8, fontWeight: 700 }}>
+                              ⏳ Wacht op goedkeuring
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteEcho(echo.id)}
+                              style={{
+                                padding: '4px 8px',
+                                border: '1px solid #B23A4D',
+                                borderRadius: 6,
+                                background: '#fff',
+                                color: '#B23A4D',
+                                fontSize: '.74rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Annuleren
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Sectie 2: Goedgekeurde Echo's (op website) */}
+          <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 22, padding: 24, boxShadow: '0 6px 24px rgba(0,0,0,0.04)', borderTop: '6px solid #1A3D2A' }}>
+            <h3 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>📚</span>
+              <span>Goedgekeurde Echo&apos;s</span>
+            </h3>
+            <p style={{ margin: '0 0 16px', fontSize: '.82rem', color: '#4A6855', fontWeight: 600 }}>
+              Zichtbaar op de officiële website.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {approvedEchos.length === 0 ? (
+                <div style={{ padding: '24px 16px', background: '#FAFBF9', border: '1.5px solid #E0E5E1', borderRadius: 12, textAlign: 'center', color: '#6A8A75', fontSize: '.88rem' }}>
+                  Nog geen goedgekeurde Echo&apos;s beschikbaar.
+                </div>
+              ) : (
+                approvedEchos.map(echo => {
+                  const pdfUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/echos/${echo.file_name}`
+                  return (
+                    <div
+                      key={echo.id}
+                      className="echo-pill-card"
                       style={{
                         display: 'flex',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        gap: 10,
-                        minWidth: 0,
-                        flex: 1,
-                        textDecoration: 'none',
-                        color: 'inherit',
+                        padding: '14px 16px',
+                        background: '#FAFBF9',
+                        border: '1.5px solid #E0E5E1',
+                        borderRadius: 14,
+                        color: '#1A3D2A',
+                        transition: 'all 0.15s ease',
                       }}
                     >
-                      <i className="fa-solid fa-file-pdf" style={{ color: '#B23A4D', fontSize: '1.4rem', flexShrink: 0 }}></i>
-                      <div style={{ minWidth: 0 }}>
-                        <strong style={{ display: 'block', fontSize: '.95rem', fontWeight: 800, color: '#1A3D2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {MAANDEN[echo.month].charAt(0).toUpperCase() + MAANDEN[echo.month].slice(1)} {echo.year}
-                        </strong>
-                        <span style={{ fontSize: '.78rem', color: '#C9963A', fontWeight: 700 }}>
-                          Bekijk PDF ↗
-                        </span>
-                      </div>
-                    </a>
+                      <a
+                        href={pdfUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          minWidth: 0,
+                          flex: 1,
+                          textDecoration: 'none',
+                          color: 'inherit',
+                        }}
+                      >
+                        <i className="fa-solid fa-file-pdf" style={{ color: '#B23A4D', fontSize: '1.4rem', flexShrink: 0 }}></i>
+                        <div style={{ minWidth: 0 }}>
+                          <strong style={{ display: 'block', fontSize: '.95rem', fontWeight: 800, color: '#1A3D2A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {MAANDEN[echo.month].charAt(0).toUpperCase() + MAANDEN[echo.month].slice(1)} {echo.year}
+                          </strong>
+                          <span style={{ fontSize: '.78rem', color: '#1A3D2A', opacity: 0.8, fontWeight: 700 }}>
+                            Bekijk PDF ↗
+                          </span>
+                        </div>
+                      </a>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteEcho(echo.id)}
-                      style={{
-                        padding: '6px 12px',
-                        border: '1.5px solid #B23A4D',
-                        borderRadius: 8,
-                        background: '#fff',
-                        color: '#B23A4D',
-                        fontSize: '.78rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        flexShrink: 0,
-                        marginLeft: 8,
-                      }}
-                    >
-                      Wis
-                    </button>
-                  </div>
-                )
-              })
-            )}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteEcho(echo.id)}
+                        style={{
+                          padding: '6px 12px',
+                          border: '1.5px solid #B23A4D',
+                          borderRadius: 8,
+                          background: '#fff',
+                          color: '#B23A4D',
+                          fontSize: '.78rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          flexShrink: 0,
+                          marginLeft: 8,
+                        }}
+                      >
+                        Wis
+                      </button>
+                    </div>
+                  )
+                })
+              )}
+            </div>
           </div>
+
         </div>
 
       </div>

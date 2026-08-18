@@ -261,7 +261,7 @@ export async function POST(req: NextRequest) {
           year: Number(echoYear),
           tak: echoTak,
           file_name: filename,
-          approved: true,
+          approved: false,
           werkjaar: await getActiveWerkjaar(),
         })
         .select()

@@ -17,6 +17,8 @@ export default async function EchosPortaalPage() {
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
   if (!isLeiding) redirect('/portaal')
 
+  const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
+
   const admin = createAdminClient()
   const { data: echosData } = await admin
     .from('echos')
@@ -26,5 +28,5 @@ export default async function EchosPortaalPage() {
 
   const echos = (echosData ?? []) as Echo[]
 
-  return <EchoManager initialEchos={echos} />
+  return <EchoManager initialEchos={echos} isGroepsleiding={isGroepsleiding} />
 }
