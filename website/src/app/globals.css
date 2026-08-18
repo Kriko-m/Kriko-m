@@ -1346,14 +1346,15 @@ body.portal-theme .tak-hero.primair {
 .shop-cart-dock {
     --cart-w: 340px;
     position: fixed;
-    top: 96px;
+    top: 50%;
     right: 0;
     z-index: 130;
     display: flex;
     align-items: center;
+    transform: translateY(-50%);
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.shop-cart-dock.collapsed { transform: translateX(var(--cart-w)); }
+.shop-cart-dock.collapsed { transform: translate(var(--cart-w), -50%); }
 
 /* Verticaal tab-handvat dat altijd aan de rand zichtbaar blijft */
 .shop-cart-tab {
@@ -1398,6 +1399,7 @@ body.portal-theme .tak-hero.primair {
 /* Het schuifpaneel met de mandje-inhoud */
 .shop-cart-panel {
     width: var(--cart-w);
+    height: 520px;
     max-height: calc(100vh - 120px);
     background: var(--color-bg-white);
     border: 1px solid var(--color-border);
