@@ -100,17 +100,17 @@ export default function CheckoutForm() {
             {/* Betalings- en afhaalinfo */}
             <div style={{ background: 'var(--color-bg-linen)', borderRadius: 'var(--border-radius-md)', padding: '20px', border: '1px solid var(--color-border)', margin: '24px 0 28px' }}>
               <strong style={{ display: 'block', color: 'var(--color-primary-dark)', fontSize: '1rem', marginBottom: 8 }}>
-                💳 Betaling &amp; Ophalen bij Katrien
+                💳 Betaling &amp; Ophalen
               </strong>
               <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.88rem', color: 'var(--color-text-dark)', lineHeight: 1.6 }}>
                 <li>
-                  <strong>Optie 1: Handmatige overschrijving</strong> — Je ontvangt een IBAN en unieke gestructureerde mededeling.
+                  <strong>Optie 1: Handmatige overschrijving</strong> — Je ontvangt een IBAN en duidelijke mededeling.
                 </li>
                 <li>
                   <strong>Optie 2: Cash / contant</strong> — Je kan contant betalen bij het ophalen.
                 </li>
                 <li style={{ marginTop: 4 }}>
-                  Uniformverantwoordelijke <strong>Katrien</strong> ontvangt direct een mail van jouw bestelling en neemt zelf contact op om de afhaling af te spreken!
+                  De uniformverantwoordelijke ontvangt direct een mail van jouw bestelling en neemt zelf contact op om de afhaling af te spreken!
                 </li>
               </ul>
             </div>

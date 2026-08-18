@@ -114,7 +114,7 @@ export default function BevestigingPage() {
               📦 Ophalen van je bestelling
             </h3>
             <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
-              Uniformouder <strong>Katrien</strong> communiceert zelf per e-mail (via <a href={`mailto:${katrienEmail}`} style={{ color: 'var(--color-primary)', fontWeight: 800, textDecoration: 'underline' }}>{katrienEmail}</a>) wanneer en waar je je bestelling kan komen ophalen!
+              De uniformverantwoordelijke communiceert zelf per e-mail (via <a href={`mailto:${katrienEmail}`} style={{ color: 'var(--color-primary)', fontWeight: 800, textDecoration: 'underline' }}>{katrienEmail}</a>) wanneer en waar je je bestelling kan komen ophalen!
             </p>
           </div>
 

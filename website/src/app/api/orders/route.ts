@@ -3,13 +3,9 @@ import { createAdminClient } from '@/lib/supabase'
 import { Product, OrderItem } from '@/lib/types'
 import { sendOrderConfirmation, sendKatrienNotification } from '@/lib/email'
 
-// Belgische gestructureerde mededeling (Modulo 97)
+// Eenvoudige mededeling op basis van bestelnummer (bijv. WEB-0001)
 function generateCommunication(orderNumber: number): string {
-  const first10 = String(orderNumber % 10_000_000_000).padStart(10, '0')
-  const modulo = parseInt(first10, 10) % 97
-  const check = modulo === 0 ? 97 : modulo
-  const full12 = first10 + String(check).padStart(2, '0')
-  return `+++${full12.slice(0, 3)}/${full12.slice(3, 7)}/${full12.slice(7)}+++`
+  return `WEB-${String(orderNumber).padStart(4, '0')}`
 }
 
 export async function POST(req: NextRequest) {

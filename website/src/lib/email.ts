@@ -2,10 +2,8 @@ import { Resend } from 'resend'
 import { OrderItem } from '@/lib/types'
 
 // Resend-client. Wordt alleen server-side gebruikt (API routes).
-// RESEND_API_KEY moet gezet zijn; RESEND_FROM moet een geverifieerd
-// afzenderdomein zijn (zie Resend-dashboard → Domains).
+// RESEND_API_KEY moet gezet zijn; RESEND_FROM moet een geverifieerd afzenderdomein zijn.
 const FROM = process.env.RESEND_FROM || 'Scouts Kriko-M <bestellingen@kriko-m.be>'
-// Optioneel: stuur een kopie naar het groepsadres (komma-gescheiden mogelijk).
 const BCC = process.env.RESEND_BCC || ''
 
 function getClient(): Resend | null {
@@ -74,11 +72,11 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
         <div style="background:#EEF5F1;border:1px solid #C2D9C9;border-radius:10px;padding:16px 18px;margin-top:16px;">
           <h2 style="margin:0 0 8px;font-size:15px;color:#1A3D2A;">Betaling Cash bij Afhaling (Optie 2)</h2>
           <p style="margin:0;font-size:13px;color:#2b2b2b;line-height:1.4;">
-            Je kan ook contant/cash betalen zodra je je bestelling komt ophalen bij Katrien (uniformouder).
+            Je kan ook contant/cash betalen zodra je je bestelling komt ophalen bij de uniformverantwoordelijke.
           </p>
         </div>
 
-        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">Uniformverantwoordelijke Katrien neemt zelf contact met je op om af te spreken wanneer de bestelling opgehaald kan worden!</p>
+        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">De uniformverantwoordelijke neemt zelf contact met je op om af te spreken wanneer de bestelling opgehaald kan worden!</p>
         <p style="margin:16px 0 0;font-size:13px;color:#888;">Stevige linkerhand,<br/>Scouts Kriko-M</p>
       </div>
     </div>
@@ -101,7 +99,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     `   Mededeling: ${communication}`,
     `2. Cash bij afhaling aan de lokalen.`,
     ``,
-    `Uniformverantwoordelijke Katrien neemt zelf contact op voor de afhaling.`,
+    `De uniformverantwoordelijke neemt zelf contact op voor de afhaling.`,
     `Stevige linkerhand, Scouts Kriko-M`,
   ].join('\n')
 
@@ -109,7 +107,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     from: FROM,
     to,
     ...(BCC ? { bcc: BCC.split(',').map((s) => s.trim()).filter(Boolean) } : {}),
-    subject: `Bestelling ${orderRef} — Scouts Kriko-M`,
+    subject: `Uniformen Kriko-m - ${orderRef} - ${customerName}`,
     html,
     text,
   })
@@ -130,11 +128,11 @@ interface KatrienNotificationParams {
 export async function sendKatrienNotification(params: KatrienNotificationParams) {
   const resend = getClient()
   if (!resend) {
-    console.warn('RESEND_API_KEY ontbreekt; notificatiemail naar Katrien niet verstuurd.')
+    console.warn('RESEND_API_KEY ontbreekt; notificatiemail niet verstuurd.')
     return
   }
 
-  const { to, orderRef, customerName, email, items, total, communication } = params
+  const { to, orderRef, customerName, email, items, total } = params
 
   const itemRows = items
     .map(
@@ -155,7 +153,7 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
         <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
-          Beste Katrien,<br/><br/>
+          Beste uniformverantwoordelijke,<br/><br/>
           Er is zojuist een nieuwe bestelling geplaatst via de webshop van Scouts Kriko-M!
         </p>
 
@@ -164,7 +162,6 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
           <table style="width:100%;border-collapse:collapse;font-size:14px;">
             <tr><td style="padding:4px 0;color:#666;width:140px;">Naam koper:</td><td style="padding:4px 0;font-weight:bold;">${esc(customerName)}</td></tr>
             <tr><td style="padding:4px 0;color:#666;">E-mailadres:</td><td style="padding:4px 0;"><a href="mailto:${esc(email)}" style="color:#650B19;font-weight:bold;">${esc(email)}</a></td></tr>
-            <tr><td style="padding:4px 0;color:#666;">Gestruct. Mededeling:</td><td style="padding:4px 0;font-family:monospace;font-weight:bold;color:#650B19;">${esc(communication)}</td></tr>
             <tr><td style="padding:4px 0;color:#666;">Totaalbedrag:</td><td style="padding:4px 0;font-weight:bold;font-size:16px;color:#1A3D2A;">${euro(total)}</td></tr>
           </table>
         </div>
@@ -200,7 +197,6 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
     ``,
     `Naam koper: ${customerName}`,
     `E-mailadres: ${email}`,
-    `Gestructureerde Mededeling: ${communication}`,
     `Totaalbedrag: ${euro(total)}`,
     ``,
     `Bestelde artikelen:`,
@@ -212,7 +208,7 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `Nieuwe bestelling ${orderRef} — ${customerName}`,
+    subject: `Uniformen Kriko-m - ${orderRef} - ${customerName}`,
     html,
     text,
   })
