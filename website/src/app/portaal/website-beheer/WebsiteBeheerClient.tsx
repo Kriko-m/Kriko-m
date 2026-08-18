@@ -39,6 +39,9 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
   const [homeSubtitleGroepsleiding, setHomeSubtitleGroepsleiding] = useState<string>(
     initialSettings?.home_subtitle_groepsleiding || initialSettings?.home_subtitle || ''
   )
+  const [webshopEmail, setWebshopEmail] = useState<string>(
+    initialSettings?.webshop_email || 'vicverhaegen4@gmail.com'
+  )
 
   // Achtergronden per pagina
   const [pageBgs, setPageBgs] = useState<Record<PageKey, { type: 'photo' | 'color'; value: string }>>({
@@ -116,6 +119,7 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
         home_subtitle_leiding: homeSubtitleLeiding,
         home_title_groepsleiding: homeTitleGroepsleiding,
         home_subtitle_groepsleiding: homeSubtitleGroepsleiding,
+        webshop_email: webshopEmail,
         home_bg_type: pageBgs.home.type,
         home_bg_value: pageBgs.home.value,
         echos_bg_type: pageBgs.echos.type,
@@ -405,7 +409,29 @@ export default function WebsiteBeheerClient({ initialSettings }: Props) {
                 )}
               </div>
 
-              {/* SECTIE 2: ACHTERGROND PER PAGINA */}
+              {/* SECTIE 2: WEBSHOP NOTIFICATIE E-MAIL (KATRIEN) */}
+              <div style={{ backgroundColor: '#F8FAF8', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0' }}>
+                <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A' }}>
+                  🛍️ Webshop Bestelnotificaties (E-mailadres Katrien / Uniformouder)
+                </h4>
+                <p style={{ margin: '0 0 12px', fontSize: '0.84rem', color: '#6A8A75' }}>
+                  Bij elke webshop-bestelling ontvangt dit e-mailadres automatisch een overzicht met de bestelde artikelen en de kopergegevens.
+                </p>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                    E-mailadres voor Notificaties
+                  </label>
+                  <input
+                    type="email"
+                    value={webshopEmail}
+                    onChange={e => setWebshopEmail(e.target.value)}
+                    placeholder="vicverhaegen4@gmail.com"
+                    style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', background: '#fff', fontWeight: 700, color: '#1A3D2A' }}
+                  />
+                </div>
+              </div>
+
+              {/* SECTIE 3: ACHTERGROND PER PAGINA */}
               <div style={{ backgroundColor: '#FAFCFA', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0' }}>
                 <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A' }}>
                   🖼️ Achtergrond Per Pagina

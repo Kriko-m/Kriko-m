@@ -21,6 +21,7 @@ export interface Settings {
   bank_bic: string
   bank_holder: string
   contact_email: string
+  webshop_email?: string
   contact_phone: string
   contact_address: string
   alert_message: string

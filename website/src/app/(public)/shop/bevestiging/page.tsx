@@ -9,6 +9,7 @@ interface OrderData {
   items: Array<{ name: string; size: string; quantity: number; price: number }>
   bank_iban: string
   bank_holder: string
+  webshop_email?: string
 }
 
 export default function BevestigingPage() {
@@ -35,6 +36,8 @@ export default function BevestigingPage() {
     )
   }
 
+  const katrienEmail = order.webshop_email || 'vicverhaegen4@gmail.com'
+
   return (
     <>
       <section className="tak-hero primair hero-checkout">
@@ -48,43 +51,71 @@ export default function BevestigingPage() {
 
           {/* Bevestigingsbadge */}
           <div style={{ background: 'hsl(145,63%,95%)', border: '2px solid hsl(145,63%,70%)', borderRadius: 'var(--border-radius-lg)', padding: '24px 28px' }}>
-            <strong style={{ display: 'block', color: 'hsl(145,63%,25%)', fontSize: '1.1rem', marginBottom: 4 }}>
+            <strong style={{ display: 'block', color: 'hsl(145,63%,25%)', fontSize: '1.15rem', marginBottom: 6 }}>
               ✓ Bestelling ontvangen — {order.order_ref}
             </strong>
-            <span style={{ color: 'hsl(145,63%,30%)', fontSize: '0.95rem' }}>
-              Je bestelling is geregistreerd. Voltooi de betaling via overschrijving met de gegevens hieronder.
+            <span style={{ color: 'hsl(145,63%,30%)', fontSize: '0.95rem', lineHeight: 1.5, display: 'block' }}>
+              Je bestelling is succesvol geregistreerd. Katrien (uniformouder) ontvangt hiervan direct bericht.
             </span>
           </div>
 
-          {/* Overschrijvingsgegevens */}
+          {/* Betalingsopties */}
           <div className="checkout-card" style={{ background: 'var(--color-bg-white)' }}>
-            <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 20, paddingBottom: 12, borderBottom: '2px solid var(--color-bg-linen)' }}>
-              💳 Overschrijvingsgegevens
+            <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 18, paddingBottom: 12, borderBottom: '2px solid var(--color-bg-linen)' }}>
+              💳 Betalingsinformatie
             </h3>
-            <div style={{ display: 'grid', gap: 14 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>Begunstigde:</span>
-                <span>{order.bank_holder}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>IBAN:</span>
-                <code style={{ fontFamily: 'monospace', letterSpacing: '0.05em' }}>{order.bank_iban}</code>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>Bedrag:</span>
-                <strong style={{ color: 'var(--color-secondary)', fontSize: '1.1rem' }}>
-                  €{order.total.toFixed(2).replace('.', ',')}
+
+            <div style={{ display: 'grid', gap: 16 }}>
+
+              {/* Overschrijving */}
+              <div style={{ background: 'var(--color-bg-linen)', padding: '16px 20px', borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
+                <strong style={{ color: 'var(--color-primary-dark)', fontSize: '1rem', display: 'block', marginBottom: 10 }}>
+                  Optie 1: Handmatige Bankoverschrijving
                 </strong>
+                <div style={{ display: 'grid', gap: 10, fontSize: '0.9rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                    <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>Begunstigde:</span>
+                    <span>{order.bank_holder}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                    <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>IBAN:</span>
+                    <code style={{ fontFamily: 'monospace', letterSpacing: '0.05em', fontWeight: 'bold' }}>{order.bank_iban}</code>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                    <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>Bedrag:</span>
+                    <strong style={{ color: 'var(--color-secondary)', fontSize: '1.05rem' }}>
+                      €{order.total.toFixed(2).replace('.', ',')}
+                    </strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, background: '#fff', padding: '10px 14px', borderRadius: 8, border: '1px solid #CBD5E1', marginTop: 4 }}>
+                    <span style={{ fontWeight: 600, color: 'var(--color-text-dark)' }}>Gestructureerde mededeling:</span>
+                    <code style={{ fontWeight: 'bold', color: 'var(--color-primary-dark)', fontSize: '1.1rem', letterSpacing: '0.05em' }}>
+                      {order.communication}
+                    </code>
+                  </div>
+                </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8, background: 'var(--color-bg-linen)', padding: '14px 18px', borderRadius: 'var(--border-radius-md)' }}>
-                <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>Gestructureerde mededeling:</span>
-                <code style={{ fontWeight: 'bold', color: 'var(--color-primary-dark)', fontSize: '1.15rem', letterSpacing: '0.05em' }}>
-                  {order.communication}
-                </code>
+
+              {/* Cash bij afhaling */}
+              <div style={{ background: '#EEF5F1', padding: '16px 20px', borderRadius: 'var(--border-radius-md)', border: '1.5px solid #C2D9C9' }}>
+                <strong style={{ color: '#1A3D2A', fontSize: '1rem', display: 'block', marginBottom: 4 }}>
+                  Optie 2: Contant / Cash bij afhaling
+                </strong>
+                <p style={{ margin: 0, fontSize: '0.88rem', color: '#1A3D2A', lineHeight: 1.4 }}>
+                  Liever cash betalen? Dat kan eenvoudig bij het ophalen van je bestelling aan de lokalen.
+                </p>
               </div>
+
             </div>
-            <p style={{ marginTop: 16, fontSize: '0.85rem', color: 'var(--color-text-muted)', background: 'hsla(4,75%,48%,0.08)', padding: '10px 14px', borderRadius: 8 }}>
-              ⚠ Vermeld de gestructureerde mededeling exact zoals hierboven, anders kan de leiding je betaling niet automatisch verwerken.
+          </div>
+
+          {/* Ophalen bij Katrien */}
+          <div className="checkout-card" style={{ background: 'var(--color-bg-white)' }}>
+            <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid var(--color-bg-linen)' }}>
+              📦 Ophalen van je bestelling
+            </h3>
+            <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
+              Uniformouder <strong>Katrien</strong> communiceert zelf per e-mail (via <a href={`mailto:${katrienEmail}`} style={{ color: 'var(--color-secondary)', fontWeight: 700 }}>{katrienEmail}</a>) wanneer en waar je je bestelling kan komen ophalen!
             </p>
           </div>
 
@@ -109,14 +140,6 @@ export default function BevestigingPage() {
               <span>€{order.total.toFixed(2).replace('.', ',')}</span>
             </div>
           </div>
-
-          <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
-            Zodra we de betaling ontvangen, ligt de bestelling de <strong>eerstvolgende zondag</strong> na de meeting klaar aan de lokalen!
-          </p>
-
-          <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.9rem' }} className="no-print">
-            Je ontvangt deze gegevens ook per e-mail. Bewaar de gestructureerde mededeling goed.
-          </p>
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }} className="no-print">
             <button onClick={() => window.print()} className="btn btn-secondary">

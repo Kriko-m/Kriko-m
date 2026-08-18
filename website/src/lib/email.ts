@@ -22,7 +22,6 @@ interface OrderConfirmationParams {
   to: string
   orderRef: string
   customerName: string
-  childName: string
   items: OrderItem[]
   total: number
   communication: string
@@ -33,12 +32,11 @@ interface OrderConfirmationParams {
 export async function sendOrderConfirmation(params: OrderConfirmationParams) {
   const resend = getClient()
   if (!resend) {
-    // Geen API-key geconfigureerd — sla over in plaats van te crashen.
     console.warn('RESEND_API_KEY ontbreekt; bevestigingsmail niet verstuurd.')
     return
   }
 
-  const { to, orderRef, customerName, childName, items, total, communication, bankIban, bankHolder } = params
+  const { to, orderRef, customerName, items, total, communication, bankIban, bankHolder } = params
 
   const itemRows = items
     .map(
@@ -57,14 +55,14 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;">
         <p style="margin:0 0 16px;">Hallo ${esc(customerName)},</p>
-        <p style="margin:0 0 20px;line-height:1.5;">We hebben je bestelling voor <strong>${esc(childName)}</strong> goed ontvangen. Voltooi de betaling via overschrijving met onderstaande gegevens. Vermeld de gestructureerde mededeling <strong>exact</strong>, anders kunnen we je betaling niet automatisch verwerken.</p>
+        <p style="margin:0 0 20px;line-height:1.5;">We hebben je bestelling goed ontvangen. Je kan betalen via <strong>handmatige overschrijving</strong> met onderstaande gegevens, of <strong>contant/cash bij afhaling</strong> aan de lokalen.</p>
 
         <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">${itemRows}
           <tr><td style="padding:10px 0 0;font-weight:bold;">Totaal</td><td style="padding:10px 0 0;text-align:right;font-weight:bold;">${euro(total)}</td></tr>
         </table>
 
         <div style="background:#F0ECE4;border-radius:10px;padding:16px 18px;">
-          <h2 style="margin:0 0 12px;font-size:15px;color:#650B19;">Overschrijvingsgegevens</h2>
+          <h2 style="margin:0 0 12px;font-size:15px;color:#650B19;">Betaling via Overschrijving (Optie 1)</h2>
           <table style="width:100%;border-collapse:collapse;font-size:14px;">
             <tr><td style="padding:3px 0;color:#666;">Begunstigde</td><td style="padding:3px 0;text-align:right;">${esc(bankHolder)}</td></tr>
             <tr><td style="padding:3px 0;color:#666;">IBAN</td><td style="padding:3px 0;text-align:right;font-family:monospace;">${esc(bankIban)}</td></tr>
@@ -73,7 +71,14 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
           </table>
         </div>
 
-        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">Zodra we de betaling ontvangen, ligt je bestelling de eerstvolgende zondag na de vergadering klaar aan de lokalen.</p>
+        <div style="background:#EEF5F1;border:1px solid #C2D9C9;border-radius:10px;padding:16px 18px;margin-top:16px;">
+          <h2 style="margin:0 0 8px;font-size:15px;color:#1A3D2A;">Betaling Cash bij Afhaling (Optie 2)</h2>
+          <p style="margin:0;font-size:13px;color:#2b2b2b;line-height:1.4;">
+            Je kan ook contant/cash betalen zodra je je bestelling komt ophalen bij Katrien (uniformouder).
+          </p>
+        </div>
+
+        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">Uniformverantwoordelijke Katrien neemt zelf contact met je op om af te spreken wanneer de bestelling opgehaald kan worden!</p>
         <p style="margin:16px 0 0;font-size:13px;color:#888;">Stevige linkerhand,<br/>Scouts Kriko-M</p>
       </div>
     </div>
@@ -83,18 +88,20 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     `Bedankt voor je bestelling! (${orderRef})`,
     ``,
     `Hallo ${customerName},`,
-    `We hebben je bestelling voor ${childName} goed ontvangen.`,
+    `We hebben je bestelling goed ontvangen.`,
     ``,
     ...items.map((i) => `- ${i.quantity}x ${i.name} (${i.size}): ${euro(i.price * i.quantity)}`),
     `Totaal: ${euro(total)}`,
     ``,
-    `Overschrijvingsgegevens:`,
-    `  Begunstigde: ${bankHolder}`,
-    `  IBAN: ${bankIban}`,
-    `  Bedrag: ${euro(total)}`,
-    `  Mededeling: ${communication} (exact vermelden!)`,
+    `Betalingsmogelijkheden:`,
+    `1. Handmatige overschrijving:`,
+    `   Begunstigde: ${bankHolder}`,
+    `   IBAN: ${bankIban}`,
+    `   Bedrag: ${euro(total)}`,
+    `   Mededeling: ${communication}`,
+    `2. Cash bij afhaling aan de lokalen.`,
     ``,
-    `Zodra we de betaling ontvangen, ligt je bestelling de eerstvolgende zondag klaar aan de lokalen.`,
+    `Uniformverantwoordelijke Katrien neemt zelf contact op voor de afhaling.`,
     `Stevige linkerhand, Scouts Kriko-M`,
   ].join('\n')
 
@@ -103,6 +110,109 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     to,
     ...(BCC ? { bcc: BCC.split(',').map((s) => s.trim()).filter(Boolean) } : {}),
     subject: `Bestelling ${orderRef} — Scouts Kriko-M`,
+    html,
+    text,
+  })
+}
+
+interface KatrienNotificationParams {
+  to: string
+  orderRef: string
+  customerName: string
+  email: string
+  items: OrderItem[]
+  total: number
+  communication: string
+  bankIban: string
+  bankHolder: string
+}
+
+export async function sendKatrienNotification(params: KatrienNotificationParams) {
+  const resend = getClient()
+  if (!resend) {
+    console.warn('RESEND_API_KEY ontbreekt; notificatiemail naar Katrien niet verstuurd.')
+    return
+  }
+
+  const { to, orderRef, customerName, email, items, total, communication } = params
+
+  const itemRows = items
+    .map(
+      (i) => `<tr>
+        <td style="padding:8px;border-bottom:1px solid #eee;"><strong>${i.quantity}×</strong> ${esc(i.name)}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;">${esc(i.size)}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">${euro(i.price)}</td>
+        <td style="padding:8px;border-bottom:1px solid #eee;text-align:right;font-weight:bold;">${euro(i.price * i.quantity)}</td>
+      </tr>`
+    )
+    .join('')
+
+  const html = `<!doctype html><html><body style="margin:0;background:#F0ECE4;font-family:Arial,Helvetica,sans-serif;color:#2b2b2b;">
+    <div style="max-width:600px;margin:0 auto;padding:24px;">
+      <div style="background:#650B19;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;">
+        <h1 style="margin:0;font-size:20px;">🛍️ Nieuwe Webshop Bestelling</h1>
+        <p style="margin:6px 0 0;opacity:.9;font-size:14px;">Bestelnummer: <strong>${esc(orderRef)}</strong></p>
+      </div>
+      <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
+          Beste Katrien,<br/><br/>
+          Er is zojuist een nieuwe bestelling geplaatst via de webshop van Scouts Kriko-M!
+        </p>
+
+        <div style="background:#F0ECE4;border-radius:10px;padding:16px 18px;margin-bottom:20px;">
+          <h3 style="margin:0 0 10px;font-size:15px;color:#650B19;">👤 Gegevens Koper</h3>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;">
+            <tr><td style="padding:4px 0;color:#666;width:140px;">Naam koper:</td><td style="padding:4px 0;font-weight:bold;">${esc(customerName)}</td></tr>
+            <tr><td style="padding:4px 0;color:#666;">E-mailadres:</td><td style="padding:4px 0;"><a href="mailto:${esc(email)}" style="color:#650B19;font-weight:bold;">${esc(email)}</a></td></tr>
+            <tr><td style="padding:4px 0;color:#666;">Gestruct. Mededeling:</td><td style="padding:4px 0;font-family:monospace;font-weight:bold;color:#650B19;">${esc(communication)}</td></tr>
+            <tr><td style="padding:4px 0;color:#666;">Totaalbedrag:</td><td style="padding:4px 0;font-weight:bold;font-size:16px;color:#1A3D2A;">${euro(total)}</td></tr>
+          </table>
+        </div>
+
+        <h3 style="margin:0 0 12px;font-size:15px;color:#650B19;">📦 Bestelde Artikelen</h3>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:20px;">
+          <thead>
+            <tr style="background:#f8f9fa;text-align:left;">
+              <th style="padding:8px;border-bottom:2px solid #ddd;">Artikel</th>
+              <th style="padding:8px;border-bottom:2px solid #ddd;">Maat</th>
+              <th style="padding:8px;border-bottom:2px solid #ddd;text-align:right;">Stukprijs</th>
+              <th style="padding:8px;border-bottom:2px solid #ddd;text-align:right;">Subtotaal</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemRows}
+            <tr>
+              <td colspan="3" style="padding:12px 8px 0;font-weight:bold;text-align:right;">Totaalbedrag:</td>
+              <td style="padding:12px 8px 0;text-align:right;font-weight:bold;font-size:16px;color:#650B19;">${euro(total)}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p style="margin:20px 0 0;font-size:13px;color:#666;line-height:1.5;">
+          Je kan rechtstreeks met de koper communiceren via <a href="mailto:${esc(email)}" style="color:#650B19;">${esc(email)}</a> om af te spreken wanneer deze bestelling opgehaald kan worden.
+        </p>
+      </div>
+    </div>
+  </body></html>`
+
+  const text = [
+    `Nieuwe Webshop Bestelling (${orderRef})`,
+    ``,
+    `Naam koper: ${customerName}`,
+    `E-mailadres: ${email}`,
+    `Gestructureerde Mededeling: ${communication}`,
+    `Totaalbedrag: ${euro(total)}`,
+    ``,
+    `Bestelde artikelen:`,
+    ...items.map((i) => `- ${i.quantity}x ${i.name} (${i.size}): ${euro(i.price * i.quantity)}`),
+    ``,
+    `Communiceer met de koper via ${email} om af te spreken voor de afhaling.`,
+  ].join('\n')
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Nieuwe bestelling ${orderRef} — ${customerName}`,
     html,
     text,
   })

@@ -63,6 +63,8 @@ export async function PATCH(req: NextRequest) {
     'bank_iban',
     'bank_bic',
     'bank_holder',
+    'contact_email',
+    'webshop_email',
     'reg_fee_first',
     'reg_fee_extra',
     'home_leiding_foto',
