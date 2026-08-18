@@ -53,7 +53,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;">
         <p style="margin:0 0 16px;">Hallo ${esc(customerName)},</p>
-        <p style="margin:0 0 20px;line-height:1.5;">We hebben je bestelling goed ontvangen. Je kan betalen via <strong>handmatige overschrijving</strong> met onderstaande gegevens, of <strong>contant/cash bij afhaling</strong> aan de lokalen.</p>
+        <p style="margin:0 0 20px;line-height:1.5;">We hebben je bestelling goed ontvangen. Je kan betalen via <strong>handmatige overschrijving</strong> met onderstaande gegevens, of <strong>contant/cash bij afhaling</strong>.</p>
 
         <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">${itemRows}
           <tr><td style="padding:10px 0 0;font-weight:bold;">Totaal</td><td style="padding:10px 0 0;text-align:right;font-weight:bold;">${euro(total)}</td></tr>
@@ -76,7 +76,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
           </p>
         </div>
 
-        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">De uniformverantwoordelijke neemt zelf contact met je op om af te spreken wanneer de bestelling opgehaald kan worden!</p>
+        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">De uniformverantwoordelijke neemt zelf contact met je op om een afhaalmoment af te spreken!</p>
         <p style="margin:16px 0 0;font-size:13px;color:#888;">Stevige linkerhand,<br/>Scouts Kriko-M</p>
       </div>
     </div>
@@ -97,9 +97,9 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     `   IBAN: ${bankIban}`,
     `   Bedrag: ${euro(total)}`,
     `   Mededeling: ${communication}`,
-    `2. Cash bij afhaling aan de lokalen.`,
+    `2. Cash bij afhaling.`,
     ``,
-    `De uniformverantwoordelijke neemt zelf contact op voor de afhaling.`,
+    `De uniformverantwoordelijke neemt zelf contact op voor het afhaalmoment.`,
     `Stevige linkerhand, Scouts Kriko-M`,
   ].join('\n')
 
@@ -154,7 +154,7 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
         <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
           Beste uniformverantwoordelijke,<br/><br/>
-          Er is zojuist een nieuwe bestelling geplaatst via de webshop van Scouts Kriko-M!
+          Er is zojuist een nieuwe bestelling geplaatst via de webshop van Scouts Kriko-M.
         </p>
 
         <div style="background:#F0ECE4;border-radius:10px;padding:16px 18px;margin-bottom:20px;">
@@ -186,7 +186,7 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
         </table>
 
         <p style="margin:20px 0 0;font-size:13px;color:#666;line-height:1.5;">
-          Je kan rechtstreeks met de koper communiceren via <a href="mailto:${esc(email)}" style="color:#650B19;">${esc(email)}</a> om af te spreken wanneer deze bestelling opgehaald kan worden.
+          Je kan rechtstreeks met de koper communiceren via <a href="mailto:${esc(email)}" style="color:#650B19;">${esc(email)}</a> om een afhaalmoment af te spreken.
         </p>
       </div>
     </div>

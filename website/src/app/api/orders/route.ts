@@ -3,9 +3,9 @@ import { createAdminClient } from '@/lib/supabase'
 import { Product, OrderItem } from '@/lib/types'
 import { sendOrderConfirmation, sendKatrienNotification } from '@/lib/email'
 
-// Eenvoudige mededeling op basis van bestelnummer (bijv. WEB-0001)
+// Eenvoudige mededeling en bestelnummer (bijv. KM-0001)
 function generateCommunication(orderNumber: number): string {
-  return `WEB-${String(orderNumber).padStart(4, '0')}`
+  return `KM-${String(orderNumber).padStart(4, '0')}`
 }
 
 export async function POST(req: NextRequest) {
@@ -41,7 +41,6 @@ export async function POST(req: NextRequest) {
       .single()
     const bankIban = settings?.bank_iban || 'BE76 1234 5678 9012'
     const bankHolder = settings?.bank_holder || 'Scouts Kriko-M vzw'
-    // Default test mail is vicverhaegen4@gmail.com
     const webshopEmail = settings?.webshop_email || 'vicverhaegen4@gmail.com'
 
     // Catalogus ophalen voor server-side prijsvalidatie
@@ -89,8 +88,9 @@ export async function POST(req: NextRequest) {
 
     if (insertError || !inserted) throw insertError ?? new Error('Insert mislukt')
 
-    // Gestructureerde mededeling berekenen
+    // Eenvoudige mededeling en order referentie KM-0001
     const communication = generateCommunication(inserted.order_number)
+    const orderRef = communication
 
     const { error: updateError } = await supabase
       .from('orders')
@@ -99,11 +99,11 @@ export async function POST(req: NextRequest) {
 
     if (updateError) throw updateError
 
-    // 1. E-mail naar koper (indien geverifieerd / toegestaan)
+    // 1. E-mail naar koper
     try {
       await sendOrderConfirmation({
         to: email.trim(),
-        orderRef: inserted.order_ref,
+        orderRef,
         customerName: customer_name.trim(),
         items: validatedCart,
         total,
@@ -115,11 +115,11 @@ export async function POST(req: NextRequest) {
       console.error('Koper bevestigingsmail mislukt:', mailErr)
     }
 
-    // 2. Notificatiemail naar Katrien (vicverhaegen4@gmail.com)
+    // 2. Notificatiemail naar uniformverantwoordelijke
     try {
       await sendKatrienNotification({
         to: webshopEmail,
-        orderRef: inserted.order_ref,
+        orderRef,
         customerName: customer_name.trim(),
         email: email.trim(),
         items: validatedCart,
@@ -129,11 +129,11 @@ export async function POST(req: NextRequest) {
         bankHolder,
       })
     } catch (katrienMailErr) {
-      console.error('Katrien notificatiemail mislukt:', katrienMailErr)
+      console.error('Notificatiemail mislukt:', katrienMailErr)
     }
 
     return NextResponse.json({
-      order_ref: inserted.order_ref,
+      order_ref: orderRef,
       communication,
       total,
       items: validatedCart,
