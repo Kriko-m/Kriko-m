@@ -75,7 +75,7 @@ export default function KentekenCard({ product }: { product: Product }) {
           <span style={{
             fontSize: '0.9rem',
             fontWeight: 900,
-            color: 'var(--color-secondary, #C9963A)',
+            color: 'var(--color-primary-dark, #3a0710)',
           }}>
             €{product.price.toFixed(2).replace('.', ',')}
           </span>

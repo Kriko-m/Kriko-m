@@ -138,7 +138,7 @@ export default function CheckoutForm() {
                   <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{item.name}</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Maat: {item.size} | Aantal: {item.quantity}</div>
                 </div>
-                <div style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>
+                <div style={{ fontWeight: 800, color: 'var(--color-primary-dark)' }}>
                   €{(item.price * item.quantity).toFixed(2).replace('.', ',')}
                 </div>
               </div>

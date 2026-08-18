@@ -1169,8 +1169,8 @@ body.portal-theme .tak-hero.primair {
 .shop-card-price {
     font-size: 1.4rem;
     font-family: var(--font-outfit), sans-serif;
-    color: var(--color-secondary);
-    font-weight: 700;
+    color: var(--color-primary-dark);
+    font-weight: 800;
     margin-bottom: 12px;
 }
 

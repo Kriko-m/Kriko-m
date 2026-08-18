@@ -20,7 +20,6 @@ export default function BevestigingPage() {
       const stored = sessionStorage.getItem('kriko_last_order')
       if (stored) {
         setOrder(JSON.parse(stored))
-        sessionStorage.removeItem('kriko_last_order')
       }
     } catch {}
   }, [])
@@ -75,15 +74,15 @@ export default function BevestigingPage() {
                 <div style={{ display: 'grid', gap: 10, fontSize: '0.9rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                     <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>Begunstigde:</span>
-                    <span>{order.bank_holder}</span>
+                    <span style={{ color: 'var(--color-primary-dark)', fontWeight: 600 }}>{order.bank_holder}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                     <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>IBAN:</span>
-                    <code style={{ fontFamily: 'monospace', letterSpacing: '0.05em', fontWeight: 'bold' }}>{order.bank_iban}</code>
+                    <code style={{ fontFamily: 'monospace', letterSpacing: '0.05em', fontWeight: 'bold', color: 'var(--color-primary-dark)' }}>{order.bank_iban}</code>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
                     <span style={{ fontWeight: 600, color: 'var(--color-text-muted)' }}>Bedrag:</span>
-                    <strong style={{ color: 'var(--color-secondary)', fontSize: '1.05rem' }}>
+                    <strong style={{ color: 'var(--color-primary-dark)', fontSize: '1.15rem', fontWeight: 900 }}>
                       €{order.total.toFixed(2).replace('.', ',')}
                     </strong>
                   </div>
@@ -115,7 +114,7 @@ export default function BevestigingPage() {
               📦 Ophalen van je bestelling
             </h3>
             <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
-              Uniformouder <strong>Katrien</strong> communiceert zelf per e-mail (via <a href={`mailto:${katrienEmail}`} style={{ color: 'var(--color-secondary)', fontWeight: 700 }}>{katrienEmail}</a>) wanneer en waar je je bestelling kan komen ophalen!
+              Uniformouder <strong>Katrien</strong> communiceert zelf per e-mail (via <a href={`mailto:${katrienEmail}`} style={{ color: 'var(--color-primary)', fontWeight: 800, textDecoration: 'underline' }}>{katrienEmail}</a>) wanneer en waar je je bestelling kan komen ophalen!
             </p>
           </div>
 
@@ -127,10 +126,10 @@ export default function BevestigingPage() {
             {order.items.map((item, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--color-border)' }}>
                 <div>
-                  <div style={{ fontWeight: 600 }}>{item.quantity}× {item.name}</div>
+                  <div style={{ fontWeight: 600, color: 'var(--color-primary-dark)' }}>{item.quantity}× {item.name}</div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Maat: {item.size}</div>
                 </div>
-                <div style={{ fontWeight: 700, color: 'var(--color-secondary)' }}>
+                <div style={{ fontWeight: 800, color: 'var(--color-primary-dark)' }}>
                   €{(item.price * item.quantity).toFixed(2).replace('.', ',')}
                 </div>
               </div>
