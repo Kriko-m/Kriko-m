@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     if (updateError) throw updateError
 
-    // E-mails versturen: 1 naar koper, 1 geautomatiseerd naar Katrien (webshopEmail)
+    // 1. E-mail naar koper (indien geverifieerd / toegestaan)
     try {
       await sendOrderConfirmation({
         to: email.trim(),
@@ -115,7 +115,12 @@ export async function POST(req: NextRequest) {
         bankIban,
         bankHolder,
       })
+    } catch (mailErr) {
+      console.error('Koper bevestigingsmail mislukt:', mailErr)
+    }
 
+    // 2. Notificatiemail naar Katrien (vicverhaegen4@gmail.com)
+    try {
       await sendKatrienNotification({
         to: webshopEmail,
         orderRef: inserted.order_ref,
@@ -127,8 +132,8 @@ export async function POST(req: NextRequest) {
         bankIban,
         bankHolder,
       })
-    } catch (mailErr) {
-      console.error('E-mailverzending mislukt:', mailErr)
+    } catch (katrienMailErr) {
+      console.error('Katrien notificatiemail mislukt:', katrienMailErr)
     }
 
     return NextResponse.json({

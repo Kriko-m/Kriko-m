@@ -13,8 +13,8 @@ export default function CheckoutForm() {
   useEffect(() => { setHydrated(true) }, [])
 
   useEffect(() => {
-    if (hydrated && items.length === 0) router.push('/shop')
-  }, [hydrated, items.length, router])
+    if (hydrated && items.length === 0 && status === 'idle') router.push('/shop')
+  }, [hydrated, items.length, status, router])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
