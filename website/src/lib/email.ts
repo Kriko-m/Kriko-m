@@ -107,7 +107,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     from: FROM,
     to,
     ...(BCC ? { bcc: BCC.split(',').map((s) => s.trim()).filter(Boolean) } : {}),
-    subject: `Uniformen Kriko-m - ${orderRef} - ${customerName}`,
+    subject: `Bevestiging bestelling ${orderRef} — Scouts Kriko-M`,
     html,
     text,
   })
