@@ -58,7 +58,7 @@ export default function KentekenCard({ product }: { product: Product }) {
               style={{ objectFit: 'cover' }}
             />
           ) : (
-            <span style={{ fontSize: '1.5rem' }}>🔰</span>
+            <i className="fa-solid fa-certificate" style={{ color: 'var(--color-primary-dark)', opacity: 0.4, fontSize: '1.2rem' }} />
           )}
         </div>
 
@@ -116,7 +116,7 @@ export default function KentekenCard({ product }: { product: Product }) {
           transition: 'background-color 0.2s ease',
         }}
       >
-        <span>{added ? '✓ Toegevoegd' : '+ In winkelmandje'}</span>
+        <span>{added ? 'Toegevoegd' : '+ In winkelmandje'}</span>
       </button>
 
     </div>

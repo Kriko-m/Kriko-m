@@ -100,7 +100,7 @@ export default function CheckoutForm() {
             {/* Betalings- en afhaalinfo */}
             <div style={{ background: 'var(--color-bg-linen)', borderRadius: 'var(--border-radius-md)', padding: '20px', border: '1px solid var(--color-border)', margin: '24px 0 28px' }}>
               <strong style={{ display: 'block', color: 'var(--color-primary-dark)', fontSize: '1rem', marginBottom: 8 }}>
-                💳 Betaling &amp; Ophalen
+                Betaling &amp; Ophalen
               </strong>
               <ul style={{ margin: 0, paddingLeft: 20, fontSize: '0.88rem', color: 'var(--color-text-dark)', lineHeight: 1.6 }}>
                 <li>

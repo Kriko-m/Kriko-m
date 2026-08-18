@@ -48,11 +48,11 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
   const html = `<!doctype html><html><body style="margin:0;background:#F0ECE4;font-family:Arial,Helvetica,sans-serif;color:#2b2b2b;">
     <div style="max-width:560px;margin:0 auto;padding:24px;">
       <div style="background:#650B19;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;">
-        <h1 style="margin:0;font-size:20px;">Bedankt voor je bestelling!</h1>
-        <p style="margin:6px 0 0;opacity:.9;font-size:14px;">Bestelling ${esc(orderRef)}</p>
+        <h1 style="margin:0;font-size:20px;">Bedankt voor je bestelling</h1>
+        <p style="margin:6px 0 0;opacity:.9;font-size:14px;">Bestelnummer: ${esc(orderRef)}</p>
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;">
-        <p style="margin:0 0 16px;">Hallo ${esc(customerName)},</p>
+        <p style="margin:0 0 16px;">Beste ${esc(customerName)},</p>
         <p style="margin:0 0 20px;line-height:1.5;">We hebben je bestelling goed ontvangen. Je kan betalen via <strong>handmatige overschrijving</strong> met onderstaande gegevens, of <strong>contant/cash bij afhaling</strong>.</p>
 
         <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">${itemRows}
@@ -76,7 +76,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
           </p>
         </div>
 
-        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">De uniformverantwoordelijke neemt zelf contact met je op om een afhaalmoment af te spreken!</p>
+        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">De uniformverantwoordelijke neemt zelf contact met je op om een afhaalmoment af te spreken.</p>
         <p style="margin:16px 0 0;font-size:13px;color:#888;">Stevige linkerhand,<br/>Scouts Kriko-M</p>
       </div>
     </div>
@@ -85,7 +85,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
   const text = [
     `Bedankt voor je bestelling! (${orderRef})`,
     ``,
-    `Hallo ${customerName},`,
+    `Beste ${customerName},`,
     `We hebben je bestelling goed ontvangen.`,
     ``,
     ...items.map((i) => `- ${i.quantity}x ${i.name} (${i.size}): ${euro(i.price * i.quantity)}`),
@@ -148,7 +148,7 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
   const html = `<!doctype html><html><body style="margin:0;background:#F0ECE4;font-family:Arial,Helvetica,sans-serif;color:#2b2b2b;">
     <div style="max-width:600px;margin:0 auto;padding:24px;">
       <div style="background:#650B19;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;">
-        <h1 style="margin:0;font-size:20px;">🛍️ Nieuwe Webshop Bestelling</h1>
+        <h1 style="margin:0;font-size:20px;">Nieuwe Webshop Bestelling</h1>
         <p style="margin:6px 0 0;opacity:.9;font-size:14px;">Bestelnummer: <strong>${esc(orderRef)}</strong></p>
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
@@ -158,7 +158,7 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
         </p>
 
         <div style="background:#F0ECE4;border-radius:10px;padding:16px 18px;margin-bottom:20px;">
-          <h3 style="margin:0 0 10px;font-size:15px;color:#650B19;">👤 Gegevens Koper</h3>
+          <h3 style="margin:0 0 10px;font-size:15px;color:#650B19;">Gegevens Koper</h3>
           <table style="width:100%;border-collapse:collapse;font-size:14px;">
             <tr><td style="padding:4px 0;color:#666;width:140px;">Naam koper:</td><td style="padding:4px 0;font-weight:bold;">${esc(customerName)}</td></tr>
             <tr><td style="padding:4px 0;color:#666;">E-mailadres:</td><td style="padding:4px 0;"><a href="mailto:${esc(email)}" style="color:#650B19;font-weight:bold;">${esc(email)}</a></td></tr>
@@ -166,7 +166,7 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
           </table>
         </div>
 
-        <h3 style="margin:0 0 12px;font-size:15px;color:#650B19;">📦 Bestelde Artikelen</h3>
+        <h3 style="margin:0 0 12px;font-size:15px;color:#650B19;">Bestelde Artikelen</h3>
         <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:20px;">
           <thead>
             <tr style="background:#f8f9fa;text-align:left;">
