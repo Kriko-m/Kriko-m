@@ -30,11 +30,6 @@ export default function ShopProductCard({ product }: { product: Product }) {
     setTimeout(() => setAdded(false), 1500)
   }
 
-  const categoryLabels: Record<string, string> = {
-    kledij: 'Kledij',
-    kentekens: 'Kentekens',
-  }
-
   return (
     <div className="shop-card">
       <div className="shop-card-image">

@@ -22,7 +22,6 @@ export default function PortaalPage() {
 function PortaalContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/portaal/home'
 
   const [selectedRole, setSelectedRole] = useState<'leiding' | 'groepsleiding' | 'webshop'>('leiding')
   const [password, setPassword] = useState('')

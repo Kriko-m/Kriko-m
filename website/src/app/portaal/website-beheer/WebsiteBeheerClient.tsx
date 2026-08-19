@@ -7,6 +7,33 @@ import ExcelJS from 'exceljs'
 import { Settings } from '@/lib/types'
 import CopyButton from '@/components/CopyButton'
 
+interface OrderItem {
+  name: string
+  price: number
+  quantity: number
+  size?: string
+}
+
+interface AdminOrder {
+  id: string
+  order_ref?: string
+  customer_name: string
+  email: string
+  items: OrderItem[]
+  total: number
+  created_at?: string
+}
+
+interface ShopProduct {
+  id: string
+  name: string
+  price: number
+  category: string
+  sizes?: string[]
+  description?: string
+  image?: string
+}
+
 interface Props {
   initialSettings: Settings
   role?: string
@@ -47,12 +74,12 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   }, [role])
 
   // Orders State
-  const [orders, setOrders] = useState<any[]>([])
+  const [orders, setOrders] = useState<AdminOrder[]>([])
   const [loadingOrders, setLoadingOrders] = useState(false)
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
 
   // Shop Products State
-  const [shopProducts, setShopProducts] = useState<any[]>([])
+  const [shopProducts, setShopProducts] = useState<ShopProduct[]>([])
   const [loadingShopProducts, setLoadingShopProducts] = useState(false)
   const [selectedProductId, setSelectedProductId] = useState<string>('item_tshirt')
   const [uploadingProductPhoto, setUploadingProductPhoto] = useState(false)
@@ -173,7 +200,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
         if (Array.isArray(ord.items) && ord.items.length > 0) {
           itemCount = ord.items.length
           itemsText = ord.items
-            .map((i: any) => `• ${i.quantity}x ${i.name}${i.size ? ` (${i.size})` : ''}  —  €${(i.price * i.quantity).toFixed(2).replace('.', ',')}`)
+            .map((i: OrderItem) => `• ${i.quantity}x ${i.name}${i.size ? ` (${i.size})` : ''}  —  €${(i.price * i.quantity).toFixed(2).replace('.', ',')}`)
             .join('\n')
         }
 
@@ -349,7 +376,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     }
   }
 
-  async function handleOpenShopModal() {
+  async function _handleOpenShopModal() {
     setModalFlash(null)
     setShowShopModal(true)
     setActiveShopTab('bestellingen')
@@ -403,7 +430,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     }
   }
 
-  async function handleProductSave(productToSave: any) {
+  async function handleProductSave(productToSave: ShopProduct) {
     setSavingProduct(true)
     try {
       const res = await fetch('/api/admin/shop-products', {
@@ -435,7 +462,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     }
   }
 
-  async function handleProductPhotoUpload(e: React.ChangeEvent<HTMLInputElement>, product: any) {
+  async function handleProductPhotoUpload(e: React.ChangeEvent<HTMLInputElement>, product: ShopProduct) {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -465,7 +492,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     }
   }
 
-  async function handleRemoveProductPhoto(product: any) {
+  async function handleRemoveProductPhoto(product: ShopProduct) {
     await handleProductSave({ ...product, image: '' })
   }
 
@@ -612,7 +639,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                       <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 6 }}>Bestelde artikelen</div>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
                         <tbody>
-                          {Array.isArray(ord.items) && ord.items.map((item: any, idx: number) => (
+                          {Array.isArray(ord.items) && ord.items.map((item: OrderItem, idx: number) => (
                             <tr key={idx} style={{ borderBottom: '1px solid #F0F4F1' }}>
                               <td style={{ padding: '6px 0', color: '#1A3D2A', fontWeight: 700 }}>
                                 {item.quantity}× {item.name} <span style={{ color: '#64748B', fontWeight: 600 }}>(Maat: {item.size})</span>
@@ -885,7 +912,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                             type="number"
                             step="0.01"
                             value={product.price}
-                            onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: e.target.value } : p))}
+                            onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: parseFloat(e.target.value) || 0 } : p))}
                             style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
                           />
                         </div>
@@ -1055,7 +1082,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                 Publieke Website
               </h2>
               <p style={{ margin: 0, fontSize: '0.88rem', color: '#6A8A75', lineHeight: 1.5 }}>
-                Bewerk live teksten, kalenderactiviteiten en foto's rechtstreeks op de openbare website.
+                Bewerk live teksten, kalenderactiviteiten en foto&apos;s rechtstreeks op de openbare website.
               </p>
             </div>
 

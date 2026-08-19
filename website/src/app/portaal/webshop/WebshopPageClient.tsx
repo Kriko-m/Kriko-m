@@ -1,9 +1,36 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import ExcelJS from 'exceljs'
 import { Settings } from '@/lib/types'
 import CopyButton from '@/components/CopyButton'
+
+interface OrderItem {
+  name: string
+  price: number
+  quantity: number
+  size?: string
+}
+
+interface AdminOrder {
+  id: string
+  order_ref?: string
+  customer_name: string
+  email: string
+  items: OrderItem[]
+  total: number
+  created_at?: string
+}
+
+interface ShopProduct {
+  id: string
+  name: string
+  price: number
+  category: string
+  sizes?: string[]
+  description?: string
+  image?: string
+}
 
 interface Props {
   initialSettings: Settings
@@ -11,34 +38,29 @@ interface Props {
   activeTab: 'bestellingen' | 'artikelen'
 }
 
-export default function WebshopPageClient({ initialSettings, role, activeTab }: Props) {
+export default function WebshopPageClient({ initialSettings, role: _role, activeTab }: Props) {
   const [webshopEmail, setWebshopEmail] = useState(initialSettings.webshop_email || '')
   const [saving, setSaving] = useState(false)
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // Orders State
-  const [orders, setOrders] = useState<any[]>([])
+  const [orders, setOrders] = useState<AdminOrder[]>([])
   const [loadingOrders, setLoadingOrders] = useState(false)
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
 
   // Shop Products State
-  const [shopProducts, setShopProducts] = useState<any[]>([])
+  const [shopProducts, setShopProducts] = useState<ShopProduct[]>([])
   const [loadingShopProducts, setLoadingShopProducts] = useState(false)
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [savingProduct, setSavingProduct] = useState(false)
   const [uploadingProductPhoto, setUploadingProductPhoto] = useState(false)
 
-  useEffect(() => {
-    fetchOrders()
-    fetchShopProducts()
-  }, [])
-
-  function showNotification(type: 'success' | 'error', text: string) {
+  const showNotification = useCallback((type: 'success' | 'error', text: string) => {
     setFlashMessage({ type, text })
     setTimeout(() => setFlashMessage(null), 4000)
-  }
+  }, [])
 
-  async function fetchOrders() {
+  const fetchOrders = useCallback(async () => {
     setLoadingOrders(true)
     try {
       const res = await fetch('/api/admin/orders')
@@ -51,23 +73,30 @@ export default function WebshopPageClient({ initialSettings, role, activeTab }: 
     } finally {
       setLoadingOrders(false)
     }
-  }
+  }, [])
 
-  async function fetchShopProducts() {
+  const fetchShopProducts = useCallback(async () => {
     setLoadingShopProducts(true)
     try {
       const res = await fetch('/api/admin/shop-products')
       if (res.ok) {
         const data = await res.json()
         setShopProducts(data)
-        if (data.length > 0 && !selectedProductId) setSelectedProductId(data[0].id)
+        if (data.length > 0) {
+          setSelectedProductId(prev => prev ?? data[0].id)
+        }
       }
     } catch (err) {
       console.error(err)
     } finally {
       setLoadingShopProducts(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchOrders()
+    fetchShopProducts()
+  }, [fetchOrders, fetchShopProducts])
 
   async function handleOrderDelete(orderId: string, orderRef: string) {
     if (!confirm(`Weet je zeker dat je bestelling ${orderRef} wilt verwijderen?`)) return
@@ -101,7 +130,7 @@ export default function WebshopPageClient({ initialSettings, role, activeTab }: 
     }
   }
 
-  async function handleProductSave(productToSave: any) {
+  async function handleProductSave(productToSave: ShopProduct) {
     setSavingProduct(true)
     try {
       const res = await fetch('/api/admin/shop-products', {
@@ -176,7 +205,7 @@ export default function WebshopPageClient({ initialSettings, role, activeTab }: 
     }
   }
 
-  async function handleProductPhotoUpload(e: React.ChangeEvent<HTMLInputElement>, product: any) {
+  async function handleProductPhotoUpload(e: React.ChangeEvent<HTMLInputElement>, product: ShopProduct) {
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -201,7 +230,7 @@ export default function WebshopPageClient({ initialSettings, role, activeTab }: 
     }
   }
 
-  async function handleRemoveProductPhoto(product: any) {
+  async function handleRemoveProductPhoto(product: ShopProduct) {
     if (!confirm('Weet je zeker dat je deze artikel foto wilt verwijderen?')) return
     await handleProductSave({ ...product, image: '' })
   }
@@ -236,7 +265,7 @@ export default function WebshopPageClient({ initialSettings, role, activeTab }: 
 
       orders.forEach((ord) => {
         const itemsStr = Array.isArray(ord.items)
-          ? ord.items.map((i: any) => `${i.quantity}x ${i.name} (${i.size})`).join(', ')
+          ? ord.items.map((i: OrderItem) => `${i.quantity}x ${i.name} (${i.size})`).join(', ')
           : ''
 
         worksheet.addRow({
@@ -388,7 +417,7 @@ export default function WebshopPageClient({ initialSettings, role, activeTab }: 
                       <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 6 }}>Bestelde artikelen</div>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
                         <tbody>
-                          {Array.isArray(ord.items) && ord.items.map((item: any, idx: number) => (
+                          {Array.isArray(ord.items) && ord.items.map((item: OrderItem, idx: number) => (
                             <tr key={idx} style={{ borderBottom: '1px solid #F0F4F1' }}>
                               <td style={{ padding: '6px 0', color: '#1A3D2A', fontWeight: 700 }}>
                                 {item.quantity}× {item.name} <span style={{ color: '#64748B', fontWeight: 600 }}>(Maat: {item.size})</span>
@@ -659,7 +688,7 @@ export default function WebshopPageClient({ initialSettings, role, activeTab }: 
                             type="number"
                             step="0.01"
                             value={product.price}
-                            onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: e.target.value } : p))}
+                            onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: parseFloat(e.target.value) || 0 } : p))}
                             style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
                           />
                         </div>
