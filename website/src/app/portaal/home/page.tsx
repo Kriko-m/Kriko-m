@@ -13,6 +13,8 @@ export default async function HomePage() {
   if (error || !verified) redirect('/portaal')
 
   const role = verified.app_metadata?.role || ''
+  if (role === 'webshop') redirect('/portaal?error=unauthorized')
+
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
   if (!isLeiding) redirect('/portaal')
 

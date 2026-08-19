@@ -14,12 +14,15 @@ CREATE TABLE settings (
   bank_bic        TEXT    NOT NULL DEFAULT '',
   bank_holder     TEXT    NOT NULL DEFAULT '',
   contact_email   TEXT    NOT NULL DEFAULT '',
+  webshop_email   TEXT    NOT NULL DEFAULT 'vicverhaegen4@gmail.com',
   contact_phone   TEXT    NOT NULL DEFAULT '',
   contact_address TEXT    NOT NULL DEFAULT '',
   alert_message   TEXT    NOT NULL DEFAULT '',
   alert_active    BOOLEAN NOT NULL DEFAULT false,
   reg_fee_first   NUMERIC(8,2) NOT NULL DEFAULT 50.00,
   reg_fee_extra   NUMERIC(8,2) NOT NULL DEFAULT 45.00,
+  home_leiding_foto TEXT  NOT NULL DEFAULT '/images/leiding_25-26.jpg',
+  portal_backgrounds JSONB NOT NULL DEFAULT '{}',
   -- Takken-configuratie als JSON (naam, leeftijd, leiding, activiteiten, ...)
   takken          JSONB   NOT NULL DEFAULT '{}',
   CONSTRAINT settings_single_row CHECK (id = 1)
@@ -27,14 +30,15 @@ CREATE TABLE settings (
 
 -- Vul de standaardwaarden in
 INSERT INTO settings (id, scouts_year, bank_iban, bank_bic, bank_holder,
-  contact_email, contact_phone, contact_address,
-  alert_message, alert_active, reg_fee_first, reg_fee_extra, takken)
+  contact_email, webshop_email, contact_phone, contact_address,
+  alert_message, alert_active, reg_fee_first, reg_fee_extra, home_leiding_foto, portal_backgrounds, takken)
 VALUES (1,
   '2026-2027',
   'BE76 1234 5678 9012', 'KRIKOBE2B', 'Scouts Kriko-M vzw',
-  'groepsleiding@kriko-m.be', '+32 3 776 00 00', 'Industriepark-Noord 33, 9100 Sint-Niklaas',
+  'groepsleiding@kriko-m.be', 'vicverhaegen4@gmail.com', '+32 3 776 00 00', 'Industriepark-Noord 33, 9100 Sint-Niklaas',
   'Welkom op de nieuwe website van Scouts Kriko-M!', true,
   50.00, 45.00,
+  '/images/leiding_25-26.jpg', '{}'::jsonb,
   '{
     "kapoenen":   {"name":"Kapoenen",   "age_range":"6 - 8 jaar",   "school_year":"1e & 2e leerjaar",              "email":"kapoenenleiding@kriko-m.be",   "class":"kapoenen"},
     "welpen":     {"name":"Welpen",     "age_range":"8 - 11 jaar",  "school_year":"3e, 4e & 5e leerjaar",         "email":"welpenleiding@kriko-m.be",     "class":"welpen"},

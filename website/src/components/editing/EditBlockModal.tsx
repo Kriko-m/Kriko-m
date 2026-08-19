@@ -68,7 +68,7 @@ export default function EditBlockModal({
   const [takKamp, setTakKamp] = useState<string>(parsedData?.kamp || '')
 
   // Webshop card fields
-  const [contactInfo, setContactInfo] = useState<string>(parsedData?.contact || 'Contact Katrien: kat_vh@hotmail.com | 0476/89.57.47')
+  const [contactInfo, setContactInfo] = useState<string>(parsedData?.contact || 'Vragen over bestellingen? Neem contact op met de webshopverantwoordelijke.')
 
   // Waar is wat links descriptions
   const [linkKalender, setLinkKalender] = useState<string>(parsedData?.links?.kalender || 'Bekijk wanneer de vergaderingen vallen en wanneer onze familie-evenementen plaatsvinden.')
@@ -371,7 +371,7 @@ export default function EditBlockModal({
                   type="text"
                   value={contactInfo}
                   onChange={e => setContactInfo(e.target.value)}
-                  placeholder="Contact Katrien: kat_vh@hotmail.com | 0476/89.57.47"
+                  placeholder="bijv: Vragen over bestellingen? Neem contact op via webshop@kriko-m.be"
                   style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.92rem' }}
                 />
               </div>

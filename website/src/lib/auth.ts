@@ -4,8 +4,9 @@ import { createServerSupabaseClient } from '@/lib/supabase'
 // Gecentraliseerde rolcontroles voor server-side gebruik (API routes &
 // server components). Het portaal is leiding-only sinds de ouderaccounts weg zijn.
 
-const LEIDING_ROLES = new Set(['admin', 'groepsleiding', 'leiding'])
+const LEIDING_ROLES = new Set(['admin', 'groepsleiding', 'leiding', 'webshop'])
 const GROEPSLEIDING_ROLES = new Set(['admin', 'groepsleiding'])
+const WEBSHOP_ROLES = new Set(['admin', 'groepsleiding', 'webshop'])
 
 async function getVerifiedUser(): Promise<User | null> {
   const supabase = await createServerSupabaseClient()
@@ -13,7 +14,7 @@ async function getVerifiedUser(): Promise<User | null> {
   return user ?? null
 }
 
-// Elke leiding (takleiding, groepsleiding of admin). null = geen toegang.
+// Elke leiding (takleiding, groepsleiding, webshop of admin). null = geen toegang.
 export async function requireLeiding(): Promise<User | null> {
   const user = await getVerifiedUser()
   if (!user) return null
@@ -25,4 +26,11 @@ export async function requireGroepsleiding(): Promise<User | null> {
   const user = await getVerifiedUser()
   if (!user) return null
   return GROEPSLEIDING_ROLES.has(user.app_metadata?.role) ? user : null
+}
+
+// Webshop beheer (groepsleiding, webshop of admin). null = geen toegang.
+export async function requireWebshop(): Promise<User | null> {
+  const user = await getVerifiedUser()
+  if (!user) return null
+  return WEBSHOP_ROLES.has(user.app_metadata?.role) ? user : null
 }

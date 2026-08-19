@@ -10,6 +10,21 @@ interface Props {
 export default function PortaalSidebar({ role }: Props) {
   const pathname = usePathname()
   const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
+  const isWebshop = role === 'webshop'
+
+  if (isWebshop) {
+    return (
+      <aside className="portaal-sidebar-nav">
+        <Link
+          href="/portaal/webshop/bestellingen"
+          className={`portaal-sidebar-link${pathname.startsWith('/portaal/webshop') ? ' active' : ''}`}
+        >
+          <i className="fa-solid fa-store" style={{ width: 18, textAlign: 'center', fontSize: '0.9rem' }}></i>
+          <span>Webshop &amp; Uniformen</span>
+        </Link>
+      </aside>
+    )
+  }
 
   return (
     <aside className="portaal-sidebar-nav">

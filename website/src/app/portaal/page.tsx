@@ -1,5 +1,5 @@
 'use client'
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -24,12 +24,18 @@ function PortaalContent() {
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get('redirect') || '/portaal/home'
 
-  const [selectedRole, setSelectedRole] = useState<'leiding' | 'groepsleiding'>('leiding')
+  const [selectedRole, setSelectedRole] = useState<'leiding' | 'groepsleiding' | 'webshop'>('leiding')
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading'>('idle')
   const [error, setError] = useState('')
 
   const supabase = createClient()
+
+  useEffect(() => {
+    if (searchParams.get('error') === 'unauthorized') {
+      setError('⚠️ Geen toegang: Je account heeft onvoldoende rechten om die pagina te bekijken. Log in met het juiste account.')
+    }
+  }, [searchParams])
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -43,7 +49,9 @@ function PortaalContent() {
 
     const emailsToTry = selectedRole === 'leiding' 
       ? ['leiding@kriko-m.be', 'demo-leiding@kriko-m.be'] 
-      : ['groepsleiding@kriko-m.be', 'demo-groepsleiding@kriko-m.be']
+      : selectedRole === 'groepsleiding'
+      ? ['groepsleiding@kriko-m.be', 'demo-groepsleiding@kriko-m.be']
+      : ['webshop@kriko-m.be', 'demo-webshop@kriko-m.be']
 
     try {
       // Ensure accounts exist in Supabase Auth
@@ -69,7 +77,9 @@ function PortaalContent() {
         setError(lastError || 'Ongeldig wachtwoord voor gekozen rol.')
         setStatus('idle')
       } else {
-        router.push(redirectTo)
+        const defaultTarget = selectedRole === 'webshop' ? '/portaal/webshop/bestellingen' : '/portaal/home'
+        const target = searchParams.get('redirect') || defaultTarget
+        router.push(target)
         router.refresh()
       }
     } catch {
@@ -105,7 +115,7 @@ function PortaalContent() {
               </label>
               <select
                 value={selectedRole}
-                onChange={(e) => setSelectedRole(e.target.value as 'leiding' | 'groepsleiding')}
+                onChange={(e) => setSelectedRole(e.target.value as 'leiding' | 'groepsleiding' | 'webshop')}
                 className="form-control"
                 style={{
                   width: '100%',
@@ -121,6 +131,7 @@ function PortaalContent() {
               >
                 <option value="leiding">Leiding</option>
                 <option value="groepsleiding">Groepsleiding</option>
+                <option value="webshop">Webshop &amp; uniformen</option>
               </select>
             </div>
 
@@ -141,7 +152,7 @@ function PortaalContent() {
             </div>
 
             <button type="submit" disabled={status === 'loading'} className="btn btn-secondary" style={{ width: '100%', padding: '14px', marginTop: 6 }}>
-              {status === 'loading' ? 'Inloggen…' : `Inloggen als ${selectedRole === 'leiding' ? 'Leiding' : 'Groepsleiding'} →`}
+              {status === 'loading' ? 'Inloggen…' : `Inloggen als ${selectedRole === 'leiding' ? 'Leiding' : selectedRole === 'groepsleiding' ? 'Groepsleiding' : 'Webshop & uniformen'} →`}
             </button>
           </form>
         </div>

@@ -3,7 +3,7 @@ import { OrderItem } from '@/lib/types'
 
 // Resend-client. Wordt alleen server-side gebruikt (API routes).
 // RESEND_API_KEY moet gezet zijn; RESEND_FROM moet een geverifieerd afzenderdomein zijn.
-const FROM = process.env.RESEND_FROM || 'Scouts Kriko-M <bestellingen@kriko-m.be>'
+const FROM = process.env.RESEND_FROM || 'Scouts Kriko-M Webshop <bestellingen@kriko-m.be>'
 const BCC = process.env.RESEND_BCC || ''
 
 function getClient(): Resend | null {
@@ -72,11 +72,11 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
         <div style="background:#EEF5F1;border:1px solid #C2D9C9;border-radius:10px;padding:16px 18px;margin-top:16px;">
           <h2 style="margin:0 0 8px;font-size:15px;color:#1A3D2A;">Betaling Cash bij Afhaling (Optie 2)</h2>
           <p style="margin:0;font-size:13px;color:#2b2b2b;line-height:1.4;">
-            Je kan ook contant/cash betalen zodra je je bestelling komt ophalen bij de uniformverantwoordelijke.
+            Je kan ook contant/cash betalen zodra je je bestelling komt ophalen bij de webshopverantwoordelijke.
           </p>
         </div>
 
-        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">De uniformverantwoordelijke neemt zelf contact met je op om een afhaalmoment af te spreken.</p>
+        <p style="margin:20px 0 0;font-size:13px;color:#888;line-height:1.5;">De webshopverantwoordelijke neemt zelf contact met je op om een afhaalmoment af te spreken.</p>
         <p style="margin:16px 0 0;font-size:13px;color:#888;">Stevige linkerhand,<br/>Scouts Kriko-M</p>
       </div>
     </div>
@@ -99,7 +99,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     `   Mededeling: ${communication}`,
     `2. Cash bij afhaling.`,
     ``,
-    `De uniformverantwoordelijke neemt zelf contact op voor het afhaalmoment.`,
+    `De webshopverantwoordelijke neemt zelf contact op voor het afhaalmoment.`,
     `Stevige linkerhand, Scouts Kriko-M`,
   ].join('\n')
 
@@ -113,7 +113,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
   })
 }
 
-interface KatrienNotificationParams {
+interface WebshopOrderNotificationParams {
   to: string
   orderRef: string
   customerName: string
@@ -125,7 +125,7 @@ interface KatrienNotificationParams {
   bankHolder: string
 }
 
-export async function sendKatrienNotification(params: KatrienNotificationParams) {
+export async function sendWebshopOrderNotification(params: WebshopOrderNotificationParams) {
   const resend = getClient()
   if (!resend) {
     console.warn('RESEND_API_KEY ontbreekt; notificatiemail niet verstuurd.')
@@ -153,7 +153,7 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
         <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
-          Beste uniformverantwoordelijke,<br/><br/>
+          Beste webshopverantwoordelijke,<br/><br/>
           Er is zojuist een nieuwe bestelling geplaatst via de webshop van Scouts Kriko-M.
         </p>
 
@@ -208,8 +208,11 @@ export async function sendKatrienNotification(params: KatrienNotificationParams)
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `Uniformen Kriko-m - ${orderRef} - ${customerName}`,
+    subject: `Nieuwe Webshop Bestelling ${orderRef} — ${customerName}`,
     html,
     text,
   })
 }
+
+// Alias for backwards compatibility
+export const sendKatrienNotification = sendWebshopOrderNotification

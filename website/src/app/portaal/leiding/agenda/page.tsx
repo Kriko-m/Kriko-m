@@ -10,6 +10,8 @@ export default async function FullAgendaPage() {
   const user = session.user
 
   const role = user.app_metadata?.role || ''
+  if (role === 'webshop') redirect('/portaal?error=unauthorized')
+
   const isLeiding = role === 'admin' || role === 'groepsleiding' || role === 'leiding'
   if (!isLeiding) redirect('/portaal')
 

@@ -20,7 +20,7 @@ export default async function ShopPage() {
     <>
       <section className="tak-hero primair hero-webshop">
         <div className="container">
-          <h2 className="tak-hero-title">Onze Scouts Webshop</h2>
+          <h2 className="tak-hero-title">Webshop</h2>
         </div>
       </section>
 
@@ -53,15 +53,14 @@ export default async function ShopPage() {
               >
                 Hopper winkel of webshop
               </a>.<br/>
-              Via <strong>onze eigen Kriko-M webshop</strong> bestel je onze unieke groepskledij (T-shirt, trui en groepsdas) én onze officiële kentekens.
+              Via <strong>onze eigen Kriko-M webshop</strong> bestel je onze unieke groepskledij (T-shirt, trui en groepsdas). Kentekens zijn eveneens te bestellen via Hopper, maar bieden we voor het gemak ook rechtstreeks aan in onze webshop!
             </p>
           </div>
         </div>
 
         {/* 1. HOOFDARTIKELEN (T-Shirt, Trui, Groepsdas) */}
         <div style={{ marginBottom: 50 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 10 }}>
-            <i className="fa-solid fa-shirt" style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)' }} />
+          <div style={{ marginBottom: 20, borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 10 }}>
             <h3 style={{ fontSize: '1.4rem', color: 'var(--color-primary-dark)', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}>
               Kriko-M Kledij &amp; Groepsdas
             </h3>
@@ -74,18 +73,12 @@ export default async function ShopPage() {
           </div>
         </div>
 
-        {/* 2. KENTEKENS COLLECTIE */}
+        {/* 2. KENTEKENS */}
         <div style={{ marginBottom: 40 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 10 }}>
-            <i className="fa-solid fa-certificate" style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)' }} />
-            <div>
-              <h3 style={{ fontSize: '1.4rem', color: 'var(--color-primary-dark)', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}>
-                Collectie Kentekens &amp; Badges
-              </h3>
-              <p style={{ fontSize: '0.88rem', color: 'var(--color-text-muted)', margin: '2px 0 0' }}>
-                Alle officiële schildjes, tak- en jaarkentekens voor op het hemd.
-              </p>
-            </div>
+          <div style={{ marginBottom: 20, borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 10 }}>
+            <h3 style={{ fontSize: '1.4rem', color: 'var(--color-primary-dark)', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}>
+              Kentekens
+            </h3>
           </div>
 
           <div style={{
@@ -117,9 +110,9 @@ export default async function ShopPage() {
                 Waar horen deze kentekens op het hemd?
               </h4>
               <p style={{ fontSize: '0.88rem', color: 'var(--color-text-dark)', margin: 0, lineHeight: 1.5 }}>
-                Bekijk de schematische tekeningen en opnaai-instructies van de kentekens op de officiële website van{' '}
+                Bekijk de schematische tekeningen en opnaai-instructies van de kentekens op de officiële gids van{' '}
                 <a 
-                  href="https://www.scoutsengidsenvlaanderen.be/scoutskentekens" 
+                  href="https://www.scoutsengidsenvlaanderen.be/ouders/scoutskledij/kentekens" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'underline' }}

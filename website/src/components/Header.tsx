@@ -69,6 +69,7 @@ export default function Header() {
               </li>
               <li><Link href="/echos" className={isActive('/echos') ? 'nav-active' : ''}>KRIKO ECHO</Link></li>
               <li><Link href="/kalender" className={isActive('/kalender') ? 'nav-active' : ''}>KALENDER</Link></li>
+              <li><Link href="/shop" className={isActive('/shop') ? 'nav-active' : ''}>UNIFORMEN</Link></li>
               <li><Link href="/verhuur" className={isActive('/verhuur') ? 'nav-active' : ''}>VERHUUR</Link></li>
               <li className="nav-mobile-only">
                 <Link href="/inschrijven" className={isActive('/inschrijven') ? 'nav-active' : ''}>INSCHRIJVEN</Link>

@@ -20,6 +20,7 @@ export async function GET() {
 
     const leiding = users.find(u => u.app_metadata?.role === 'leiding' || u.email === 'leiding@kriko-m.be')
     const groepsleiding = users.find(u => u.app_metadata?.role === 'groepsleiding' || u.app_metadata?.role === 'admin' || u.email === 'groepsleiding@kriko-m.be')
+    const webshop = users.find(u => u.app_metadata?.role === 'webshop' || u.email === 'webshop@kriko-m.be')
 
     return NextResponse.json({
       accounts: [
@@ -34,6 +35,12 @@ export async function GET() {
           role: 'groepsleiding',
           email: groepsleiding?.email || 'groepsleiding@kriko-m.be',
           naam: groepsleiding?.user_metadata?.naam || 'Groepsleiding',
+        },
+        {
+          id: webshop?.id || null,
+          role: 'webshop',
+          email: webshop?.email || 'webshop@kriko-m.be',
+          naam: webshop?.user_metadata?.naam || 'Webshop & uniformen',
         },
       ]
     })
@@ -52,7 +59,7 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { role, newName, newPassword } = body
 
-    if (!role || (role !== 'leiding' && role !== 'groepsleiding')) {
+    if (!role || (role !== 'leiding' && role !== 'groepsleiding' && role !== 'webshop')) {
       return NextResponse.json({ error: 'Ongeldige rol gespecificeerd.' }, { status: 400 })
     }
 
@@ -63,7 +70,9 @@ export async function POST(request: Request) {
     const targetUser = users.find(u =>
       role === 'leiding'
         ? (u.app_metadata?.role === 'leiding' || u.email === 'leiding@kriko-m.be')
-        : (u.app_metadata?.role === 'groepsleiding' || u.app_metadata?.role === 'admin' || u.email === 'groepsleiding@kriko-m.be')
+        : role === 'groepsleiding'
+        ? (u.app_metadata?.role === 'groepsleiding' || u.app_metadata?.role === 'admin' || u.email === 'groepsleiding@kriko-m.be')
+        : (u.app_metadata?.role === 'webshop' || u.email === 'webshop@kriko-m.be')
     )
 
     const updatePayload: Record<string, unknown> = {}
@@ -88,13 +97,14 @@ export async function POST(request: Request) {
 
     if (!targetUser) {
       // Create user if not existing yet
-      const email = role === 'leiding' ? 'leiding@kriko-m.be' : 'groepsleiding@kriko-m.be'
+      const email = role === 'leiding' ? 'leiding@kriko-m.be' : role === 'groepsleiding' ? 'groepsleiding@kriko-m.be' : 'webshop@kriko-m.be'
+      const defaultNaam = role === 'leiding' ? 'Leiding' : role === 'groepsleiding' ? 'Groepsleiding' : 'Webshop & uniformen'
       const { error: createError } = await admin.auth.admin.createUser({
         email,
         password: newPassword?.trim() || 'test123',
         email_confirm: true,
         app_metadata: { role },
-        user_metadata: { naam: newName?.trim() || (role === 'leiding' ? 'Leiding' : 'Groepsleiding') },
+        user_metadata: { naam: newName?.trim() || defaultNaam },
       })
       if (createError) throw createError
       return NextResponse.json({ success: true, message: 'Account succesvol aangemaakt en bijgewerkt.' })

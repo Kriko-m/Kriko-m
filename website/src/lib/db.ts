@@ -105,8 +105,8 @@ export const getShopProducts = unstable_cache(
       .order('sort_order', { ascending: true })
     return data ?? []
   },
-  ['shop-products-cache'],
-  { revalidate: 300, tags: ['shop-products'] }
+  ['shop-products-cache-v2'],
+  { revalidate: 10, tags: ['shop-products'] }
 )
 
 export async function getOrders() {

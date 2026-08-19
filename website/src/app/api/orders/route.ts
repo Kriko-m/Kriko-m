@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
 import { Product, OrderItem } from '@/lib/types'
-import { sendOrderConfirmation, sendKatrienNotification } from '@/lib/email'
+import { sendOrderConfirmation, sendWebshopOrderNotification } from '@/lib/email'
 
 // Eenvoudige mededeling en bestelnummer (bijv. KM-0001)
 function generateCommunication(orderNumber: number): string {
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     // Bank- en instellingsgegevens ophalen (inclusief webshop_email)
     const { data: settings } = await supabase
       .from('settings')
-      .select('bank_iban, bank_holder, webshop_email, contact_email')
+      .select('*')
       .single()
     const bankIban = settings?.bank_iban || 'BE76 1234 5678 9012'
     const bankHolder = settings?.bank_holder || 'Scouts Kriko-M vzw'
@@ -115,9 +115,9 @@ export async function POST(req: NextRequest) {
       console.error('Koper bevestigingsmail mislukt:', mailErr)
     }
 
-    // 2. Notificatiemail naar uniformverantwoordelijke
+    // 2. Notificatiemail naar webshopverantwoordelijke
     try {
-      await sendKatrienNotification({
+      await sendWebshopOrderNotification({
         to: webshopEmail,
         orderRef,
         customerName: customer_name.trim(),
@@ -128,8 +128,8 @@ export async function POST(req: NextRequest) {
         bankIban,
         bankHolder,
       })
-    } catch (katrienMailErr) {
-      console.error('Notificatiemail mislukt:', katrienMailErr)
+    } catch (orderMailErr) {
+      console.error('Notificatiemail mislukt:', orderMailErr)
     }
 
     return NextResponse.json({

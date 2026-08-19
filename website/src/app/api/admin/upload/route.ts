@@ -11,13 +11,29 @@ const MAX_BYTES = 10 * 1024 * 1024 // 10 MB
 const ALLOWED_MIME: Record<string, string> = {
   'application/pdf': 'pdf',
   'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+  'image/pjpeg': 'jpg',
   'image/png': 'png',
   'image/webp': 'webp',
+  'image/gif': 'gif',
+  'image/heic': 'heic',
+  'image/heif': 'heif',
+  'image/avif': 'avif',
   // Presentaties (enkel zinvol voor kamp-bijlagen, type 'presentatie').
   'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
 }
-// Omslagfoto's: enkel afbeeldingen.
-const IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp'])
+// Omslagfoto's & productfoto's: enkel afbeeldingen.
+const IMAGE_MIME = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/pjpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/heic',
+  'image/heif',
+  'image/avif',
+])
 
 /**
  * Optimaliseert een afbeelding met sharp:
@@ -83,11 +99,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Bestand is te groot (max. 10 MB).' }, { status: 400 })
     }
 
-    const initialExt = ALLOWED_MIME[file.type]
+    let effectiveMime = file.type
+    if (!effectiveMime || !ALLOWED_MIME[effectiveMime]) {
+      const extMatch = file.name.split('.').pop()?.toLowerCase()
+      if (extMatch === 'jpg' || extMatch === 'jpeg') effectiveMime = 'image/jpeg'
+      else if (extMatch === 'png') effectiveMime = 'image/png'
+      else if (extMatch === 'webp') effectiveMime = 'image/webp'
+      else if (extMatch === 'pdf') effectiveMime = 'application/pdf'
+      else if (extMatch === 'gif') effectiveMime = 'image/gif'
+      else if (extMatch === 'heic') effectiveMime = 'image/heic'
+      else if (extMatch === 'pptx') effectiveMime = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    }
+
+    const initialExt = ALLOWED_MIME[effectiveMime]
     if (!initialExt) {
       return NextResponse.json({ error: 'Bestandstype niet toegestaan. Enkel PDF, JPG, PNG of WebP.' }, { status: 400 })
     }
-    if (uploadType === 'kamp-foto' && !IMAGE_MIME.has(file.type)) {
+    if (uploadType === 'kamp-foto' && !IMAGE_MIME.has(effectiveMime)) {
       return NextResponse.json({ error: 'Omslagfoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
     }
     // PPTX is enkel zinvol als kamp-bijlage (presentatie), nergens anders.
@@ -99,7 +127,7 @@ export async function POST(req: NextRequest) {
     const rawBuffer = Buffer.from(arrayBuffer)
 
     // Automatische compressie en herschaling via sharp indien het een foto betreft
-    const { buffer, contentType, ext } = await optimizeImageBuffer(rawBuffer, file.type)
+    const { buffer, contentType, ext } = await optimizeImageBuffer(rawBuffer, effectiveMime)
 
     const admin = createAdminClient()
     const oldUrl = formData.get('oldUrl') as string | null
@@ -333,6 +361,25 @@ export async function POST(req: NextRequest) {
 
       await cleanupOldFile('kamp-fotos', oldUrl)
       const filename = `home-leiding-${Date.now()}.${ext}`
+
+      const { error: storageError } = await admin.storage
+        .from('kamp-fotos')
+        .upload(filename, buffer, { contentType, upsert: true })
+
+      if (storageError) throw storageError
+
+      const { data: pub } = admin.storage.from('kamp-fotos').getPublicUrl(filename)
+      return NextResponse.json({ url: pub.publicUrl, filename })
+    }
+
+    if (uploadType === 'shop-product-foto') {
+      if (!IMAGE_MIME.has(file.type)) {
+        return NextResponse.json({ error: 'Productfoto moet een afbeelding zijn (JPG, PNG of WebP).' }, { status: 400 })
+      }
+
+      await cleanupOldFile('kamp-fotos', oldUrl)
+      const productId = formData.get('productId') as string | null
+      const filename = `shop-product-${productId || 'item'}-${Date.now()}.${ext}`
 
       const { error: storageError } = await admin.storage
         .from('kamp-fotos')

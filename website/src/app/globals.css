@@ -947,30 +947,8 @@ body.portal-theme .tak-hero.primair {
     background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
 }
 .tak-hero.primair::after {
-    content: '\269C';  /* fallback Fleur-de-lis */
-    position: absolute;
-    right: 5%;
-    top: 50%;
-    transform: translateY(-50%) translateY(-0.07em);
-    font-size: 9rem;
-    line-height: 1;
-    opacity: 0.09;
-    pointer-events: none;
-    user-select: none;
+    display: none !important;
 }
-.tak-hero.primair .container {
-    padding-left: 8px;
-}
-.tak-hero.hero-takken::after    { content: '\269C'; }
-.tak-hero.hero-kalender::after  { content: '\1F4C5'; }
-.tak-hero.hero-echos::after     { content: '\1F4F0'; }
-.tak-hero.hero-archief::after   { content: '\1F4C1'; }
-.tak-hero.hero-verslagen::after { content: '\1F4CB'; }
-.tak-hero.hero-webshop::after   { content: '\1F6CD'; }
-.tak-hero.hero-inschrijven::after { content: '\270D'; }
-.tak-hero.hero-contact::after   { content: '\2709'; }
-.tak-hero.hero-checkout::after  { content: '\1F6D2'; }
-.tak-hero.hero-bestelling::after { content: '\2705'; }
 
 /* Banners worden nu via Next.js <Image> component en WebP ingeladen in takken/[slug]/page.tsx voor snellere laadtijden */
 
@@ -1119,8 +1097,8 @@ body.portal-theme .tak-hero.primair {
 }
 
 .shop-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+    /* Kader blijft stil staan */
+    box-shadow: var(--shadow-md);
 }
 
 .shop-card-image {
@@ -1138,7 +1116,7 @@ body.portal-theme .tak-hero.primair {
 }
 
 .shop-card:hover .shop-card-image img {
-    transform: scale(1.08);
+    transform: scale(1.06);
 }
 
 .shop-badge {

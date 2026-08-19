@@ -425,7 +425,7 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                     } catch {}
 
                     const uitleg = parsed.uitleg || raw || 'Bestel de officiële groepsdas (bordeaux-beige), Kriko T-shirts/truien en tweedehands uniformstukken rechtstreeks via onze webshop!'
-                    const contact = parsed.contact || 'Contact Katrien: kat_vh@hotmail.com | 0476/89.57.47'
+                    const contact = parsed.contact || 'Vragen over bestellingen? Neem contact op met de webshopverantwoordelijke.'
 
                     return (
                       <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 22, borderRadius: 'var(--border-radius-md)', border: '2px solid var(--color-secondary)', display: 'flex', flexDirection: 'column', height: '100%' }}>

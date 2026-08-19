@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase'
-import { requireGroepsleiding } from '@/lib/auth'
+import { requireWebshop } from '@/lib/auth'
 
 const VALID_STATUSES = new Set(['pending', 'waiting_approval', 'paid', 'completed', 'cancelled'])
 
@@ -8,7 +8,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await requireGroepsleiding()
+  const user = await requireWebshop()
   if (!user) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const { id } = await params
@@ -25,7 +25,7 @@ export async function DELETE(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const user = await requireGroepsleiding()
+  const user = await requireWebshop()
   if (!user) return NextResponse.json({ error: 'Geen toegang' }, { status: 403 })
 
   const { id } = await params

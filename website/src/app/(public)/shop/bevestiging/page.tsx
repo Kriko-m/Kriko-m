@@ -35,7 +35,7 @@ export default function BevestigingPage() {
     )
   }
 
-  const katrienEmail = order.webshop_email || 'vicverhaegen4@gmail.com'
+  const notificationEmail = order.webshop_email || 'bestellingen@kriko-m.be'
 
   return (
     <>
@@ -54,7 +54,7 @@ export default function BevestigingPage() {
               Bestelling ontvangen — {order.order_ref}
             </strong>
             <span style={{ color: 'hsl(145,63%,30%)', fontSize: '0.95rem', lineHeight: 1.5, display: 'block' }}>
-              Je bestelling is succesvol geregistreerd. De uniformverantwoordelijke ontvangt hiervan direct bericht.
+              Je bestelling is succesvol geregistreerd. De webshopverantwoordelijke ontvangt hiervan direct bericht.
             </span>
           </div>
 
@@ -114,7 +114,7 @@ export default function BevestigingPage() {
               Ophalen van je bestelling
             </h3>
             <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
-              De uniformverantwoordelijke communiceert zelf per e-mail (via <a href={`mailto:${katrienEmail}`} style={{ color: 'var(--color-primary)', fontWeight: 800, textDecoration: 'underline' }}>{katrienEmail}</a>) wanneer en waar je je bestelling kan komen ophalen.
+              De webshopverantwoordelijke communiceert zelf per e-mail (via <a href={`mailto:${notificationEmail}`} style={{ color: 'var(--color-primary)', fontWeight: 800, textDecoration: 'underline' }}>{notificationEmail}</a>) wanneer en waar je je bestelling kan komen ophalen.
             </p>
           </div>
 

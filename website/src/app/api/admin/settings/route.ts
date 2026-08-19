@@ -119,7 +119,23 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Geen geldige velden' }, { status: 400 })
   }
 
-  const { data, error } = await admin.from('settings').update(update).eq('id', 1).select().single()
+  let { data, error } = await admin.from('settings').update(update).eq('id', 1).select().single()
+  
+  // Als de database-tabel een specifieke kolom mist (bijv. webshop_email als de migratie nog niet uitgevoerd is),
+  // vangen we de fout op, verwijderen de ontbrekende kolom uit 'update' en proberen opnieuw.
+  while (error && error.message.includes("Could not find the '")) {
+    const match = error.message.match(/Could not find the '([^']+)' column/)
+    if (match && match[1] && match[1] in update) {
+      delete update[match[1]]
+      if (Object.keys(update).length === 0) break
+      const retry = await admin.from('settings').update(update).eq('id', 1).select().single()
+      data = retry.data
+      error = retry.error
+    } else {
+      break
+    }
+  }
+
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   revalidateTag('settings', 'max')

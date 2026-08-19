@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase-browser'
 import { useEffect, useState } from 'react'
 
@@ -12,7 +12,7 @@ interface Props {
 
 interface AccountInfo {
   id: string | null
-  role: 'leiding' | 'groepsleiding'
+  role: 'leiding' | 'groepsleiding' | 'webshop'
   email: string
   naam: string
 }
@@ -20,20 +20,23 @@ interface AccountInfo {
 export default function PortaalNav({ naam, role }: Props) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const activeTabParam = searchParams.get('tab') || 'bestellingen'
   const supabase = createClient()
 
   const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
+  const isWebshop = role === 'webshop'
   const isHomePage = pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/'
 
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showAccountsModal, setShowAccountsModal] = useState(false)
   const [displayName, setDisplayName] = useState(naam)
-  
+
   // Account Management State (Groepsleiding)
   const [accounts, setAccounts] = useState<AccountInfo[]>([])
   const [loadingAccounts, setLoadingAccounts] = useState(false)
-  const [editingRole, setEditingRole] = useState<'leiding' | 'groepsleiding'>('leiding')
+  const [editingRole, setEditingRole] = useState<'leiding' | 'groepsleiding' | 'webshop'>('leiding')
   const [editName, setEditName] = useState('')
   const [editPassword, setEditPassword] = useState('')
   const [savingAccount, setSavingAccount] = useState(false)
@@ -114,7 +117,7 @@ export default function PortaalNav({ naam, role }: Props) {
     }
   }
 
-  function handleSelectRoleToEdit(roleType: 'leiding' | 'groepsleiding') {
+  function handleSelectRoleToEdit(roleType: 'leiding' | 'groepsleiding' | 'webshop') {
     setEditingRole(roleType)
     setEditPassword('')
     setModalError('')
@@ -144,7 +147,8 @@ export default function PortaalNav({ naam, role }: Props) {
       if (!res.ok || data.error) {
         setModalError(data.error || 'Fout bij opslaan van account.')
       } else {
-        setModalSuccess(`Account voor ${editingRole === 'leiding' ? 'Leiding' : 'Groepsleiding'} succesvol bijgewerkt!`)
+        const roleLabel = editingRole === 'leiding' ? 'Leiding' : editingRole === 'groepsleiding' ? 'Groepsleiding' : 'Webshop & uniformen'
+        setModalSuccess(`Account voor ${roleLabel} succesvol bijgewerkt!`)
         setEditPassword('')
         // Refresh accounts list
         const listRes = await fetch('/api/admin/accounts')
@@ -178,7 +182,7 @@ export default function PortaalNav({ naam, role }: Props) {
           
           {/* Left: Clean Brand Title & Icon */}
           <Link
-            href="/portaal/home"
+            href={isWebshop ? "/portaal/webshop/bestellingen" : "/portaal/home"}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -187,7 +191,7 @@ export default function PortaalNav({ naam, role }: Props) {
               flexShrink: 0,
               padding: '4px 0',
             }}
-            title="Leidingportaal Home"
+            title={isWebshop ? "Webshop & Uniformen" : "Leidingportaal Home"}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo-finaal.png" alt="Kriko-M" width={34} height={34} style={{ objectFit: 'contain', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' }} />
@@ -201,12 +205,38 @@ export default function PortaalNav({ naam, role }: Props) {
               textTransform: 'uppercase',
               textShadow: '0 2px 4px rgba(0,0,0,0.2)',
             }}>
-              Leidingportaal
+              {isWebshop ? 'Webshop & Uniformen' : 'Leidingportaal'}
             </span>
           </Link>
 
           {/* Center: Centered Nav Tabs (Desktop only) */}
-          {!isHomePage && (
+          {(isWebshop || pathname.startsWith('/portaal/webshop')) ? (
+            <nav className="portaal-nav-center-tabs desktop-only-tabs">
+              <Link
+                href="/portaal/webshop/bestellingen"
+                className={`portaal-nav-tab${pathname === '/portaal/webshop/bestellingen' || pathname === '/portaal/webshop' ? ' active' : ''}`}
+              >
+                <i className="fa-solid fa-box-archive"></i>
+                <span>Bestellingen</span>
+              </Link>
+              <Link
+                href="/portaal/webshop/artikelen"
+                className={`portaal-nav-tab${pathname === '/portaal/webshop/artikelen' ? ' active' : ''}`}
+              >
+                <i className="fa-solid fa-shirt"></i>
+                <span>Artikelen &amp; Assortiment</span>
+              </Link>
+              {isGroepsleiding && (
+                <Link
+                  href="/portaal/home"
+                  className="portaal-nav-tab"
+                >
+                  <i className="fa-solid fa-house"></i>
+                  <span>Terug naar portaal</span>
+                </Link>
+              )}
+            </nav>
+          ) : !isHomePage && (
             <nav className="portaal-nav-center-tabs desktop-only-tabs">
               {/* 1. Kriko Echo */}
               <Link
@@ -307,27 +337,48 @@ export default function PortaalNav({ naam, role }: Props) {
                     animation: 'dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
                   }}
                 >
-                  <Link href="/portaal/home" className={`portaal-dropdown-item${pathname === '/portaal/home' || pathname === '/portaal/leiding' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                    <i className="fa-solid fa-house" style={{ color: '#6A8A75' }}></i>
-                    <span>Portaal Home</span>
-                  </Link>
-                  <Link href="/portaal/echos" className={`portaal-dropdown-item${pathname === '/portaal/echos' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                    <i className="fa-solid fa-newspaper" style={{ color: '#6A8A75' }}></i>
-                    <span>Kriko Echo</span>
-                  </Link>
-                  <Link href="/portaal/algemene-info" className={`portaal-dropdown-item${pathname === '/portaal/algemene-info' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                    <i className="fa-solid fa-folder-open" style={{ color: '#6A8A75' }}></i>
-                    <span>Documenten &amp; Links</span>
-                  </Link>
-                  <Link href="/portaal/leiding/agenda" className={`portaal-dropdown-item${pathname === '/portaal/leiding/agenda' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                    <i className="fa-solid fa-calendar-days" style={{ color: '#6A8A75' }}></i>
-                    <span>Kalender</span>
-                  </Link>
-                  {isGroepsleiding && (
-                    <Link href="/portaal/website-beheer" className={`portaal-dropdown-item${pathname === '/portaal/website-beheer' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                      <i className="fa-solid fa-globe" style={{ color: '#6A8A75' }}></i>
-                      <span>Website Beheer</span>
-                    </Link>
+                  {isWebshop ? (
+                    <>
+                      <Link href="/portaal/webshop/bestellingen" className={`portaal-dropdown-item${pathname === '/portaal/webshop/bestellingen' || pathname === '/portaal/webshop' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                        <i className="fa-solid fa-box-archive" style={{ color: '#6A8A75' }}></i>
+                        <span>Bestellingen</span>
+                      </Link>
+                      <Link href="/portaal/webshop/artikelen" className={`portaal-dropdown-item${pathname === '/portaal/webshop/artikelen' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                        <i className="fa-solid fa-shirt" style={{ color: '#6A8A75' }}></i>
+                        <span>Artikelen &amp; Assortiment</span>
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/portaal/home" className={`portaal-dropdown-item${pathname === '/portaal/home' || pathname === '/portaal/leiding' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                        <i className="fa-solid fa-house" style={{ color: '#6A8A75' }}></i>
+                        <span>Portaal Home</span>
+                      </Link>
+                      <Link href="/portaal/echos" className={`portaal-dropdown-item${pathname === '/portaal/echos' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                        <i className="fa-solid fa-newspaper" style={{ color: '#6A8A75' }}></i>
+                        <span>Kriko Echo</span>
+                      </Link>
+                      <Link href="/portaal/algemene-info" className={`portaal-dropdown-item${pathname === '/portaal/algemene-info' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                        <i className="fa-solid fa-folder-open" style={{ color: '#6A8A75' }}></i>
+                        <span>Documenten &amp; Links</span>
+                      </Link>
+                      <Link href="/portaal/leiding/agenda" className={`portaal-dropdown-item${pathname === '/portaal/leiding/agenda' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                        <i className="fa-solid fa-calendar-days" style={{ color: '#6A8A75' }}></i>
+                        <span>Kalender</span>
+                      </Link>
+                      {isGroepsleiding && (
+                        <>
+                          <Link href="/portaal/website-beheer" className={`portaal-dropdown-item${pathname === '/portaal/website-beheer' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                            <i className="fa-solid fa-globe" style={{ color: '#6A8A75' }}></i>
+                            <span>Website Beheer</span>
+                          </Link>
+                          <Link href="/portaal/webshop/bestellingen" className={`portaal-dropdown-item${pathname.startsWith('/portaal/webshop') ? ' active' : ''}`} style={mobileDropdownItemStyle}>
+                            <i className="fa-solid fa-store" style={{ color: '#6A8A75' }}></i>
+                            <span>Webshop Beheer</span>
+                          </Link>
+                        </>
+                      )}
+                    </>
                   )}
                   <div style={{ height: 1, background: '#C2D9C9', margin: '4px 6px' }} />
                   <Link href="/" className="portaal-dropdown-item" style={{ ...mobileDropdownItemStyle, color: '#1A3D2A', fontWeight: 800 }}>
@@ -387,10 +438,10 @@ export default function PortaalNav({ naam, role }: Props) {
                       Ingelogd als
                     </span>
                     <strong style={{ display: 'block', fontSize: '0.98rem', fontWeight: 800, color: '#1A3D2A', marginTop: 2, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
-                      {displayName || (isGroepsleiding ? 'Groepsleiding' : 'Leiding')}
+                      {displayName || (isWebshop ? 'Webshop & uniformen' : isGroepsleiding ? 'Groepsleiding' : 'Leiding')}
                     </strong>
                     <span style={{ display: 'inline-block', marginTop: 4, fontSize: '0.72rem', fontWeight: 700, color: '#1A3D2A', background: 'rgba(26,61,42,0.1)', padding: '2px 8px', borderRadius: 10 }}>
-                      {isGroepsleiding ? 'Groepsleiding' : 'Leiding'}
+                      {isWebshop ? 'Webshop & uniformen' : isGroepsleiding ? 'Groepsleiding' : 'Leiding'}
                     </span>
                   </div>
 
@@ -474,13 +525,13 @@ export default function PortaalNav({ naam, role }: Props) {
                     Selecteer hieronder het account dat je wilt bewerken (naam of wachtwoord aanpassen):
                   </div>
 
-                  {/* Selector between the 2 accounts */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  {/* Selector between the 3 accounts */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
                     <button
                       type="button"
                       onClick={() => handleSelectRoleToEdit('leiding')}
                       style={{
-                        padding: '12px',
+                        padding: '10px 6px',
                         borderRadius: 12,
                         border: editingRole === 'leiding' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
                         background: editingRole === 'leiding' ? '#EEF5F1' : '#FAFAFA',
@@ -488,6 +539,7 @@ export default function PortaalNav({ naam, role }: Props) {
                         fontWeight: editingRole === 'leiding' ? 800 : 600,
                         cursor: 'pointer',
                         textAlign: 'center',
+                        fontSize: '0.85rem',
                       }}
                     >
                       Leiding
@@ -496,7 +548,7 @@ export default function PortaalNav({ naam, role }: Props) {
                       type="button"
                       onClick={() => handleSelectRoleToEdit('groepsleiding')}
                       style={{
-                        padding: '12px',
+                        padding: '10px 6px',
                         borderRadius: 12,
                         border: editingRole === 'groepsleiding' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
                         background: editingRole === 'groepsleiding' ? '#EEF5F1' : '#FAFAFA',
@@ -504,14 +556,32 @@ export default function PortaalNav({ naam, role }: Props) {
                         fontWeight: editingRole === 'groepsleiding' ? 800 : 600,
                         cursor: 'pointer',
                         textAlign: 'center',
+                        fontSize: '0.85rem',
                       }}
                     >
                       Groepsleiding
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectRoleToEdit('webshop')}
+                      style={{
+                        padding: '10px 6px',
+                        borderRadius: 12,
+                        border: editingRole === 'webshop' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
+                        background: editingRole === 'webshop' ? '#EEF5F1' : '#FAFAFA',
+                        color: '#1A3D2A',
+                        fontWeight: editingRole === 'webshop' ? 800 : 600,
+                        cursor: 'pointer',
+                        textAlign: 'center',
+                        fontSize: '0.85rem',
+                      }}
+                    >
+                      Webshop
+                    </button>
                   </div>
 
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Weergavenaam voor {editingRole === 'leiding' ? 'Leiding' : 'Groepsleiding'}:</label>
+                    <label className="form-label">Weergavenaam voor {editingRole === 'leiding' ? 'Leiding' : editingRole === 'groepsleiding' ? 'Groepsleiding' : 'Webshop & uniformen'}:</label>
                     <input
                       type="text"
                       className="form-control"
