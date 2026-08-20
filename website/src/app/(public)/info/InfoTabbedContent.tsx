@@ -168,10 +168,23 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                   <p style={{ margin: '0 0 12px 0', whiteSpace: 'pre-line' }}>
                     {(() => {
                       const raw = siteContent['info.waariswat']?.content || ''
+                      const defaultIntro = 'Omdat we alle praktische zaken al overzichtelijk elders op de website tonen, sturen we je graag door naar de juiste plek:'
                       try {
-                        if (raw.startsWith('{')) return JSON.parse(raw).intro
+                        if (raw.trim().startsWith('{')) {
+                          const parsed = JSON.parse(raw)
+                          let introText = parsed.intro
+                          if (typeof introText === 'string' && introText.trim().startsWith('{')) {
+                            try {
+                              introText = JSON.parse(introText).intro
+                            } catch {}
+                          }
+                          if (introText && typeof introText === 'string' && !introText.trim().startsWith('{') && introText.trim().length > 0) {
+                            return introText
+                          }
+                          return defaultIntro
+                        }
                       } catch {}
-                      return raw || 'Omdat we alle praktische zaken al overzichtelijk elders op de website tonen, sturen we je graag door naar de juiste plek:'
+                      return raw && !raw.trim().startsWith('{') ? raw : defaultIntro
                     })()}
                   </p>
                   <ul style={{ margin: 0, paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -179,7 +192,10 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                       const raw = siteContent['info.waariswat']?.content || ''
                       let linksData: Record<string, string> = {}
                       try {
-                        if (raw.startsWith('{')) linksData = JSON.parse(raw).links || {}
+                        if (raw.trim().startsWith('{')) {
+                          const parsed = JSON.parse(raw)
+                          linksData = parsed.links || {}
+                        }
                       } catch {}
 
                       return (

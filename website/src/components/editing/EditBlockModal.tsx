@@ -60,7 +60,19 @@ export default function EditBlockModal({
   })()
 
   // Standard text state
-  const [content, setContent] = useState(parsedData?.uitleg || parsedData?.intro || initialContent)
+  const [content, setContent] = useState(() => {
+    if (parsedData) {
+      let val = parsedData.uitleg ?? parsedData.intro ?? ''
+      if (typeof val === 'string' && val.trim().startsWith('{')) {
+        try {
+          const nested = JSON.parse(val)
+          val = nested.intro ?? ''
+        } catch {}
+      }
+      return val
+    }
+    return initialContent
+  })
 
   // Tak card fields
   const [takSfeer, setTakSfeer] = useState<string>(parsedData?.sfeer || '')

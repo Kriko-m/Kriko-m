@@ -914,7 +914,7 @@ a {
     z-index: 3;
 }
 
-/* Hero "eyebrow" label â€” accentlabel boven hero-titels */
+/* Hero "eyebrow" label — accentlabel boven hero-titels */
 .hero-eyebrow {
     display: inline-block;
     color: var(--tak-color, var(--color-accent-light));
@@ -934,13 +934,19 @@ a {
 .tak-hero.jonggivers { --tak-color: var(--color-jonggivers); }
 .tak-hero.givers     { --tak-color: var(--color-givers); }
 .tak-hero.algemeen   { --tak-color: var(--color-accent-light); } /* algemene paginakop (niet tak-specifiek) */
-.tak-hero.primair    { --tak-color: var(--color-accent-light); } /* bordeaux paginakop â€” niet tak-specifiek */
+.tak-hero.primair    { --tak-color: var(--color-accent-light); } /* bordeaux paginakop — niet tak-specifiek */
 
 .tak-hero.primair {
     /* Thema-bewust: bordeaux op de publieke site, groen in de portaal-/webshopzone */
     background: linear-gradient(160deg, var(--color-primary-dark) 0%, var(--color-primary) 55%);
     padding: 44px 0;
     margin-bottom: 40px;
+}
+
+@media (min-width: 993px) and (max-width: 1320px) {
+    .tak-hero-title {
+        padding-left: 155px;
+    }
 }
 /* Groene variant met wat meer diepte in de portaal-/webshopzone */
 body.portal-theme .tak-hero.primair {
@@ -7201,7 +7207,7 @@ html, body {
     /* Title overflow fix across all pages */
     .tak-hero-title,
     .tak-hero.algemeen .tak-hero-title {
-        font-size: clamp(1.6rem, 6.5vw, 3.2rem) !important;
+        font-size: clamp(2.8rem, 12vw, 3.8rem) !important;
         white-space: normal !important;
         overflow-wrap: break-word !important;
         word-break: break-word !important;
@@ -7210,6 +7216,9 @@ html, body {
 }
 
 @media (max-width: 640px) {
+    .container {
+        padding: 0 14px !important;
+    }
     /* Kriko Echo: 1-column layout so PDF titles & dates are fully visible */
     .echo-grid {
         grid-template-columns: 1fr !important;
@@ -7217,8 +7226,8 @@ html, body {
     }
     .echo-card {
         height: auto !important;
-        min-height: 140px !important;
-        padding: 24px 0 16px !important;
+        min-height: 185px !important;
+        padding: 28px 0 20px !important;
     }
     .echo-card-pdf-btn {
         padding: 10px 14px !important;
@@ -7244,16 +7253,86 @@ html, body {
 
     /* Kalender grid & activity layout */
     .cal-grid-wrapper {
-        padding: 12px 6px !important;
-        border-radius: 14px !important;
+        padding: 12px 10px !important;
+        border-radius: 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+    .cal-grid-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+    .cal-grid-month-title {
+        font-size: 1.5rem !important;
+    }
+    .section {
+        padding-bottom: 48px !important;
     }
     .cal-2col-layout {
         width: 100% !important;
         max-width: 100% !important;
+        box-sizing: border-box !important;
         overflow-x: hidden;
+        margin-bottom: 32px !important;
     }
+    .cal-grid-weekdays,
     .cal-grid-days {
+        display: grid !important;
+        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .cal-grid-weekday {
+        font-size: 0.72rem !important;
+        padding: 4px 0 !important;
+    }
+    .cal-grid-cell {
+        min-width: 0 !important;
+        overflow: hidden !important;
+        padding: 4px 2px !important;
+        min-height: 44px !important;
+        box-sizing: border-box !important;
+    }
+    .cal-grid-day-number {
+        font-size: 0.85rem !important;
+    }
+    /* Hide 'Vandaag' text inside small grid cell so it doesn't force cell width expansion */
+    .cal-grid-today-tag {
+        display: none !important;
+    }
+    /* Activity cards and badge alignment */
+    .cal-col-main,
+    .cal-col-sidebar {
+        width: 100% !important;
         max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .event-card-v2,
+    .event-card-compact {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        border-radius: 14px !important;
+        overflow: hidden !important;
+        padding: 10px 12px !important;
+        gap: 10px !important;
+    }
+    .event-card-compact-header {
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+    }
+    .event-card-compact-title {
+        font-size: 0.95rem !important;
+    }
+    .event-card-compact-badge {
+        font-size: 0.6rem !important;
+        padding: 2px 6px !important;
+    }
+    .event-card-v2-header-top {
+        justify-content: flex-start !important;
     }
 
     /* Inschrijfpagina step boxes & action buttons */
