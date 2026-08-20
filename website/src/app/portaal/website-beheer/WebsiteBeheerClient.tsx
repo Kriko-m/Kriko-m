@@ -48,15 +48,7 @@ interface Props {
   role?: string
 }
 
-type PageKey = 'home' | 'echos' | 'docs' | 'agenda' | 'beheer'
 
-const PAGE_NAMES: Record<PageKey, { label: string }> = {
-  home: { label: 'Startpagina' },
-  echos: { label: 'Kriko Echo' },
-  docs: { label: 'Documenten & Links' },
-  agenda: { label: 'Kalender' },
-  beheer: { label: 'Website Beheer' },
-}
 
 export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   const router = useRouter()
@@ -112,18 +104,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     initialSettings?.webshop_email || 'groepsleiding@kriko-m.be'
   )
 
-  // Achtergronden per pagina
-  const [pageBgs, setPageBgs] = useState<Record<PageKey, { type: 'photo' | 'color'; value: string }>>({
-    home: { type: initialSettings?.home_bg_type || 'photo', value: initialSettings?.home_bg_value || '/images/hero-nieuw.webp' },
-    echos: { type: initialSettings?.echos_bg_type || 'color', value: initialSettings?.echos_bg_value || '#2A5A40' },
-    docs: { type: initialSettings?.docs_bg_type || 'color', value: initialSettings?.docs_bg_value || '#2A5A40' },
-    agenda: { type: initialSettings?.agenda_bg_type || 'color', value: initialSettings?.agenda_bg_value || '#2A5A40' },
-    beheer: { type: initialSettings?.beheer_bg_type || 'color', value: initialSettings?.beheer_bg_value || '#2A5A40' },
-  })
-
-  const [activeBgTab, setActiveBgTab] = useState<PageKey>('home')
   const [activeTitleRoleTab, setActiveTitleRoleTab] = useState<'leiding' | 'groepsleiding'>('leiding')
-  const [uploadingBg, setUploadingBg] = useState(false)
 
   // Accountbeheer State inside Portaal Instellingen
   const [accounts, setAccounts] = useState<AccountInfo[]>([])
@@ -369,50 +350,6 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     }
   }
 
-  async function handleUploadBackgroundPhoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setUploadingBg(true)
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('type', 'portal-background')
-      formData.append('tak', activeBgTab)
-
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Uploaden mislukt')
-      }
-
-      const data = await res.json()
-      if (data.url) {
-        updateActivePageBg('value', data.url)
-        showModalNotification('success', `Nieuwe foto geüpload voor ${PAGE_NAMES[activeBgTab].label}! Klik op 'Wijzigingen Opslaan' om te bevestigen.`)
-      }
-    } catch (err: unknown) {
-      showModalNotification('error', err instanceof Error ? err.message : 'Fout bij uploaden foto')
-    } finally {
-      setUploadingBg(false)
-      e.target.value = ''
-    }
-  }
-
-  function updateActivePageBg(field: 'type' | 'value', val: string) {
-    setPageBgs(prev => ({
-      ...prev,
-      [activeBgTab]: {
-        ...prev[activeBgTab],
-        [field]: val,
-      },
-    }))
-  }
-
   async function handleSavePortalSettings() {
     setSaving(true)
     setModalFlash(null)
@@ -423,16 +360,6 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
         home_title_groepsleiding: homeTitleGroepsleiding,
         home_subtitle_groepsleiding: homeSubtitleGroepsleiding,
         webshop_email: webshopEmail,
-        home_bg_type: pageBgs.home.type,
-        home_bg_value: pageBgs.home.value,
-        echos_bg_type: pageBgs.echos.type,
-        echos_bg_value: pageBgs.echos.value,
-        docs_bg_type: pageBgs.docs.type,
-        docs_bg_value: pageBgs.docs.value,
-        agenda_bg_type: pageBgs.agenda.type,
-        agenda_bg_value: pageBgs.agenda.value,
-        beheer_bg_type: pageBgs.beheer.type,
-        beheer_bg_value: pageBgs.beheer.value,
       }
 
       const res = await fetch('/api/admin/settings', {
@@ -1081,19 +1008,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   }
 
   return (
-    <div style={{ maxWidth: 1240, margin: '0 auto', width: '100%' }} className="portaal-page-container">
-      <header className="portaal-page-header" style={{ margin: '-28px -20px 28px -20px' }}>
-        <div className="portaal-page-header-inner">
-          <div>
-            <h1 className="portaal-page-header-title">
-              <i className="fa-solid fa-globe"></i> Website &amp; Systeem Beheer
-            </h1>
-            <p className="portaal-page-header-desc">
-              Beheer de inhoud van de website, portaalbeheerders en webshopinstellingen.
-            </p>
-          </div>
-        </div>
-      </header>
+    <div style={{ maxWidth: 1240, margin: '0 auto', width: '100%', padding: '24px 20px 48px' }} className="portaal-page-container">
 
       {/* Notification Toast Outside Modal */}
       {flashMessage && (
@@ -1520,128 +1435,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                 )}
               </div>
 
-              {/* SECTIE 2: ACHTERGROND PER PAGINA */}
-              <div style={{ backgroundColor: '#FAFCFA', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0' }}>
-                <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A' }}>
-                  Achtergrond Per Pagina
-                </h4>
-                <p style={{ margin: '0 0 14px', fontSize: '0.84rem', color: '#6A8A75' }}>
-                  Kies een foto of een effen kleur als achtergrond voor elke specifieke pagina in het portaal.
-                </p>
 
-                {/* Page Selector Tabs */}
-                <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 16 }}>
-                  {(Object.keys(PAGE_NAMES) as PageKey[]).map((pageKey) => {
-                    const active = activeBgTab === pageKey
-                    const info = PAGE_NAMES[pageKey]
-                    return (
-                      <button
-                        key={pageKey}
-                        type="button"
-                        onClick={() => setActiveBgTab(pageKey)}
-                        style={{
-                          padding: '8px 14px',
-                          borderRadius: 10,
-                          border: active ? '2px solid #1A3D2A' : '1.5px solid #CBD5E1',
-                          backgroundColor: active ? '#1A3D2A' : '#fff',
-                          color: active ? '#fff' : '#1A3D2A',
-                          fontWeight: 800,
-                          fontSize: '0.82rem',
-                          cursor: 'pointer',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {info.label}
-                      </button>
-                    )
-                  })}
-                </div>
-
-                {/* Type Selection (Foto vs Kleur) */}
-                <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}>
-                    <input
-                      type="radio"
-                      name="bgType"
-                      checked={pageBgs[activeBgTab].type === 'photo'}
-                      onChange={() => updateActivePageBg('type', 'photo')}
-                    />
-                    Afbeelding / Foto
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}>
-                    <input
-                      type="radio"
-                      name="bgType"
-                      checked={pageBgs[activeBgTab].type === 'color'}
-                      onChange={() => updateActivePageBg('type', 'color')}
-                    />
-                    Effen Kleur
-                  </label>
-                </div>
-
-                {/* Controls per Type */}
-                {pageBgs[activeBgTab].type === 'photo' ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                        Afbeelding URL voor {PAGE_NAMES[activeBgTab].label}
-                      </label>
-                      <div style={{ display: 'flex', gap: 10 }}>
-                        <input
-                          type="text"
-                          value={pageBgs[activeBgTab].value}
-                          onChange={e => updateActivePageBg('value', e.target.value)}
-                          placeholder="/images/hero-nieuw.webp of https://..."
-                          style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', background: '#fff', color: '#1A3D2A' }}
-                        />
-                        <label style={{
-                          padding: '10px 16px',
-                          borderRadius: 8,
-                          backgroundColor: '#1A3D2A',
-                          color: '#fff',
-                          fontWeight: 800,
-                          fontSize: '0.85rem',
-                          cursor: uploadingBg ? 'wait' : 'pointer',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 6,
-                          whiteSpace: 'nowrap',
-                        }}>
-                          <span>{uploadingBg ? 'Uploaden…' : 'Foto Uploaden'}</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            disabled={uploadingBg}
-                            onChange={handleUploadBackgroundPhoto}
-                            style={{ display: 'none' }}
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                      Achtergrondkleur (Hex code)
-                    </label>
-                    <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                      <input
-                        type="color"
-                        value={pageBgs[activeBgTab].value.startsWith('#') ? pageBgs[activeBgTab].value : '#2A5A40'}
-                        onChange={e => updateActivePageBg('value', e.target.value)}
-                        style={{ width: 44, height: 44, border: 'none', borderRadius: 8, cursor: 'pointer' }}
-                      />
-                      <input
-                        type="text"
-                        value={pageBgs[activeBgTab].value}
-                        onChange={e => updateActivePageBg('value', e.target.value)}
-                        placeholder="#2A5A40"
-                        style={{ width: 140, padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, background: '#fff', color: '#1A3D2A' }}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
 
               {/* SECTIE 3: ACCOUNTBEHEER & WACHTWOORDEN */}
               <div style={{ backgroundColor: '#F8FAF8', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0' }}>

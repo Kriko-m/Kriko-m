@@ -603,44 +603,8 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const showEditControls = isGroepsleiding && editMode
 
   return (
-    <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }} className="portaal-page-container">
-      <header className="portaal-page-header" style={{ margin: '-28px -20px 28px -20px' }}>
-        <div className="portaal-page-header-inner">
-          <div>
-            <h1 className="portaal-page-header-title">
-              <i className="fa-solid fa-folder-open"></i> Documenten &amp; Links
-            </h1>
-            <p className="portaal-page-header-desc">
-              Handige sjablonen, checklists, formulieren en nuttige snelkoppelingen voor de leiding.
-            </p>
-          </div>
-          {isGroepsleiding && (
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <button
-                onClick={() => setEditMode(!editMode)}
-                className="portaal-btn-secondary"
-                style={{ background: editMode ? '#F5B82E' : '#FFFFFF', color: editMode ? '#3a2a00' : '#1A3D2A' }}
-              >
-                <i className={editMode ? 'fa-solid fa-check' : 'fa-solid fa-pen-to-square'}></i>
-                <span>{editMode ? 'Klaar met bewerken' : 'Bewerken'}</span>
-              </button>
-              {editMode && (
-                <>
-                  <button onClick={openCategoryModal} className="portaal-btn-secondary">
-                    <i className="fa-solid fa-folder-plus"></i>
-                    <span>Nieuwe Categorie</span>
-                  </button>
-                  <button onClick={() => openNewItemModal()} className="portaal-btn-primary">
-                    <i className="fa-solid fa-plus"></i>
-                    <span>Nieuw Item</span>
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      </header>
-
+    <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%', padding: '24px 20px 48px' }} className="portaal-page-container">
+      
       {/* Documenten & Sjablonen per Categorie */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
         {Object.entries(categoriesMap).map(([catName, items], index) => {
@@ -678,26 +642,26 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-                <h2 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#FFFFFF', margin: 0, display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-heading, Nunito, sans-serif)', textShadow: '0 2px 4px rgba(0,0,0,0.15)' }}>
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#1A3D2A', margin: 0, display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
                   <span>{catName}</span>
                   {showEditControls && (
                     <button
                       onClick={() => openEditCategoryModal(catName)}
                       title="Categorie bewerken of verwijderen"
                       style={{
-                        background: 'rgba(255, 255, 255, 0.2)',
-                        border: '1px solid rgba(255, 255, 255, 0.35)',
+                        background: '#FFFFFF',
+                        border: '1.5px solid #C2D9C9',
                         borderRadius: 8,
                         padding: '4px 10px',
                         fontSize: '.75rem',
-                        color: '#FFFFFF',
+                        color: '#1A3D2A',
                         cursor: 'pointer',
                         fontWeight: 700,
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: 5,
                         marginLeft: 6,
-                        backdropFilter: 'blur(4px)',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
                       }}
                     >
                       <i className="fa-solid fa-gear"></i> Categorie bewerken
@@ -706,22 +670,22 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 </h2>
 
                 {index === 0 && isGroepsleiding && (
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
                     <button
                       onClick={() => setEditMode(!editMode)}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: 6,
+                        gap: 8,
                         padding: '7px 16px',
                         borderRadius: 12,
                         background: editMode ? '#F5B82E' : '#FFFFFF',
                         color: editMode ? '#3a2a00' : '#1A3D2A',
-                        border: 'none',
+                        border: editMode ? '1.5px solid #E6A71B' : '1.5px solid #C2D9C9',
                         fontWeight: 900,
                         fontSize: '.84rem',
                         cursor: 'pointer',
-                        boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                         transition: 'all 0.15s ease',
                       }}
                     >
@@ -736,21 +700,20 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: 6,
+                            gap: 8,
                             padding: '7px 16px',
                             borderRadius: 12,
-                            background: 'rgba(255, 255, 255, 0.95)',
+                            background: '#FFFFFF',
                             color: '#1A3D2A',
-                            border: 'none',
+                            border: '1.5px solid #C2D9C9',
                             fontWeight: 800,
                             fontSize: '.84rem',
                             cursor: 'pointer',
-                            boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                             transition: 'all 0.15s ease',
                           }}
-                          className="action-card-hover"
                         >
-                          <i className="fa-solid fa-folder-plus"></i>
+                          <i className="fa-solid fa-folder-plus" style={{ color: '#1A3D2A' }}></i>
                           <span>Nieuwe Categorie</span>
                         </button>
 
@@ -759,19 +722,18 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                           style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: 6,
+                            gap: 8,
                             padding: '7px 16px',
                             borderRadius: 12,
-                            background: '#C9963A',
+                            background: '#1A3D2A',
                             color: '#FFFFFF',
                             border: 'none',
                             fontWeight: 800,
                             fontSize: '.84rem',
                             cursor: 'pointer',
-                            boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+                            boxShadow: '0 4px 12px rgba(26,61,42,0.2)',
                             transition: 'all 0.15s ease',
                           }}
-                          className="action-card-hover"
                         >
                           <i className="fa-solid fa-plus"></i>
                           <span>Nieuw Item</span>
@@ -782,8 +744,13 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                 )}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
-                {items.map(item => (
+              {/* Resource cards list */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: 16,
+              }}>
+                {items.map((item) => (
                   <ResourceCard
                     key={item.id}
                     item={item}
@@ -810,11 +777,12 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                       gap: 12,
                       padding: '16px 18px',
                       borderRadius: 16,
-                      border: '2px dashed rgba(255, 255, 255, 0.45)',
-                      background: 'rgba(255, 255, 255, 0.12)',
-                      color: '#FFFFFF',
+                      border: '2px dashed #C2D9C9',
+                      background: '#FFFFFF',
+                      color: '#1A3D2A',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
                     }}
                     className="action-card-hover"
                   >
@@ -823,9 +791,9 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
                         width: 40,
                         height: 40,
                         borderRadius: 12,
-                        background: 'rgba(255, 255, 255, 0.25)',
-                        border: '1.5px dashed #FFFFFF',
-                        color: '#FFFFFF',
+                        background: '#EEF5F1',
+                        border: '1.5px dashed #C2D9C9',
+                        color: '#1A3D2A',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

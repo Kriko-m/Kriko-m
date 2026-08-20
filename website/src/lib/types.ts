@@ -38,17 +38,6 @@ export interface Settings {
   home_title_groepsleiding?: string
   home_subtitle_groepsleiding?: string
 
-  // Per-pagina achtergronden in portaal
-  home_bg_type?: 'photo' | 'color'
-  home_bg_value?: string
-  echos_bg_type?: 'photo' | 'color'
-  echos_bg_value?: string
-  docs_bg_type?: 'photo' | 'color'
-  docs_bg_value?: string
-  agenda_bg_type?: 'photo' | 'color'
-  agenda_bg_value?: string
-  beheer_bg_type?: 'photo' | 'color'
-  beheer_bg_value?: string
   takken: Record<string, TakConfig>
   // Geheim token voor de private leiding-ICS-feed (zie /api/leiding/ics).
   leiding_ics_token?: string

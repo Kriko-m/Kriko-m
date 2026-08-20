@@ -13,20 +13,26 @@ export async function POST() {
 
     const users = usersData?.users || []
 
-    const leidingUser = users.find(u => u.email === 'leiding@kriko-m.be' || u.email === 'demo-leiding@kriko-m.be' || u.app_metadata?.role === 'leiding')
-    const groepsleidingUser = users.find(u => u.email === 'groepsleiding@kriko-m.be' || u.email === 'demo-groepsleiding@kriko-m.be' || u.app_metadata?.role === 'groepsleiding' || u.app_metadata?.role === 'admin')
-    const webshopUser = users.find(u => u.email === 'webshop@kriko-m.be' || u.email === 'demo-webshop@kriko-m.be' || u.app_metadata?.role === 'webshop')
+    // 1. Clean up legacy/demo accounts
+    const demoUsers = users.filter(u => u.email?.startsWith('demo-'))
+    for (const demoUser of demoUsers) {
+      await admin.auth.admin.deleteUser(demoUser.id)
+    }
+
+    // 2. Strictly match official accounts by exact email
+    const leidingUser = users.find(u => u.email === 'leiding@kriko-m.be')
+    const groepsleidingUser = users.find(u => u.email === 'groepsleiding@kriko-m.be')
+    const webshopUser = users.find(u => u.email === 'webshop@kriko-m.be')
 
     if (!leidingUser) {
       await admin.auth.admin.createUser({
         email: 'leiding@kriko-m.be',
-        password: 'test123',
+        password: `Kriko-${crypto.randomUUID()}`,
         email_confirm: true,
         app_metadata: { role: 'leiding' },
         user_metadata: { naam: 'Leiding' },
       })
     } else {
-      // Ensure app_metadata role is leiding
       await admin.auth.admin.updateUserById(leidingUser.id, {
         email_confirm: true,
         app_metadata: { ...leidingUser.app_metadata, role: 'leiding' }
@@ -36,13 +42,12 @@ export async function POST() {
     if (!groepsleidingUser) {
       await admin.auth.admin.createUser({
         email: 'groepsleiding@kriko-m.be',
-        password: 'test123',
+        password: `Kriko-${crypto.randomUUID()}`,
         email_confirm: true,
         app_metadata: { role: 'groepsleiding' },
         user_metadata: { naam: 'Groepsleiding' },
       })
     } else {
-      // Ensure app_metadata role is groepsleiding
       await admin.auth.admin.updateUserById(groepsleidingUser.id, {
         email_confirm: true,
         app_metadata: { ...groepsleidingUser.app_metadata, role: 'groepsleiding' }
@@ -52,13 +57,12 @@ export async function POST() {
     if (!webshopUser) {
       await admin.auth.admin.createUser({
         email: 'webshop@kriko-m.be',
-        password: 'test123',
+        password: `Kriko-${crypto.randomUUID()}`,
         email_confirm: true,
         app_metadata: { role: 'webshop' },
         user_metadata: { naam: 'Webshop & uniformen' },
       })
     } else {
-      // Ensure app_metadata role is webshop
       await admin.auth.admin.updateUserById(webshopUser.id, {
         email_confirm: true,
         app_metadata: { ...webshopUser.app_metadata, role: 'webshop' }

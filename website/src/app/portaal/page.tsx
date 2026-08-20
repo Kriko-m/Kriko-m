@@ -46,34 +46,23 @@ function PortaalContent() {
     setStatus('loading')
     setError('')
 
-    const emailsToTry = selectedRole === 'leiding' 
-      ? ['leiding@kriko-m.be', 'demo-leiding@kriko-m.be'] 
+    const targetEmail = selectedRole === 'leiding' 
+      ? 'leiding@kriko-m.be' 
       : selectedRole === 'groepsleiding'
-      ? ['groepsleiding@kriko-m.be', 'demo-groepsleiding@kriko-m.be']
-      : ['webshop@kriko-m.be', 'demo-webshop@kriko-m.be']
+      ? 'groepsleiding@kriko-m.be'
+      : 'webshop@kriko-m.be'
 
     try {
       // Ensure accounts exist in Supabase Auth
       await fetch('/api/auth/ensure-accounts', { method: 'POST' })
 
-      let loginSuccess = false
-      let lastError = ''
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: targetEmail,
+        password,
+      })
 
-      for (const email of emailsToTry) {
-        const { error: authError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-        if (!authError) {
-          loginSuccess = true
-          break
-        } else {
-          lastError = authError.message
-        }
-      }
-
-      if (!loginSuccess) {
-        setError(lastError || 'Ongeldig wachtwoord voor gekozen rol.')
+      if (authError) {
+        setError(authError.message || 'Ongeldig wachtwoord voor gekozen rol.')
         setStatus('idle')
       } else {
         const defaultTarget = selectedRole === 'webshop' ? '/portaal/webshop/bestellingen' : '/portaal/home'

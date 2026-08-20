@@ -153,19 +153,7 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
   const labelStyle = { display: 'block', fontSize: '.88rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }
 
   return (
-    <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }} className="portaal-page-container">
-      <header className="portaal-page-header" style={{ margin: '-28px -20px 28px -20px' }}>
-        <div className="portaal-page-header-inner">
-          <div>
-            <h1 className="portaal-page-header-title">
-              <i className="fa-solid fa-newspaper"></i> Kriko Echo Beheer
-            </h1>
-            <p className="portaal-page-header-desc">
-              Upload en beheer de maandelijkse Kriko Echo edities per tak.
-            </p>
-          </div>
-        </div>
-      </header>
+    <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%', padding: '24px 20px 48px' }} className="portaal-page-container">
 
       {flash && (
         <div style={{ background: '#FFFFFF', border: '2px solid #3F7D5A', color: '#1A3D2A', padding: '14px 20px', borderRadius: 14, marginBottom: 28, fontWeight: 700, boxShadow: '0 6px 20px rgba(0,0,0,0.15)' }}>
@@ -193,7 +181,7 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                 padding: '14px 32px',
                 minWidth: 140,
                 borderRadius: 16,
-                border: isActive ? (tak === 'kapoenen' ? '2.5px solid #F5B82E' : '2.5px solid #FFFFFF') : '2px solid rgba(255,255,255,0.4)',
+                border: isActive ? '2.5px solid #FFFFFF' : '1.5px solid #C2D9C9',
                 background: isActive ? takColor : '#FFFFFF',
                 color: isActive ? (tak === 'kapoenen' ? '#3a2a00' : '#FFFFFF') : '#1A3D2A',
                 fontWeight: 900,

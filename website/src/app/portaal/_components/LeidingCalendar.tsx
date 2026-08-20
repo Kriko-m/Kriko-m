@@ -149,22 +149,28 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
   function TagChips({ tags, compact = false }: { tags: AudienceTag[]; compact?: boolean }) {
     return (
       <span className="cal-tag-chips-wrap">
-        {tags.map(t => (
-          <span key={t} style={{
-            padding: compact ? '2px 7px' : '2px 9px',
-            borderRadius: 20,
-            fontSize: compact ? '9.5px' : '11px',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.4px',
-            background: `${AUDIENCE_KLEUREN[t]}18`,
-            color: AUDIENCE_KLEUREN[t],
-            lineHeight: 1.3,
-            whiteSpace: 'nowrap',
-          }}>
-            {AUDIENCE_NAMEN[t]}
-          </span>
-        ))}
+        {tags.map(t => {
+          const isYellow = t === 'kapoenen'
+          const tagBg = isYellow ? '#FEF3D6' : `${AUDIENCE_KLEUREN[t]}1E`
+          const tagColor = isYellow ? '#3A2A00' : AUDIENCE_KLEUREN[t]
+          return (
+            <span key={t} style={{
+              padding: compact ? '2px 7px' : '2px 9px',
+              borderRadius: 20,
+              fontSize: compact ? '9.5px' : '11px',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.4px',
+              background: tagBg,
+              color: tagColor,
+              border: isYellow ? '1px solid #F5B82E' : 'none',
+              lineHeight: 1.3,
+              whiteSpace: 'nowrap',
+            }}>
+              {AUDIENCE_NAMEN[t]}
+            </span>
+          )
+        })}
       </span>
     )
   }
@@ -466,10 +472,9 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
       </div>
     )
   }
-  // ─── Filter Bar Component ───────────────────────────────────────────────
   function FilterBar() {
     return (
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 16, minHeight: 34 }}>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
           {(['groep', 'leiding'] as const).map(tag => {
             const isActive = filter.has(tag)
@@ -580,14 +585,14 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
 
           {/* Right: activity list */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, gap: 8 }}>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 900, color: '#FFFFFF', margin: 0, textShadow: '0 1px 3px rgba(0,0,0,0.2)', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, minHeight: 34, gap: 8 }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#1A3D2A', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
                 {selectedDate ? 'Activiteiten op deze dag' : 'Alle activiteiten'}
-                {rightEntries.length > 0 && <span style={{ marginLeft: 8, fontSize: '.85rem', fontWeight: 700, color: 'rgba(255,255,255,0.8)' }}>({rightEntries.length})</span>}
+                {rightEntries.length > 0 && <span style={{ marginLeft: 8, fontSize: '.85rem', fontWeight: 700, color: '#5A7E68' }}>({rightEntries.length})</span>}
               </h3>
               {!readOnly && !showForm && (
                 <button onClick={() => { setEditId(null); setShowForm(true) }}
-                  style={{ padding: '8px 16px', background: '#FFFFFF', color: '#1A3D2A', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 900, fontSize: '.84rem', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}>
+                  style={{ padding: '8px 16px', background: '#1A3D2A', color: '#FFFFFF', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 800, fontSize: '.84rem', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(26,61,42,0.2)' }}>
                   + Toevoegen
                 </button>
               )}

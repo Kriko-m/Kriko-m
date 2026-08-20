@@ -4480,8 +4480,7 @@ body.portal-theme .portaal-nav {
 }
 
 .portal-agenda-left-column {
-    position: sticky;
-    top: 80px;
+    position: relative;
     z-index: 10;
 }
 

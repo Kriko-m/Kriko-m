@@ -33,16 +33,6 @@ export async function PATCH(req: NextRequest) {
     'home_subtitle_leiding',
     'home_title_groepsleiding',
     'home_subtitle_groepsleiding',
-    'home_bg_type',
-    'home_bg_value',
-    'echos_bg_type',
-    'echos_bg_value',
-    'docs_bg_type',
-    'docs_bg_value',
-    'agenda_bg_type',
-    'agenda_bg_value',
-    'beheer_bg_type',
-    'beheer_bg_value',
   ]
 
   let pbChanged = false

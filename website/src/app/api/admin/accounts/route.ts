@@ -18,9 +18,9 @@ export async function GET() {
 
     const users = usersData?.users || []
 
-    const leiding = users.find(u => u.app_metadata?.role === 'leiding' || u.email === 'leiding@kriko-m.be')
-    const groepsleiding = users.find(u => u.app_metadata?.role === 'groepsleiding' || u.app_metadata?.role === 'admin' || u.email === 'groepsleiding@kriko-m.be')
-    const webshop = users.find(u => u.app_metadata?.role === 'webshop' || u.email === 'webshop@kriko-m.be')
+    const leiding = users.find(u => u.email === 'leiding@kriko-m.be')
+    const groepsleiding = users.find(u => u.email === 'groepsleiding@kriko-m.be')
+    const webshop = users.find(u => u.email === 'webshop@kriko-m.be')
 
     return NextResponse.json({
       accounts: [
@@ -67,13 +67,8 @@ export async function POST(request: Request) {
     const { data: usersData } = await admin.auth.admin.listUsers()
     const users = usersData?.users || []
 
-    const targetUser = users.find(u =>
-      role === 'leiding'
-        ? (u.app_metadata?.role === 'leiding' || u.email === 'leiding@kriko-m.be')
-        : role === 'groepsleiding'
-        ? (u.app_metadata?.role === 'groepsleiding' || u.app_metadata?.role === 'admin' || u.email === 'groepsleiding@kriko-m.be')
-        : (u.app_metadata?.role === 'webshop' || u.email === 'webshop@kriko-m.be')
-    )
+    const targetEmail = role === 'leiding' ? 'leiding@kriko-m.be' : role === 'groepsleiding' ? 'groepsleiding@kriko-m.be' : 'webshop@kriko-m.be'
+    const targetUser = users.find(u => u.email === targetEmail)
 
     const updatePayload: Record<string, unknown> = {}
 
@@ -97,11 +92,11 @@ export async function POST(request: Request) {
 
     if (!targetUser) {
       // Create user if not existing yet
-      const email = role === 'leiding' ? 'leiding@kriko-m.be' : role === 'groepsleiding' ? 'groepsleiding@kriko-m.be' : 'webshop@kriko-m.be'
       const defaultNaam = role === 'leiding' ? 'Leiding' : role === 'groepsleiding' ? 'Groepsleiding' : 'Webshop & uniformen'
+      const initialPassword = newPassword?.trim() || `Kriko-${crypto.randomUUID()}`
       const { error: createError } = await admin.auth.admin.createUser({
-        email,
-        password: newPassword?.trim() || 'test123',
+        email: targetEmail,
+        password: initialPassword,
         email_confirm: true,
         app_metadata: { role },
         user_metadata: { naam: newName?.trim() || defaultNaam },

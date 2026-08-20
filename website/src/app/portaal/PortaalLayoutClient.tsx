@@ -19,38 +19,7 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
   const showNav = pathname !== '/portaal' && pathname !== '/portaal/'
   const isHomePage = pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/'
 
-  // Compute dynamic per-page background
-  let pageBgType: 'photo' | 'color' | undefined
-  let pageBgValue: string | undefined
 
-  if (pathname.includes('/echos')) {
-    pageBgType = settings?.echos_bg_type
-    pageBgValue = settings?.echos_bg_value
-  } else if (pathname.includes('/algemene-info')) {
-    pageBgType = settings?.docs_bg_type
-    pageBgValue = settings?.docs_bg_value
-  } else if (pathname.includes('/agenda')) {
-    pageBgType = settings?.agenda_bg_type
-    pageBgValue = settings?.agenda_bg_value
-  } else if (pathname.includes('/website-beheer')) {
-    pageBgType = settings?.beheer_bg_type
-    pageBgValue = settings?.beheer_bg_value
-  }
-
-  const customBgStyle: React.CSSProperties = {}
-  if (!isHomePage) {
-    if (pageBgType === 'photo' && pageBgValue) {
-      customBgStyle.backgroundColor = '#2A5A40'
-      customBgStyle.backgroundImage = `linear-gradient(rgba(42, 90, 64, 0.86), rgba(42, 90, 64, 0.93)), url(${pageBgValue})`
-      customBgStyle.backgroundSize = 'cover'
-      customBgStyle.backgroundPosition = 'center center'
-      customBgStyle.backgroundAttachment = 'fixed'
-    } else if (pageBgType === 'color' && pageBgValue) {
-      customBgStyle.backgroundColor = pageBgValue
-    } else {
-      customBgStyle.backgroundColor = '#2A5A40'
-    }
-  }
 
   // Clear website edit mode whenever navigating inside the portal
   useEffect(() => {

@@ -29,20 +29,7 @@ export default async function FullAgendaPage() {
   const canPublish = role === 'admin' || role === 'groepsleiding'
 
   return (
-    <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }} className="portaal-page-container">
-      <header className="portaal-page-header" style={{ margin: '-28px -20px 28px -20px' }}>
-        <div className="portaal-page-header-inner">
-          <div>
-            <h1 className="portaal-page-header-title">
-              <i className="fa-solid fa-calendar-days"></i> Kalender &amp; Activiteiten
-            </h1>
-            <p className="portaal-page-header-desc">
-              Bekijk en beheer alle takactiviteiten, leidingsevenementen en synchroniseer met je smartphone.
-            </p>
-          </div>
-        </div>
-      </header>
-
+    <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%', padding: '24px 20px 48px' }} className="portaal-page-container">
       <LeidingCalendar
         initialCalendar={calendarEvents}
         canPublish={canPublish}
