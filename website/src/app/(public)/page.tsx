@@ -44,6 +44,7 @@ export default async function HomePage() {
           className="hero-img"
           fill
           priority
+          unoptimized
           style={{ objectFit: 'cover' }}
         />
         <div className="hero-overlay">

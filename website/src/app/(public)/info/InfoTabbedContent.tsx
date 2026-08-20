@@ -468,7 +468,7 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                       {siteContent['info.uniform.hopper']?.content || 'Het beige scoutshemd, de groene broek/rok en de kentekens koop je in een officiële Hopper winkel of online.'}
                     </p>
                     <div style={{ marginTop: 'auto' }}>
-                      <a href="https://www.hopper.be" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.85rem', width: '100%', justifyContent: 'center' }}>
+                      <a href="https://www.hopper.be/nl/shop" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.85rem', width: '100%', justifyContent: 'center' }}>
                         Bezoek Hopper.be &raquo;
                       </a>
                     </div>
@@ -544,17 +544,20 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                     {siteContent['info.opmaat.ziekenfondsen']?.content || 'Mutualiteiten dragen vaak ook bij aan de kosten van vrijetijdsbesteding van uw kinderen. Welke voordelen dit precies zijn, hangt af van bij welk ziekenfonds u bent. Klik op het juiste ziekenfonds om meer informatie te verkrijgen omtrent terugbetalingen:'}
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-                    <a href="http://www.cm.be/diensten-en-voordelen/vakantie-en-vrije-tijd/vrije-tijd/jeugdvereniging.jsp" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                    <a href="https://www.cm.be/diensten-en-voordelen/vakantie-en-vrije-tijd" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
                       CM &raquo;
                     </a>
-                    <a href="https://www.oz.be/vakantie/voordelen/jeugdbewegingskampen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-                      Helan / OZ &raquo;
+                    <a href="https://www.helan.be/nl/het-krijgen/voordelen-en-terugbetalingen/kampen-en-meerdaagse-activiteiten/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                      Helan &raquo;
                     </a>
-                    <a href="http://www.bondmoyson.be/ovl/voordelen-advies/terugbetalingen-ledenvoordelen/terugbetalingen-voordelen/vrije-tijd/jongerenvoordeel/Pages/Speelplein-en-vakanties.aspx" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-                      Solidaris / Bond Moyson &raquo;
+                    <a href="https://www.solidaris-vlaanderen.be/terugbetaling-kampen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                      Solidaris &raquo;
                     </a>
-                    <a href="http://www.lm.be/Oost-Vlaanderen/Rubrieken/Voordelen-en-diensten/Kinderen-en-jongeren/jeugdbeweging/Pages/DefaultArticle.aspx" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-                      Liberale Mutualiteit &raquo;
+                    <a href="https://www.lm-ml.be/nl/voordelen-en-diensten/jeugdkampen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                      Liberale Mutualiteit (LM) &raquo;
+                    </a>
+                    <a href="https://www.vnz.be/voordelen-terugbetalingen/jeugdbeweging/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                      VNZ &raquo;
                     </a>
                   </div>
                 </div>

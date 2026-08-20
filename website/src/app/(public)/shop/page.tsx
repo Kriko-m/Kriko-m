@@ -46,7 +46,7 @@ export default async function ShopPage() {
             <p style={{ fontSize: '0.94rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
               Standaard scoutskledij zoals de <strong>officiële scoutsbroek of -rok</strong> en het <strong>scoutshemd</strong> schaf je aan via de{' '}
               <a
-                href="https://www.hopper.be/winkel"
+                href="https://www.hopper.be/nl/shop"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: 'var(--color-primary)', fontWeight: 800, textDecoration: 'underline' }}
@@ -95,32 +95,26 @@ export default async function ShopPage() {
           <div style={{
             background: '#fff',
             border: '1.5px solid #C2D9C9',
-            borderRadius: 'var(--border-radius-lg)',
-            padding: '22px 26px',
-            marginTop: 28,
+            borderRadius: 'var(--border-radius-md, 12px)',
+            padding: '12px 18px',
+            marginTop: 24,
             display: 'flex',
-            gap: 18,
+            gap: 12,
             alignItems: 'center',
-            flexWrap: 'wrap',
             boxShadow: 'var(--shadow-sm)'
           }}>
-            <i className="fa-solid fa-compass" style={{ fontSize: '1.6rem', color: 'var(--color-primary-dark)', flexShrink: 0 }} />
-            <div style={{ flex: 1, minWidth: 240 }}>
-              <h4 style={{ color: 'var(--color-primary-dark)', fontSize: '1.05rem', margin: '0 0 4px', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 800 }}>
-                Waar horen deze kentekens op het hemd?
-              </h4>
-              <p style={{ fontSize: '0.88rem', color: 'var(--color-text-dark)', margin: 0, lineHeight: 1.5 }}>
-                Bekijk de schematische tekeningen en opnaai-instructies van de kentekens op de officiële gids van{' '}
-                <a 
-                  href="https://www.scoutsengidsenvlaanderen.be/ouders/scoutskledij/kentekens" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'underline' }}
-                >
-                  Scouts &amp; Gidsen Vlaanderen
-                </a>.
-              </p>
-            </div>
+            <i className="fa-solid fa-compass" style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', flexShrink: 0 }} />
+            <p style={{ fontSize: '0.88rem', color: 'var(--color-text-dark)', margin: 0, lineHeight: 1.45 }}>
+              Weet je niet waar de kentekens horen op je hemd?{' '}
+              <a 
+                href="https://www.scoutsengidsenvlaanderen.be/scouts-en-gidsenleden/praktisch/waar-horen-de-kentekens" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'underline' }}
+              >
+                Bekijk hier de opnaai-instructies van Scouts &amp; Gidsen Vlaanderen &raquo;
+              </a>
+            </p>
           </div>
         </div>
 

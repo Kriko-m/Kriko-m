@@ -33,6 +33,7 @@ export default async function VerhuurPage() {
           className="verhuur-hero-img"
           fill
           priority
+          unoptimized
           style={{ objectFit: 'cover', objectPosition: 'center 42%', zIndex: 1 }}
         />
         <div className="container verhuur-hero-inner" style={{ position: 'relative', zIndex: 2 }}>

@@ -219,8 +219,7 @@ function TakPageClientContent({
           className="tak-hero-img"
           fill
           priority
-          sizes="100vw"
-          quality={85}
+          unoptimized
           style={{ objectFit: 'cover', zIndex: 1 }}
         />
         <div className="tak-hero-overlay" />
@@ -490,7 +489,7 @@ function TakPageClientContent({
                     <i className="fa-solid fa-cart-shopping" style={{ marginRight: 6 }}></i> Kriko-M Webshop
                   </Link>
                   <a
-                    href="https://www.hopper.be/"
+                    href="https://www.hopper.be/nl/shop"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-outline"
