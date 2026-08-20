@@ -18,7 +18,7 @@ export default function VoorwaardenPage() {
     },
     {
       title: '4. Levering & Afhaling',
-      text: 'Om verzendkosten en milieu-impact te beperken, worden bestelde artikelen niet per post verzonden. Bestellingen kunnen worden afgehaald op de wekelijkse scoutsvergaderingen of na afspraak aan de scoutslokalen. Zodra je betaling is ontvangen en verwerkt, ligt je bestelling klaar.'
+      text: 'Bestelde artikelen worden niet per post verzonden. Het afhalen van bestellingen wordt rechtstreeks afgesproken met onze uniformverantwoordelijke (tijdens de wekelijkse scoutsvergaderingen of na afspraak aan de scoutslokalen). Zodra je betaling is ontvangen en verwerkt, ontvang je hierover verdere berichtgeving.'
     },
     {
       title: '5. Herroepingsrecht & Retournering',

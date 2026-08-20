@@ -14,7 +14,7 @@ Kriko-M is the website for Belgian scouts group **Scouts Kriko-M vzw** (Scouts &
 1. **Public Info & Takken:** Presenting practical info, group history, takken, leiding contacts, and an interactive calendar with iCal feeds.
 2. **Kriko Echo:** Displaying and letting parents download monthly editions of the Kriko Echo (PDF).
 3. **Inschrijven Info:** Guiding new and existing members through registration (embedded S&G Groepsadmin form + lidgeld payment instructions via bank transfer).
-4. **Accountless Webshop:** Letting parents order scoutskledij (t-shirts, trui, das, kentekens) with email confirmation (Resend), payment via Belgian structured bank transfer, and pickup at scouts.
+4. **Accountless Webshop:** Letting parents order scoutskledij (t-shirts, trui, das, kentekens) with email confirmation (Resend), payment via Belgian structured bank transfer, and pickup arranged with the uniformverantwoordelijke.
 5. **Verhuur Info:** Informing potential renters about local rental space (directing requests to Kampas.be).
 6. **Leiding Management Portal:** Giving leiding a private portal to manage calendar events, Kriko Echo uploads, internal documents, webshop products & orders, and site settings.
 
