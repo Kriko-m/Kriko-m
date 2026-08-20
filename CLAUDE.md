@@ -6,42 +6,24 @@ This file provides system context, tech stack specifications, styling guidelines
 
 ## Product Vision & Direction
 
-Kriko-M is the website for a Belgian scouts group (Scouts & Gidsen Vlaanderen,
-Sint-Niklaas). It has two halves: a **public marketing site** and a small
-**operational tool** for leiding and parents.
+Kriko-M is the website for Belgian scouts group **Scouts Kriko-M vzw** (Scouts & Gidsen Vlaanderen, Sint-Niklaas — KBO BE0409.040.288). It consists of a **public marketing/info site** and a **leiding-only management portal**.
 
-**Guiding principle — keep it minimal.** The site exists to do the few things
-email can't, *without* re-inventing things that already work. Email (sent from the
-S&G Groepsadmin site, which already holds every parent's address) remains the
-group's communication channel. WhatsApp is the leiding's last-minute push channel.
-The site should **not** try to replace either — it should remove specific recurring
-email burdens by turning them into structured, self-service flows.
+**Guiding principle — keep it minimal.** The site exists to provide structured self-service for parents and public visitors without re-inventing things that already work elsewhere. Email (sent from the S&G Groepsadmin site) and WhatsApp remain the group's communication channels.
 
-**What the site is for (the only real jobs):**
-1. Let parents say **yes/no** to a camp/weekend.
-2. Let parents see a **private** uitnodiging + practical info (not public, not
-   indexed).
-3. Let parents **order** webshop items and receive payment instructions.
-4. Give leiding a place to manage camps, echos, the calendar, and a per-werkjaar
-   archive.
+**What the site is for (the actual jobs):**
+1. **Public Info & Takken:** Presenting practical info, group history, takken, leiding contacts, and an interactive calendar with iCal feeds.
+2. **Kriko Echo:** Displaying and letting parents download monthly editions of the Kriko Echo (PDF).
+3. **Inschrijven Info:** Guiding new and existing members through registration (embedded S&G Groepsadmin form + lidgeld payment instructions via bank transfer).
+4. **Accountless Webshop:** Letting parents order scoutskledij (t-shirts, trui, das, kentekens) with email confirmation (Resend), payment via Belgian structured bank transfer, and pickup at scouts.
+5. **Verhuur Info:** Informing potential renters about local rental space (directing requests to Kampas.be).
+6. **Leiding Management Portal:** Giving leiding a private portal to manage calendar events, Kriko Echo uploads, internal documents, webshop products & orders, and site settings.
 
-**Deliberate architectural decisions (target state — see `IMPLEMENTATION.md`):**
-- **No parent accounts.** Camp RSVP works via an unguessable per-camp link that
-  leiding paste into their S&G-composed email; parents self-declare child + tak +
-  ja/nee. The webshop is accountless (name + email at checkout).
-- **No S&G API integration.** Medical fiches stay in S&G where leiding read them
-  directly — the site never stores medical or other S&G-sourced personal data.
-- **Login is leiding-only** (Supabase email/password).
-- **Site-sent email is limited to the webshop order confirmation** (Resend).
-- **Server-side price validation** on all orders; never trust client prices.
-- Data is scoped by **werkjaar**; a once-a-year groepsleiding "rollover" snapshots
-  the year into a leiding-only archive (draft → publish, never an accidental
-  click).
-
-> NOTE: `IMPLEMENTATION.md` (repo root) is the authoritative plan for the target
-> state — consult it before extending the portal. The older account-based portal
-> tables (`ouder_profiles`, `parent_children`, `kampinschrijvingen`) have been
-> dropped; `orders.parent_id` is gone. Do not re-introduce parent accounts.
+**What the site does NOT do (DO NOT RE-INTRODUCE):**
+- **NO camp or weekend RSVP / registrations.** Kamp and weekend signups do **not** take place on this website. Kamp communication and signups are handled via S&G Groepsadmin and leiding emails.
+- **NO parent accounts or parent login.** Login is strictly leiding-only (`/portaal`). Webshop checkout is accountless.
+- **NO medical fiches or S&G personal data stored.** Medical info stays 100% in S&G Groepsadmin where leiding consult it directly.
+- **NO online payment gateways (Mollie/Stripe/credit cards).** All payments (webshop & lidgeld) use Belgian structured bank transfers (`BE59 7360 6413 2626`).
+- **NO local rental booking engine.** Rental bookings redirect to Kampas.be.
 
 ---
 

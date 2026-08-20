@@ -10,27 +10,27 @@ export default function PrivacyPage() {
     },
     {
       title: '2. Welke gegevens verzamelen wij?',
-      text: 'Wij verwerken uitsluitend gegevens die noodzakelijk zijn voor onze scoutswerking en webshop: naam, e-mailadres, telefoonnummer, en naam/tak van je kind bij kamp- of weekendinschrijvingen. Medische en gevoelige persoonsgegevens van leden worden nooit lokaal op onze servers opgeslagen; deze blijven uitsluitend beveiligd beheerd via de officiële Groepsadministratie van Scouts & Gidsen Vlaanderen.'
+      text: 'Wij bewaren enkel minimale gegevens die noodzakelijk zijn voor het afhandelen van bestellingen in onze webshop en contactaanvragen: naam en e-mailadres (plus optionele opmerking/telefoonnummer bij bestelling of contact). Medische fiches, lidregistraties en persoonlijke informatie van leden worden NOOIT op onze website of servers opgeslagen; deze worden uitsluitend en rechtstreeks beheerd via de officiële Groepsadministratie van Scouts & Gidsen Vlaanderen.'
     },
     {
       title: '3. Waarvoor gebruiken wij je gegevens?',
-      text: 'Je gegevens worden uitsluitend gebruikt voor het afhandelen van webshopbestellingen, de organisatie van kampen en weekenden, en het versturen van noodzakelijke communicatie over onze scoutswerking. Wij verkopen, verhuren of delen je persoonsgegevens nooit met commerciële derden.'
+      text: 'Je gegevens worden uitsluitend gebruikt voor het verwerken van je webshopbestelling (zoals het versturen van de bestelbevestiging met betaalinstructies) en het beantwoorden van je berichten. Wij verwerken geen kamp- of weekendinschrijvingen op deze website en verkopen, verhuren of delen je persoonsgegevens nooit met derden.'
     },
     {
       title: '4. Bewaartermijn',
-      text: 'Persoonsgegevens worden niet langer bewaard dan noodzakelijk voor het doel waarvoor ze zijn verzameld (zoals het afhandelen van de bestelling of het lopende werkjaar) of om te voldoen aan wettelijke en administratieve verplichtingen van de vzw.'
+      text: 'Persoonsgegevens worden niet langer bewaard dan noodzakelijk voor het afhandelen van je bestelling of om te voldoen aan wettelijke en boekhoudkundige verplichtingen van de vzw.'
     },
     {
-      title: '5. Cookies & Functionele Opslag',
-      text: 'Onze website maakt uitsluitend gebruik van functionele cookies en lokale opslag (zoals het bewaren van artikelen in je winkelmandje). Wij gebruiken geen tracking-, marketing- of analytische cookies van derden.'
+      title: '5. Cookies & Opslag',
+      text: 'Onze website maakt uitsluitend gebruik van functionele cookies en lokale opslag (noodzakelijk voor de werking van het winkelmandje en sessiebeheer). Wij gebruiken geen tracking-, marketing- of analytische cookies van derden.'
     },
     {
       title: '6. Externe platformen',
-      text: 'Reserveringen en verhuuraanvragen van ons scoutslokaal verlopen via het externe platform Kampas (Kampas.be). Bij het boeken gelden de privacyvoorwaarden van Kampas.'
+      text: 'Aanvragen voor het huren van onze scoutslokalen verlopen via het externe platform Kampas (Kampas.be). De officiële ledenadministratie verloopt via Groepsadministratie van Scouts & Gidsen Vlaanderen. Bij het gebruik van deze platformen gelden hun respectievelijke privacyvoorwaarden.'
     },
     {
       title: '7. Jouw rechten',
-      text: 'Je hebt recht op inzage, correctie, beperking of verwijdering van je persoonsgegevens. Ook kan je bezwaar maken tegen de verwerking. Neem hiervoor contact met ons op via groepsleiding@kriko-m.be.'
+      text: 'Je hebt recht op inzage, correctie, beperking of verwijdering van je persoonsgegevens. Neem hiervoor contact met ons op via groepsleiding@kriko-m.be.'
     }
   ]
 
@@ -69,4 +69,5 @@ export default function PrivacyPage() {
     </>
   )
 }
+
 
