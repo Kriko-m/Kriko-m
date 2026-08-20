@@ -8,7 +8,7 @@ interface Props {
   year: string
 }
 
-export default function InschrijvenClient({ email, _year }: Props) {
+export default function InschrijvenClient({ email, year: _year }: Props) {
   const [activeTab, setActiveTab] = useState<'nieuw' | 'bestaand'>('nieuw')
   const [isFormOpen, setIsFormOpen] = useState(false)
 
