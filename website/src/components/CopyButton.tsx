@@ -56,6 +56,10 @@ export default function CopyButton({ text, variant, className, style, children }
         style={{
           cursor: 'pointer',
           transition: 'all 0.2s ease',
+          maxWidth: '100%',
+          wordBreak: 'break-word',
+          overflowWrap: 'anywhere',
+          whiteSpace: 'normal',
           ...(customBg ? { backgroundColor: customBg } : {}),
           ...cleanedStyle,
         }}

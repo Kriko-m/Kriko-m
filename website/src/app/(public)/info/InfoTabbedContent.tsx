@@ -53,6 +53,7 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
       
       {/* Horizontal Navigation Tabs */}
       <div 
+        className="info-tabs-nav-grid"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -99,7 +100,7 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
       </div>
 
       {/* Tab Content Cards */}
-      <div style={{ backgroundColor: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', padding: 36, border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)', minHeight: 380 }}>
+      <div className="info-tab-card-body" style={{ backgroundColor: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', padding: 36, border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)', minHeight: 380 }}>
         
         {/* TAB 1: Praktisch & Werking */}
         {activeTab === 'praktisch' && (
@@ -665,7 +666,7 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                 Wat doet de Oudertak concreet?
               </h3>
               
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+              <div className="info-oudertak-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                 {[
                   { icon: 'fa-comments', defaultTitle: 'Vergaderingen & overleg', defaultDesc: 'Enkele keren per jaar samenkomen om terug te blikken op wat is gebeurd en vooruit te kijken.' },
                   { icon: 'fa-calendar-check', defaultTitle: 'Hulp bij evenementen', defaultDesc: 'Praktische voorbereiding en ondersteuning bij grote evenementen zoals onze BBQ, Souphé, Bidong.' },
@@ -720,7 +721,7 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                 initialTitle={siteContent['info.oudertak.cta']?.title || 'Interesse om aan te sluiten of mee te helpen?'}
                 initialContent={siteContent['info.oudertak.cta']?.content || 'Wil je ook je steentje bijdragen aan de oudertak, helpen op evenementen of bij het onderhoud? Wij verwelkomen alle enthousiaste ouders en oud-leiding met open armen! Contacteer ons gerust via de groepsleiding.'}
               >
-                <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '2px solid var(--color-primary)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+                <div className="info-cta-box" style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '2px solid var(--color-primary)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
                   <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}>
                     {siteContent['info.oudertak.cta']?.title || 'Interesse om aan te sluiten of mee te helpen?'}
                   </h3>

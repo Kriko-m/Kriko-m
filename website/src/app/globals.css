@@ -7192,6 +7192,83 @@ html, body {
     }
 }
 
+/* ==========================================================================
+   Mobile Responsiveness Overrides (Strictly Scope-Bound to Small Screens)
+   Laptop / Desktop views remain 100% unchanged.
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    /* Title overflow fix across all pages */
+    .tak-hero-title,
+    .tak-hero.algemeen .tak-hero-title {
+        font-size: clamp(1.6rem, 6.5vw, 3.2rem) !important;
+        white-space: normal !important;
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
+        hyphens: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    /* Kriko Echo: 1-column layout so PDF titles & dates are fully visible */
+    .echo-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+    .echo-card {
+        height: auto !important;
+        min-height: 140px !important;
+        padding: 24px 0 16px !important;
+    }
+    .echo-card-pdf-btn {
+        padding: 10px 14px !important;
+    }
+    .echo-pdf-maand {
+        white-space: normal !important;
+    }
+
+    /* Oudertak & Info page tabbed cards and CTAs */
+    .info-tab-card-body {
+        padding: 18px 14px !important;
+    }
+    .info-oudertak-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .info-tabs-nav-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .info-cta-box {
+        padding: 18px 14px !important;
+        max-width: 100% !important;
+    }
+
+    /* Kalender grid & activity layout */
+    .cal-grid-wrapper {
+        padding: 12px 6px !important;
+        border-radius: 14px !important;
+    }
+    .cal-2col-layout {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden;
+    }
+    .cal-grid-days {
+        max-width: 100% !important;
+    }
+
+    /* Inschrijfpagina step boxes & action buttons */
+    .inschrijven-step-box {
+        padding: 18px 14px !important;
+        border-radius: 14px !important;
+    }
+    .inschrijven-action-btn {
+        width: 100% !important;
+        white-space: normal !important;
+        text-align: center !important;
+    }
+}
+
+
 
 
 

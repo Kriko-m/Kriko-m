@@ -78,7 +78,17 @@ export default async function HomePage() {
                   lineHeight: 1.2,
                   letterSpacing: '-0.5px'
                 }}>
-                  {welcomeTitle}
+                  {typeof welcomeTitle === 'string' && /Kriko/i.test(welcomeTitle) ? (
+                    welcomeTitle.split(/(Kriko-M|Kriko-m|Kriko M|Kriko m)/g).map((part, i) =>
+                      /^(Kriko-M|Kriko-m|Kriko M|Kriko m)$/i.test(part) ? (
+                        <span key={i} style={{ whiteSpace: 'nowrap', display: 'inline-block' }}>{part}</span>
+                      ) : (
+                        part
+                      )
+                    )
+                  ) : (
+                    welcomeTitle
+                  )}
                 </h2>
 
                 <p style={{ marginBottom: 20, fontSize: '1.05rem', color: '#2B2B2B', lineHeight: 1.65, whiteSpace: 'pre-line' }}>

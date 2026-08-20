@@ -33,18 +33,19 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
           onClick={() => setActiveTab('nieuw')}
           style={{
             padding: '14px 24px',
+            minHeight: 52,
             borderRadius: 'var(--border-radius-md)',
             border: 'none',
             backgroundColor: activeTab === 'nieuw' ? 'var(--color-primary)' : 'transparent',
             color: activeTab === 'nieuw' ? '#fff' : 'var(--color-primary-dark)',
-            fontWeight: activeTab === 'nieuw' ? 800 : 600,
+            fontWeight: 700,
             fontSize: '1.05rem',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 10,
-            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease',
             boxShadow: activeTab === 'nieuw' ? '0 4px 14px color-mix(in srgb, var(--color-primary) 30%, transparent)' : 'none',
           }}
         >
@@ -53,6 +54,7 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
             style={{
               color: activeTab === 'nieuw' ? 'var(--color-accent)' : 'var(--color-primary)',
               fontSize: '1.1rem',
+              transition: 'color 0.2s ease',
             }}
           ></i>
           Nieuw lid bij Kriko-M
@@ -63,18 +65,19 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
           onClick={() => setActiveTab('bestaand')}
           style={{
             padding: '14px 24px',
+            minHeight: 52,
             borderRadius: 'var(--border-radius-md)',
             border: 'none',
             backgroundColor: activeTab === 'bestaand' ? 'var(--color-primary)' : 'transparent',
             color: activeTab === 'bestaand' ? '#fff' : 'var(--color-primary-dark)',
-            fontWeight: activeTab === 'bestaand' ? 800 : 600,
+            fontWeight: 700,
             fontSize: '1.05rem',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 10,
-            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease',
             boxShadow: activeTab === 'bestaand' ? '0 4px 14px color-mix(in srgb, var(--color-primary) 30%, transparent)' : 'none',
           }}
         >
@@ -83,6 +86,7 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
             style={{
               color: activeTab === 'bestaand' ? 'var(--color-accent)' : 'var(--color-primary)',
               fontSize: '1.1rem',
+              transition: 'color 0.2s ease',
             }}
           ></i>
           Reeds lid (Herinschrijving)
@@ -93,6 +97,7 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
         <>
           {/* STAP 1: Inschrijvingsformulier (Openklappen) */}
           <div
+            className="inschrijven-step-box"
             style={{
               backgroundColor: '#fff',
               border: isFormOpen ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
@@ -121,7 +126,7 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
               <button
                 type="button"
                 onClick={() => setIsFormOpen(!isFormOpen)}
-                className="btn btn-secondary"
+                className="btn btn-secondary inschrijven-action-btn"
                 style={{
                   padding: '12px 24px',
                   fontSize: '1rem',
@@ -130,7 +135,6 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 10,
-                  whiteSpace: 'nowrap',
                 }}
               >
                 <i className={`fa-solid ${isFormOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
@@ -193,6 +197,7 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
 
           {/* STAP 2: Lidgeld overschrijven */}
           <div
+            className="inschrijven-step-box"
             style={{
               backgroundColor: '#fff',
               border: '1px solid var(--color-border)',
@@ -252,6 +257,7 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
 
           {/* STAP 3: Individuele Steekkaart (Informatie) */}
           <div
+            className="inschrijven-step-box"
             style={{
               backgroundColor: '#fff',
               border: '1px solid var(--color-border)',
