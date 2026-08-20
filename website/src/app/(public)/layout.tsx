@@ -22,7 +22,6 @@ export default async function PublicLayout({ children }: { children: React.React
       </div>
       <Footer
         contactEmail={settings?.contact_email}
-        contactPhone={settings?.contact_phone}
         contactAddress={settings?.contact_address}
       />
       <ScrollTopButton />

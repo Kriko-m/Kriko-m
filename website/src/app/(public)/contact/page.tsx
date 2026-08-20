@@ -57,10 +57,6 @@ export default async function ContactPage() {
                   </CopyButton>
                 </li>
                 <li className="contact-sidebar-item">
-                  <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Telefoon</span>
-                  <a href={`tel:${settings?.contact_phone?.replace(/\s+/g,'')}`} style={{ fontWeight: 600 }}>{settings?.contact_phone}</a>
-                </li>
-                <li className="contact-sidebar-item">
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Adres</span>
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings?.contact_address ?? '')}`}

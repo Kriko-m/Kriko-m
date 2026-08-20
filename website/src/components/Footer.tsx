@@ -1,15 +1,12 @@
 import Link from 'next/link'
-import CopyButton from './CopyButton'
 
 interface FooterProps {
   contactEmail?: string
-  contactPhone?: string
   contactAddress?: string
 }
 
 export default function Footer({
   contactEmail = 'groepsleiding@kriko-m.be',
-  contactPhone = '+32 3 776 00 00',
   contactAddress = 'Industriepark-Noord 33, 9100 Sint-Niklaas',
 }: FooterProps) {
   const year = new Date().getFullYear()
@@ -66,18 +63,6 @@ export default function Footer({
             <i className="fas fa-envelope"></i> Contacteer ons
           </Link>
           <ul className="footer-links">
-            <li>
-              <CopyButton
-                text={contactEmail ?? ''}
-                className="footer-copy-mail"
-              >
-                <i className="far fa-copy"></i>
-                <span className="footer-copy-mail-text">{contactEmail}</span>
-              </CopyButton>
-            </li>
-            <li>
-              <a href={`tel:${contactPhone.replace(/\s+/g, '')}`}>{contactPhone}</a>
-            </li>
             <li style={{ color: '#bbb', fontSize: '0.85rem' }}>{contactAddress}</li>
           </ul>
         </div>
