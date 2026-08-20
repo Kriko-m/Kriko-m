@@ -35,6 +35,14 @@ interface ShopProduct {
   image?: string
 }
 
+interface AccountInfo {
+  id: string | null
+  role: string
+  email: string
+  naam: string
+}
+
+
 interface Props {
   initialSettings: Settings
   role?: string
@@ -117,6 +125,78 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   const [activeTitleRoleTab, setActiveTitleRoleTab] = useState<'leiding' | 'groepsleiding'>('leiding')
   const [uploadingBg, setUploadingBg] = useState(false)
 
+  // Accountbeheer State inside Portaal Instellingen
+  const [accounts, setAccounts] = useState<AccountInfo[]>([])
+  const [loadingAccounts, setLoadingAccounts] = useState(false)
+  const [editingAccountRole, setEditingAccountRole] = useState<'leiding' | 'groepsleiding' | 'webshop'>('leiding')
+  const [editAccountName, setEditAccountName] = useState('')
+  const [editAccountPassword, setEditAccountPassword] = useState('')
+  const [savingAccount, setSavingAccount] = useState(false)
+  const [accountSuccess, setAccountSuccess] = useState('')
+  const [accountError, setAccountError] = useState('')
+
+  async function fetchAccounts() {
+    setLoadingAccounts(true)
+    setAccountError('')
+    setAccountSuccess('')
+    try {
+      const res = await fetch('/api/admin/accounts')
+      const data = await res.json()
+      if (data.accounts) {
+        setAccounts(data.accounts)
+        const target = data.accounts.find((a: AccountInfo) => a.role === editingAccountRole)
+        if (target) setEditAccountName(target.naam)
+      }
+    } catch {
+      setAccountError('Kon accountgegevens niet laden.')
+    } finally {
+      setLoadingAccounts(false)
+    }
+  }
+
+  function handleSelectAccountRole(roleType: 'leiding' | 'groepsleiding' | 'webshop') {
+    setEditingAccountRole(roleType)
+    setEditAccountPassword('')
+    setAccountError('')
+    setAccountSuccess('')
+    const target = accounts.find(a => a.role === roleType)
+    if (target) setEditAccountName(target.naam)
+  }
+
+  async function handleSaveAccountInModal(e: React.FormEvent) {
+    e.preventDefault()
+    setSavingAccount(true)
+    setAccountError('')
+    setAccountSuccess('')
+
+    try {
+      const res = await fetch('/api/admin/accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: editingAccountRole,
+          newName: editAccountName,
+          newPassword: editAccountPassword || undefined,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        setAccountError(data.error || 'Fout bij opslaan van account.')
+      } else {
+        const roleLabel = editingAccountRole === 'leiding' ? 'Leiding' : editingAccountRole === 'groepsleiding' ? 'Groepsleiding' : 'Webshop & uniformen'
+        setAccountSuccess(`Account voor ${roleLabel} succesvol bijgewerkt!`)
+        setEditAccountPassword('')
+        await fetchAccounts()
+        router.refresh()
+      }
+    } catch {
+      setAccountError('Netwerkfout bij opslaan.')
+    } finally {
+      setSavingAccount(false)
+    }
+  }
+
   function showNotification(type: 'success' | 'error', text: string) {
     setFlashMessage({ type, text })
     setTimeout(() => setFlashMessage(null), 4000)
@@ -126,6 +206,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     setModalFlash({ type, text })
     setTimeout(() => setModalFlash(null), 4000)
   }
+
 
   async function exportOrdersToExcel() {
     if (!orders || orders.length === 0) return
@@ -1183,12 +1264,12 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                 Leidingsportaal
               </h2>
               <p style={{ margin: 0, fontSize: '0.88rem', color: '#6A8A75', lineHeight: 1.5 }}>
-                Pas de welkomsttitels voor leiding vs. groepsleiding en de achtergronden van het portaal aan.
+                Pas de welkomsttitels, achtergronden en account-wachtwoorden (Leiding, Groepsleiding, Webshop) van het portaal aan.
               </p>
             </div>
 
             <button
-              onClick={() => { setModalFlash(null); setShowPortalModal(true) }}
+              onClick={() => { setModalFlash(null); setShowPortalModal(true); fetchAccounts(); }}
               type="button"
               style={{
                 width: '100%',
@@ -1547,6 +1628,137 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                       />
                     </div>
                   </div>
+                )}
+              </div>
+
+              {/* SECTIE 3: ACCOUNTBEHEER & WACHTWOORDEN */}
+              <div style={{ backgroundColor: '#F8FAF8', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0' }}>
+                <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A' }}>
+                  👥 Accountbeheer — Rollen &amp; Wachtwoorden
+                </h4>
+                <p style={{ margin: '0 0 14px', fontSize: '0.84rem', color: '#6A8A75' }}>
+                  Pas de weergavenaam of het wachtwoord aan voor de 3 hoofdaccounts van de website (Leiding, Groepsleiding, Webshop).
+                </p>
+
+                {loadingAccounts ? (
+                  <div style={{ padding: 20, textAlign: 'center', color: '#6A8A75', fontWeight: 600 }}>Accounts laden…</div>
+                ) : (
+                  <form onSubmit={handleSaveAccountInModal} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    {accountError && (
+                      <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FDF0F2', color: '#B23A4D', border: '1px solid #E0C0C4', fontSize: '0.86rem', fontWeight: 700 }}>
+                        {accountError}
+                      </div>
+                    )}
+                    {accountSuccess && (
+                      <div style={{ padding: '10px 14px', borderRadius: 10, background: '#EEF5F1', color: '#1A3D2A', border: '1px solid #C2D9C9', fontSize: '0.86rem', fontWeight: 700 }}>
+                        {accountSuccess}
+                      </div>
+                    )}
+
+                    {/* Role Selector */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectAccountRole('leiding')}
+                        style={{
+                          padding: '10px 6px',
+                          borderRadius: 12,
+                          border: editingAccountRole === 'leiding' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
+                          background: editingAccountRole === 'leiding' ? '#EEF5F1' : '#FAFAFA',
+                          color: '#1A3D2A',
+                          fontWeight: editingAccountRole === 'leiding' ? 800 : 600,
+                          cursor: 'pointer',
+                          textAlign: 'center',
+                          fontSize: '0.85rem',
+                        }}
+                      >
+                        Leiding
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectAccountRole('groepsleiding')}
+                        style={{
+                          padding: '10px 6px',
+                          borderRadius: 12,
+                          border: editingAccountRole === 'groepsleiding' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
+                          background: editingAccountRole === 'groepsleiding' ? '#EEF5F1' : '#FAFAFA',
+                          color: '#1A3D2A',
+                          fontWeight: editingAccountRole === 'groepsleiding' ? 800 : 600,
+                          cursor: 'pointer',
+                          textAlign: 'center',
+                          fontSize: '0.85rem',
+                        }}
+                      >
+                        Groepsleiding
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectAccountRole('webshop')}
+                        style={{
+                          padding: '10px 6px',
+                          borderRadius: 12,
+                          border: editingAccountRole === 'webshop' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
+                          background: editingAccountRole === 'webshop' ? '#EEF5F1' : '#FAFAFA',
+                          color: '#1A3D2A',
+                          fontWeight: editingAccountRole === 'webshop' ? 800 : 600,
+                          cursor: 'pointer',
+                          textAlign: 'center',
+                          fontSize: '0.85rem',
+                        }}
+                      >
+                        Webshop
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                          Weergavenaam ({editingAccountRole === 'leiding' ? 'Leiding' : editingAccountRole === 'groepsleiding' ? 'Groepsleiding' : 'Webshop'})
+                        </label>
+                        <input
+                          type="text"
+                          value={editAccountName}
+                          onChange={(e) => setEditAccountName(e.target.value)}
+                          required
+                          placeholder="Bijv. Leiding Kriko-M"
+                          disabled={savingAccount}
+                          style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', background: '#fff', fontWeight: 700, color: '#1A3D2A' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                          Nieuw Wachtwoord (min. 6 tekens)
+                        </label>
+                        <input
+                          type="password"
+                          value={editAccountPassword}
+                          onChange={(e) => setEditAccountPassword(e.target.value)}
+                          placeholder="Laat leeg om niet te wijzigen"
+                          disabled={savingAccount}
+                          style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', background: '#fff', color: '#1A3D2A' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+                      <button
+                        type="submit"
+                        disabled={savingAccount || !editAccountName.trim()}
+                        style={{
+                          padding: '9px 18px',
+                          borderRadius: 8,
+                          backgroundColor: '#1A3D2A',
+                          color: '#fff',
+                          fontWeight: 800,
+                          fontSize: '0.86rem',
+                          border: 'none',
+                          cursor: savingAccount ? 'wait' : 'pointer',
+                        }}
+                      >
+                        {savingAccount ? 'Opslaan…' : 'Account Opslaan'}
+                      </button>
+                    </div>
+                  </form>
                 )}
               </div>
 
