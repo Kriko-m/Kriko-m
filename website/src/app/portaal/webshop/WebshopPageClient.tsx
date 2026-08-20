@@ -323,7 +323,19 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
   }
 
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto', width: '100%', minHeight: 'calc(100vh - 76px)', display: 'flex', flexDirection: 'column', boxSizing: 'border-box', fontFamily: 'var(--font-body, Outfit, sans-serif)', padding: '28px 16px' }} className="portaal-page-container">
+    <div style={{ maxWidth: 1240, margin: '0 auto', width: '100%' }} className="portaal-page-container">
+      <header className="portaal-page-header" style={{ margin: '-28px -20px 28px -20px' }}>
+        <div className="portaal-page-header-inner">
+          <div>
+            <h1 className="portaal-page-header-title">
+              <i className="fa-solid fa-store"></i> Webshop &amp; Uniformen Beheer
+            </h1>
+            <p className="portaal-page-header-desc">
+              Beheer artikelen, maten, prijzen en ingekomen bestellingen.
+            </p>
+          </div>
+        </div>
+      </header>
       
       {/* Toast Flash Message */}
       {flashMessage && (

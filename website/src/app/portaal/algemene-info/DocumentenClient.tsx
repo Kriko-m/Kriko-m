@@ -604,6 +604,42 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
 
   return (
     <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }} className="portaal-page-container">
+      <header className="portaal-page-header" style={{ margin: '-28px -20px 28px -20px' }}>
+        <div className="portaal-page-header-inner">
+          <div>
+            <h1 className="portaal-page-header-title">
+              <i className="fa-solid fa-folder-open"></i> Documenten &amp; Links
+            </h1>
+            <p className="portaal-page-header-desc">
+              Handige sjablonen, checklists, formulieren en nuttige snelkoppelingen voor de leiding.
+            </p>
+          </div>
+          {isGroepsleiding && (
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setEditMode(!editMode)}
+                className="portaal-btn-secondary"
+                style={{ background: editMode ? '#F5B82E' : '#FFFFFF', color: editMode ? '#3a2a00' : '#1A3D2A' }}
+              >
+                <i className={editMode ? 'fa-solid fa-check' : 'fa-solid fa-pen-to-square'}></i>
+                <span>{editMode ? 'Klaar met bewerken' : 'Bewerken'}</span>
+              </button>
+              {editMode && (
+                <>
+                  <button onClick={openCategoryModal} className="portaal-btn-secondary">
+                    <i className="fa-solid fa-folder-plus"></i>
+                    <span>Nieuwe Categorie</span>
+                  </button>
+                  <button onClick={() => openNewItemModal()} className="portaal-btn-primary">
+                    <i className="fa-solid fa-plus"></i>
+                    <span>Nieuw Item</span>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      </header>
 
       {/* Documenten & Sjablonen per Categorie */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>

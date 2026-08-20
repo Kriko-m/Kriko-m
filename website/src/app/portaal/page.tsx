@@ -88,45 +88,36 @@ function PortaalContent() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundImage: 'url(/images/leiding_25-26.jpg)', backgroundSize: 'cover', backgroundPosition: 'center top', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', gap: 20, fontFamily: 'var(--font-body, Outfit, sans-serif)', position: 'relative' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(26,61,42,0.55)', backdropFilter: 'blur(2px)' }} />
+    <div style={{ minHeight: '100vh', backgroundImage: 'url(/images/leiding_25-26.jpg)', backgroundSize: 'cover', backgroundPosition: 'center top', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', gap: 24, fontFamily: 'var(--font-body, Outfit, sans-serif)', position: 'relative' }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(26,61,42,0.75) 0%, rgba(37,82,57,0.85) 100%)', backdropFilter: 'blur(3px)' }} />
 
       {/* Logo */}
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 14 }}>
-        <Image src="/images/logo-finaal.png" alt="Kriko-M logo" width={60} height={60} style={{ objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }} />
-        <div style={{ lineHeight: 1.1 }}>
-          <span style={{ display: 'block', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '1.8rem', letterSpacing: '.06em', textTransform: 'uppercase', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>Kriko-M</span>
-          <span style={{ fontSize: '.82rem', fontWeight: 700, color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase', letterSpacing: '.08em' }}>Scouts Kriko-M Sint-Niklaas</span>
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, textAlign: 'center' }}>
+        <Image src="/images/logo-finaal.png" alt="Kriko-M logo" width={68} height={68} style={{ objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))' }} />
+        <div style={{ lineHeight: 1.2 }}>
+          <span style={{ display: 'block', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900, fontSize: '2rem', letterSpacing: '.06em', textTransform: 'uppercase', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.4)' }}>Kriko-M</span>
+          <div style={{ marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(217,207,179,0.25)', border: '1px solid rgba(217,207,179,0.4)', backdropFilter: 'blur(4px)', padding: '3px 12px', borderRadius: 20, color: '#EDE8D0', fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            ⚜️ LEIDINGSPORTAAL
+          </div>
         </div>
       </div>
 
       {/* Card */}
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 460, background: '#fff', borderRadius: 22, boxShadow: '0 24px 60px rgba(0,0,0,0.35)', overflow: 'hidden' }}>
-        <div style={{ padding: '36px 40px 38px' }}>
-          <div style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontSize: '1.35rem', fontWeight: 900, color: '#1A3D2A', marginBottom: 20, textAlign: 'center' }}>Inloggen</div>
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 440, background: '#fff', borderRadius: 20, boxShadow: '0 24px 60px rgba(0,0,0,0.35)', overflow: 'hidden', borderTop: '5px solid #650B19' }}>
+        <div style={{ padding: '36px 36px 38px' }}>
+          <div style={{ fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontSize: '1.4rem', fontWeight: 900, color: '#1A3D2A', marginBottom: 22, textAlign: 'center' }}>Inloggen op het Portaal</div>
 
-          {error && <div style={{ padding: '10px 14px', borderRadius: 10, fontSize: '.85rem', fontWeight: 600, textAlign: 'center', marginBottom: 18, background: 'hsla(349,51%,47%,.1)', border: '1.5px solid #B23A4D', color: '#B23A4D' }}>{error}</div>}
+          {error && <div style={{ padding: '12px 14px', borderRadius: 12, fontSize: '.88rem', fontWeight: 600, textAlign: 'center', marginBottom: 20, background: 'rgba(178,58,77,0.08)', border: '1.5px solid #B23A4D', color: '#B23A4D' }}>{error}</div>}
 
           <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             <div>
-              <label style={{ display: 'block', fontSize: '.82rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }}>
+              <label style={{ display: 'block', fontSize: '.85rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 8 }}>
                 Selecteer Account
               </label>
               <select
                 value={selectedRole}
                 onChange={(e) => setSelectedRole(e.target.value as 'leiding' | 'groepsleiding' | 'webshop')}
-                className="form-control"
-                style={{
-                  width: '100%',
-                  padding: '12px 14px',
-                  borderRadius: 12,
-                  border: '1.5px solid #C2D9C9',
-                  background: '#FAFAFA',
-                  color: '#1A3D2A',
-                  fontWeight: 700,
-                  fontSize: '0.92rem',
-                  cursor: 'pointer',
-                }}
+                className="portaal-select"
               >
                 <option value="leiding">Leiding</option>
                 <option value="groepsleiding">Groepsleiding</option>
@@ -135,7 +126,7 @@ function PortaalContent() {
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '.82rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 6 }}>
+              <label style={{ display: 'block', fontSize: '.85rem', fontWeight: 700, color: '#1A3D2A', marginBottom: 8 }}>
                 Wachtwoord
               </label>
               <input
@@ -145,20 +136,20 @@ function PortaalContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="form-control"
+                className="portaal-input"
                 autoFocus
               />
             </div>
 
-            <button type="submit" disabled={status === 'loading'} className="btn btn-secondary" style={{ width: '100%', padding: '14px', marginTop: 6 }}>
+            <button type="submit" disabled={status === 'loading'} className="portaal-btn-primary" style={{ width: '100%', padding: '14px', marginTop: 8, fontSize: '0.95rem' }}>
               {status === 'loading' ? 'Inloggen…' : `Inloggen als ${selectedRole === 'leiding' ? 'Leiding' : selectedRole === 'groepsleiding' ? 'Groepsleiding' : 'Webshop & uniformen'} →`}
             </button>
           </form>
         </div>
       </div>
 
-      <Link href="/" style={{ position: 'relative', zIndex: 1, display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: '.88rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>
-        ← Terug naar de website
+      <Link href="/" style={{ position: 'relative', zIndex: 1, display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '.9rem', fontWeight: 700, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', background: 'rgba(0,0,0,0.25)', padding: '8px 16px', borderRadius: 20, backdropFilter: 'blur(4px)' }}>
+        ← Terug naar de publieke website
       </Link>
     </div>
   )

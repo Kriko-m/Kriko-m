@@ -60,24 +60,17 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
     } catch {}
   }, [])
 
-  const activeColor = (customBgStyle.backgroundColor as string) || (isHomePage ? '#1A3D2A' : '#2A5A40')
+  const activeColor = '#F2F6F4'
 
   useEffect(() => {
     if (!showNav) return
     document.body.style.backgroundColor = activeColor
     document.documentElement.style.backgroundColor = activeColor
-    if (customBgStyle.backgroundImage) {
-      document.body.style.backgroundImage = customBgStyle.backgroundImage as string
-      document.body.style.backgroundSize = (customBgStyle.backgroundSize as string) || 'cover'
-      document.body.style.backgroundPosition = (customBgStyle.backgroundPosition as string) || 'center center'
-      document.body.style.backgroundAttachment = (customBgStyle.backgroundAttachment as string) || 'fixed'
-    } else {
-      document.body.style.backgroundImage = ''
-    }
+    document.body.style.backgroundImage = ''
     return () => {
       document.body.style.backgroundImage = ''
     }
-  }, [showNav, activeColor, customBgStyle.backgroundImage, customBgStyle.backgroundSize, customBgStyle.backgroundPosition, customBgStyle.backgroundAttachment])
+  }, [showNav, activeColor])
 
   useEffect(() => {
     if (!showNav) return
@@ -128,17 +121,13 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
       {showNav && <PortaalNav naam={naam} role={role} />}
       {showNav ? (
         <div
-          className={`portaal-page-layout portaal-page-layout--no-sidebar${isHomePage ? ' portaal-page-layout--home' : ''}`}
-          style={{
-            backgroundColor: activeColor,
-          }}
+          className="portaal-page-layout portaal-page-layout--no-sidebar"
         >
           <main
-            className={`portaal-page-main portaal-page-main--anchor${isHomePage ? ' portaal-page-main--home' : ''}`}
+            className="portaal-page-main portaal-page-main--anchor"
             style={{
               width: '100%',
-              backgroundColor: activeColor,
-              ...customBgStyle,
+              backgroundColor: '#F2F6F4',
             }}
           >
             {children}

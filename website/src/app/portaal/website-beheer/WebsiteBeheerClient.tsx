@@ -1081,7 +1081,19 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   }
 
   return (
-    <div style={{ maxWidth: 1040, margin: '0 auto', width: '100%', minHeight: 'calc(100vh - 76px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', boxSizing: 'border-box', fontFamily: 'var(--font-body, Outfit, sans-serif)', padding: '24px 0' }} className="portaal-page-container">
+    <div style={{ maxWidth: 1240, margin: '0 auto', width: '100%' }} className="portaal-page-container">
+      <header className="portaal-page-header" style={{ margin: '-28px -20px 28px -20px' }}>
+        <div className="portaal-page-header-inner">
+          <div>
+            <h1 className="portaal-page-header-title">
+              <i className="fa-solid fa-globe"></i> Website &amp; Systeem Beheer
+            </h1>
+            <p className="portaal-page-header-desc">
+              Beheer de inhoud van de website, portaalbeheerders en webshopinstellingen.
+            </p>
+          </div>
+        </div>
+      </header>
 
       {/* Notification Toast Outside Modal */}
       {flashMessage && (

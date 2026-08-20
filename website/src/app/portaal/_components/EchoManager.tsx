@@ -154,6 +154,19 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
 
   return (
     <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }} className="portaal-page-container">
+      <header className="portaal-page-header" style={{ margin: '-28px -20px 28px -20px' }}>
+        <div className="portaal-page-header-inner">
+          <div>
+            <h1 className="portaal-page-header-title">
+              <i className="fa-solid fa-newspaper"></i> Kriko Echo Beheer
+            </h1>
+            <p className="portaal-page-header-desc">
+              Upload en beheer de maandelijkse Kriko Echo edities per tak.
+            </p>
+          </div>
+        </div>
+      </header>
+
       {flash && (
         <div style={{ background: '#FFFFFF', border: '2px solid #3F7D5A', color: '#1A3D2A', padding: '14px 20px', borderRadius: 14, marginBottom: 28, fontWeight: 700, boxShadow: '0 6px 20px rgba(0,0,0,0.15)' }}>
           {flash}

@@ -30,12 +30,25 @@ export default async function FullAgendaPage() {
 
   return (
     <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%' }} className="portaal-page-container">
-        <LeidingCalendar
-          initialCalendar={calendarEvents}
-          canPublish={canPublish}
-          icsToken={icsToken}
-          twoColumn={true}
-        />
+      <header className="portaal-page-header" style={{ margin: '-28px -20px 28px -20px' }}>
+        <div className="portaal-page-header-inner">
+          <div>
+            <h1 className="portaal-page-header-title">
+              <i className="fa-solid fa-calendar-days"></i> Kalender &amp; Activiteiten
+            </h1>
+            <p className="portaal-page-header-desc">
+              Bekijk en beheer alle takactiviteiten, leidingsevenementen en synchroniseer met je smartphone.
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <LeidingCalendar
+        initialCalendar={calendarEvents}
+        canPublish={canPublish}
+        icsToken={icsToken}
+        twoColumn={true}
+      />
     </div>
   )
 }

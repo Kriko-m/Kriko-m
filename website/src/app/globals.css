@@ -7347,6 +7347,185 @@ html, body {
     }
 }
 
+/* ==========================================================================
+   Leidingsportaal Design System (Bosgroen & Bordeaux Theme)
+   ========================================================================== */
+
+:root {
+  --portaal-bg: #F2F6F4;
+  --portaal-header-bg: #1A3D2A;
+  --portaal-header-accent: #D9CFB3;
+  --portaal-card-bg: #FFFFFF;
+  --portaal-card-border: #D6E4DC;
+  --portaal-btn-primary: #650B19;
+  --portaal-btn-primary-hover: #4A0812;
+  --portaal-btn-secondary: #E2EFE8;
+  --portaal-btn-secondary-hover: #CDE2D7;
+  --portaal-text-dark: #1A3D2A;
+  --portaal-text-muted: #567364;
+}
+
+/* Portaal Base Shell */
+.portaal-page-layout {
+  min-height: calc(100vh - 76px);
+  background-color: var(--portaal-bg) !important;
+  color: #1A1A1A;
+  font-family: var(--font-body), sans-serif;
+  padding-bottom: 60px;
+}
+
+/* Portaal Page Header Banner */
+.portaal-page-header {
+  background: linear-gradient(135deg, #1A3D2A 0%, #255239 100%);
+  border-bottom: 3px solid #D9CFB3;
+  color: #FFFFFF;
+  padding: 32px 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.portaal-page-header-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.portaal-page-header-title {
+  font-family: var(--font-heading), sans-serif;
+  font-weight: 900;
+  font-size: 1.75rem;
+  letter-spacing: -0.01em;
+  color: #FFFFFF;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.portaal-page-header-desc {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+/* Container */
+.portaal-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 28px 20px;
+}
+
+/* Portaal Cards */
+.portaal-card {
+  background: #FFFFFF;
+  border: 1px solid var(--portaal-card-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(26, 61, 42, 0.05);
+  padding: 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.portaal-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(26, 61, 42, 0.1);
+  border-color: #B5D1C1;
+}
+
+/* Buttons */
+.portaal-btn-primary {
+  background-color: var(--portaal-btn-primary) !important;
+  color: #FFFFFF !important;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 6px rgba(101, 11, 25, 0.2);
+  text-decoration: none;
+}
+
+.portaal-btn-primary:hover {
+  background-color: var(--portaal-btn-primary-hover) !important;
+  transform: translateY(-1px);
+}
+
+.portaal-btn-secondary {
+  background-color: var(--portaal-btn-secondary) !important;
+  color: var(--portaal-text-dark) !important;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 10px 20px;
+  border: 1.5px solid #C2D9C9;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  text-decoration: none;
+}
+
+.portaal-btn-secondary:hover {
+  background-color: var(--portaal-btn-secondary-hover) !important;
+  border-color: #A3C9B0;
+}
+
+/* Inputs & Selects */
+.portaal-input,
+.portaal-select {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid #C2D9C9;
+  background-color: #FFFFFF;
+  color: #1A3D2A;
+  font-weight: 600;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.portaal-input:focus,
+.portaal-select:focus {
+  border-color: #1A3D2A;
+  box-shadow: 0 0 0 3px rgba(26, 61, 42, 0.15);
+}
+
+/* Badges */
+.portaal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.portaal-badge-groenscouts {
+  background-color: #E2EFE8;
+  color: #1A3D2A;
+  border: 1px solid #C2D9C9;
+}
+
+.portaal-badge-bordeaux {
+  background-color: rgba(101, 11, 25, 0.1);
+  color: #650B19;
+  border: 1px solid rgba(101, 11, 25, 0.2);
+}
+
+
 
 
 
