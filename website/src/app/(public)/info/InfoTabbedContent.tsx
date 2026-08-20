@@ -544,19 +544,19 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                     {siteContent['info.opmaat.ziekenfondsen']?.content || 'Mutualiteiten dragen vaak ook bij aan de kosten van vrijetijdsbesteding van uw kinderen. Welke voordelen dit precies zijn, hangt af van bij welk ziekenfonds u bent. Klik op het juiste ziekenfonds om meer informatie te verkrijgen omtrent terugbetalingen:'}
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-                    <a href="https://www.cm.be/diensten-en-voordelen/vakantie-en-vrije-tijd" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                    <a href="https://www.cm.be/diensten-en-voordelen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
                       CM &raquo;
                     </a>
-                    <a href="https://www.helan.be/nl/het-krijgen/voordelen-en-terugbetalingen/kampen-en-meerdaagse-activiteiten/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                    <a href="https://www.helan.be/nl/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
                       Helan &raquo;
                     </a>
-                    <a href="https://www.solidaris-vlaanderen.be/terugbetaling-kampen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                    <a href="https://www.solidaris-vlaanderen.be" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
                       Solidaris &raquo;
                     </a>
-                    <a href="https://www.lm-ml.be/nl/voordelen-en-diensten/jeugdkampen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                    <a href="https://www.lm.be" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
                       Liberale Mutualiteit (LM) &raquo;
                     </a>
-                    <a href="https://www.vnz.be/voordelen-terugbetalingen/jeugdbeweging/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                    <a href="https://www.vnz.be/voordelen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
                       VNZ &raquo;
                     </a>
                   </div>
