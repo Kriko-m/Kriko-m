@@ -20,23 +20,24 @@ export default function InschrijvenClient({ email, year }: Props) {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: 12,
-          backgroundColor: 'var(--color-bg-linen)',
-          padding: 8,
-          borderRadius: 'var(--border-radius-md)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+          gap: 8,
+          backgroundColor: '#fff',
+          padding: 6,
+          borderRadius: 'var(--border-radius-lg)',
           border: '1px solid var(--color-border)',
+          boxShadow: 'var(--shadow-sm)',
         }}
       >
         <button
           type="button"
           onClick={() => setActiveTab('nieuw')}
           style={{
-            padding: '16px 22px',
-            borderRadius: 'var(--border-radius-sm)',
-            border: activeTab === 'nieuw' ? '2px solid var(--color-primary)' : '1px solid transparent',
-            backgroundColor: activeTab === 'nieuw' ? '#fff' : 'transparent',
-            color: activeTab === 'nieuw' ? 'var(--color-primary-dark)' : 'var(--color-text-dark)',
+            padding: '14px 24px',
+            borderRadius: 'var(--border-radius-md)',
+            border: 'none',
+            backgroundColor: activeTab === 'nieuw' ? 'var(--color-primary)' : 'transparent',
+            color: activeTab === 'nieuw' ? '#fff' : 'var(--color-primary-dark)',
             fontWeight: activeTab === 'nieuw' ? 800 : 600,
             fontSize: '1.05rem',
             cursor: 'pointer',
@@ -44,10 +45,17 @@ export default function InschrijvenClient({ email, year }: Props) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 10,
-            transition: 'all 0.2s ease',
+            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxShadow: activeTab === 'nieuw' ? '0 4px 14px color-mix(in srgb, var(--color-primary) 30%, transparent)' : 'none',
           }}
         >
-          <i className="fa-solid fa-user-plus" style={{ color: 'var(--color-primary)' }}></i>
+          <i
+            className="fa-solid fa-user-plus"
+            style={{
+              color: activeTab === 'nieuw' ? 'var(--color-accent)' : 'var(--color-primary)',
+              fontSize: '1.1rem',
+            }}
+          ></i>
           Nieuw lid bij Kriko-M
         </button>
 
@@ -55,11 +63,11 @@ export default function InschrijvenClient({ email, year }: Props) {
           type="button"
           onClick={() => setActiveTab('bestaand')}
           style={{
-            padding: '16px 22px',
-            borderRadius: 'var(--border-radius-sm)',
-            border: activeTab === 'bestaand' ? '2px solid var(--color-primary)' : '1px solid transparent',
-            backgroundColor: activeTab === 'bestaand' ? '#fff' : 'transparent',
-            color: activeTab === 'bestaand' ? 'var(--color-primary-dark)' : 'var(--color-text-dark)',
+            padding: '14px 24px',
+            borderRadius: 'var(--border-radius-md)',
+            border: 'none',
+            backgroundColor: activeTab === 'bestaand' ? 'var(--color-primary)' : 'transparent',
+            color: activeTab === 'bestaand' ? '#fff' : 'var(--color-primary-dark)',
             fontWeight: activeTab === 'bestaand' ? 800 : 600,
             fontSize: '1.05rem',
             cursor: 'pointer',
@@ -67,10 +75,17 @@ export default function InschrijvenClient({ email, year }: Props) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 10,
-            transition: 'all 0.2s ease',
+            transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxShadow: activeTab === 'bestaand' ? '0 4px 14px color-mix(in srgb, var(--color-primary) 30%, transparent)' : 'none',
           }}
         >
-          <i className="fa-solid fa-user-check" style={{ color: 'var(--color-primary)' }}></i>
+          <i
+            className="fa-solid fa-user-check"
+            style={{
+              color: activeTab === 'bestaand' ? 'var(--color-accent)' : 'var(--color-primary)',
+              fontSize: '1.1rem',
+            }}
+          ></i>
           Reeds lid (Herinschrijving)
         </button>
       </div>
