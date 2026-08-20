@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
 
 interface Props {
@@ -9,7 +8,7 @@ interface Props {
   year: string
 }
 
-export default function InschrijvenClient({ email, year }: Props) {
+export default function InschrijvenClient({ email, _year }: Props) {
   const [activeTab, setActiveTab] = useState<'nieuw' | 'bestaand'>('nieuw')
   const [isFormOpen, setIsFormOpen] = useState(false)
 
