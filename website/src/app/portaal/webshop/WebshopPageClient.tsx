@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import ExcelJS from 'exceljs'
 import { Settings } from '@/lib/types'
 import CopyButton from '@/components/CopyButton'
+import ConfirmDialog from '../_components/ConfirmDialog'
 
 interface OrderItem {
   name: string
@@ -27,7 +28,7 @@ interface ShopProduct {
   name: string
   price: number
   category: string
-  sizes?: string[]
+  sizes?: string[] | string
   description?: string
   image?: string
 }
@@ -54,6 +55,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [savingProduct, setSavingProduct] = useState(false)
   const [uploadingProductPhoto, setUploadingProductPhoto] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<{ title?: string; message: string; confirmLabel?: string; danger?: boolean; onConfirm: () => void } | null>(null)
 
   const showNotification = useCallback((type: 'success' | 'error', text: string) => {
     setFlashMessage({ type, text })
@@ -98,19 +100,27 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
     fetchShopProducts()
   }, [fetchOrders, fetchShopProducts])
 
-  async function handleOrderDelete(orderId: string, orderRef: string) {
-    if (!confirm(`Weet je zeker dat je bestelling ${orderRef} wilt verwijderen?`)) return
-    setUpdatingOrderId(orderId)
-    try {
-      const res = await fetch(`/api/admin/orders/${orderId}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Verwijderen mislukt')
-      setOrders(prev => prev.filter(o => o.id !== orderId))
-      showNotification('success', `Bestelling ${orderRef} verwijderd!`)
-    } catch (err: unknown) {
-      showNotification('error', err instanceof Error ? err.message : 'Fout bij verwijderen bestelling')
-    } finally {
-      setUpdatingOrderId(null)
-    }
+  function handleOrderDelete(orderId: string, orderRef: string) {
+    setConfirmDialog({
+      title: 'Bestelling verwijderen',
+      message: `Weet je zeker dat je bestelling ${orderRef} wilt verwijderen?`,
+      confirmLabel: 'Verwijderen',
+      danger: true,
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        setUpdatingOrderId(orderId)
+        try {
+          const res = await fetch(`/api/admin/orders/${orderId}`, { method: 'DELETE' })
+          if (!res.ok) throw new Error('Verwijderen mislukt')
+          setOrders(prev => prev.filter(o => o.id !== orderId))
+          showNotification('success', `Bestelling ${orderRef} verwijderd!`)
+        } catch (err: unknown) {
+          showNotification('error', err instanceof Error ? err.message : 'Fout bij verwijderen bestelling')
+        } finally {
+          setUpdatingOrderId(null)
+        }
+      },
+    })
   }
 
   async function handleSaveSettings() {
@@ -133,6 +143,10 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
   async function handleProductSave(productToSave: ShopProduct) {
     setSavingProduct(true)
     try {
+      const parsedSizes = typeof productToSave.sizes === 'string'
+        ? productToSave.sizes.split(',').map(s => s.trim()).filter(Boolean)
+        : productToSave.sizes
+
       const res = await fetch('/api/admin/shop-products', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -141,7 +155,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
           name: productToSave.name,
           price: productToSave.price,
           category: productToSave.category,
-          sizes: productToSave.sizes,
+          sizes: parsedSizes,
           description: productToSave.description,
           image: productToSave.image,
         }),
@@ -186,23 +200,31 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
     }
   }
 
-  async function handleProductDelete(id: string) {
-    if (!confirm('Weet je zeker dat je dit artikel wilt verwijderen uit de webshop?')) return
-    setSavingProduct(true)
-    try {
-      const res = await fetch(`/api/admin/shop-products?id=${id}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Verwijderen mislukt')
-      setShopProducts(prev => {
-        const next = prev.filter(p => p.id !== id)
-        if (next.length > 0) setSelectedProductId(next[0].id)
-        return next
-      })
-      showNotification('success', 'Artikel succesvol verwijderd uit de webshop!')
-    } catch (err: unknown) {
-      showNotification('error', err instanceof Error ? err.message : 'Fout bij verwijderen')
-    } finally {
-      setSavingProduct(false)
-    }
+  function handleProductDelete(id: string) {
+    setConfirmDialog({
+      title: 'Artikel verwijderen',
+      message: 'Weet je zeker dat je dit artikel wilt verwijderen uit de webshop?',
+      confirmLabel: 'Verwijderen',
+      danger: true,
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        setSavingProduct(true)
+        try {
+          const res = await fetch(`/api/admin/shop-products?id=${id}`, { method: 'DELETE' })
+          if (!res.ok) throw new Error('Verwijderen mislukt')
+          setShopProducts(prev => {
+            const next = prev.filter(p => p.id !== id)
+            if (next.length > 0) setSelectedProductId(next[0].id)
+            return next
+          })
+          showNotification('success', 'Artikel succesvol verwijderd uit de webshop!')
+        } catch (err: unknown) {
+          showNotification('error', err instanceof Error ? err.message : 'Fout bij verwijderen')
+        } finally {
+          setSavingProduct(false)
+        }
+      },
+    })
   }
 
   async function handleProductPhotoUpload(e: React.ChangeEvent<HTMLInputElement>, product: ShopProduct) {
@@ -230,14 +252,22 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
     }
   }
 
-  async function handleRemoveProductPhoto(product: ShopProduct) {
-    if (!confirm('Weet je zeker dat je deze artikel foto wilt verwijderen?')) return
-    await handleProductSave({ ...product, image: '' })
+  function handleRemoveProductPhoto(product: ShopProduct) {
+    setConfirmDialog({
+      title: 'Artikel foto verwijderen',
+      message: 'Weet je zeker dat je deze artikel foto wilt verwijderen?',
+      confirmLabel: 'Foto verwijderen',
+      danger: true,
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        await handleProductSave({ ...product, image: '' })
+      },
+    })
   }
 
   async function exportOrdersToExcel() {
     if (orders.length === 0) {
-      alert('Er zijn geen bestellingen om te exporteren.')
+      showNotification('error', 'Er zijn geen bestellingen om te exporteren.')
       return
     }
 
@@ -288,7 +318,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
       window.URL.revokeObjectURL(url)
     } catch (err) {
       console.error('Fout bij exporteren Excel:', err)
-      alert('Er is een fout opgetreden bij het genereren van het Excel-bestand.')
+      showNotification('error', 'Er is een fout opgetreden bij het genereren van het Excel-bestand.')
     }
   }
 
@@ -686,7 +716,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                           </label>
                           <input
                             type="number"
-                            step="0.01"
+                            step="1"
                             value={product.price}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: parseFloat(e.target.value) || 0 } : p))}
                             style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
@@ -714,10 +744,10 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                         </label>
                         <input
                           type="text"
-                          value={Array.isArray(product.sizes) ? product.sizes.join(', ') : product.sizes || ''}
+                          value={typeof product.sizes === 'string' ? product.sizes : (Array.isArray(product.sizes) ? product.sizes.join(', ') : '')}
                           onChange={e => {
-                            const newSizes = e.target.value.split(',').map(s => s.trim()).filter(Boolean)
-                            setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, sizes: newSizes } : p))
+                            const val = e.target.value
+                            setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, sizes: val } : p))
                           }}
                           placeholder="Bijv. S, M, L, XL of 6j, 8j, 10j"
                           style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#1A3D2A' }}
@@ -742,6 +772,17 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
         )}
 
       </div>
+
+      {confirmDialog && (
+        <ConfirmDialog
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          confirmLabel={confirmDialog.confirmLabel}
+          danger={confirmDialog.danger}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(null)}
+        />
+      )}
     </div>
   )
 }

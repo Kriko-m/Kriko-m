@@ -193,7 +193,7 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
               }}
             >
               {TAK_NAMEN[tak] ?? tak}
-              {pendingCount > 0 && (
+              {isGroepsleiding && pendingCount > 0 && (
                 <span style={{
                   position: 'absolute',
                   top: -8,
@@ -332,31 +332,25 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
           </form>
         </div>
 
-        {/* Compact Right Side Column: Te Goedkeuren & Goedgekeurde Echo's */}
+        {/* Compact Right Side Column: Te Goedkeuren & Kriko Echo's */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           
           {/* Sectie 1: Nog goed te keuren Echo's */}
-          <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 22, padding: 24, boxShadow: '0 6px 24px rgba(0,0,0,0.04)', borderTop: '6px solid #C9963A' }}>
-            <h3 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span>⏳</span>
-              <span>Nog goed te keuren</span>
-              {pendingEchos.length > 0 && (
-                <span style={{ background: '#C9963A', color: '#fff', fontSize: '.75rem', fontWeight: 800, padding: '2px 8px', borderRadius: 12, marginLeft: 'auto' }}>
+          {pendingEchos.length > 0 && (
+            <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 22, padding: 24, boxShadow: '0 6px 24px rgba(0,0,0,0.04)', borderTop: '6px solid #1A3D2A' }}>
+              <h3 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>⏳</span>
+                <span>Nog goed te keuren</span>
+                <span style={{ background: '#1A3D2A', color: '#fff', fontSize: '.75rem', fontWeight: 800, padding: '2px 8px', borderRadius: 12, marginLeft: 'auto' }}>
                   {pendingEchos.length}
                 </span>
-              )}
-            </h3>
-            <p style={{ margin: '0 0 16px', fontSize: '.82rem', color: '#4A6855', fontWeight: 600 }}>
-              {isGroepsleiding ? 'Geüploade Echo\'s die wachten op jouw goedkeuring.' : 'Echo\'s in afwachting van goedkeuring door groepsleiding.'}
-            </p>
+              </h3>
+              <p style={{ margin: '0 0 16px', fontSize: '.82rem', color: '#4A6855', fontWeight: 600 }}>
+                {isGroepsleiding ? 'Geüploade Echo\'s die wachten op jouw goedkeuring.' : 'Echo\'s in afwachting van goedkeuring door groepsleiding.'}
+              </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {pendingEchos.length === 0 ? (
-                <div style={{ padding: '20px 16px', background: '#FAFBF9', border: '1.5px dashed #D0D9D3', borderRadius: 14, textAlign: 'center', color: '#6A8A75', fontSize: '.88rem' }}>
-                  Geen te goedkeuren Echo&apos;s voor deze tak.
-                </div>
-              ) : (
-                pendingEchos.map(echo => {
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {pendingEchos.map(echo => {
                   const pdfUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/echos/${echo.file_name}`
                   return (
                     <div
@@ -462,16 +456,16 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                       </div>
                     </div>
                   )
-                })
-              )}
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Sectie 2: Goedgekeurde Echo's (op website) */}
+          {/* Sectie 2: Kriko Echo's (op website) */}
           <div style={{ background: '#fff', border: '1.5px solid #C2D9C9', borderRadius: 22, padding: 24, boxShadow: '0 6px 24px rgba(0,0,0,0.04)', borderTop: '6px solid #1A3D2A' }}>
             <h3 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A', display: 'flex', alignItems: 'center', gap: 8 }}>
               <span>📚</span>
-              <span>Goedgekeurde Echo&apos;s</span>
+              <span>Kriko Echo&apos;s</span>
             </h3>
             <p style={{ margin: '0 0 16px', fontSize: '.82rem', color: '#4A6855', fontWeight: 600 }}>
               Zichtbaar op de officiële website.
@@ -480,7 +474,7 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {approvedEchos.length === 0 ? (
                 <div style={{ padding: '24px 16px', background: '#FAFBF9', border: '1.5px solid #E0E5E1', borderRadius: 12, textAlign: 'center', color: '#6A8A75', fontSize: '.88rem' }}>
-                  Nog geen goedgekeurde Echo&apos;s beschikbaar.
+                  Nog geen Kriko Echo&apos;s beschikbaar.
                 </div>
               ) : (
                 approvedEchos.map(echo => {

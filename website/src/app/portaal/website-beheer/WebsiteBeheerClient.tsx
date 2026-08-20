@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import ExcelJS from 'exceljs'
 import { Settings } from '@/lib/types'
 import CopyButton from '@/components/CopyButton'
+import ConfirmDialog from '../_components/ConfirmDialog'
 
 interface OrderItem {
   name: string
@@ -29,7 +30,7 @@ interface ShopProduct {
   name: string
   price: number
   category: string
-  sizes?: string[]
+  sizes?: string[] | string
   description?: string
   image?: string
 }
@@ -84,6 +85,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   const [selectedProductId, setSelectedProductId] = useState<string>('item_tshirt')
   const [uploadingProductPhoto, setUploadingProductPhoto] = useState(false)
   const [savingProduct, setSavingProduct] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<{ title?: string; message: string; confirmLabel?: string; danger?: boolean; onConfirm: () => void } | null>(null)
 
   // Titels & Subtitels per rol op de startpagina
   const [homeTitleLeiding, setHomeTitleLeiding] = useState<string>(
@@ -415,24 +417,36 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     }
   }
 
-  async function handleOrderDelete(orderId: string, orderRef: string) {
-    if (!confirm(`Weet je zeker dat je bestelling ${orderRef} wilt verwijderen?`)) return
-    setUpdatingOrderId(orderId)
-    try {
-      const res = await fetch(`/api/admin/orders/${orderId}`, { method: 'DELETE' })
-      if (!res.ok) throw new Error('Verwijderen mislukt')
-      setOrders(prev => prev.filter(o => o.id !== orderId))
-      showModalNotification('success', `Bestelling ${orderRef} verwijderd!`)
-    } catch (err: unknown) {
-      showModalNotification('error', err instanceof Error ? err.message : 'Fout bij verwijderen bestelling')
-    } finally {
-      setUpdatingOrderId(null)
-    }
+  function handleOrderDelete(orderId: string, orderRef: string) {
+    setConfirmDialog({
+      title: 'Bestelling verwijderen',
+      message: `Weet je zeker dat je bestelling ${orderRef} wilt verwijderen?`,
+      confirmLabel: 'Verwijderen',
+      danger: true,
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        setUpdatingOrderId(orderId)
+        try {
+          const res = await fetch(`/api/admin/orders/${orderId}`, { method: 'DELETE' })
+          if (!res.ok) throw new Error('Verwijderen mislukt')
+          setOrders(prev => prev.filter(o => o.id !== orderId))
+          showModalNotification('success', `Bestelling ${orderRef} verwijderd!`)
+        } catch (err: unknown) {
+          showModalNotification('error', err instanceof Error ? err.message : 'Fout bij verwijderen bestelling')
+        } finally {
+          setUpdatingOrderId(null)
+        }
+      },
+    })
   }
 
   async function handleProductSave(productToSave: ShopProduct) {
     setSavingProduct(true)
     try {
+      const parsedSizes = typeof productToSave.sizes === 'string'
+        ? productToSave.sizes.split(',').map(s => s.trim()).filter(Boolean)
+        : productToSave.sizes
+
       const res = await fetch('/api/admin/shop-products', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -441,7 +455,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
           name: productToSave.name,
           price: productToSave.price,
           category: productToSave.category,
-          sizes: productToSave.sizes,
+          sizes: parsedSizes,
           description: productToSave.description,
           image: productToSave.image,
         }),
@@ -492,8 +506,17 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     }
   }
 
-  async function handleRemoveProductPhoto(product: ShopProduct) {
-    await handleProductSave({ ...product, image: '' })
+  function handleRemoveProductPhoto(product: ShopProduct) {
+    setConfirmDialog({
+      title: 'Artikel foto verwijderen',
+      message: 'Weet je zeker dat je deze artikel foto wilt verwijderen?',
+      confirmLabel: 'Foto verwijderen',
+      danger: true,
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        await handleProductSave({ ...product, image: '' })
+      },
+    })
   }
 
   async function handleProductAdd() {
@@ -528,30 +551,38 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     }
   }
 
-  async function handleProductDelete(id: string) {
-    if (!confirm('Weet je zeker dat je dit artikel wilt verwijderen uit de webshop?')) return
-    setSavingProduct(true)
-    try {
-      const res = await fetch(`/api/admin/shop-products?id=${id}`, {
-        method: 'DELETE',
-      })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Verwijderen mislukt')
-      }
-      setShopProducts(prev => {
-        const next = prev.filter(p => p.id !== id)
-        if (next.length > 0) setSelectedProductId(next[0].id)
-        return next
-      })
-      showModalNotification('success', 'Artikel succesvol verwijderd uit de webshop!')
-      router.refresh()
-    } catch (err: unknown) {
-      const errorText = err instanceof Error ? err.message : 'Fout bij verwijderen'
-      showModalNotification('error', errorText)
-    } finally {
-      setSavingProduct(false)
-    }
+  function handleProductDelete(id: string) {
+    setConfirmDialog({
+      title: 'Artikel verwijderen',
+      message: 'Weet je zeker dat je dit artikel wilt verwijderen uit de webshop?',
+      confirmLabel: 'Verwijderen',
+      danger: true,
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        setSavingProduct(true)
+        try {
+          const res = await fetch(`/api/admin/shop-products?id=${id}`, {
+            method: 'DELETE',
+          })
+          if (!res.ok) {
+            const err = await res.json()
+            throw new Error(err.error || 'Verwijderen mislukt')
+          }
+          setShopProducts(prev => {
+            const next = prev.filter(p => p.id !== id)
+            if (next.length > 0) setSelectedProductId(next[0].id)
+            return next
+          })
+          showModalNotification('success', 'Artikel succesvol verwijderd uit de webshop!')
+          router.refresh()
+        } catch (err: unknown) {
+          const errorText = err instanceof Error ? err.message : 'Fout bij verwijderen'
+          showModalNotification('error', errorText)
+        } finally {
+          setSavingProduct(false)
+        }
+      },
+    })
   }
 
   function renderShopTabBody(activeTabToUse: 'bestellingen' | 'beheer') {
@@ -910,7 +941,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                           </label>
                           <input
                             type="number"
-                            step="0.01"
+                            step="1"
                             value={product.price}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: parseFloat(e.target.value) || 0 } : p))}
                             style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
@@ -938,10 +969,10 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                         </label>
                         <input
                           type="text"
-                          value={Array.isArray(product.sizes) ? product.sizes.join(', ') : product.sizes || ''}
+                          value={typeof product.sizes === 'string' ? product.sizes : (Array.isArray(product.sizes) ? product.sizes.join(', ') : '')}
                           onChange={e => {
-                            const newSizes = e.target.value.split(',').map(s => s.trim()).filter(Boolean)
-                            setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, sizes: newSizes } : p))
+                            const val = e.target.value
+                            setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, sizes: val } : p))
                           }}
                           placeholder="Bijv. S, M, L, XL of 6j, 8j, 10j"
                           style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#1A3D2A' }}
@@ -1608,6 +1639,16 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
         </div>
       )}
 
+      {confirmDialog && (
+        <ConfirmDialog
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          confirmLabel={confirmDialog.confirmLabel}
+          danger={confirmDialog.danger}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(null)}
+        />
+      )}
     </div>
   )
 }
