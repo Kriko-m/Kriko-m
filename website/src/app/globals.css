@@ -186,7 +186,7 @@ a {
 
 .btn-primary {
     background-color: var(--color-accent);
-    color: var(--color-bg-white);
+    color: var(--color-primary-dark);
 }
 
 .btn-primary:hover {
