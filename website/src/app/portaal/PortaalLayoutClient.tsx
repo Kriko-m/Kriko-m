@@ -11,13 +11,12 @@ interface Props {
   settings?: import('@/lib/types').Settings | null
 }
 
-export default function PortaalLayoutClient({ children, naam, role, settings }: Props) {
+export default function PortaalLayoutClient({ children, naam, role, settings: _settings }: Props) {
   const pathname = usePathname()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
   const showNav = pathname !== '/portaal' && pathname !== '/portaal/'
-  const isHomePage = pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/'
 
 
 

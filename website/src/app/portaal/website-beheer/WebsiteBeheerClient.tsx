@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import ExcelJS from 'exceljs'
@@ -67,13 +67,6 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   const [showShopModal, setShowShopModal] = useState(false)
   const [activeShopTab, setActiveShopTab] = useState<'bestellingen' | 'beheer'>('bestellingen')
 
-  useEffect(() => {
-    if (role === 'webshop') {
-      fetchOrders()
-      fetchShopProducts()
-    }
-  }, [role])
-
   // Orders State
   const [orders, setOrders] = useState<AdminOrder[]>([])
   const [loadingOrders, setLoadingOrders] = useState(false)
@@ -86,6 +79,44 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   const [uploadingProductPhoto, setUploadingProductPhoto] = useState(false)
   const [savingProduct, setSavingProduct] = useState(false)
   const [confirmDialog, setConfirmDialog] = useState<{ title?: string; message: string; confirmLabel?: string; danger?: boolean; onConfirm: () => void } | null>(null)
+
+  const fetchOrders = useCallback(async () => {
+    setLoadingOrders(true)
+    try {
+      const res = await fetch('/api/admin/orders')
+      if (res.ok) {
+        const data = await res.json()
+        setOrders(data)
+      }
+    } catch (err) {
+      console.error('Fout bij ophalen bestellingen:', err)
+    } finally {
+      setLoadingOrders(false)
+    }
+  }, [])
+
+  const fetchShopProducts = useCallback(async () => {
+    setLoadingShopProducts(true)
+    try {
+      const res = await fetch('/api/admin/shop-products')
+      if (res.ok) {
+        const data = await res.json()
+        setShopProducts(data)
+        if (data.length > 0) setSelectedProductId(data[0].id)
+      }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingShopProducts(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (role === 'webshop') {
+      fetchOrders()
+      fetchShopProducts()
+    }
+  }, [role, fetchOrders, fetchShopProducts])
 
   // Titels & Subtitels per rol op de startpagina
   const [homeTitleLeiding, setHomeTitleLeiding] = useState<string>(
@@ -394,36 +425,6 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     fetchShopProducts()
   }
 
-  async function fetchOrders() {
-    setLoadingOrders(true)
-    try {
-      const res = await fetch('/api/admin/orders')
-      if (res.ok) {
-        const data = await res.json()
-        setOrders(data)
-      }
-    } catch (err) {
-      console.error('Fout bij ophalen bestellingen:', err)
-    } finally {
-      setLoadingOrders(false)
-    }
-  }
-
-  async function fetchShopProducts() {
-    setLoadingShopProducts(true)
-    try {
-      const res = await fetch('/api/admin/shop-products')
-      if (res.ok) {
-        const data = await res.json()
-        setShopProducts(data)
-        if (data.length > 0) setSelectedProductId(data[0].id)
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoadingShopProducts(false)
-    }
-  }
 
   function handleOrderDelete(orderId: string, orderRef: string) {
     setConfirmDialog({

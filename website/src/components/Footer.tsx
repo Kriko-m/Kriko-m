@@ -6,7 +6,7 @@ interface FooterProps {
 }
 
 export default function Footer({
-  contactEmail = 'groepsleiding@kriko-m.be',
+  contactEmail: _contactEmail = 'groepsleiding@kriko-m.be',
   contactAddress = 'Industriepark-Noord 33, 9100 Sint-Niklaas',
 }: FooterProps) {
   const year = new Date().getFullYear()
