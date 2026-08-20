@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       .single()
     const bankIban = settings?.bank_iban || 'BE76 1234 5678 9012'
     const bankHolder = settings?.bank_holder || 'Scouts Kriko-M vzw'
-    const webshopEmail = settings?.webshop_email || 'vicverhaegen4@gmail.com'
+    const webshopEmail = settings?.webshop_email || 'groepsleiding@kriko-m.be'
 
     // Catalogus ophalen voor server-side prijsvalidatie
     const { data: products } = await supabase

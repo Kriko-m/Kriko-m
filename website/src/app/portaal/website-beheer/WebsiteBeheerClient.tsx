@@ -101,7 +101,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
     initialSettings?.home_subtitle_groepsleiding || initialSettings?.home_subtitle || ''
   )
   const [webshopEmail, setWebshopEmail] = useState<string>(
-    initialSettings?.webshop_email || 'vicverhaegen4@gmail.com'
+    initialSettings?.webshop_email || 'groepsleiding@kriko-m.be'
   )
 
   // Achtergronden per pagina
