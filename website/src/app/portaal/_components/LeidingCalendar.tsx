@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CalendarEvent, AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, AUDIENCE_NAMEN, PORTAAL_AUDIENCE_KLEUREN } from '@/lib/constants'
-import { getEventIcon } from '@/lib/calendar'
+import { getEventIcon, getPrimaryAudienceTag } from '@/lib/calendar'
 import SubscribeCalendarButton from '@/components/SubscribeCalendarButton'
 import ConfirmDialog from './ConfirmDialog'
 import KalenderActiviteitModal from './KalenderActiviteitModal'
@@ -181,7 +181,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
         {tags.map(t => {
           const isYellow = t === 'kapoenen'
           const tagBg = isYellow ? '#FEF3D6' : `${PORTAAL_AUDIENCE_KLEUREN[t]}1E`
-          const tagColor = isYellow ? '#3A2A00' : PORTAAL_AUDIENCE_KLEUREN[t]
+          const tagColor = isYellow ? '#8C6700' : PORTAAL_AUDIENCE_KLEUREN[t]
           return (
             <span key={t} style={{
               padding: compact ? '2px 7px' : '2px 9px',
@@ -192,7 +192,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
               letterSpacing: '0.4px',
               background: tagBg,
               color: tagColor,
-              border: isYellow ? '1.5px solid #F5B82E' : 'none',
+              border: 'none',
               lineHeight: 1.3,
               whiteSpace: 'nowrap',
             }}>
@@ -251,16 +251,16 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
         </div>
 
         {/* Days of week header */}
-        <div className="cal-grid-weekdays">
+        <div className="portal-cal-grid-weekdays">
           {DAG_LETTERS.map(d => (
-            <div key={d} className="cal-grid-weekday">
+            <div key={d} className="portal-cal-grid-weekday">
               {d}
             </div>
           ))}
         </div>
 
         {/* Month Days Grid */}
-        <div className="cal-grid-days">
+        <div className="portal-cal-grid-days">
           {calGrid.map((cell) => {
             const isCurrentMonth = cell.date!.getMonth() === calMonth
             const dateStr = toLocalDateStr(cell.date!)
@@ -272,27 +272,28 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
             return (
               <div
                 key={cell.key}
-                className={`cal-grid-cell ${
-                  !isCurrentMonth ? 'cal-grid-cell--out' : ''
-                } ${isToday ? 'cal-grid-cell--today' : ''} ${
-                  isSelected ? 'cal-grid-cell--selected' : ''
-                } ${hasEvents ? 'cal-grid-cell--has-events' : ''}`}
+                className={`portal-cal-grid-cell ${
+                  !isCurrentMonth ? 'portal-cal-grid-cell--out' : ''
+                } ${isToday ? 'portal-cal-grid-cell--today' : ''} ${
+                  isSelected ? 'portal-cal-grid-cell--selected' : ''
+                } ${hasEvents ? 'portal-cal-grid-cell--has-events' : ''}`}
                 style={{ cursor: 'pointer' }}
                 onClick={() => {
                   setSelectedDate(prev => prev === dateStr ? null : dateStr)
                 }}
               >
-                <div className="cal-grid-cell-top">
-                  <span className="cal-grid-day-number">{cell.date!.getDate()}</span>
-                  {isToday && <span className="cal-grid-today-tag">Vandaag</span>}
+                <div className="portal-cal-grid-cell-top">
+                  <span className="portal-cal-grid-day-number">{cell.date!.getDate()}</span>
+                  {isToday && <span className="portal-cal-grid-today-tag">Vandaag</span>}
                 </div>
 
                 {/* Render event pills inside cell */}
                 {hasEvents && (
-                  <div className="cal-grid-cell-events">
+                  <div className="portal-cal-grid-cell-events">
                     {dayEvents.map(ev => {
-                      const primaryTag = (ev.audience[0] || 'groep') as AudienceTag
+                      const primaryTag = getPrimaryAudienceTag(ev.audience)
                       const isImportant = ev.is_evenement
+                      const isTak = primaryTag !== 'groep' && primaryTag !== 'leiding'
                       const isNoMeeting = ev.title.toLowerCase().includes('geen vergadering')
                       const iconClass = getEventIcon(ev)
                       const tagColor = PORTAAL_AUDIENCE_KLEUREN[primaryTag] || '#243B6B'
@@ -300,7 +301,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
 
                       let pillStyle: React.CSSProperties = {}
 
-                      if (isImportant) {
+                      if (isImportant || isTak) {
                         pillStyle = {
                           background: tagColor,
                           color: isYellow ? '#3A2A00' : '#FFFFFF',
@@ -333,7 +334,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                         <button
                           key={ev.id}
                           type="button"
-                          className="cal-event-pill"
+                          className="portal-cal-event-pill"
                           style={pillStyle}
                           onClick={(e) => {
                             e.stopPropagation()
@@ -341,8 +342,8 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                           }}
                           title={`${ev.title} (${ev.time || 'Hele dag'})`}
                         >
-                          {iconClass && <i className={`fa-solid ${iconClass} pill-icon`} />}
-                          <span className="cal-event-pill-title">{ev.title}</span>
+                          {iconClass ? <i className={`fa-solid ${iconClass} portal-pill-icon`} /> : null}
+                          <span className="portal-cal-event-pill-title">{ev.title}</span>
                         </button>
                       )
                     })}
@@ -357,7 +358,47 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
   }
 
   // ─── Date box widget (left column of each activity card) ─────────────────
-  function DateBox({ date, datumTot, isImportant }: { date: string; datumTot?: string; isImportant?: boolean }) {
+  interface DateBoxStyle {
+    bg: string
+    border: string
+    dayColor: string
+    monthColor: string
+  }
+
+  function getDateBoxStyles(tag: AudienceTag, isImportant: boolean): DateBoxStyle {
+    // Takken (kapoenen, welpen, jonggivers, givers) krijgen altijd de volle/donkere tak-kleur zonder rand
+    switch (tag) {
+      case 'kapoenen':
+        return { bg: '#F4C842', border: 'none', dayColor: '#3A2A00', monthColor: '#473400' }
+      case 'welpen':
+        return { bg: '#2E8B3A', border: 'none', dayColor: '#FFFFFF', monthColor: '#EBF5EE' }
+      case 'jonggivers':
+        return { bg: '#D96800', border: 'none', dayColor: '#FFFFFF', monthColor: '#FDF0E4' }
+      case 'givers':
+        return { bg: '#1A3FB5', border: 'none', dayColor: '#FFFFFF', monthColor: '#EEF2FC' }
+      case 'groep':
+        return isImportant
+          ? { bg: '#650B19', border: 'none', dayColor: '#FFFFFF', monthColor: '#F9EBEF' }
+          : { bg: '#F9EBEF', border: '#E8BDC7', dayColor: '#650B19', monthColor: '#8C182B' }
+      case 'leiding':
+      default:
+        return isImportant
+          ? { bg: '#162544', border: 'none', dayColor: '#FFFFFF', monthColor: '#EBF0F9' }
+          : { bg: '#EBF0F9', border: '#D0DCEE', dayColor: '#162544', monthColor: '#243B6B' }
+    }
+  }
+
+  function DateBox({
+    date,
+    datumTot,
+    isImportant,
+    tag = 'leiding',
+  }: {
+    date: string
+    datumTot?: string
+    isImportant?: boolean
+    tag?: AudienceTag
+  }) {
     const start = new Date(date)
     const startDay = start.getDate()
     const startMaand = MAANDEN_KORT[start.getMonth()].toLowerCase()
@@ -366,13 +407,15 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
     const end = isMultiDay ? new Date(datumTot!) : null
     const sameMonth = end ? (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) : true
 
+    const { bg, border, dayColor, monthColor } = getDateBoxStyles(tag, !!isImportant)
+
     const boxStyle: React.CSSProperties = {
       flexShrink: 0,
       width: isMultiDay && !sameMonth ? 62 : 54,
       minHeight: 52,
-      background: isImportant ? '#162544' : '#EBF0F9',
+      background: bg,
       borderRadius: 12,
-      border: isImportant ? '1.5px solid #162544' : '1.5px solid #D0DCEE',
+      border: border && border !== 'none' ? `1.5px solid ${border}` : 'none',
       padding: '6px 4px',
       textAlign: 'center',
       display: 'flex',
@@ -386,10 +429,10 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
     if (!isMultiDay) {
       return (
         <div style={boxStyle}>
-          <span style={{ fontSize: 20, fontWeight: 900, color: isImportant ? '#FFFFFF' : '#162544', lineHeight: 1 }}>
+          <span style={{ fontSize: 20, fontWeight: 900, color: dayColor, lineHeight: 1 }}>
             {String(startDay).padStart(2, '0')}
           </span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: isImportant ? '#EBF0F9' : '#243B6B', lineHeight: 1, textTransform: 'lowercase' }}>{startMaand}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: monthColor, lineHeight: 1, textTransform: 'lowercase' }}>{startMaand}</span>
         </div>
       )
     }
@@ -401,17 +444,17 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
       <div style={boxStyle}>
         {sameMonth ? (
           <>
-            <span style={{ fontSize: 15, fontWeight: 900, color: isImportant ? '#FFFFFF' : '#162544', lineHeight: 1.1, letterSpacing: '-0.3px' }}>
+            <span style={{ fontSize: 15, fontWeight: 900, color: dayColor, lineHeight: 1.1, letterSpacing: '-0.3px' }}>
               {startDay}–{endDay}
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: isImportant ? '#EBF0F9' : '#243B6B', lineHeight: 1, textTransform: 'lowercase' }}>{startMaand}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: monthColor, lineHeight: 1, textTransform: 'lowercase' }}>{startMaand}</span>
           </>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-            <span style={{ fontSize: 11, fontWeight: 800, color: isImportant ? '#FFFFFF' : '#162544', lineHeight: 1.15, whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: dayColor, lineHeight: 1.15, whiteSpace: 'nowrap' }}>
               {startDay} {startMaand}
             </span>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: isImportant ? '#EBF0F9' : '#162544', lineHeight: 1.15, whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: monthColor, lineHeight: 1.15, whiteSpace: 'nowrap' }}>
               – {endDay} {endMaand}
             </span>
           </div>
@@ -430,6 +473,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
           </p>
         )}
         {listEntries.map(ev => {
+          const primaryTag = getPrimaryAudienceTag(ev.audience) as AudienceTag
           const highlighted = highlightTak ? ev.audience.includes(highlightTak as AudienceTag) : false
           const isImportant = ev.is_evenement
           const isMultiDay = !!ev.datum_tot && ev.datum_tot !== ev.date
@@ -451,7 +495,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
               onClick={() => setActiveViewEvent(ev)}
             >
               <div className="portal-activity-card-inner">
-                <DateBox date={ev.date} datumTot={ev.datum_tot || undefined} isImportant={isImportant} />
+                <DateBox date={ev.date} datumTot={ev.datum_tot || undefined} isImportant={isImportant} tag={primaryTag} />
                 
                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <strong style={{
@@ -485,20 +529,6 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
 
                 <div className="portal-activity-card-actions">
                   <TagChips tags={ev.audience} compact />
-
-                  {!readOnly && !(!canPublish && ev.audience.includes('groep')) && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setEditId(ev.id)
-                        setShowForm(true)
-                      }}
-                      title="Bewerken"
-                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: '50%', background: '#EBF0F9', color: '#243B6B', fontSize: '.8rem', border: 'none', cursor: 'pointer', flexShrink: 0, transition: 'all 0.15s ease' }}
-                    >
-                      <i className="fas fa-pen"></i>
-                    </button>
-                  )}
                   <span style={{ fontSize: '.85rem', color: '#243B6B', fontWeight: 800 }}>
                     <i className="fa-solid fa-chevron-right"></i>
                   </span>
@@ -678,6 +708,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
         <EventDetailDialog
           event={activeViewEvent}
           todayMs={today.getTime()}
+          isPortal={true}
           onClose={() => setActiveViewEvent(null)}
           onEdit={
             !readOnly && !(!canPublish && activeViewEvent.audience.includes('groep'))

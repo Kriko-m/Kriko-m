@@ -391,6 +391,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ url: pub.publicUrl, filename })
     }
 
+    if (
+      uploadType === 'site-content' ||
+      uploadType === 'home-hero-foto' ||
+      uploadType === 'verhuur' ||
+      uploadType === 'tak-banner' ||
+      uploadType === 'general-photo'
+    ) {
+      if (!IMAGE_MIME.has(file.type)) {
+        return NextResponse.json({ error: 'Foto moet een geldig afbeeldingsformaat zijn (JPG, PNG of WebP).' }, { status: 400 })
+      }
+
+      await cleanupOldFile('kamp-fotos', oldUrl)
+      const filename = `site-${uploadType}-${Date.now()}.${ext}`
+
+      const { error: storageError } = await admin.storage
+        .from('kamp-fotos')
+        .upload(filename, buffer, { contentType, upsert: true })
+
+      if (storageError) throw storageError
+
+      const { data: pub } = admin.storage.from('kamp-fotos').getPublicUrl(filename)
+      return NextResponse.json({ url: pub.publicUrl, filename })
+    }
+
     return NextResponse.json({ error: 'Ongeldig uploadtype' }, { status: 400 })
   } catch (err) {
     console.error('Upload API error:', err)

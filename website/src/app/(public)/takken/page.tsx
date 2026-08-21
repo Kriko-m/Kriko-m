@@ -1,8 +1,7 @@
-import { Suspense } from 'react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getSiteContent } from '@/lib/db'
-import EditableBlock from '@/components/editing/EditableBlock'
+import EditableText from '@/components/editing/EditableText'
 
 export const metadata: Metadata = { title: 'Onze Takken | Scouts Kriko-M' }
 
@@ -17,23 +16,20 @@ export default async function TakkenOverzicht() {
   const siteContent = await getSiteContent()
   const heroBlock = siteContent['takken.hero'] || {}
   const heroTitle = heroBlock.title || 'Onze Takken'
-  const heroContent = heroBlock.content || 'Bij Scouts Kriko-M worden onze leden verdeeld volgens leeftijd in vier takken.'
 
   return (
     <>
       <section className="tak-hero primair hero-takken">
         <div className="container">
-          <Suspense fallback={null}>
-            <EditableBlock
-              blockKey="takken.hero"
-              page="takken"
-              section="hero"
-              initialTitle={heroTitle}
-              initialContent={heroContent}
-            >
-              <h1 className="tak-hero-title">{heroTitle}</h1>
-            </EditableBlock>
-          </Suspense>
+          <EditableText
+            blockKey="takken.hero"
+            page="takken"
+            section="hero"
+            field="title"
+            defaultValue={heroTitle}
+            as="h1"
+            className="tak-hero-title"
+          />
         </div>
       </section>
 
@@ -46,24 +42,22 @@ export default async function TakkenOverzicht() {
             const imgUrl = cardBlock.image_url || `/images/tak_${slug}.jpg`
 
             return (
-              <Suspense key={slug} fallback={null}>
-                <EditableBlock
+              <Link
+                key={slug}
+                href={`/takken/${slug}`}
+                className={`vic-tak-card tak-${slug}`}
+                style={{ backgroundImage: `url(${imgUrl})`, width: '100%' }}
+              >
+                <EditableText
                   blockKey={blockKey}
                   page="takken"
                   section="card"
-                  initialTitle={cardTitle}
-                  initialImageUrl={imgUrl}
-                  style={{ display: 'flex', height: '100%' }}
-                >
-                  <Link
-                    href={`/takken/${slug}`}
-                    className={`vic-tak-card tak-${slug}`}
-                    style={{ backgroundImage: `url(${imgUrl})`, width: '100%' }}
-                  >
-                    <span className="vic-tak-name">{cardTitle}</span>
-                  </Link>
-                </EditableBlock>
-              </Suspense>
+                  field="title"
+                  defaultValue={cardTitle}
+                  as="span"
+                  className="vic-tak-name"
+                />
+              </Link>
             )
           })}
         </div>
@@ -71,4 +65,3 @@ export default async function TakkenOverzicht() {
     </>
   )
 }
-

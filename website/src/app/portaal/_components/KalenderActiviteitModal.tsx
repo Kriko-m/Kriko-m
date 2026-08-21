@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { CalendarEvent, AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, AUDIENCE_NAMEN, PORTAAL_AUDIENCE_KLEUREN } from '@/lib/constants'
 import { PRESET_EVENT_ICONS } from '@/lib/calendar'
@@ -40,6 +41,7 @@ export default function KalenderActiviteitModal({
   onSaved: (event: CalendarEvent, isNew: boolean) => void
   onDeleted?: (id: string) => void
 }) {
+  const [mounted, setMounted] = useState(false)
   const [activeTab, setActiveTab] = useState<'basis' | 'opties'>('basis')
   const [form, setForm] = useState<FormState>(() =>
     editEvent
@@ -60,6 +62,15 @@ export default function KalenderActiviteitModal({
   const [externalLinkOpen, setExternalLinkOpen] = useState(!!(editEvent?.external_link_url))
   const [documentOpen, setDocumentOpen] = useState(!!(editEvent?.document_url))
   const [isMeerdaags, setIsMeerdaags] = useState(!!(editEvent?.datum_tot))
+
+  useEffect(() => {
+    setMounted(true)
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [])
 
   const selectableTags: AudienceTag[] = canPublish ? [...AUDIENCE_TAGS] : AUDIENCE_TAGS.filter(t => t !== 'groep')
 
@@ -155,11 +166,13 @@ export default function KalenderActiviteitModal({
     ? { boxShadow: '0 0 0 2px #e74c3c, 0 0 10px rgba(231,76,60,.35)', borderRadius: 10 }
     : {}
 
-  return (
+  if (!mounted || typeof document === 'undefined') return null
+
+  return createPortal(
     <>
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(22,37,68,0.5)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)', zIndex: 1200 }} onClick={onClose} />
-      <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1201, padding: 16, pointerEvents: 'none' }}>
-        <div style={{ pointerEvents: 'auto', width: '95%', maxWidth: 720, maxHeight: '90vh', overflow: 'auto', background: '#fff', borderRadius: 20, padding: 32, boxShadow: '0 24px 60px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div className="portaal-modal-overlay kalender-modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(22,37,68,0.55)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)', zIndex: 3500 }} onClick={onClose} />
+      <div className="portaal-modal-overlay kalender-modal-overlay" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3501, padding: '36px 16px', pointerEvents: 'none' }}>
+        <div style={{ pointerEvents: 'auto', width: '95%', maxWidth: 720, maxHeight: 'calc(100vh - 90px)', overflowY: 'auto', overflowX: 'hidden', background: '#fff', borderRadius: 20, padding: 32, boxShadow: '0 24px 60px rgba(0,0,0,0.22)', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12, borderBottom: '1px solid #EDE8D0' }}>
@@ -214,15 +227,9 @@ export default function KalenderActiviteitModal({
                 fontSize: '.88rem',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
               }}
             >
               Opties & Links
-              {(form.icon || form.is_evenement || form.external_link_url || form.document_url || form.facebook_event_url) ? (
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#162544', display: 'inline-block' }} />
-              ) : null}
             </button>
           </div>
 
@@ -316,104 +323,224 @@ export default function KalenderActiviteitModal({
             {/* TAB 2: OPTIES & LINKS */}
             {activeTab === 'opties' && (
               <>
-                {/* Belangrijk checkbox */}
-                <div>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#162544', fontSize: '.88rem', background: '#EBF0F9', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #D0DCEE' }}>
-                    <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-                    Markeer als belangrijk evenement (subtiele blauwe datum)
-                  </label>
-                </div>
-
                 {/* Optional Icon Selector */}
                 <div>
-                  <label style={labelStyle}>Icoontje kiezen (optioneel)</label>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    {PRESET_EVENT_ICONS.map((ic) => {
-                      const selected = (form.icon || '') === ic.id
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <label style={{ ...labelStyle, marginBottom: 0 }}>Icoontje kiezen (optioneel)</label>
+                    {form.icon ? (
+                      <span style={{ fontSize: '.78rem', color: '#243B6B', fontWeight: 700 }}>
+                        Geselecteerd: {PRESET_EVENT_ICONS.find(i => i.id === form.icon)?.label || form.icon}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(44px, 1fr))',
+                      gap: 8,
+                      maxHeight: 180,
+                      overflowY: 'auto',
+                      padding: 10,
+                      background: '#F8FAFC',
+                      borderRadius: 12,
+                      border: '1px solid #E2E8F0',
+                    }}
+                  >
+                    {PRESET_EVENT_ICONS.filter(ic => ic.id).map((ic) => {
+                      const isSelected = form.icon === ic.id
                       return (
                         <button
-                          key={ic.id || 'none'}
+                          key={ic.id}
                           type="button"
-                          onClick={() => setForm((p) => ({ ...p, icon: ic.id }))}
+                          onClick={() => setForm((p) => ({ ...p, icon: p.icon === ic.id ? '' : ic.id }))}
                           title={ic.label}
                           style={{
-                            display: 'inline-flex',
+                            width: 44,
+                            height: 44,
+                            borderRadius: 10,
+                            display: 'flex',
                             alignItems: 'center',
-                            gap: 6,
-                            padding: '5px 12px',
-                            borderRadius: 8,
-                            border: selected ? '1.5px solid #243B6B' : '1.5px solid #D0DCEE',
-                            background: selected ? '#243B6B' : '#F0ECE4',
-                            color: selected ? '#FFF' : '#1A1A1A',
-                            fontSize: '.8rem',
-                            fontWeight: 700,
+                            justifyContent: 'center',
+                            fontSize: '1.15rem',
                             cursor: 'pointer',
-                            transition: 'all 0.15s ease',
+                            transition: 'all 0.15s ease-in-out',
+                            border: isSelected ? '2px solid #162544' : '1px solid #C5D5EA',
+                            background: isSelected ? '#243B6B' : '#EBF0F9',
+                            color: isSelected ? '#FFFFFF' : '#243B6B',
+                            boxShadow: isSelected ? '0 3px 8px rgba(36, 59, 107, 0.35)' : 'none',
+                            transform: isSelected ? 'scale(1.05)' : 'scale(1)',
                           }}
                         >
-                          {ic.id ? <i className={`fa-solid ${ic.id}`}></i> : '🚫'} {ic.label}
+                          <i className={`fa-solid ${ic.id}`} />
                         </button>
                       )
                     })}
                   </div>
                 </div>
 
-                {/* Option Toggles */}
-                <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#162544', fontSize: '.85rem' }}>
-                    <input type="checkbox" checked={externalLinkOpen} onChange={e => setExternalLinkOpen(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-                    📝 Inschrijflink / Formulier?
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#162544', fontSize: '.85rem' }}>
-                    <input type="checkbox" checked={documentOpen} onChange={e => setDocumentOpen(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-                    📄 Uitnodiging (Flyer / PDF)?
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#162544', fontSize: '.85rem' }}>
-                    <input type="checkbox" checked={facebookLinkOpen} onChange={e => setFacebookLinkOpen(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-                    Facebook link?
-                  </label>
-                </div>
-
-                {/* Inschrijflink */}
-                {externalLinkOpen && (
-                  <div style={{ padding: '12px 16px', background: '#EBF0F9', border: '1.5px solid #D0DCEE', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <label style={labelStyle}>Invulformulier / Inschrijflink (URL)</label>
-                    <input style={inputStyle} value={form.external_link_url} onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))} placeholder="https://forms.google.com/... of inschrijf-URL" />
+                {/* 4 Selectors onder elkaar in dezelfde stijl (als één geheel met topbalk & dropdown) */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  
+                  {/* 1. Belangrijk evenement */}
+                  <div style={{
+                    background: '#EBF0F9',
+                    border: '1.5px solid #D0DCEE',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                  }}>
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      cursor: 'pointer',
+                      fontWeight: 700,
+                      color: '#162544',
+                      fontSize: '.88rem',
+                      padding: '12px 16px',
+                      userSelect: 'none',
+                      background: form.is_evenement ? '#E2EAF6' : '#EBF0F9',
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={form.is_evenement}
+                        onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))}
+                        style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#243B6B' }}
+                      />
+                      Belangrijk evenement
+                    </label>
                   </div>
-                )}
 
-                {/* Uitnodiging PDF */}
-                {documentOpen && (
-                  <div style={{ padding: '12px 16px', background: '#FCF0F0', border: '1.5px solid #F2C0C0', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <label style={labelStyle}>Uitnodiging uploaden (PDF, JPG, PNG)</label>
-                    <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocumentChange} style={{ fontSize: '.8rem' }} />
-                    {form.document_url && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
-                        <a href={form.document_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.82rem', color: '#243B6B', fontWeight: 700, textDecoration: 'underline' }}>
-                          📄 Huidige uitnodiging bekijken
-                        </a>
-                        <button type="button" onClick={() => setForm(p => ({ ...p, document_url: '' }))}
-                          style={{ fontSize: '.78rem', color: '#B23A4D', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>
-                          ✕ Verwijderen
-                        </button>
+                  {/* 2. Inschrijflink */}
+                  <div style={{
+                    background: '#EBF0F9',
+                    border: '1.5px solid #D0DCEE',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                  }}>
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      cursor: 'pointer',
+                      fontWeight: 700,
+                      color: '#162544',
+                      fontSize: '.88rem',
+                      padding: '12px 16px',
+                      userSelect: 'none',
+                      background: externalLinkOpen ? '#E2EAF6' : '#EBF0F9',
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={externalLinkOpen}
+                        onChange={e => setExternalLinkOpen(e.target.checked)}
+                        style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#243B6B' }}
+                      />
+                      Inschrijflink
+                    </label>
+                    {externalLinkOpen && (
+                      <div style={{ padding: '14px 16px', background: '#FFFFFF', borderTop: '1.5px solid #D0DCEE', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <label style={labelStyle}>Invulformulier / Inschrijflink (URL)</label>
+                        <input
+                          style={inputStyle}
+                          value={form.external_link_url}
+                          onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))}
+                          placeholder="https://forms.google.com/... of inschrijf-URL"
+                        />
                       </div>
                     )}
                   </div>
-                )}
 
-                {/* Facebook links */}
-                {facebookLinkOpen && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 16px', background: '#EBF0F9', border: '1.5px solid #D0DCEE', borderRadius: 12 }}>
-                    <div>
-                      <label style={labelStyle}>Facebook evenement link</label>
-                      <input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} placeholder="https://facebook.com/events/..." />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Facebook post URL (voor embed)</label>
-                      <input style={inputStyle} value={form.facebook_post_url} onChange={e => setForm(p => ({ ...p, facebook_post_url: e.target.value }))} placeholder="https://www.facebook.com/ScoutsKrikoM/posts/..." />
-                    </div>
+                  {/* 3. Uitnodiging */}
+                  <div style={{
+                    background: '#EBF0F9',
+                    border: '1.5px solid #D0DCEE',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                  }}>
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      cursor: 'pointer',
+                      fontWeight: 700,
+                      color: '#162544',
+                      fontSize: '.88rem',
+                      padding: '12px 16px',
+                      userSelect: 'none',
+                      background: documentOpen ? '#E2EAF6' : '#EBF0F9',
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={documentOpen}
+                        onChange={e => setDocumentOpen(e.target.checked)}
+                        style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#243B6B' }}
+                      />
+                      Uitnodiging
+                    </label>
+                    {documentOpen && (
+                      <div style={{ padding: '14px 16px', background: '#FFFFFF', borderTop: '1.5px solid #D0DCEE', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <label style={labelStyle}>Uitnodiging uploaden (PDF, JPG, PNG)</label>
+                        <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocumentChange} style={{ fontSize: '.8rem' }} />
+                        {form.document_url && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+                            <a href={form.document_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.82rem', color: '#243B6B', fontWeight: 700, textDecoration: 'underline' }}>
+                              📄 Huidige uitnodiging bekijken
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => setForm(p => ({ ...p, document_url: '' }))}
+                              style={{ fontSize: '.78rem', color: '#B23A4D', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}
+                            >
+                              ✕ Verwijderen
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
+
+                  {/* 4. Facebook link */}
+                  <div style={{
+                    background: '#EBF0F9',
+                    border: '1.5px solid #D0DCEE',
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                  }}>
+                    <label style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      cursor: 'pointer',
+                      fontWeight: 700,
+                      color: '#162544',
+                      fontSize: '.88rem',
+                      padding: '12px 16px',
+                      userSelect: 'none',
+                      background: facebookLinkOpen ? '#E2EAF6' : '#EBF0F9',
+                    }}>
+                      <input
+                        type="checkbox"
+                        checked={facebookLinkOpen}
+                        onChange={e => setFacebookLinkOpen(e.target.checked)}
+                        style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#243B6B' }}
+                      />
+                      Facebook link
+                    </label>
+                    {facebookLinkOpen && (
+                      <div style={{ padding: '14px 16px', background: '#FFFFFF', borderTop: '1.5px solid #D0DCEE', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div>
+                          <label style={labelStyle}>Facebook evenement link</label>
+                          <input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} placeholder="https://facebook.com/events/..." />
+                        </div>
+                        <div>
+                          <label style={labelStyle}>Facebook post URL (voor embed)</label>
+                          <input style={inputStyle} value={form.facebook_post_url} onChange={e => setForm(p => ({ ...p, facebook_post_url: e.target.value }))} placeholder="https://www.facebook.com/ScoutsKrikoM/posts/..." />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
 
                 {/* Cover foto voor publieke kalender */}
                 {canPublish && form.audience.includes('groep') && (
@@ -450,6 +577,7 @@ export default function KalenderActiviteitModal({
           </form>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   )
 }

@@ -44,13 +44,48 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json()
+    const admin = createAdminClient()
+    const now = new Date().toISOString()
+    const updatedBy = verified.email || verified.id
+
+    // Check for batch updates { updates: { [key]: { page, section, title?, content?, image_url? } } }
+    if (body.updates && typeof body.updates === 'object') {
+      const rowsToUpsert = []
+      for (const [key, val] of Object.entries(body.updates)) {
+        if (!key || typeof val !== 'object' || !val) continue
+        const item = val as { page?: string; section?: string; title?: string; content?: string; image_url?: string }
+        rowsToUpsert.push({
+          key,
+          page: item.page || 'general',
+          section: item.section || 'general',
+          title: item.title !== undefined ? item.title : null,
+          content: item.content !== undefined ? item.content : null,
+          image_url: item.image_url !== undefined ? item.image_url : null,
+          updated_at: now,
+          updated_by: updatedBy,
+        })
+      }
+
+      if (rowsToUpsert.length > 0) {
+        const { error: batchErr } = await admin
+          .from('site_content')
+          .upsert(rowsToUpsert, { onConflict: 'key' })
+        if (batchErr) throw batchErr
+      }
+
+      revalidateTag('site-content', 'max')
+      revalidatePath('/', 'layout')
+
+      return NextResponse.json({ success: true, count: rowsToUpsert.length })
+    }
+
+    // Single item update fallback
     const { key, page, section, title, content, image_url } = body
 
     if (!key || !page) {
       return NextResponse.json({ error: 'Sleutel en pagina zijn verplicht' }, { status: 400 })
     }
 
-    const admin = createAdminClient()
     const { error: upsertErr } = await admin
       .from('site_content')
       .upsert({
@@ -60,9 +95,9 @@ export async function POST(req: Request) {
         title: title ?? null,
         content: content ?? null,
         image_url: image_url ?? null,
-        updated_at: new Date().toISOString(),
-        updated_by: verified.email || verified.id,
-      })
+        updated_at: now,
+        updated_by: updatedBy,
+      }, { onConflict: 'key' })
 
     if (upsertErr) throw upsertErr
 

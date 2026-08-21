@@ -197,7 +197,7 @@ export default function CalendarMonthGrid({ events, todayMs }: CalendarMonthGrid
                       onClick={() => setActiveModalEvent(ev)}
                       title={`${ev.title} (${ev.time || 'Hele dag'})`}
                     >
-                      <i className={`fa-solid ${iconClass} pill-icon`}></i>
+                      {iconClass ? <i className={`fa-solid ${iconClass} pill-icon`} /> : null}
                       <span className="cal-event-pill-title">{ev.title}</span>
                     </button>
                   )

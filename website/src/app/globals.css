@@ -2883,10 +2883,12 @@ body.portal-theme .tak-hero.primair {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.88);
+    background: rgba(0, 0, 0, 0.92);
     z-index: 9999;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
 .lightbox-overlay.active {
@@ -2895,36 +2897,50 @@ body.portal-theme .tak-hero.primair {
 
 .lightbox-img {
     max-width: 90vw;
-    max-height: 88vh;
-    border-radius: 8px;
+    max-height: 86vh;
+    border-radius: 12px;
     object-fit: contain;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.7);
     user-select: none;
+    pointer-events: auto;
 }
 
 .lightbox-close {
     position: absolute;
     top: 20px;
     right: 24px;
-    background: none;
-    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     color: #fff;
-    font-size: 2.2rem;
+    font-size: 1.3rem;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
-    opacity: 0.8;
-    transition: opacity 0.15s;
+    opacity: 0.9;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
-.lightbox-close:hover { opacity: 1; }
+.lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    opacity: 1;
+    transform: scale(1.08);
+}
 
 .lightbox-arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255,255,255,0.12);
-    border: none;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     color: #fff;
-    font-size: 2rem;
+    font-size: 1.35rem;
     width: 52px;
     height: 52px;
     border-radius: 50%;
@@ -2932,20 +2948,62 @@ body.portal-theme .tak-hero.primair {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s;
+    transition: all 0.2s ease;
+    z-index: 10001;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
 }
-.lightbox-arrow:hover { background: rgba(255,255,255,0.25); }
-.lightbox-arrow.prev { left: 20px; }
-.lightbox-arrow.next { right: 20px; }
+.lightbox-arrow:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: translateY(-50%) scale(1.1);
+}
+.lightbox-arrow:active {
+    transform: translateY(-50%) scale(0.95);
+}
+.lightbox-arrow.prev { left: 24px; }
+.lightbox-arrow.next { right: 24px; }
 
 .lightbox-counter {
     position: absolute;
-    bottom: 20px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    color: rgba(255,255,255,0.6);
-    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.88rem;
+    font-weight: 600;
     font-family: var(--font-nunito), sans-serif;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 10001;
+    pointer-events: none;
+}
+
+@media (max-width: 640px) {
+    .lightbox-arrow {
+        width: 44px;
+        height: 44px;
+        font-size: 1.1rem;
+    }
+    .lightbox-arrow.prev { left: 12px; }
+    .lightbox-arrow.next { right: 12px; }
+    .lightbox-close {
+        top: 14px;
+        right: 14px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.15rem;
+    }
+    .lightbox-counter {
+        bottom: 16px;
+        font-size: 0.8rem;
+        padding: 4px 10px;
+    }
 }
 
 /* ==========================================================================
@@ -6166,6 +6224,11 @@ body.portal-theme .portaal-nav {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.event-card-v2--featured .event-card-v2-datebox {
+    background: linear-gradient(145deg, #D4A348 0%, #B88225 100%);
+    box-shadow: 0 4px 12px rgba(184, 130, 37, 0.35);
+}
+
 .event-card-v2-day {
     font-family: var(--font-outfit), sans-serif;
     font-size: 1.6rem;
@@ -6443,14 +6506,14 @@ body.portal-theme .portaal-nav {
 
 .cal-grid-cell {
     min-height: 98px;
-    padding: 8px 10px;
+    padding: 8px 8px 6px;
     min-width: 0;
     border-right: 1px solid rgba(0, 0, 0, 0.05);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     background: #ffffff;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
     transition: background-color 0.15s ease;
     box-sizing: border-box;
 }
@@ -6465,27 +6528,29 @@ body.portal-theme .portaal-nav {
 }
 
 .cal-grid-cell--today {
-    background: #EBF0F9;
-    border-top: 3.5px solid #243B6B !important;
+    background: #FAF6EE !important;
+    border-top: 3px solid #C9963A !important;
 }
 
 .cal-grid-cell--selected {
-    background: #EBF0F9 !important;
-    outline: 2px solid #162544;
+    background: #FAF6EE !important;
+    outline: 2px solid #650B19;
     outline-offset: -2px;
 }
 
 .cal-grid-cell-top {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
     min-width: 0;
 }
 
 .cal-grid-day-number {
     font-weight: 800;
     font-size: 0.95rem;
-    color: #162544;
+    color: var(--color-primary-dark, #40050E);
+    line-height: 1.1;
 }
 
 .cal-grid-cell--out .cal-grid-day-number {
@@ -6493,14 +6558,17 @@ body.portal-theme .portaal-nav {
 }
 
 .cal-grid-today-tag {
-    font-size: 0.65rem;
+    font-size: 0.56rem;
     font-weight: 800;
     text-transform: uppercase;
-    background: #243B6B;
-    color: #FFFFFF;
-    padding: 2px 7px;
-    border-radius: 6px;
-    letter-spacing: 0.3px;
+    background: #EFE7DC;
+    color: #7A5E3A;
+    padding: 1px 5px;
+    border-radius: 4px;
+    letter-spacing: 0.4px;
+    line-height: 1.2;
+    display: inline-block;
+    border: 1px solid #E2D6C6;
 }
 
 /* Event Pills inside Day Cell */
@@ -6515,9 +6583,9 @@ body.portal-theme .portaal-nav {
 
 .cal-event-pill {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 5px;
-    padding: 4px 7px;
+    padding: 3px 6px;
     border-radius: 6px;
     border: none;
     font-size: 0.74rem;
@@ -6538,13 +6606,14 @@ body.portal-theme .portaal-nav {
 }
 
 .pill-primary {
-    background: var(--color-primary);
+    background: var(--color-primary, #650B19);
     color: #ffffff;
 }
 
 .pill-featured {
-    background: linear-gradient(135deg, #162544 0%, #243B6B 100%);
+    background: linear-gradient(135deg, #D4A348 0%, #B88225 100%);
     color: #ffffff;
+    box-shadow: 0 1px 4px rgba(184, 130, 37, 0.3);
 }
 
 .pill-nomeeting {
@@ -6555,10 +6624,150 @@ body.portal-theme .portaal-nav {
 .pill-icon {
     font-size: 0.68rem;
     flex-shrink: 0;
-    margin-top: 2px;
 }
 
 .cal-event-pill-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
+    white-space: normal;
+    min-width: 0;
+    flex: 1;
+}
+
+/* ==========================================================================
+   Portal Calendar Grid Styles (Dedicated for Leidingportaal)
+   ========================================================================== */
+.portal-cal-grid-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.78rem;
+    color: #243B6B;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 0 8px;
+    background: #F8FAFC;
+    border-bottom: 2px solid #E2E8F0;
+}
+
+.portal-cal-grid-weekday {
+    padding: 4px 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.portal-cal-grid-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    border-left: 1px solid #E2E8F0;
+    border-top: 1px solid #E2E8F0;
+}
+
+.portal-cal-grid-cell {
+    min-height: 98px;
+    padding: 8px 10px;
+    min-width: 0;
+    border-right: 1px solid #E2E8F0;
+    border-bottom: 1px solid #E2E8F0;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: background-color 0.15s ease;
+    box-sizing: border-box;
+}
+
+.portal-cal-grid-cell:hover {
+    background: #F8FAFC;
+}
+
+.portal-cal-grid-cell--out {
+    background: #F1F5F9;
+    opacity: 0.55;
+}
+
+.portal-cal-grid-cell--today {
+    background: #EBF0F9 !important;
+    border-top: 3.5px solid #243B6B !important;
+}
+
+.portal-cal-grid-cell--selected {
+    background: #EBF0F9 !important;
+    outline: 2px solid #162544;
+    outline-offset: -2px;
+}
+
+.portal-cal-grid-cell-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+}
+
+.portal-cal-grid-day-number {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #162544;
+}
+
+.portal-cal-grid-cell--out .portal-cal-grid-day-number {
+    color: #94A3B8;
+}
+
+.portal-cal-grid-today-tag {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    background: #243B6B;
+    color: #FFFFFF;
+    padding: 2px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+}
+
+.portal-cal-grid-cell-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 2px;
+    min-width: 0;
+    width: 100%;
+}
+
+.portal-cal-event-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 6px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.74rem;
+    line-height: 1.25;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.portal-cal-event-pill:hover {
+    transform: scale(1.02);
+    opacity: 0.95;
+}
+
+.portal-pill-icon {
+    font-size: 0.68rem;
+    flex-shrink: 0;
+}
+
+.portal-cal-event-pill-title {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -6790,6 +6999,11 @@ body.portal-theme .portaal-nav {
     justify-content: center;
 }
 
+.event-card-compact--featured .event-card-compact-datebox {
+    background: linear-gradient(135deg, #D4A348 0%, #B88225 100%);
+    box-shadow: 0 3px 10px rgba(184, 130, 37, 0.3);
+}
+
 .event-card-compact-day {
     font-size: 1.2rem;
     font-weight: 800;
@@ -6943,11 +7157,7 @@ html, body {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding-right: 40px;
-}
-
-.cal-modal-title-wrap.has-edit {
-    padding-right: 120px;
+    padding-right: 0;
 }
 
 .cal-modal-datetime-grid {
@@ -6987,6 +7197,30 @@ html, body {
 
 .portaal-home-cards-grid {
     margin-top: 68px;
+}
+
+.portaal-home-card {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease !important;
+}
+
+.portaal-home-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14), 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+    border-color: #B0BCCB !important;
+}
+
+.portaal-home-card:active {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.portaal-home-card:hover .portaal-home-card-arrow {
+    transform: translateX(4px) !important;
+}
+
+.portaal-home-card:hover .portaal-home-card-icon {
+    background: #243B6B !important;
+    transform: scale(1.05);
 }
 
 .portaal-page-layout--home {
@@ -7174,7 +7408,7 @@ html, body {
 
     .cal-modal-title-wrap,
     .cal-modal-title-wrap.has-edit {
-        padding-right: 48px;
+        padding-right: 0;
     }
 
     .cal-modal-datetime-grid {

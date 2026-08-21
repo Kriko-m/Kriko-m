@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Leader } from '@/lib/types'
 import EditLeidingModal from '@/components/editing/EditLeidingModal'
+import EditableText from '@/components/editing/EditableText'
+import { useEditMode } from '@/components/editing/EditContext'
 
 interface Props {
   initialLeaders: Leader[]
@@ -15,12 +17,10 @@ export default function ContactGroepsleidingCard({
   initialPhoto = null,
 }: Props) {
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const { isEditMode } = useEditMode()
 
   const [leaders, setLeaders] = useState<Leader[]>(initialLeaders)
   const [photo, setPhoto] = useState<string | null>(initialPhoto)
-  const [isGroepsleiding, setIsGroepsleiding] = useState(false)
-  const [isEditMode, setIsEditMode] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
@@ -31,37 +31,28 @@ export default function ContactGroepsleidingCard({
     setPhoto(initialPhoto)
   }, [initialPhoto])
 
-  useEffect(() => {
-    const editQuery = searchParams.get('edit') === 'true'
-    const storedEdit = Boolean(
-      typeof window !== 'undefined' &&
-      (sessionStorage.getItem('kriko_edit_mode') === 'true' || localStorage.getItem('kriko_edit_mode') === 'true')
-    )
-    setIsEditMode(editQuery || storedEdit)
-
-    fetch('/api/admin/check-groepsleiding')
-      .then(res => res.json())
-      .then(data => setIsGroepsleiding(Boolean(data.isGroepsleiding)))
-      .catch(() => setIsGroepsleiding(false))
-  }, [searchParams])
-
-  const canEdit = isGroepsleiding && isEditMode
-
   return (
     <div className="side-card" style={{ position: 'relative' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h3 style={{ margin: 0, color: 'var(--color-primary-dark)', fontSize: '1.25rem' }}>
-          Groepsleiding
+          <EditableText
+            blockKey="contact.groepsleiding.title"
+            page="contact"
+            section="groepsleiding"
+            field="title"
+            defaultValue="Groepsleiding"
+            as="span"
+          />
         </h3>
 
-        {canEdit && (
+        {isEditMode && (
           <button
             onClick={() => setIsModalOpen(true)}
             type="button"
             style={{
-              backgroundColor: '#1A3D2A',
-              color: '#C9963A',
-              border: '1.5px solid #C9963A',
+              backgroundColor: '#162544',
+              color: '#FFFFFF',
+              border: '1.5px solid #243B6B',
               borderRadius: 20,
               padding: '6px 14px',
               display: 'flex',
@@ -71,9 +62,11 @@ export default function ContactGroepsleidingCard({
               fontWeight: 800,
               cursor: 'pointer',
               boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              fontFamily: 'var(--font-heading, Nunito, sans-serif)',
             }}
           >
-            ✏️ Bewerken
+            <i className="fa-solid fa-pen-to-square" style={{ color: '#E2C58D' }}></i>
+            Bewerken
           </button>
         )}
       </div>

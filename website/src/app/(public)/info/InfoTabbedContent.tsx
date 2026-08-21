@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
-import EditableBlock from '@/components/editing/EditableBlock'
+import EditableText from '@/components/editing/EditableText'
+import EditableImage from '@/components/editing/EditableImage'
 
 interface InfoTabbedContentProps {
   email: string
@@ -13,7 +14,7 @@ interface InfoTabbedContentProps {
 
 type TabType = 'praktisch' | 'takken' | 'uniform' | 'op-maat' | 'oudertak'
 
-export default function InfoTabbedContent({ email, address: _address, siteContent = {} }: InfoTabbedContentProps) {
+export default function InfoTabbedContent({ email, address: _address }: InfoTabbedContentProps) {
   const [activeTab, setActiveTab] = useState<TabType>('praktisch')
 
   useEffect(() => {
@@ -106,135 +107,175 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
         {activeTab === 'praktisch' && (
           <div style={{ animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 24, fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)' }}>
             
-            {/* Block 1.1: Welcome (Text Only) */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.welcome"
+            {/* Block 1.1: Welcome */}
+            <div>
+              <EditableText
+                blockKey="info.welcome.title"
                 page="info"
                 section="praktisch"
-                blockType="text_only"
-                initialTitle={siteContent['info.welcome']?.title || 'Welkom bij Scouts Kriko-M'}
-                initialContent={siteContent['info.welcome']?.content || 'Wij zijn Scouts Kriko-M, een gezellige en betrokken scoutsgroep uit Sint-Niklaas voor jongens én meisjes. Onze enthousiaste leidingsploeg staat elke week klaar om van de zondag een onvergetelijke dag te maken: samen spelen, ravotten, uitdagingen aangaan en hechte vriendschappen opbouwen voor het leven!'}
-              >
-                <div>
-                  <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 12, fontWeight: 800 }}>
-                    {siteContent['info.welcome']?.title || 'Welkom bij Scouts Kriko-M'}
-                  </h2>
-                  <p style={{ margin: '0 0 16px 0', whiteSpace: 'pre-line' }}>
-                    {siteContent['info.welcome']?.content || 'Wij zijn Scouts Kriko-M, een gezellige en betrokken scoutsgroep uit Sint-Niklaas voor jongens én meisjes. Onze enthousiaste leidingsploeg staat elke week klaar om van de zondag een onvergetelijke dag te maken: samen spelen, ravotten, uitdagingen aangaan en hechte vriendschappen opbouwen voor het leven!'}
-                  </p>
-                  <p style={{ margin: 0 }}>
-                    Naast onze wekelijkse activiteiten op zondag organiseren we doorheen het jaar ook heel wat gezellige <strong>evenementen voor de hele familie</strong> — zoals onze jaarlijkse barbecue, ouderavonden en feestelijke bijeenkomsten. Nieuwsgierig naar wat er op de planning staat? Alle evenementen en data kan je terugvinden op onze <Link href="/kalender" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'underline' }}>kalenderpagina</Link>.
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Welkom bij Scouts Kriko-M"
+                as="h2"
+                style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 12, fontWeight: 800 }}
+              />
 
-            {/* Block 1.2: Leeftijd (Text Only) */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.leeftijd"
+              <EditableText
+                blockKey="info.welcome.content"
                 page="info"
                 section="praktisch"
-                blockType="text_only"
-                initialTitle={siteContent['info.leeftijd']?.title || 'Vanaf welke leeftijd?'}
-                initialContent={siteContent['info.leeftijd']?.content || 'Iedereen die 6 jaar wordt vóór 1 januari van het lopende scoutsjaar of reeds in het eerste leerjaar zit, kan lid worden van onze scouts. Nieuwe leden mogen bovendien altijd 3 keer gratis komen proberen vooraleer ze definitief inschrijven!'}
-              >
-                <div>
-                  <h3 style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}>
-                    {siteContent['info.leeftijd']?.title || 'Vanaf welke leeftijd?'}
-                  </h3>
-                  <p style={{ margin: 0, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.leeftijd']?.content || 'Iedereen die 6 jaar wordt vóór 1 januari van het lopende scoutsjaar of reeds in het eerste leerjaar zit, kan lid worden van onze scouts. Nieuwe leden mogen bovendien altijd 3 keer gratis komen proberen vooraleer ze definitief inschrijven!'}
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="content"
+                defaultValue="Wij zijn Scouts Kriko-M, een gezellige en betrokken scoutsgroep uit Sint-Niklaas voor jongens én meisjes. Onze enthousiaste leidingsploeg staat elke week klaar om van de zondag een onvergetelijke dag te maken: samen spelen, ravotten, uitdagingen aangaan en hechte vriendschappen opbouwen voor het leven!"
+                as="p"
+                multiline
+                style={{ margin: '0 0 16px 0', whiteSpace: 'pre-line' }}
+              />
 
-            {/* Block 1.3: Waar vind je wat (AANPASBARE LINKS & OMSCHRIJVINGEN) */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.waariswat"
+              <EditableText
+                blockKey="info.welcome.p2"
                 page="info"
                 section="praktisch"
-                blockType="waariswat"
-                initialTitle={siteContent['info.waariswat']?.title || 'Waar vind je wat?'}
-                initialContent={siteContent['info.waariswat']?.content || ''}
-              >
-                <div>
-                  <h3 style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}>
-                    {siteContent['info.waariswat']?.title || 'Waar vind je wat?'}
-                  </h3>
-                  <p style={{ margin: '0 0 12px 0', whiteSpace: 'pre-line' }}>
-                    {(() => {
-                      const raw = siteContent['info.waariswat']?.content || ''
-                      const defaultIntro = 'Omdat we alle praktische zaken al overzichtelijk elders op de website tonen, sturen we je graag door naar de juiste plek:'
-                      try {
-                        if (raw.trim().startsWith('{')) {
-                          const parsed = JSON.parse(raw)
-                          let introText = parsed.intro
-                          if (typeof introText === 'string' && introText.trim().startsWith('{')) {
-                            try {
-                              introText = JSON.parse(introText).intro
-                            } catch {}
-                          }
-                          if (introText && typeof introText === 'string' && !introText.trim().startsWith('{') && introText.trim().length > 0) {
-                            return introText
-                          }
-                          return defaultIntro
-                        }
-                      } catch {}
-                      return raw && !raw.trim().startsWith('{') ? raw : defaultIntro
-                    })()}
-                  </p>
-                  <ul style={{ margin: 0, paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {(() => {
-                      const raw = siteContent['info.waariswat']?.content || ''
-                      let linksData: Record<string, string> = {}
-                      try {
-                        if (raw.trim().startsWith('{')) {
-                          const parsed = JSON.parse(raw)
-                          linksData = parsed.links || {}
-                        }
-                      } catch {}
+                field="content"
+                defaultValue="Naast onze wekelijkse activiteiten op zondag organiseren we doorheen het jaar ook heel wat gezellige evenementen voor de hele familie — zoals onze jaarlijkse barbecue, ouderavonden en feestelijke bijeenkomsten. Nieuwsgierig naar wat er op de planning staat? Alle evenementen en data kan je terugvinden op onze kalenderpagina."
+                as="p"
+                multiline
+                style={{ margin: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
-                      return (
-                        <>
-                          <li>📅 <strong><Link href="/kalender" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Kalender</Link>:</strong> {linksData.kalender || 'Bekijk wanneer de vergaderingen vallen en wanneer onze familie-evenementen plaatsvinden.'}</li>
-                          <li>📖 <strong><Link href="/kriko-echo" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Kriko Echo</Link>:</strong> {linksData.echo || 'Ons maandelijkse programmaboekje met het concrete programma en uren per tak.'}</li>
-                          <li>⚜️ <strong><button type="button" onClick={() => handleTabChange('takken')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Onze Takken</button>:</strong> {linksData.takken || 'Ontdek alle leeftijdsgroepen en hoe lang je in dezelfde tak blijft.'}</li>
-                          <li>📝 <strong><Link href="/inschrijven" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Inschrijven &amp; Lidgeld</Link>:</strong> {linksData.inschrijven || 'Alle info over de inschrijvingsfiche, steekkaart en het jaarlijks lidgeld.'}</li>
-                          <li>💚 <strong><button type="button" onClick={() => handleTabChange('op-maat')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Scouting op Maat</button>:</strong> {linksData.opmaat || 'Alles over verminderd lidgeld (€10), Fonds op Maat en kortingen via het ziekenfonds.'}</li>
-                          <li>👔 <strong><button type="button" onClick={() => handleTabChange('uniform')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Uniform &amp; Webshop</button>:</strong> {linksData.uniform || 'Info over onze das, kledij en bestellen via de shop.'}</li>
-                          <li>👨‍👩‍👧‍👦 <strong><button type="button" onClick={() => handleTabChange('oudertak')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Oudertak</button>:</strong> {linksData.oudertak || 'De kritische vriend van onze groep: hoe ouders en oud-leiding Kriko-M ondersteunen.'}</li>
-                        </>
-                      )
-                    })()}
-                  </ul>
-                </div>
-              </EditableBlock>
-            </Suspense>
-
-            {/* Block 1.4: Vragen (Text Only) */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.vragen"
+            {/* Block 1.2: Leeftijd */}
+            <div>
+              <EditableText
+                blockKey="info.leeftijd.title"
                 page="info"
                 section="praktisch"
-                blockType="text_only"
-                initialTitle={siteContent['info.vragen']?.title || 'Heb je nog vragen?'}
-                initialContent={siteContent['info.vragen']?.content || 'Heb je specifieke vragen over onze scouts of wil je een keertje komen proberen? Neem dan gerust een kijkje op onze contactpagina om een berichtje te sturen of een van de leiding aan te spreken!'}
-              >
-                <div>
-                  <h3 style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}>
-                    {siteContent['info.vragen']?.title || 'Heb je nog vragen?'}
-                  </h3>
-                  <p style={{ margin: 0, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.vragen']?.content || 'Heb je specifieke vragen over onze scouts of wil je een keertje komen proberen? Neem dan gerust een kijkje op onze contactpagina om een berichtje te sturen of een van de leiding aan te spreken!'}
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Vanaf welke leeftijd?"
+                as="h3"
+                style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}
+              />
+              <EditableText
+                blockKey="info.leeftijd.content"
+                page="info"
+                section="praktisch"
+                field="content"
+                defaultValue="Iedereen die 6 jaar wordt vóór 1 januari van het lopende scoutsjaar of reeds in het eerste leerjaar zit, kan lid worden van onze scouts. Nieuwe leden mogen bovendien altijd 3 keer gratis komen proberen vooraleer ze definitief inschrijven!"
+                as="p"
+                multiline
+                style={{ margin: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
+
+            {/* Block 1.3: Waar vind je wat */}
+            <div>
+              <EditableText
+                blockKey="info.waariswat.title"
+                page="info"
+                section="praktisch"
+                field="title"
+                defaultValue="Waar vind je wat?"
+                as="h3"
+                style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}
+              />
+
+              <EditableText
+                blockKey="info.waariswat.intro"
+                page="info"
+                section="praktisch"
+                field="content"
+                defaultValue="Omdat we alle praktische zaken al overzichtelijk elders op de website tonen, sturen we je graag door naar de juiste plek:"
+                as="p"
+                style={{ margin: '0 0 12px 0' }}
+              />
+
+              <ul style={{ margin: 0, paddingLeft: 24, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <li>
+                  📅 <strong><Link href="/kalender" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Kalender</Link>:</strong>{' '}
+                  <EditableText
+                    blockKey="info.waariswat.kalender"
+                    page="info"
+                    section="praktisch"
+                    defaultValue="Bekijk wanneer de vergaderingen vallen en wanneer onze familie-evenementen plaatsvinden."
+                  />
+                </li>
+                <li>
+                  📖 <strong><Link href="/echos" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Kriko Echo</Link>:</strong>{' '}
+                  <EditableText
+                    blockKey="info.waariswat.echo"
+                    page="info"
+                    section="praktisch"
+                    defaultValue="Ons maandelijkse programmaboekje met het concrete programma en uren per tak."
+                  />
+                </li>
+                <li>
+                  ⚜️ <strong><button type="button" onClick={() => handleTabChange('takken')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Onze Takken</button>:</strong>{' '}
+                  <EditableText
+                    blockKey="info.waariswat.takken"
+                    page="info"
+                    section="praktisch"
+                    defaultValue="Ontdek alle leeftijdsgroepen en hoe lang je in dezelfde tak blijft."
+                  />
+                </li>
+                <li>
+                  📝 <strong><Link href="/inschrijven" style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>Inschrijven &amp; Lidgeld</Link>:</strong>{' '}
+                  <EditableText
+                    blockKey="info.waariswat.inschrijven"
+                    page="info"
+                    section="praktisch"
+                    defaultValue="Alle info over de inschrijvingsfiche, steekkaart en het jaarlijks lidgeld."
+                  />
+                </li>
+                <li>
+                  💚 <strong><button type="button" onClick={() => handleTabChange('op-maat')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Scouting op Maat</button>:</strong>{' '}
+                  <EditableText
+                    blockKey="info.waariswat.opmaat"
+                    page="info"
+                    section="praktisch"
+                    defaultValue="Alles over verminderd lidgeld (€10), Fonds op Maat en kortingen via het ziekenfonds."
+                  />
+                </li>
+                <li>
+                  👔 <strong><button type="button" onClick={() => handleTabChange('uniform')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Uniform &amp; Webshop</button>:</strong>{' '}
+                  <EditableText
+                    blockKey="info.waariswat.uniform"
+                    page="info"
+                    section="praktisch"
+                    defaultValue="Info over onze das, kledij en bestellen via de shop."
+                  />
+                </li>
+                <li>
+                  👨‍👩‍👧‍👦 <strong><button type="button" onClick={() => handleTabChange('oudertak')} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', textDecoration: 'underline', font: 'inherit', cursor: 'pointer', padding: 0 }}>Oudertak</button>:</strong>{' '}
+                  <EditableText
+                    blockKey="info.waariswat.oudertak"
+                    page="info"
+                    section="praktisch"
+                    defaultValue="De kritische vriend van onze groep: hoe ouders en oud-leiding Kriko-M ondersteunen."
+                  />
+                </li>
+              </ul>
+            </div>
+
+            {/* Block 1.4: Vragen */}
+            <div>
+              <EditableText
+                blockKey="info.vragen.title"
+                page="info"
+                section="praktisch"
+                field="title"
+                defaultValue="Heb je nog vragen?"
+                as="h3"
+                style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 10, fontWeight: 700 }}
+              />
+              <EditableText
+                blockKey="info.vragen.content"
+                page="info"
+                section="praktisch"
+                field="content"
+                defaultValue="Heb je specifieke vragen over onze scouts of wil je een keertje komen proberen? Neem dan gerust een kijkje op onze contactpagina om een berichtje te sturen of een van de leiding aan te spreken!"
+                as="p"
+                multiline
+                style={{ margin: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
           </div>
         )}
@@ -243,46 +284,51 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
         {activeTab === 'takken' && (
           <div style={{ animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 24 }}>
             {/* Block 2.1: Intro */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.takken.intro"
+            <div>
+              <EditableText
+                blockKey="info.takken.intro.title"
                 page="info"
                 section="takken"
-                blockType="text_only"
-                initialTitle={siteContent['info.takken.intro']?.title || 'Takken, wat is dat?'}
-                initialContent={siteContent['info.takken.intro']?.content || 'Bij Scouts Kriko-M speel je niet in één grote groep, maar worden de leden opgedeeld volgens leeftijd. Dat noemen we takken. Zo sluiten de spelletjes, uitdagingen, technieken en kamplengte naadloos aan bij de leefwereld van elk kind.'}
-              >
-                <div>
-                  <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}>
-                    {siteContent['info.takken.intro']?.title || 'Takken, wat is dat?'}
-                  </h2>
-                  <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.takken.intro']?.content || 'Bij Scouts Kriko-M speel je niet in één grote groep, maar worden de leden opgedeeld volgens leeftijd. Dat noemen we takken. Zo sluiten de spelletjes, uitdagingen, technieken en kamplengte naadloos aan bij de leefwereld van elk kind.'}
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
-
-            {/* Block 2.2: Takduur toelichting (AANPASBAAR) */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.takken.duur"
+                field="title"
+                defaultValue="Takken, wat is dat?"
+                as="h2"
+                style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}
+              />
+              <EditableText
+                blockKey="info.takken.intro.content"
                 page="info"
                 section="takken"
-                blockType="text_only"
-                initialTitle={siteContent['info.takken.duur']?.title || 'Hoe lang zit je in een tak?'}
-                initialContent={siteContent['info.takken.duur']?.content || 'Leden blijven in principe drie jaar bij elke tak (Welpen, Jonggivers en Givers). Uitzondering zijn onze allerjongste leden, de Kapoenen: in deze tak zit je twee jaar (1e & 2e leerjaar).'}
-              >
-                <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: '16px 20px', borderRadius: 'var(--border-radius-md)', borderLeft: '4px solid var(--color-secondary)', fontSize: '0.96rem', lineHeight: 1.6, color: 'var(--color-text-dark)' }}>
-                  <strong>{siteContent['info.takken.duur']?.title || 'Hoe lang zit je in een tak?'}</strong>{' '}
-                  <span style={{ whiteSpace: 'pre-line' }}>
-                    {siteContent['info.takken.duur']?.content || 'Leden blijven in principe drie jaar bij elke tak (Welpen, Jonggivers en Givers). Uitzondering zijn onze allerjongste leden, de Kapoenen: in deze tak zit je twee jaar (1e & 2e leerjaar).'}
-                  </span>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="content"
+                defaultValue="Bij Scouts Kriko-M speel je niet in één grote groep, maar worden de leden opgedeeld volgens leeftijd. Dat noemen we takken. Zo sluiten de spelletjes, uitdagingen, technieken en kamplengte naadloos aan bij de leefwereld van elk kind."
+                as="p"
+                multiline
+                style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
-            {/* Grid van 4 Takken Kaarten (VOLLEDIG GEPASTE SCHERMING MET TAK_CARD FIELDS) */}
+            {/* Block 2.2: Takduur */}
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: '16px 20px', borderRadius: 'var(--border-radius-md)', borderLeft: '4px solid var(--color-secondary)', fontSize: '0.96rem', lineHeight: 1.6, color: 'var(--color-text-dark)' }}>
+              <strong>
+                <EditableText
+                  blockKey="info.takken.duur.title"
+                  page="info"
+                  section="takken"
+                  field="title"
+                  defaultValue="Hoe lang zit je in een tak?"
+                  as="span"
+                />
+              </strong>{' '}
+              <EditableText
+                blockKey="info.takken.duur.content"
+                page="info"
+                section="takken"
+                field="content"
+                defaultValue="Leden blijven in principe drie jaar bij elke tak (Welpen, Jonggivers en Givers). Uitzondering zijn onze allerjongste leden, de Kapoenen: in deze tak zit je twee jaar (1e & 2e leerjaar)."
+                as="span"
+              />
+            </div>
+
+            {/* Grid van 4 Takken Kaarten */}
             <div className="info-takken-grid info-two-col-grid">
               {[
                 { slug: 'kapoenen', defaultName: 'Kapoenen', defaultAge: '6 tot 8 jaar (1e & 2e leerjaar)', color: 'var(--color-kapoenen, #eab308)', bgTint: 'rgba(234, 179, 8, 0.08)', border: 'rgba(234, 179, 8, 0.4)', defaultImg: '/images/tak_kapoenen.jpg', defaultKamp: '5 dagen kamp (in een gebouw)', defaultSfeer: 'Spel, fantasie & de allereerste scoutservaring.', defaultUitleg: 'Bij de kapoenen staat verbeelding en samen spelen centraal. Alles kan en niets moet! Van een zoektocht naar een verloren piratenschat tot knutselen of verkleden.' },
@@ -290,90 +336,102 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                 { slug: 'jonggivers', defaultName: 'Jonggivers', defaultAge: '11 tot 14 jaar (6e lj & 1e-2e middelbaar)', color: 'var(--color-jonggivers, #ea580c)', bgTint: 'rgba(234, 88, 12, 0.08)', border: 'rgba(234, 88, 12, 0.4)', defaultImg: '/images/tak_jonggivers.jpg', defaultKamp: '11 dagen tentenkamp', defaultSfeer: 'Sjorren, tenten opzetten & koken op houtvuur.', defaultUitleg: 'Bij de jonggivers begint het échte outdoor avontuur! Ze leren sjorren met palen en touw, koken maaltijden op hun eigen houtvuur en slapen in tenten.' },
                 { slug: 'givers', defaultName: 'Givers', defaultAge: '14 tot 17 jaar (3e, 4e & 5e middelbaar)', color: 'var(--color-givers, #2563eb)', bgTint: 'rgba(37, 99, 235, 0.08)', border: 'rgba(37, 99, 235, 0.4)', defaultImg: '/images/tak_givers.jpg', defaultKamp: '11 dagen tentenkamp (1x/3j buitenlands kamp)', defaultSfeer: 'Zelfstandigheid, avontuur & hechte vriendschappen.', defaultUitleg: 'Givers krijgen de vrijheid om hun eigen programma mede te bepalen. Ze gaan uitdagende hikes aan, organiseren grote projecten en vormen een vriendengroep voor het leven.' },
               ].map((tak) => {
-                const blockKey = `info.takken.${tak.slug}`
-                const cardBlock = siteContent[blockKey] || {}
-                const title = cardBlock.title || tak.defaultName
-                const imgUrl = cardBlock.image_url || tak.defaultImg
-                
-                let parsed: Record<string, string> = {}
-                try {
-                  if (cardBlock.content?.startsWith('{')) parsed = JSON.parse(cardBlock.content)
-                } catch {}
-
-                const sfeer = parsed.sfeer || tak.defaultSfeer
-                const age = parsed.age || tak.defaultAge
-                const uitleg = parsed.uitleg || cardBlock.content || tak.defaultUitleg
-                const kamp = parsed.kamp || tak.defaultKamp
-
                 return (
-                  <Suspense key={tak.slug} fallback={null}>
-                    <EditableBlock
-                      blockKey={blockKey}
-                      page="info"
-                      section="takken"
-                      blockType="tak_card"
-                      initialTitle={title}
-                      initialContent={cardBlock.content || tak.defaultUitleg}
-                      initialImageUrl={imgUrl}
-                      style={{ height: '100%' }}
-                    >
-                      <div 
-                        style={{
-                          backgroundColor: 'var(--color-bg-linen)',
-                          borderRadius: 'var(--border-radius-lg)',
-                          border: `2px solid ${tak.border}`,
-                          overflow: 'hidden',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          boxShadow: 'var(--shadow-sm)',
-                          height: '100%',
+                  <div 
+                    key={tak.slug}
+                    style={{
+                      backgroundColor: 'var(--color-bg-linen)',
+                      borderRadius: 'var(--border-radius-lg)',
+                      border: `2px solid ${tak.border}`,
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      boxShadow: 'var(--shadow-sm)',
+                      height: '100%',
+                    }}
+                  >
+                    <div style={{ height: 160, position: 'relative', overflow: 'hidden', borderBottom: `2px solid ${tak.border}` }}>
+                      <EditableImage
+                        blockKey={`info.takken.${tak.slug}.photo`}
+                        page="info"
+                        section="takken"
+                        defaultSrc={tak.defaultImg}
+                        alt={`Illustratie ${tak.defaultName}`}
+                        fill
+                        badgePosition="top-left"
+                        imageStyle={{ objectFit: 'cover', objectPosition: 'center' }}
+                      />
+                      <span 
+                        style={{ 
+                          position: 'absolute', top: 12, right: 12, backgroundColor: tak.color, color: '#ffffff', fontSize: '0.8rem', fontWeight: 800, padding: '5px 12px', borderRadius: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.3)', whiteSpace: 'nowrap', zIndex: 10
                         }}
                       >
-                        <div style={{ height: 160, position: 'relative', overflow: 'hidden', borderBottom: `2px solid ${tak.border}` }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img 
-                            src={imgUrl} 
-                            alt={`Illustratie ${title}`}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} 
-                          />
-                          <span 
-                            style={{ 
-                              position: 'absolute', top: 12, right: 12, backgroundColor: tak.color, color: '#ffffff', fontSize: '0.8rem', fontWeight: 800, padding: '5px 12px', borderRadius: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.3)', whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {age}
-                          </span>
-                        </div>
+                        <EditableText
+                          blockKey={`info.takken.${tak.slug}.age`}
+                          page="info"
+                          section="takken"
+                          defaultValue={tak.defaultAge}
+                        />
+                      </span>
+                    </div>
 
-                        <div style={{ padding: 22, display: 'flex', flexDirection: 'column', flex: 1, gap: 12 }}>
-                          <div>
-                            <h3 style={{ fontSize: '1.45rem', color: tak.color, margin: '0 0 4px 0', fontWeight: 800 }}>
-                              {title}
-                            </h3>
-                            <p style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--color-text-dark)', margin: 0 }}>
-                              {sfeer}
-                            </p>
-                          </div>
-
-                          <p style={{ fontSize: '0.94rem', lineHeight: 1.6, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                            {uitleg}
-                          </p>
-
-                          <div style={{ backgroundColor: tak.bgTint, padding: '10px 14px', borderRadius: 'var(--border-radius-md)', fontSize: '0.88rem', color: 'var(--color-primary-dark)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, marginTop: 'auto' }}>
-                            <span><strong>Zomerkamp:</strong> {kamp}</span>
-                          </div>
-
-                          <Link 
-                            href={`/takken/${tak.slug}`}
-                            className="btn btn-outline"
-                            style={{ fontSize: '0.88rem', fontWeight: 700, justifyContent: 'center', borderColor: tak.color, color: tak.color, marginTop: 4 }}
-                          >
-                            Meer over de {title} &raquo;
-                          </Link>
-                        </div>
+                    <div style={{ padding: 22, display: 'flex', flexDirection: 'column', flex: 1, gap: 12 }}>
+                      <div>
+                        <EditableText
+                          blockKey={`info.takken.${tak.slug}.title`}
+                          page="info"
+                          section="takken"
+                          field="title"
+                          defaultValue={tak.defaultName}
+                          as="h3"
+                          style={{ fontSize: '1.45rem', color: tak.color, margin: '0 0 4px 0', fontWeight: 800 }}
+                        />
+                        <EditableText
+                          blockKey={`info.takken.${tak.slug}.sfeer`}
+                          page="info"
+                          section="takken"
+                          defaultValue={tak.defaultSfeer}
+                          as="p"
+                          style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--color-text-dark)', margin: 0 }}
+                        />
                       </div>
-                    </EditableBlock>
-                  </Suspense>
+
+                      <EditableText
+                        blockKey={`info.takken.${tak.slug}.uitleg`}
+                        page="info"
+                        section="takken"
+                        defaultValue={tak.defaultUitleg}
+                        as="p"
+                        multiline
+                        style={{ fontSize: '0.94rem', lineHeight: 1.6, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+                      />
+
+                      <div style={{ backgroundColor: tak.bgTint, padding: '10px 14px', borderRadius: 'var(--border-radius-md)', fontSize: '0.88rem', color: 'var(--color-primary-dark)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, marginTop: 'auto' }}>
+                        <span>
+                          <strong>Zomerkamp:</strong>{' '}
+                          <EditableText
+                            blockKey={`info.takken.${tak.slug}.kamp`}
+                            page="info"
+                            section="takken"
+                            defaultValue={tak.defaultKamp}
+                          />
+                        </span>
+                      </div>
+
+                      <Link 
+                        href={`/takken/${tak.slug}`}
+                        className="btn btn-outline"
+                        style={{ fontSize: '0.88rem', fontWeight: 700, justifyContent: 'center', borderColor: tak.color, color: tak.color, marginTop: 4 }}
+                      >
+                        <EditableText
+                          blockKey={`info.takken.${tak.slug}.btn_text`}
+                          page="info"
+                          section="takken"
+                          defaultValue={`Meer over de ${tak.defaultName} »`}
+                        />
+                      </Link>
+                    </div>
+                  </div>
                 )
               })}
             </div>
@@ -384,303 +442,336 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
         {activeTab === 'uniform' && (
           <div style={{ animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 24 }}>
             {/* Block 3.1: Intro */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.uniform.intro"
+            <div>
+              <EditableText
+                blockKey="info.uniform.intro.title"
                 page="info"
                 section="uniform"
-                blockType="text_only"
-                initialTitle={siteContent['info.uniform.intro']?.title || 'Uniform & Aankoop'}
-                initialContent={siteContent['info.uniform.intro']?.content || 'Met het dragen van het uniform toon je dat je scout of gids bent. Het geeft leden en leiding de mogelijkheid om hun verbondenheid te tonen en laat toch ruimte voor een persoonlijke touch.'}
-              >
-                <div>
-                  <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', margin: 0 }}>
-                    {siteContent['info.uniform.intro']?.title || 'Uniform & Aankoop'}
-                  </h2>
-                  <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginTop: 10, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.uniform.intro']?.content || 'Met het dragen van het uniform toon je dat je scout of gids bent. Het geeft leden en leiding de mogelijkheid om hun verbondenheid te tonen en laat toch ruimte voor een persoonlijke touch.'}
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Uniform &amp; Aankoop"
+                as="h2"
+                style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', margin: 0 }}
+              />
+              <EditableText
+                blockKey="info.uniform.intro.content"
+                page="info"
+                section="uniform"
+                field="content"
+                defaultValue="Met het dragen van het uniform toon je dat je scout of gids bent. Het geeft leden en leiding de mogelijkheid om hun verbondenheid te tonen en laat toch ruimte voor een persoonlijke touch."
+                as="p"
+                multiline
+                style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginTop: 10, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
             {/* Block 3.2: Details */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.uniform.details"
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <EditableText
+                blockKey="info.uniform.details.title"
                 page="info"
                 section="uniform"
-                blockType="text_only"
-                initialTitle={siteContent['info.uniform.details']?.title || 'Waaruit bestaat ons uniform?'}
-                initialContent={siteContent['info.uniform.details']?.content || 'Het uniform bestaat voor iedereen vanaf de jonggivers uit 3 basisstukken: een das, een scoutshemd en een groene broek of rok. Kapoenen en welpen hebben geen voorgeschreven uniform: speelkleren die vuil mogen worden zijn ideaal om wekelijks in te ravotten. Wel vragen we om een das van onze groep aan te kopen.'}
-              >
-                <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 16 }}>
-                  <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.uniform.details']?.content || 'Het uniform bestaat voor iedereen vanaf de jonggivers uit 3 basisstukken: een das, een scoutshemd en een groene broek of rok. Kapoenen en welpen hebben geen voorgeschreven uniform: speelkleren die vuil mogen worden zijn ideaal om wekelijks in te ravotten. Wel vragen we om een das van onze groep aan te kopen.'}
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Waaruit bestaat ons uniform?"
+                as="h3"
+                style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}
+              />
+              <EditableText
+                blockKey="info.uniform.details.content"
+                page="info"
+                section="uniform"
+                field="content"
+                defaultValue="Het uniform bestaat voor iedereen vanaf de jonggivers uit 3 basisstukken: een das, een scoutshemd en een groene broek of rok. Kapoenen en welpen hebben geen voorgeschreven uniform: speelkleren die vuil mogen worden zijn ideaal om wekelijks in te ravotten. Wel vragen we om een das van onze groep aan te kopen."
+                as="p"
+                multiline
+                style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
             <div className="info-two-col-grid">
-              {/* Block 3.3: Webshop Card (SPECIFIEKE WEBSHOP VELDEN) */}
-              <Suspense fallback={null}>
-                <EditableBlock
-                  blockKey="info.uniform.webshop"
+              {/* Block 3.3: Webshop Card */}
+              <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 22, borderRadius: 'var(--border-radius-md)', border: '2px solid var(--color-secondary)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <EditableText
+                  blockKey="info.uniform.webshop.title"
                   page="info"
                   section="uniform"
-                  blockType="webshop_card"
-                  initialTitle={siteContent['info.uniform.webshop']?.title || 'Onze Webshop'}
-                  initialContent={siteContent['info.uniform.webshop']?.content || ''}
-                  style={{ height: '100%' }}
-                >
-                  {(() => {
-                    const raw = siteContent['info.uniform.webshop']?.content || ''
-                    let parsed: Record<string, string> = {}
-                    try {
-                      if (raw.startsWith('{')) parsed = JSON.parse(raw)
-                    } catch {}
-
-                    const uitleg = parsed.uitleg || raw || 'Bestel de officiële groepsdas (bordeaux-beige), Kriko T-shirts/truien en tweedehands uniformstukken rechtstreeks via onze webshop!'
-                    const contact = parsed.contact || 'Vragen over bestellingen? Neem contact op met de webshopverantwoordelijke.'
-
-                    return (
-                      <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 22, borderRadius: 'var(--border-radius-md)', border: '2px solid var(--color-secondary)', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                        <h3 style={{ fontSize: '1.15rem', color: 'var(--color-primary-dark)', marginBottom: 8 }}>
-                          {siteContent['info.uniform.webshop']?.title || 'Onze Webshop'}
-                        </h3>
-                        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: 12, whiteSpace: 'pre-line' }}>
-                          {uitleg}
-                        </p>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--color-text-dark)', marginBottom: 16 }}>
-                          {contact}
-                        </p>
-                        <div style={{ marginTop: 'auto' }}>
-                          <Link href="/shop" className="btn btn-secondary" style={{ fontSize: '0.9rem', width: '100%', justifyContent: 'center' }}>
-                            Naar onze Webshop &raquo;
-                          </Link>
-                        </div>
-                      </div>
-                    )
-                  })()}
-                </EditableBlock>
-              </Suspense>
+                  field="title"
+                  defaultValue="Onze Webshop"
+                  as="h3"
+                  style={{ fontSize: '1.15rem', color: 'var(--color-primary-dark)', marginBottom: 8 }}
+                />
+                <EditableText
+                  blockKey="info.uniform.webshop.uitleg"
+                  page="info"
+                  section="uniform"
+                  defaultValue="Bestel de officiële groepsdas (bordeaux-beige), Kriko T-shirts/truien en tweedehands uniformstukken rechtstreeks via onze webshop!"
+                  as="p"
+                  multiline
+                  style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: 12, whiteSpace: 'pre-line' }}
+                />
+                <EditableText
+                  blockKey="info.uniform.webshop.contact"
+                  page="info"
+                  section="uniform"
+                  defaultValue="Vragen over bestellingen? Neem contact op met de webshopverantwoordelijke."
+                  as="p"
+                  style={{ fontSize: '0.85rem', color: 'var(--color-text-dark)', marginBottom: 16 }}
+                />
+                <div style={{ marginTop: 'auto' }}>
+                  <Link href="/shop" className="btn btn-secondary" style={{ fontSize: '0.9rem', width: '100%', justifyContent: 'center' }}>
+                    <EditableText
+                      blockKey="info.uniform.webshop.btn_text"
+                      page="info"
+                      section="uniform"
+                      defaultValue="Naar onze Webshop »"
+                    />
+                  </Link>
+                </div>
+              </div>
 
               {/* Block 3.4: Hopper Card */}
-              <Suspense fallback={null}>
-                <EditableBlock
-                  blockKey="info.uniform.hopper"
+              <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 22, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <EditableText
+                  blockKey="info.uniform.hopper.title"
                   page="info"
                   section="uniform"
-                  blockType="text_only"
-                  initialTitle={siteContent['info.uniform.hopper']?.title || 'Hopper Scoutswinkel'}
-                  initialContent={siteContent['info.uniform.hopper']?.content || 'Het beige scoutshemd, de groene broek/rok en de kentekens koop je in een officiële Hopper winkel of online.'}
-                  style={{ height: '100%' }}
-                >
-                  <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 22, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <h3 style={{ fontSize: '1.15rem', color: 'var(--color-primary-dark)', marginBottom: 8 }}>
-                      {siteContent['info.uniform.hopper']?.title || 'Hopper Scoutswinkel'}
-                    </h3>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: 14, whiteSpace: 'pre-line' }}>
-                      {siteContent['info.uniform.hopper']?.content || 'Het beige scoutshemd, de groene broek/rok en de kentekens koop je in een officiële Hopper winkel of online.'}
-                    </p>
-                    <div style={{ marginTop: 'auto' }}>
-                      <a href="https://www.hopper.be/nl/shop" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.85rem', width: '100%', justifyContent: 'center' }}>
-                        Bezoek Hopper.be &raquo;
-                      </a>
-                    </div>
-                  </div>
-                </EditableBlock>
-              </Suspense>
+                  field="title"
+                  defaultValue="Hopper Scoutswinkel"
+                  as="h3"
+                  style={{ fontSize: '1.15rem', color: 'var(--color-primary-dark)', marginBottom: 8 }}
+                />
+                <EditableText
+                  blockKey="info.uniform.hopper.content"
+                  page="info"
+                  section="uniform"
+                  field="content"
+                  defaultValue="Het beige scoutshemd, de groene broek/rok en de kentekens koop je in een officiële Hopper winkel of online."
+                  as="p"
+                  multiline
+                  style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: 14, whiteSpace: 'pre-line' }}
+                />
+                <div style={{ marginTop: 'auto' }}>
+                  <a href="https://www.hopper.be/nl/shop" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.85rem', width: '100%', justifyContent: 'center' }}>
+                    <EditableText
+                      blockKey="info.uniform.hopper.btn_text"
+                      page="info"
+                      section="uniform"
+                      defaultValue="Bezoek Hopper.be »"
+                    />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* TAB 4: Scouting op Maat (ALLE 6 OORSPRONKELIJKE BLOKKEN HERSTELD & BEWERKBAAR) */}
+        {/* TAB 4: Scouting op Maat */}
         {activeTab === 'op-maat' && (
           <div style={{ animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 24 }}>
             {/* Box 4.1: Intro Quote */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.opmaat.intro"
+            <div>
+              <EditableText
+                blockKey="info.opmaat.intro.title"
                 page="info"
                 section="opmaat"
-                blockType="text_only"
-                initialTitle={siteContent['info.opmaat.intro']?.title || 'Scouting op Maat'}
-                initialContent={siteContent['info.opmaat.intro']?.content || 'We weten dat de prijs van een jaar scouting voor uw kind(eren) een belangrijke hap uit uw gezinsbudget kan zijn. Maar we vinden ook dat dit voor niemand een reden mag zijn om thuis te blijven.'}
-              >
-                <div>
-                  <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', margin: 0 }}>
-                    {siteContent['info.opmaat.intro']?.title || 'Scouting op Maat'}
-                  </h2>
-                  <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', borderLeft: '5px solid var(--color-secondary)', marginTop: 14 }}>
-                    <p style={{ fontSize: '1.08rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, fontStyle: 'italic', whiteSpace: 'pre-line' }}>
-                      {siteContent['info.opmaat.intro']?.content || 'We weten dat de prijs van een jaar scouting voor uw kind(eren) een belangrijke hap uit uw gezinsbudget kan zijn. Maar we vinden ook dat dit voor niemand een reden mag zijn om thuis te blijven.'}
-                    </p>
-                  </div>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Scouting op Maat"
+                as="h2"
+                style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', margin: 0 }}
+              />
+              <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', borderLeft: '5px solid var(--color-secondary)', marginTop: 14 }}>
+                <EditableText
+                  blockKey="info.opmaat.intro.quote"
+                  page="info"
+                  section="opmaat"
+                  defaultValue="We weten dat de prijs van een jaar scouting voor uw kind(eren) een belangrijke hap uit uw gezinsbudget kan zijn. Maar we vinden ook dat dit voor niemand een reden mag zijn om thuis te blijven."
+                  as="p"
+                  multiline
+                  style={{ fontSize: '1.08rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, fontStyle: 'italic', whiteSpace: 'pre-line' }}
+                />
+              </div>
+            </div>
 
             {/* Box 4.2: Verminderd Lidgeld */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.opmaat.verminderd"
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
+              <EditableText
+                blockKey="info.opmaat.verminderd.title"
                 page="info"
                 section="opmaat"
-                blockType="text_only"
-                initialTitle={siteContent['info.opmaat.verminderd']?.title || 'Verminderd Lidgeld'}
-                initialContent={siteContent['info.opmaat.verminderd']?.content || 'We vragen jaarlijks om voor elk kind lidgeld te betalen. Dankzij dit bedrag is uw zoon/dochter verzekerd tijdens onze scoutsactiviteiten. Een ander deel van dit bedrag gaat naar de algemene werkingskosten. We begrijpen dat dit lidgeld voor u misschien een groot bedrag is om te betalen. Wij hebben dan ook de mogelijkheid om hierop een korting te bieden, voor wie dit nodig heeft. Je betaalt dan €10 voor het gehele scoutsjaar (na 1 maart: €5). Spreek hiervoor simpelweg een (groeps)leid(st)er aan!'}
-              >
-                <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
-                  <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}>
-                    {siteContent['info.opmaat.verminderd']?.title || 'Verminderd Lidgeld'}
-                  </h3>
-                  <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.opmaat.verminderd']?.content || 'We vragen jaarlijks om voor elk kind lidgeld te betalen. Dankzij dit bedrag is uw zoon/dochter verzekerd tijdens onze scoutsactiviteiten. Een ander deel van dit bedrag gaat naar de algemene werkingskosten. We begrijpen dat dit lidgeld voor u misschien een groot bedrag is om te betalen. Wij hebben dan ook de mogelijkheid om hierop een korting te bieden, voor wie dit nodig heeft. Je betaalt dan €10 voor het gehele scoutsjaar (na 1 maart: €5). Spreek hiervoor simpelweg een (groeps)leid(st)er aan!'}
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Verminderd Lidgeld"
+                as="h3"
+                style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}
+              />
+              <EditableText
+                blockKey="info.opmaat.verminderd.content"
+                page="info"
+                section="opmaat"
+                field="content"
+                defaultValue="We vragen jaarlijks om voor elk kind lidgeld te betalen. Dankzij dit bedrag is uw zoon/dochter verzekerd tijdens onze scoutsactiviteiten. Een ander deel van dit bedrag gaat naar de algemene werkingskosten. We begrijpen dat dit lidgeld voor u misschien een groot bedrag is om te betalen. Wij hebben dan ook de mogelijkheid om hierop een korting te bieden, voor wie dit nodig heeft. Je betaalt dan €10 voor het gehele scoutsjaar (na 1 maart: €5). Spreek hiervoor simpelweg een (groeps)leid(st)er aan!"
+                as="p"
+                multiline
+                style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
-            {/* Box 4.3: Voordelen bij Ziekenfondsen (VOLLEDIG HERSTELD MET LINKS & BEWERKBAAR) */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.opmaat.ziekenfondsen"
+            {/* Box 4.3: Voordelen bij Ziekenfondsen */}
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
+              <EditableText
+                blockKey="info.opmaat.ziekenfondsen.title"
                 page="info"
                 section="opmaat"
-                blockType="text_only"
-                initialTitle={siteContent['info.opmaat.ziekenfondsen']?.title || 'Voordelen bij Ziekenfondsen'}
-                initialContent={siteContent['info.opmaat.ziekenfondsen']?.content || 'Mutualiteiten dragen vaak ook bij aan de kosten van vrijetijdsbesteding van uw kinderen. Welke voordelen dit precies zijn, hangt af van bij welk ziekenfonds u bent. Klik op het juiste ziekenfonds om meer informatie te verkrijgen omtrent terugbetalingen:'}
-              >
-                <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
-                  <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}>
-                    {siteContent['info.opmaat.ziekenfondsen']?.title || 'Voordelen bij Ziekenfondsen'}
-                  </h3>
-                  <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 16, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.opmaat.ziekenfondsen']?.content || 'Mutualiteiten dragen vaak ook bij aan de kosten van vrijetijdsbesteding van uw kinderen. Welke voordelen dit precies zijn, hangt af van bij welk ziekenfonds u bent. Klik op het juiste ziekenfonds om meer informatie te verkrijgen omtrent terugbetalingen:'}
-                  </p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-                    <a href="https://www.cm.be/diensten-en-voordelen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-                      CM &raquo;
-                    </a>
-                    <a href="https://www.helan.be/nl/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-                      Helan &raquo;
-                    </a>
-                    <a href="https://www.solidaris-vlaanderen.be" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-                      Solidaris &raquo;
-                    </a>
-                    <a href="https://www.lm.be" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-                      Liberale Mutualiteit (LM) &raquo;
-                    </a>
-                    <a href="https://www.vnz.be/voordelen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
-                      VNZ &raquo;
-                    </a>
-                  </div>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Voordelen bij Ziekenfondsen"
+                as="h3"
+                style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}
+              />
+              <EditableText
+                blockKey="info.opmaat.ziekenfondsen.content"
+                page="info"
+                section="opmaat"
+                field="content"
+                defaultValue="Mutualiteiten dragen vaak ook bij aan de kosten van vrijetijdsbesteding van uw kinderen. Welke voordelen dit precies zijn, hangt af van bij welk ziekenfonds u bent. Klik op het juiste ziekenfonds om meer informatie te verkrijgen omtrent terugbetalingen:"
+                as="p"
+                multiline
+                style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 16, whiteSpace: 'pre-line' }}
+              />
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+                <a href="https://www.cm.be/diensten-en-voordelen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                  CM &raquo;
+                </a>
+                <a href="https://www.helan.be/nl/" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                  Helan &raquo;
+                </a>
+                <a href="https://www.solidaris-vlaanderen.be" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                  Solidaris &raquo;
+                </a>
+                <a href="https://www.lm.be" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                  Liberale Mutualiteit (LM) &raquo;
+                </a>
+                <a href="https://www.vnz.be/voordelen" target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ fontSize: '0.9rem', padding: '8px 16px' }}>
+                  VNZ &raquo;
+                </a>
+              </div>
+            </div>
 
             {/* Box 4.4: Belastingsvoordelen */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.opmaat.belastingen"
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
+              <EditableText
+                blockKey="info.opmaat.belastingen.title"
                 page="info"
                 section="opmaat"
-                blockType="text_only"
-                initialTitle={siteContent['info.opmaat.belastingen']?.title || 'Belastingsvoordelen'}
-                initialContent={siteContent['info.opmaat.belastingen']?.content || 'De kostprijs voor kampen en weekends van alle kinderen jonger dan 12 jaar kan door middel van een fiscaal attest afgetrokken worden van de belastingen. Hiervoor moet de groepsleiding het ‘Attest inzake uitgaven voor de opvang van kinderen’ invullen en aan u bezorgen. U moet dit formulier dan bij uw belastingaangifte voegen. Stuur een mailtje naar groepsleiding@kriko-m.be indien u interesse heeft.'}
-              >
-                <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
-                  <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}>
-                    {siteContent['info.opmaat.belastingen']?.title || 'Belastingsvoordelen'}
-                  </h3>
-                  <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.opmaat.belastingen']?.content || 'De kostprijs voor kampen en weekends van alle kinderen jonger dan 12 jaar kan door middel van een fiscaal attest afgetrokken worden van de belastingen. Hiervoor moet de groepsleiding het ‘Attest inzake uitgaven voor de opvang van kinderen’ invullen en aan u bezorgen. U moet dit formulier dan bij uw belastingaangifte voegen. Stuur een mailtje naar groepsleiding@kriko-m.be indien u interesse heeft.'}
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Belastingsvoordelen"
+                as="h3"
+                style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}
+              />
+              <EditableText
+                blockKey="info.opmaat.belastingen.content"
+                page="info"
+                section="opmaat"
+                field="content"
+                defaultValue="De kostprijs voor kampen en weekends van alle kinderen jonger dan 12 jaar kan door middel van een fiscaal attest afgetrokken worden van de belastingen. Hiervoor moet de groepsleiding het ‘Attest inzake uitgaven voor de opvang van kinderen’ invullen en aan u bezorgen. U moet dit formulier dan bij uw belastingaangifte voegen. Stuur een mailtje naar groepsleiding@kriko-m.be indien u interesse heeft."
+                as="p"
+                multiline
+                style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
             {/* Box 4.5: Fonds op Maat */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.opmaat.fonds"
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
+              <EditableText
+                blockKey="info.opmaat.fonds.title"
                 page="info"
                 section="opmaat"
-                blockType="text_only"
-                initialTitle={siteContent['info.opmaat.fonds']?.title || 'Fonds op Maat'}
-                initialContent={siteContent['info.opmaat.fonds']?.content || 'Voor activiteiten zoals uitstappen, weekends en kampen kan er gebruik gemaakt worden van Fonds op Maat. Het kostenplaatje wordt verdeeld volgens de derdenregel: 1/3 door het gezin, 1/3 door Scouts Kriko-M en 1/3 door Scouts & Gidsen Vlaanderen.'}
-              >
-                <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
-                  <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}>
-                    {siteContent['info.opmaat.fonds']?.title || 'Fonds op Maat'}
-                  </h3>
-                  <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.opmaat.fonds']?.content || 'Voor activiteiten zoals uitstappen, weekends en kampen kan er gebruik gemaakt worden van Fonds op Maat. Het kostenplaatje wordt verdeeld volgens de derdenregel: 1/3 door het gezin, 1/3 door Scouts Kriko-M en 1/3 door Scouts & Gidsen Vlaanderen.'}
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Fonds op Maat"
+                as="h3"
+                style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}
+              />
+              <EditableText
+                blockKey="info.opmaat.fonds.content"
+                page="info"
+                section="opmaat"
+                field="content"
+                defaultValue="Voor activiteiten zoals uitstappen, weekends en kampen kan er gebruik gemaakt worden van Fonds op Maat. Het kostenplaatje wordt verdeeld volgens de derdenregel: 1/3 door het gezin, 1/3 door Scouts Kriko-M en 1/3 door Scouts & Gidsen Vlaanderen."
+                as="p"
+                multiline
+                style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
             {/* Box 4.6: Uniform en Materiaal */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.opmaat.materiaal"
+            <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
+              <EditableText
+                blockKey="info.opmaat.materiaal.title"
                 page="info"
                 section="opmaat"
-                blockType="text_only"
-                initialTitle={siteContent['info.opmaat.materiaal']?.title || 'Uniform en Materiaal'}
-                initialContent={siteContent['info.opmaat.materiaal']?.content || 'Ook een uniform kan een grote uitgave zijn. Wij verwachten dan ook niet dat iedereen het volledige scoutsuniform aankoopt. Bij de kapoenen en welpen vragen we enkel een das van onze scouts aan te kopen. Vanaf de jonggivers vragen we ook een T-shirt aan te kopen. Deze kleren bieden we ook tweedehands aan.'}
-              >
-                <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 28, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)' }}>
-                  <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}>
-                    {siteContent['info.opmaat.materiaal']?.title || 'Uniform en Materiaal'}
-                  </h3>
-                  <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.opmaat.materiaal']?.content || 'Ook een uniform kan een grote uitgave zijn. Wij verwachten dan ook niet dat iedereen het volledige scoutsuniform aankoopt. Bij de kapoenen en welpen vragen we enkel een das van onze scouts aan te kopen. Vanaf de jonggivers vragen we ook een T-shirt aan te kopen. Deze kleren bieden we ook tweedehands aan.'}
-                  </p>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Uniform en Materiaal"
+                as="h3"
+                style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', marginBottom: 12 }}
+              />
+              <EditableText
+                blockKey="info.opmaat.materiaal.content"
+                page="info"
+                section="opmaat"
+                field="content"
+                defaultValue="Ook een uniform kan een grote uitgave zijn. Wij verwachten dan ook niet dat iedereen het volledige scoutsuniform aankoopt. Bij de kapoenen en welpen vragen we enkel een das van onze scouts aan te kopen. Vanaf de jonggivers vragen we ook een T-shirt aan te kopen. Deze kleren bieden we ook tweedehands aan."
+                as="p"
+                multiline
+                style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
           </div>
         )}
 
-        {/* TAB 5: Oudertak (SUBTITEL VERWIJDERD & ELK ITEM AANPASBAAR) */}
+        {/* TAB 5: Oudertak */}
         {activeTab === 'oudertak' && (
           <div style={{ animation: 'fadeIn 0.25s ease', display: 'flex', flexDirection: 'column', gap: 24 }}>
             {/* Box 5.1: Intro */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.oudertak.intro"
+            <div>
+              <EditableText
+                blockKey="info.oudertak.heading"
                 page="info"
                 section="oudertak"
-                blockType="text_only"
-                initialTitle={siteContent['info.oudertak.intro']?.title || 'Wat is de Oudertak?'}
-                initialContent={siteContent['info.oudertak.intro']?.content || 'De oudertak is de "kritische vriend" van onze scoutsgroep. Ouders en oudleiding ondersteunen de leiding en groepsleiding, en zetten samen hun schouders onder Kriko-M. Gezamenlijk helpen ze evenementen op poten te zetten en zoeken ze naar oplossingen voor praktische zaken.'}
-              >
-                <div>
-                  <h2 style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 14, fontWeight: 800 }}>
-                    Oudertak
-                  </h2>
-                  <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', borderLeft: '5px solid var(--color-primary)', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    <h3 style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}>
-                      {siteContent['info.oudertak.intro']?.title || 'Wat is de Oudertak?'}
-                    </h3>
-                    <p style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                      {siteContent['info.oudertak.intro']?.content || 'De oudertak is de "kritische vriend" van onze scoutsgroep. Ouders en oudleiding ondersteunen de leiding en groepsleiding, en zetten samen hun schouders onder Kriko-M. Gezamenlijk helpen ze evenementen op poten te zetten en zoeken ze naar oplossingen voor praktische zaken.'}
-                    </p>
-                  </div>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                defaultValue="Oudertak"
+                as="h2"
+                style={{ fontSize: '1.75rem', color: 'var(--color-primary-dark)', marginBottom: 14, fontWeight: 800 }}
+              />
+              <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', borderLeft: '5px solid var(--color-primary)', display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <EditableText
+                  blockKey="info.oudertak.intro.title"
+                  page="info"
+                  section="oudertak"
+                  field="title"
+                  defaultValue="Wat is de Oudertak?"
+                  as="h3"
+                  style={{ fontSize: '1.3rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}
+                />
+                <EditableText
+                  blockKey="info.oudertak.intro.content"
+                  page="info"
+                  section="oudertak"
+                  field="content"
+                  defaultValue="De oudertak is de 'kritische vriend' van onze scoutsgroep. Ouders en oudleiding ondersteunen de leiding en groepsleiding, en zetten samen hun schouders onder Kriko-M. Gezamenlijk helpen ze evenementen op poten te zetten en zoeken ze naar oplossingen voor praktische zaken."
+                  as="p"
+                  multiline
+                  style={{ fontSize: '1.02rem', lineHeight: 1.7, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+                />
+              </div>
+            </div>
 
-            {/* Concrete taken grid (ELK ITEM AANPASBAAR) */}
+            {/* Concrete taken grid */}
             <div>
-              <h3 style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 16, fontWeight: 700 }}>
-                Wat doet de Oudertak concreet?
-              </h3>
+              <EditableText
+                blockKey="info.oudertak.taken_title"
+                page="info"
+                section="oudertak"
+                defaultValue="Wat doet de Oudertak concreet?"
+                as="h3"
+                style={{ fontSize: '1.35rem', color: 'var(--color-primary-dark)', marginBottom: 16, fontWeight: 700 }}
+              />
               
               <div className="info-oudertak-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                 {[
@@ -690,68 +781,64 @@ export default function InfoTabbedContent({ email, address: _address, siteConten
                   { icon: 'fa-hammer', defaultTitle: 'Bouwen aan de toekomst', defaultDesc: 'Meedenken, plannen en meebouwen aan de vernieuwing van onze scoutslokalen (Ploegje Bouw).' },
                   { icon: 'fa-user-graduate', defaultTitle: 'Ouders in leiding (Examens)', defaultDesc: 'Om de studerende leiding te ontlasten tijdens de examenperiode, bokst de oudertak 1x per jaar een vergadering in elkaar!' },
                   { icon: 'fa-heart', defaultTitle: 'Een dikke merci!', defaultDesc: 'Zonder de inzet van al onze fantastische ouders zou Kriko-M niet staan waar het nu staat. Bedankt!' },
-                ].map((item, idx) => {
-                  const blockKey = `info.oudertak.item_${idx}`
-                  const itemBlock = siteContent[blockKey] || {}
-                  const title = itemBlock.title || item.defaultTitle
-                  const desc = itemBlock.content || item.defaultDesc
-
-                  return (
-                    <Suspense key={idx} fallback={null}>
-                      <EditableBlock
-                        blockKey={blockKey}
+                ].map((item, idx) => (
+                  <div key={idx} style={{ backgroundColor: 'var(--color-bg-linen)', padding: 20, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)', display: 'flex', gap: 16, alignItems: 'flex-start', height: '100%' }}>
+                    <div style={{ width: 44, height: 44, borderRadius: '50%', backgroundColor: 'rgba(26, 61, 42, 0.1)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
+                      <i className={`fa-solid ${item.icon}`}></i>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <EditableText
+                        blockKey={`info.oudertak.item_${idx}.title`}
                         page="info"
                         section="oudertak"
-                        blockType="text_only"
-                        initialTitle={title}
-                        initialContent={desc}
-                        style={{ height: '100%' }}
-                      >
-                        <div style={{ backgroundColor: 'var(--color-bg-linen)', padding: 20, borderRadius: 'var(--border-radius-md)', border: '1px solid var(--color-border)', display: 'flex', gap: 16, alignItems: 'flex-start', height: '100%' }}>
-                          <div style={{ width: 44, height: 44, borderRadius: '50%', backgroundColor: 'rgba(26, 61, 42, 0.1)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>
-                            <i className={`fa-solid ${item.icon}`}></i>
-                          </div>
-                          <div>
-                            <h4 style={{ fontSize: '1.05rem', color: 'var(--color-primary-dark)', margin: '0 0 6px 0', fontWeight: 700 }}>
-                              {title}
-                            </h4>
-                            <p style={{ fontSize: '0.94rem', lineHeight: 1.6, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                              {desc}
-                            </p>
-                          </div>
-                        </div>
-                      </EditableBlock>
-                    </Suspense>
-                  )
-                })}
+                        field="title"
+                        defaultValue={item.defaultTitle}
+                        as="h4"
+                        style={{ fontSize: '1.05rem', color: 'var(--color-primary-dark)', margin: '0 0 6px 0', fontWeight: 700 }}
+                      />
+                      <EditableText
+                        blockKey={`info.oudertak.item_${idx}.content`}
+                        page="info"
+                        section="oudertak"
+                        field="content"
+                        defaultValue={item.defaultDesc}
+                        as="p"
+                        multiline
+                        style={{ fontSize: '0.94rem', lineHeight: 1.6, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
             {/* Call to action box */}
-            <Suspense fallback={null}>
-              <EditableBlock
-                blockKey="info.oudertak.cta"
+            <div className="info-cta-box" style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '2px solid var(--color-primary)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+              <EditableText
+                blockKey="info.oudertak.cta.title"
                 page="info"
                 section="oudertak"
-                blockType="text_only"
-                initialTitle={siteContent['info.oudertak.cta']?.title || 'Interesse om aan te sluiten of mee te helpen?'}
-                initialContent={siteContent['info.oudertak.cta']?.content || 'Wil je ook je steentje bijdragen aan de oudertak, helpen op evenementen of bij het onderhoud? Wij verwelkomen alle enthousiaste ouders en oud-leiding met open armen! Contacteer ons gerust via de groepsleiding.'}
-              >
-                <div className="info-cta-box" style={{ backgroundColor: 'var(--color-bg-linen)', padding: 24, borderRadius: 'var(--border-radius-md)', border: '2px solid var(--color-primary)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
-                  <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}>
-                    {siteContent['info.oudertak.cta']?.title || 'Interesse om aan te sluiten of mee te helpen?'}
-                  </h3>
-                  <p style={{ fontSize: '0.98rem', lineHeight: 1.6, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}>
-                    {siteContent['info.oudertak.cta']?.content || 'Wil je ook je steentje bijdragen aan de oudertak, helpen op evenementen of bij het onderhoud? Wij verwelkomen alle enthousiaste ouders en oud-leiding met open armen! Contacteer ons gerust via de groepsleiding:'}
-                  </p>
-                  <div style={{ marginTop: 4 }}>
-                    <CopyButton text={email} variant="button" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: '0.95rem' }}>
-                      {email} <i className="fa-regular fa-copy" style={{ fontSize: '0.85em', opacity: 0.7 }}></i>
-                    </CopyButton>
-                  </div>
-                </div>
-              </EditableBlock>
-            </Suspense>
+                field="title"
+                defaultValue="Interesse om aan te sluiten of mee te helpen?"
+                as="h3"
+                style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}
+              />
+              <EditableText
+                blockKey="info.oudertak.cta.content"
+                page="info"
+                section="oudertak"
+                field="content"
+                defaultValue="Wil je ook je steentje bijdragen aan de oudertak, helpen op evenementen of bij het onderhoud? Wij verwelkomen alle enthousiaste ouders en oud-leiding met open armen! Contacteer ons gerust via de groepsleiding:"
+                as="p"
+                multiline
+                style={{ fontSize: '0.98rem', lineHeight: 1.6, color: 'var(--color-text-dark)', margin: 0, whiteSpace: 'pre-line' }}
+              />
+              <div style={{ marginTop: 4 }}>
+                <CopyButton text={email} variant="button" className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: '0.95rem' }}>
+                  {email} <i className="fa-regular fa-copy" style={{ fontSize: '0.85em', opacity: 0.7 }}></i>
+                </CopyButton>
+              </div>
+            </div>
 
           </div>
         )}

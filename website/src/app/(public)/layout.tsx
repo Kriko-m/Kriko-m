@@ -5,27 +5,33 @@ import CartProvider from '@/components/shop/CartProvider'
 import ScrollRestorer from '@/components/ScrollRestorer'
 import ScrollTopButton from '@/components/ScrollTopButton'
 import EditModeBar from '@/components/editing/EditModeBar'
-import { getSettings } from '@/lib/db'
+import { EditProvider } from '@/components/editing/EditContext'
+import ContentLinkInterceptor from '@/components/editing/ContentLinkInterceptor'
+import { getSettings, getSiteContent } from '@/lib/db'
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
-  const settings = await getSettings()
+  const [settings, siteContent] = await Promise.all([
+    getSettings(),
+    getSiteContent(),
+  ])
 
   return (
-    <CartProvider>
-      <ScrollRestorer />
-      <Suspense fallback={null}>
-        <EditModeBar />
-      </Suspense>
-      <Header />
-      <div className="public-layout-content">
-        {children}
-      </div>
-      <Footer
-        contactEmail={settings?.contact_email}
-        contactAddress={settings?.contact_address}
-      />
-      <ScrollTopButton />
-    </CartProvider>
+    <EditProvider initialContent={siteContent}>
+      <CartProvider>
+        <ScrollRestorer />
+        <Suspense fallback={null}>
+          <EditModeBar />
+        </Suspense>
+        <Header />
+        <ContentLinkInterceptor>
+          {children}
+        </ContentLinkInterceptor>
+        <Footer
+          contactEmail={settings?.contact_email}
+          contactAddress={settings?.contact_address}
+        />
+        <ScrollTopButton />
+      </CartProvider>
+    </EditProvider>
   )
 }
-

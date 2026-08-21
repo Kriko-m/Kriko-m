@@ -1,13 +1,16 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import CopyButton from '@/components/CopyButton'
 import WhatsAppJoinButton from '@/components/WhatsAppJoinButton'
-import EditableBlock from '@/components/editing/EditableBlock'
+import EditableText from '@/components/editing/EditableText'
+import EditableImage from '@/components/editing/EditableImage'
 import EditLeidingModal from '@/components/editing/EditLeidingModal'
+import EditTakContactModal from '@/components/editing/EditTakContactModal'
+import { useEditMode } from '@/components/editing/EditContext'
 import { Echo, Leader } from '@/lib/types'
 
 const MONTHS_NL: Record<number, string> = {
@@ -15,68 +18,30 @@ const MONTHS_NL: Record<number, string> = {
   7:'juli',8:'augustus',9:'september',10:'oktober',11:'november',12:'december',
 }
 
-const TAK_TRADITIES: Record<string, { wetTitle: string; wet: string; extraTitle?: string; extra?: React.ReactNode }> = {
+const TAK_TRADITIES: Record<string, { wetTitle: string; wet: string; extraTitle?: string; extra?: string }> = {
   kapoenen: {
     wetTitle: 'De Kapoenenwet',
     wet: 'Ik ben een kapoen en ik probeer mijn best te doen.',
     extraTitle: 'Het Kapoenenlied',
-    extra: (
-      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.95rem', borderLeft: '4px solid var(--color-kapoenen)', lineHeight: 1.6 }}>
-        1, 2, 3, 4, kapoenen hebben veel plezier, 1, 2, 3, 4, kapoenenland is hier.<br />
-        En zonder glimlach bij de hand gaat niemand naar kapoenenland.<br />
-        1, 2, 3, 4, kapoenenland is hier.
-      </div>
-    ),
+    extra: '1, 2, 3, 4, kapoenen hebben veel plezier, 1, 2, 3, 4, kapoenenland is hier.\nEn zonder glimlach bij de hand gaat niemand naar kapoenenland.\n1, 2, 3, 4, kapoenenland is hier.',
   },
   welpen: {
     wetTitle: 'De Welpenwet',
     wet: 'Ik zeg wat ik voel, gruwel van vals gezwets,\nIk bereik eerlijk mijn doel, zonder dat ik iemand kwets.\nIk respecteer alles wat leeft en de Kracht die leven geeft.\nIk voel me één, met de wereld om me heen.\nHou niet van nep en deel alles wat ik heb.\nWant niemand is alles, niemand is niets, iedereen is altijd iets.',
     extraTitle: 'Het Welpenlied',
-    extra: (
-      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.92rem', borderLeft: '4px solid var(--color-welpen)', lineHeight: 1.6 }}>
-        Ja dat zijn wij welpen blij die zingen samen in de rij<br />
-        wij spelen graag wij werken graag wij doen ons beste best, wij doen ons beste best.<br />
-        Een welpenbroek een bordeaux das, twee groene kousjes voor de was<br />
-        een bruine trui vergeet hem niet zo zingen wij graag ons lied.<br />
-        Ja dat zijn wij welpen blij die zingen samen in de rij<br />
-        wij spelen graag wij werken graag wij doen ons beste best, wij doen ons beste best.<br />
-        En dat we van de kriko zijn daar zijn we trots op groot en klein<br />
-        en komt ge ons tegen op een keer dan zijn we met eentje meer!<br />
-        Ja dat zijn wij welpen blij die zingen samen in de rij<br />
-        wij spelen graag wij werken graag wij doen ons beste best, wij doen ons beste best.<br />
-        <strong style={{ fontStyle: 'normal' }}>De leiding doet de rest!</strong>
-      </div>
-    ),
+    extra: 'Ja dat zijn wij welpen blij die zingen samen in de rij\nwij spelen graag wij werken graag wij doen ons beste best, wij doen ons beste best.\nEen welpenbroek een bordeaux das, twee groene kousjes voor de was\neen bruine trui vergeet hem niet zo zingen wij graag ons lied.\nJa dat zijn wij welpen blij die zingen samen in de rij\nwij spelen graag wij werken graag wij doen ons beste best, wij doen ons beste best.\nEn dat we van de kriko zijn daar zijn we trots op groot en klein\nen komt ge ons tegen op een keer dan zijn we met eentje meer!\nJa dat zijn wij welpen blij die zingen samen in de rij\nwij spelen graag wij werken graag wij doen ons beste best, wij doen ons beste best.\nDe leiding doet de rest!',
   },
   jonggivers: {
     wetTitle: 'De Jonggiverwet',
     wet: 'Wij zijn jonggivers, wij wagen het avontuur.\nWij zijn eerlijk en delen onze vreugde.\nWij zijn goede kameraden voor elkaar.\nWij willen winnen maar kunnen verliezen.\nWij zijn tot luisteren bereid.\nOnze grootste vreugde is pleziertjes doen.\nWij leven graag in de natuur.\nDe leiding is onze gids.',
     extraTitle: 'Het (Jong)giverlied',
-    extra: (
-      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.92rem', borderLeft: '4px solid var(--color-jonggivers)', lineHeight: 1.6 }}>
-        Een giver is een puber gezond en weltevree en weltevree.<br />
-        Die zingt met volle longen, met alle and&apos;ren mee.<br />
-        En onze leuze klinkt &ldquo;wees vaardig&rdquo;, want het leven is een strijd.<br />
-        En we vinden het leven aardig, evenwel zijn wij bereid.<br />
-        Natuur is onze woning, zo gaan wij hand in hand, in hand, in hand<br />
-        ten strijde voor de koning, voor vorst en vaderland.
-      </div>
-    ),
+    extra: 'Een giver is een puber gezond en weltevree en weltevree.\nDie zingt met volle longen, met alle and\'ren mee.\nEn onze leuze klinkt "wees vaardig", want het leven is een strijd.\nEn we vinden het leven aardig, evenwel zijn wij bereid.\nNatuur is onze woning, zo gaan wij hand in hand, in hand, in hand\nten strijde voor de koning, voor vorst en vaderland.',
   },
   givers: {
     wetTitle: 'De Giverwet',
     wet: 'Een giver is oprecht, op zijn of haar woord kan men vertrouwen.\nEen giver is trouw aan de naaste en zichzelf.\nEen giver is vriendelijk en voorkomend, een broeder of zuster voor elke andere giver.\nEen giver is hoffelijk en weet dat de anderen op hem kunnen rekenen.\nEen giver is hulpvaardig en doet geen half werk.\nEen giver is sober en draagt zorg voor het goed van de ander.\nEen giver leeft met open ogen in de natuur.',
     extraTitle: 'Het Giverlied & Buitenlands Kamp',
-    extra: (
-      <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.92rem', borderLeft: '4px solid var(--color-givers)', lineHeight: 1.6 }}>
-        Een giver is een puber gezond en weltevree en weltevree.<br />
-        Die zingt met volle longen, met alle and&apos;ren mee.<br />
-        En onze leuze klinkt &ldquo;wees vaardig&rdquo;, want het leven is een strijd.<br />
-        En we vinden het leven aardig, evenwel zijn wij bereid.<br />
-        Natuur is onze woning, zo gaan wij hand in hand, in hand, in hand<br />
-        ten strijde voor de koning, voor vorst en vaderland.
-      </div>
-    ),
+    extra: 'Een giver is een puber gezond en weltevree en weltevree.\nDie zingt met volle longen, met alle and\'ren mee.\nEn onze leuze klinkt "wees vaardig", want het leven is een strijd.\nEn we vinden het leven aardig, evenwel zijn wij bereid.\nNatuur is onze woning, zo gaan wij hand in hand, in hand, in hand\nten strijde voor de koning, voor vorst en vaderland.',
   },
 }
 
@@ -148,27 +113,27 @@ interface Props {
   siteContent?: Record<string, { title?: string; content?: string; image_url?: string }>
 }
 
-function TakPageClientContent({
+export default function TakPageClient({
   slug,
   takName,
   takDescription: _takDescription,
-  takEmail,
-  takWhatsapp,
+  takEmail: initialTakEmail,
+  takWhatsapp: initialTakWhatsapp,
   takPhotoSrc: initialTakPhotoSrc,
   leadersToDisplay: initialLeadersToDisplay,
   recentEchos,
   dark,
-  siteContent = {},
 }: Props) {
-
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const { isEditMode } = useEditMode()
 
   const [leadersToDisplay, setLeadersToDisplay] = useState<Leader[]>(initialLeadersToDisplay)
   const [takPhotoSrc, setTakPhotoSrc] = useState<string | null>(initialTakPhotoSrc)
-  const [isGroepsleiding, setIsGroepsleiding] = useState(false)
-  const [isEditMode, setIsEditMode] = useState(false)
+  const [takEmail, setTakEmail] = useState<string>(initialTakEmail)
+  const [takWhatsapp, setTakWhatsapp] = useState<string>(initialTakWhatsapp)
+
   const [isLeidingModalOpen, setIsLeidingModalOpen] = useState(false)
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false)
 
   useEffect(() => {
     setLeadersToDisplay(initialLeadersToDisplay)
@@ -179,33 +144,15 @@ function TakPageClientContent({
   }, [initialTakPhotoSrc])
 
   useEffect(() => {
-    const editQuery = searchParams.get('edit') === 'true'
-    const storedEdit = Boolean(
-      typeof window !== 'undefined' &&
-      (sessionStorage.getItem('kriko_edit_mode') === 'true' || localStorage.getItem('kriko_edit_mode') === 'true')
-    )
-    setIsEditMode(editQuery || storedEdit)
+    setTakEmail(initialTakEmail)
+  }, [initialTakEmail])
 
-    fetch('/api/admin/check-groepsleiding')
-      .then(res => res.json())
-      .then(data => setIsGroepsleiding(Boolean(data.isGroepsleiding)))
-      .catch(() => setIsGroepsleiding(false))
-  }, [searchParams])
+  useEffect(() => {
+    setTakWhatsapp(initialTakWhatsapp)
+  }, [initialTakWhatsapp])
 
-  const canEdit = isGroepsleiding && isEditMode
-
-  // Dynamic overrides from siteContent with FULL DEFAULT TEXT fallback
-  const descBlock = siteContent[`takken.${slug}.description`]
   const fallbackInfo = FULL_TAK_DETAILS_TEXT[slug] || { title: `Wat is een ${takName}?`, defaultContent: '' }
-  const customTitle = descBlock?.title || fallbackInfo.title
-  const customContent = descBlock?.content || fallbackInfo.defaultContent
-
-  const tradBlock = siteContent[`takken.${slug}.traditie`]
-  const wetTitle = tradBlock?.title || TAK_TRADITIES[slug]?.wetTitle || 'De Scoutswet'
-  const wetText = tradBlock?.content || TAK_TRADITIES[slug]?.wet || ''
-
-  const uniBlock = siteContent[`takken.${slug}.uniform`]
-  const uniformText = uniBlock?.content || TAK_UNIFORM[slug] || ''
+  const traditie = TAK_TRADITIES[slug]
 
   return (
     <>
@@ -213,18 +160,28 @@ function TakPageClientContent({
 
       {/* Hero Header */}
       <section className={`tak-hero ${slug}`} style={{ position: 'relative', overflow: 'hidden' }}>
-        <Image
-          src={`/images/banner_${slug}.webp`}
+        <EditableImage
+          blockKey={`takken.${slug}.hero_image`}
+          page="takken"
+          section={slug}
+          defaultSrc={`/images/banner_${slug}.webp`}
           alt={takName}
-          className="tak-hero-img"
           fill
           priority
-          unoptimized
-          style={{ objectFit: 'cover', zIndex: 1 }}
+          uploadType="tak-banner"
+          imageStyle={{ objectFit: 'cover', zIndex: 1 }}
         />
-        <div className="tak-hero-overlay" />
-        <div className="container">
-          <h2 className="tak-hero-title">{takName}</h2>
+        <div className="tak-hero-overlay" style={{ zIndex: 2 }} />
+        <div className="container" style={{ position: 'relative', zIndex: 3 }}>
+          <EditableText
+            blockKey={`takken.${slug}.hero_title`}
+            page="takken"
+            section={slug}
+            field="title"
+            defaultValue={takName}
+            as="h2"
+            className="tak-hero-title"
+          />
         </div>
       </section>
 
@@ -234,61 +191,87 @@ function TakPageClientContent({
           {/* Linker kolom */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
 
-            {/* 1. Beschrijving Block (FULL EDITABLE TEXT) */}
-            <EditableBlock
-              blockKey={`takken.${slug}.description`}
-              page="takken"
-              section={slug}
-              blockType="text_only"
-              initialTitle={customTitle}
-              initialContent={customContent}
-            >
-              <div style={{ backgroundColor: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', padding: 40, border: '1px solid var(--color-border)' }}>
-                <h3 style={{ fontSize: '1.8rem', marginBottom: 18, color: 'var(--color-primary-dark)', textTransform: 'uppercase' }}>
-                  {customTitle}
-                </h3>
-                <p style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 0, whiteSpace: 'pre-line' }}>
-                  {customContent}
-                </p>
-              </div>
-            </EditableBlock>
-
-            {/* 2. Traditie & Belofte Block */}
-            {TAK_TRADITIES[slug] && (
-              <EditableBlock
-                blockKey={`takken.${slug}.traditie`}
+            {/* 1. Beschrijving Block */}
+            <div style={{ backgroundColor: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', padding: 40, border: '1px solid var(--color-border)' }}>
+              <EditableText
+                blockKey={`takken.${slug}.description.title`}
                 page="takken"
                 section={slug}
-                blockType="text_only"
-                initialTitle={wetTitle}
-                initialContent={wetText}
-              >
-                <div style={{ backgroundColor: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', padding: 40, border: '1px solid var(--color-border)' }}>
-                  <h3 style={{ fontSize: '1.6rem', marginBottom: 14, color: 'var(--color-primary-dark)' }}>
-                    <i className="fa-solid fa-scroll" style={{ color: 'var(--color-secondary)', marginRight: 10 }}></i>
-                    {wetTitle}
-                  </h3>
-                  <p style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 24, fontStyle: 'italic', whiteSpace: 'pre-line' }}>
-                    &ldquo;{wetText}&rdquo;
-                  </p>
+                field="title"
+                defaultValue={fallbackInfo.title}
+                as="h3"
+                style={{ fontSize: '1.8rem', marginBottom: 18, color: 'var(--color-primary-dark)', textTransform: 'uppercase' }}
+              />
+              <EditableText
+                blockKey={`takken.${slug}.description.content`}
+                page="takken"
+                section={slug}
+                field="content"
+                defaultValue={fallbackInfo.defaultContent}
+                as="p"
+                multiline
+                style={{ fontSize: '1.05rem', lineHeight: 1.7, color: 'var(--color-text-dark)', marginBottom: 0, whiteSpace: 'pre-line' }}
+              />
+            </div>
 
-                  {TAK_TRADITIES[slug].extraTitle && (
-                    <>
-                      <h4 style={{ fontSize: '1.25rem', marginBottom: 12, color: 'var(--color-primary-dark)' }}>
-                        {TAK_TRADITIES[slug].extraTitle}
-                      </h4>
-                      {TAK_TRADITIES[slug].extra}
-                    </>
-                  )}
-                </div>
-              </EditableBlock>
+            {/* 2. Traditie & Belofte Block */}
+            {traditie && (
+              <div style={{ backgroundColor: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', padding: 40, border: '1px solid var(--color-border)' }}>
+                <h3 style={{ fontSize: '1.6rem', marginBottom: 14, color: 'var(--color-primary-dark)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <i className="fa-solid fa-scroll" style={{ color: 'var(--color-secondary)' }}></i>
+                  <EditableText
+                    blockKey={`takken.${slug}.traditie.wet_title`}
+                    page="takken"
+                    section={slug}
+                    field="title"
+                    defaultValue={traditie.wetTitle}
+                    as="span"
+                  />
+                </h3>
+                <EditableText
+                  blockKey={`takken.${slug}.traditie.wet_content`}
+                  page="takken"
+                  section={slug}
+                  field="content"
+                  defaultValue={traditie.wet}
+                  as="p"
+                  multiline
+                  style={{ fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 24, fontStyle: 'italic', whiteSpace: 'pre-line' }}
+                />
+
+                {traditie.extraTitle && (
+                  <>
+                    <EditableText
+                      blockKey={`takken.${slug}.traditie.extra_title`}
+                      page="takken"
+                      section={slug}
+                      field="title"
+                      defaultValue={traditie.extraTitle}
+                      as="h4"
+                      style={{ fontSize: '1.25rem', marginBottom: 12, color: 'var(--color-primary-dark)' }}
+                    />
+                    <div style={{ fontStyle: 'italic', background: 'var(--color-bg-linen)', padding: 18, borderRadius: 'var(--border-radius-md)', fontSize: '0.95rem', borderLeft: `4px solid var(--color-${slug})`, lineHeight: 1.6 }}>
+                      <EditableText
+                        blockKey={`takken.${slug}.traditie.extra_content`}
+                        page="takken"
+                        section={slug}
+                        field="content"
+                        defaultValue={traditie.extra || ''}
+                        as="div"
+                        multiline
+                        style={{ whiteSpace: 'pre-line' }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
             )}
 
-            {/* 3. Leiding Section & Foto (Met specifieke Leiding Beheer Knop) */}
+            {/* 3. Leiding Section & Foto */}
             <div className="leaders-section" style={{ position: 'relative', overflow: 'visible' }}>
               
-              {/* Groepsleiding EDIT Button voor Leidingsploeg & Foto */}
-              {canEdit && (
+              {/* Dedicated blue portal button for groepsleiding */}
+              {isEditMode && (
                 <button
                   onClick={() => setIsLeidingModalOpen(true)}
                   type="button"
@@ -297,30 +280,30 @@ function TakPageClientContent({
                     top: 10,
                     right: takPhotoSrc ? 230 : 10,
                     zIndex: 999,
-                    backgroundColor: '#1A3D2A',
-                    color: '#C9963A',
-                    border: '1.5px solid #C9963A',
+                    backgroundColor: '#162544',
+                    color: '#ffffff',
+                    border: '1.5px solid #243B6B',
                     borderRadius: 20,
                     padding: '8px 16px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
-                    fontSize: '0.88rem',
+                    fontSize: '0.86rem',
                     fontWeight: 800,
                     cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+                    boxShadow: '0 4px 14px rgba(22, 37, 68, 0.35)',
+                    fontFamily: 'var(--font-heading, Nunito, sans-serif)',
                   }}
                 >
-                  ✏️ Leidingsploeg &amp; Foto Bewerken
+                  <i className="fa-solid fa-pen-to-square" style={{ color: '#E2C58D' }}></i>
+                  Leidingsploeg &amp; Foto Bewerken
                 </button>
               )}
 
-              {/* Schuine Foto aan de RECHTER BOVENHOEK van de Leidingkaart */}
+              {/* Schuine Foto aan de RECHTER BOVENHOEK */}
               {takPhotoSrc && (
                 <div className="tak-leader-photo-wrap">
-                  {/* Tape Effect */}
                   <div className="tak-photo-tape" />
-
                   <div style={{
                     backgroundColor: '#fff',
                     padding: 6,
@@ -345,11 +328,24 @@ function TakPageClientContent({
               {/* Titel en Introductie */}
               <div className={`tak-leaders-header-info${takPhotoSrc ? ' has-photo' : ''}`}>
                 <h3 style={{ fontSize: '1.6rem', borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 12, color: 'var(--color-primary-dark)' }}>
-                  De Leiding
+                  <EditableText
+                    blockKey={`takken.${slug}.leaders.title`}
+                    page="takken"
+                    section={slug}
+                    field="title"
+                    defaultValue="De Leiding"
+                    as="span"
+                  />
                 </h3>
-                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginTop: 8, marginBottom: 24 }}>
-                  Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of bel de leiding!
-                </p>
+                <EditableText
+                  blockKey={`takken.${slug}.leaders.intro`}
+                  page="takken"
+                  section={slug}
+                  field="content"
+                  defaultValue="Dit team staat elke zondag klaar om de tak de tijd van hun leven te bezorgen. Heb je een vraag? Spreek ons gerust aan of bel de leiding!"
+                  as="p"
+                  style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', marginTop: 8, marginBottom: 24 }}
+                />
               </div>
 
               {/* Lijst van Leiding */}
@@ -359,9 +355,9 @@ function TakPageClientContent({
                     Er is momenteel geen leiding ingesteld voor deze tak.
                   </p>
                 ) : (
-                  leadersToDisplay.map((leader: Leader) => (
+                  leadersToDisplay.map((leader: Leader, idx: number) => (
                     <div
-                      key={leader.name}
+                      key={leader.name + idx}
                       style={{
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -428,11 +424,24 @@ function TakPageClientContent({
             }}>
               <Link href="/echos" style={{ textDecoration: 'none' }}>
                 <h3 style={{ color: 'rgba(255,255,255,0.9)' }}>
-                  Kriko Echo <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '0.7em', opacity: 0.6, marginLeft: 4 }}></i>
+                  <EditableText
+                    blockKey={`takken.${slug}.echo_card.title`}
+                    page="takken"
+                    section={slug}
+                    defaultValue="Kriko Echo"
+                    as="span"
+                  />{' '}
+                  <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '0.7em', opacity: 0.6, marginLeft: 4 }}></i>
                 </h3>
               </Link>
               <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.55)', margin: '-4px 0 14px', borderBottom: '1px dashed rgba(255,255,255,0.2)', paddingBottom: 14 }}>
-                Onze maandelijkse planning
+                <EditableText
+                  blockKey={`takken.${slug}.echo_card.sub`}
+                  page="takken"
+                  section={slug}
+                  defaultValue="Onze maandelijkse planning"
+                  as="span"
+                />
               </p>
               <div className="echo-card-pdfs">
                 {recentEchos.length === 0 ? (
@@ -452,9 +461,51 @@ function TakPageClientContent({
             </div>
 
             {/* Contact kaart */}
-            <div className="side-card">
-              <h3>Contact</h3>
-              <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginBottom: 8 }}>Vragen aan de leiding?</p>
+            <div className="side-card" style={{ position: 'relative' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <h3 style={{ margin: 0 }}>
+                  <EditableText
+                    blockKey={`takken.${slug}.contact.title`}
+                    page="takken"
+                    section={slug}
+                    defaultValue="Contact"
+                    as="span"
+                  />
+                </h3>
+
+                {isEditMode && (
+                  <button
+                    onClick={() => setIsContactModalOpen(true)}
+                    type="button"
+                    style={{
+                      backgroundColor: '#162544',
+                      color: '#ffffff',
+                      border: '1.5px solid #243B6B',
+                      borderRadius: 16,
+                      padding: '4px 10px',
+                      fontSize: '0.78rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <i className="fa-solid fa-pen-to-square" style={{ color: '#E2C58D' }}></i>
+                    Bewerken
+                  </button>
+                )}
+              </div>
+
+              <EditableText
+                blockKey={`takken.${slug}.contact.sub`}
+                page="takken"
+                section={slug}
+                defaultValue="Vragen aan de leiding?"
+                as="p"
+                style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginBottom: 8 }}
+              />
+
               <CopyButton
                 text={takEmail}
                 variant="button"
@@ -470,43 +521,60 @@ function TakPageClientContent({
             </div>
 
             {/* Uniform & Webshop kaart */}
-            <EditableBlock
-              blockKey={`takken.${slug}.uniform`}
-              page="takken"
-              section={slug}
-              blockType="text_only"
-              initialTitle="Uniform & Webshop"
-              initialContent={uniformText}
-            >
-              <div className="side-card">
-                <h3>Uniform &amp; Webshop</h3>
-                <p style={{ fontSize: '0.92rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 16, whiteSpace: 'pre-line' }}>
-                  {uniformText}
-                </p>
+            <div className="side-card">
+              <EditableText
+                blockKey={`takken.${slug}.uniform.title`}
+                page="takken"
+                section={slug}
+                field="title"
+                defaultValue="Uniform &amp; Webshop"
+                as="h3"
+              />
+              <EditableText
+                blockKey={`takken.${slug}.uniform.content`}
+                page="takken"
+                section={slug}
+                field="content"
+                defaultValue={TAK_UNIFORM[slug] || ''}
+                as="p"
+                multiline
+                style={{ fontSize: '0.92rem', lineHeight: 1.6, color: 'var(--color-text-dark)', marginBottom: 16, whiteSpace: 'pre-line' }}
+              />
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <Link href="/shop" className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
-                    <i className="fa-solid fa-cart-shopping" style={{ marginRight: 6 }}></i> Kriko-M Webshop
-                  </Link>
-                  <a
-                    href="https://www.hopper.be/nl/shop"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn btn-outline"
-                    style={{ width: '100%', justifyContent: 'center' }}
-                  >
-                    <i className="fa-solid fa-arrow-up-right-from-square" style={{ marginRight: 6 }}></i> Naar Hopper Winkel
-                  </a>
-                </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <Link href="/shop" className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
+                  <i className="fa-solid fa-cart-shopping" style={{ marginRight: 6 }}></i>
+                  <EditableText
+                    blockKey={`takken.${slug}.uniform.btn1`}
+                    page="takken"
+                    section={slug}
+                    defaultValue="Kriko-M Webshop"
+                  />
+                </Link>
+                <a
+                  href="https://www.hopper.be/nl/shop"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  <i className="fa-solid fa-arrow-up-right-from-square" style={{ marginRight: 6 }}></i>
+                  <EditableText
+                    blockKey={`takken.${slug}.uniform.btn2`}
+                    page="takken"
+                    section={slug}
+                    defaultValue="Naar Hopper Winkel"
+                  />
+                </a>
               </div>
-            </EditableBlock>
+            </div>
 
           </div>
 
         </div>
       </section>
 
-      {/* Leiding Edit Modal */}
+      {/* Leiding Edit Modal in portal blue */}
       {isLeidingModalOpen && (
         <EditLeidingModal
           slug={slug}
@@ -521,14 +589,22 @@ function TakPageClientContent({
           }}
         />
       )}
-    </>
-  )
-}
 
-export default function TakPageClient(props: Props) {
-  return (
-    <Suspense fallback={null}>
-      <TakPageClientContent {...props} />
-    </Suspense>
+      {/* Contact & WhatsApp Edit Modal */}
+      {isContactModalOpen && (
+        <EditTakContactModal
+          slug={slug}
+          takName={takName}
+          initialEmail={takEmail}
+          initialWhatsapp={takWhatsapp}
+          onClose={() => setIsContactModalOpen(false)}
+          onSaved={(savedEmail, savedWhatsapp) => {
+            setTakEmail(savedEmail)
+            setTakWhatsapp(savedWhatsapp)
+            router.refresh()
+          }}
+        />
+      )}
+    </>
   )
 }

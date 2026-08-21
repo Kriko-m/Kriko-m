@@ -1,9 +1,9 @@
-import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { getSettings } from '@/lib/db'
 import ContactForm from './ContactForm'
 import CopyButton from '@/components/CopyButton'
 import ContactGroepsleidingCard from './ContactGroepsleidingCard'
+import EditableText from '@/components/editing/EditableText'
 import { Leader } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Contact | Scouts Kriko-M' }
@@ -18,7 +18,15 @@ export default async function ContactPage() {
     <>
       <section className="tak-hero primair hero-contact">
         <div className="container">
-          <h1 className="tak-hero-title">Contact</h1>
+          <EditableText
+            blockKey="contact.hero.title"
+            page="contact"
+            section="hero"
+            field="title"
+            defaultValue="Contact"
+            as="h1"
+            className="tak-hero-title"
+          />
         </div>
       </section>
 
@@ -26,14 +34,36 @@ export default async function ContactPage() {
         <div className="contact-page-grid">
 
           <div style={{ background: 'var(--color-bg-white)', borderRadius: 'var(--border-radius-lg)', boxShadow: 'var(--shadow-md)', padding: 40, border: '1px solid var(--color-border)' }}>
-            <h2 style={{ marginBottom: 8 }}>Stuur ons een berichtje</h2>
-            <p style={{ color: 'var(--color-text-muted)', marginBottom: 28 }}>We antwoorden normaal binnen de 2 werkdagen.</p>
+            <EditableText
+              blockKey="contact.form.title"
+              page="contact"
+              section="form"
+              field="title"
+              defaultValue="Stuur ons een berichtje"
+              as="h2"
+              style={{ marginBottom: 8 }}
+            />
+            <EditableText
+              blockKey="contact.form.sub"
+              page="contact"
+              section="form"
+              defaultValue="We antwoorden normaal binnen de 2 werkdagen."
+              as="p"
+              style={{ color: 'var(--color-text-muted)', marginBottom: 28 }}
+            />
             <ContactForm />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div className="side-card">
-              <h3>Contactgegevens</h3>
+              <EditableText
+                blockKey="contact.sidebar.title"
+                page="contact"
+                section="sidebar"
+                field="title"
+                defaultValue="Contactgegevens"
+                as="h3"
+              />
               <ul className="contact-sidebar-list" style={{ marginTop: 16 }}>
                 <li className="contact-sidebar-item">
                   <span style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>E-mail</span>
@@ -71,12 +101,10 @@ export default async function ContactPage() {
               </ul>
             </div>
 
-            <Suspense fallback={null}>
-              <ContactGroepsleidingCard
-                initialLeaders={groepsleidingLeaders}
-                initialPhoto={groepsleidingPhoto}
-              />
-            </Suspense>
+            <ContactGroepsleidingCard
+              initialLeaders={groepsleidingLeaders}
+              initialPhoto={groepsleidingPhoto}
+            />
           </div>
 
         </div>
@@ -84,5 +112,3 @@ export default async function ContactPage() {
     </>
   )
 }
-
-

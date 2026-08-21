@@ -3,6 +3,7 @@ import { getShopProducts } from '@/lib/db'
 import ShopProductCard from '@/components/shop/ShopProductCard'
 import KentekenCard from '@/components/shop/KentekenCard'
 import CartDrawer from '@/components/shop/CartDrawer'
+import EditableText from '@/components/editing/EditableText'
 import { Product } from '@/lib/types'
 
 export const metadata: Metadata = { title: 'Webshop – Scouts Kriko-M' }
@@ -20,7 +21,15 @@ export default async function ShopPage() {
     <>
       <section className="tak-hero primair hero-webshop">
         <div className="container">
-          <h2 className="tak-hero-title">Webshop</h2>
+          <EditableText
+            blockKey="shop.hero.title"
+            page="shop"
+            section="hero"
+            field="title"
+            defaultValue="Webshop"
+            as="h1"
+            className="tak-hero-title"
+          />
         </div>
       </section>
 
@@ -40,20 +49,25 @@ export default async function ShopPage() {
         }}>
           <i className="fa-solid fa-circle-info" style={{ fontSize: '1.5rem', color: 'var(--color-primary-dark)', marginTop: 2, flexShrink: 0 }} />
           <div>
-            <h3 style={{ color: 'var(--color-primary-dark, #3a0710)', fontSize: '1.15rem', margin: '0 0 6px', fontWeight: 800 }}>
-              Waar koop je wat? (Hopper vs. Kriko-M Webshop)
-            </h3>
+            <EditableText
+              blockKey="shop.info.title"
+              page="shop"
+              section="info"
+              field="title"
+              defaultValue="Waar koop je wat? (Hopper vs. Kriko-M Webshop)"
+              as="h3"
+              style={{ color: 'var(--color-primary-dark, #3a0710)', fontSize: '1.15rem', margin: '0 0 6px', fontWeight: 800 }}
+            />
             <p style={{ fontSize: '0.94rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
-              Standaard scoutskledij zoals de <strong>officiële scoutsbroek of -rok</strong> en het <strong>scoutshemd</strong> schaf je aan via de{' '}
-              <a
-                href="https://www.hopper.be/nl/shop"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: 'var(--color-primary)', fontWeight: 800, textDecoration: 'underline' }}
-              >
-                Hopper winkel of webshop
-              </a>.<br/>
-              Via <strong>onze eigen Kriko-M webshop</strong> bestel je onze unieke groepskledij (T-shirt, trui en groepsdas). Kentekens zijn eveneens te bestellen via Hopper, maar bieden we voor het gemak ook rechtstreeks aan in onze webshop!
+              <EditableText
+                blockKey="shop.info.content"
+                page="shop"
+                section="info"
+                field="content"
+                defaultValue="Standaard scoutskledij zoals de officiële scoutsbroek of -rok en het scoutshemd schaf je aan via de Hopper winkel of webshop. Via onze eigen Kriko-M webshop bestel je onze unieke groepskledij (T-shirt, trui en groepsdas). Kentekens zijn eveneens te bestellen via Hopper, maar bieden we voor het gemak ook rechtstreeks aan in onze webshop!"
+                as="span"
+                multiline
+              />
             </p>
           </div>
         </div>
@@ -61,9 +75,15 @@ export default async function ShopPage() {
         {/* 1. HOOFDARTIKELEN (T-Shirt, Trui, Groepsdas) */}
         <div style={{ marginBottom: 50 }}>
           <div style={{ marginBottom: 20, borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 10 }}>
-            <h3 style={{ fontSize: '1.4rem', color: 'var(--color-primary-dark)', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}>
-              Kriko-M Kledij &amp; Groepsdas
-            </h3>
+            <EditableText
+              blockKey="shop.kledij.title"
+              page="shop"
+              section="kledij"
+              field="title"
+              defaultValue="Kriko-M Kledij &amp; Groepsdas"
+              as="h3"
+              style={{ fontSize: '1.4rem', color: 'var(--color-primary-dark)', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}
+            />
           </div>
 
           <div className="shop-grid">
@@ -76,9 +96,15 @@ export default async function ShopPage() {
         {/* 2. KENTEKENS */}
         <div style={{ marginBottom: 40 }}>
           <div style={{ marginBottom: 20, borderBottom: '2px solid var(--color-bg-linen)', paddingBottom: 10 }}>
-            <h3 style={{ fontSize: '1.4rem', color: 'var(--color-primary-dark)', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}>
-              Kentekens
-            </h3>
+            <EditableText
+              blockKey="shop.kentekens.title"
+              page="shop"
+              section="kentekens"
+              field="title"
+              defaultValue="Kentekens"
+              as="h3"
+              style={{ fontSize: '1.4rem', color: 'var(--color-primary-dark)', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}
+            />
           </div>
 
           <div style={{
@@ -105,15 +131,13 @@ export default async function ShopPage() {
           }}>
             <i className="fa-solid fa-compass" style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', flexShrink: 0 }} />
             <p style={{ fontSize: '0.88rem', color: 'var(--color-text-dark)', margin: 0, lineHeight: 1.45 }}>
-              Weet je niet waar de kentekens horen op je hemd?{' '}
-              <a 
-                href="https://www.scoutsengidsenvlaanderen.be/scouts-en-gidsenleden/praktisch/waar-horen-de-kentekens" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'underline' }}
-              >
-                Bekijk hier de opnaai-instructies van Scouts &amp; Gidsen Vlaanderen &raquo;
-              </a>
+              <EditableText
+                blockKey="shop.kentekens.instructions"
+                page="shop"
+                section="kentekens"
+                defaultValue="Weet je niet waar de kentekens horen op je hemd? Bekijk hier de opnaai-instructies van Scouts & Gidsen Vlaanderen »"
+                as="span"
+              />
             </p>
           </div>
         </div>

@@ -82,7 +82,6 @@ export default function LeidingPanel({ isGroepsleiding = false, settings, unappr
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            transition: 'all 0.2s ease-in-out',
             minHeight: 220,
             position: 'relative',
           }}
@@ -90,17 +89,21 @@ export default function LeidingPanel({ isGroepsleiding = false, settings, unappr
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-              <div style={{
-                width: 48,
-                height: 48,
-                borderRadius: 12,
-                background: '#162544',
-                color: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.35rem',
-              }}>
+              <div
+                className="portaal-home-card-icon"
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: '#162544',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.35rem',
+                  transition: 'all 0.2s ease',
+                }}
+              >
                 <i className="fa-solid fa-newspaper"></i>
               </div>
 
@@ -161,7 +164,7 @@ export default function LeidingPanel({ isGroepsleiding = false, settings, unappr
             color: '#243B6B',
           }}>
             <span>Echo beheer</span>
-            <i className="fa-solid fa-arrow-right" style={{ transition: 'transform 0.2s ease' }}></i>
+            <i className="fa-solid fa-arrow-right portaal-home-card-arrow" style={{ transition: 'transform 0.2s ease' }}></i>
           </div>
         </Link>
 
@@ -178,24 +181,27 @@ export default function LeidingPanel({ isGroepsleiding = false, settings, unappr
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            transition: 'all 0.2s ease-in-out',
             minHeight: 220,
           }}
           className="portaal-home-card"
         >
           <div>
-            <div style={{
-              width: 48,
-              height: 48,
-              borderRadius: 12,
-              background: '#162544',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.35rem',
-              marginBottom: 18,
-            }}>
+            <div
+              className="portaal-home-card-icon"
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                background: '#162544',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.35rem',
+                marginBottom: 18,
+                transition: 'all 0.2s ease',
+              }}
+            >
               <i className="fa-solid fa-folder-open"></i>
             </div>
             <strong style={{
@@ -232,7 +238,7 @@ export default function LeidingPanel({ isGroepsleiding = false, settings, unappr
             color: '#243B6B',
           }}>
             <span>Documenten bekijken</span>
-            <i className="fa-solid fa-arrow-right" style={{ transition: 'transform 0.2s ease' }}></i>
+            <i className="fa-solid fa-arrow-right portaal-home-card-arrow" style={{ transition: 'transform 0.2s ease' }}></i>
           </div>
         </Link>
 
@@ -249,24 +255,27 @@ export default function LeidingPanel({ isGroepsleiding = false, settings, unappr
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            transition: 'all 0.2s ease-in-out',
             minHeight: 220,
           }}
           className="portaal-home-card"
         >
           <div>
-            <div style={{
-              width: 48,
-              height: 48,
-              borderRadius: 12,
-              background: '#162544',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.35rem',
-              marginBottom: 18,
-            }}>
+            <div
+              className="portaal-home-card-icon"
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                background: '#162544',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.35rem',
+                marginBottom: 18,
+                transition: 'all 0.2s ease',
+              }}
+            >
               <i className="fa-solid fa-calendar-days"></i>
             </div>
             <strong style={{
@@ -303,7 +312,7 @@ export default function LeidingPanel({ isGroepsleiding = false, settings, unappr
             color: '#243B6B',
           }}>
             <span>Naar kalender</span>
-            <i className="fa-solid fa-arrow-right" style={{ transition: 'transform 0.2s ease' }}></i>
+            <i className="fa-solid fa-arrow-right portaal-home-card-arrow" style={{ transition: 'transform 0.2s ease' }}></i>
           </div>
         </Link>
 
@@ -321,24 +330,27 @@ export default function LeidingPanel({ isGroepsleiding = false, settings, unappr
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              transition: 'all 0.2s ease-in-out',
               minHeight: 220,
             }}
             className="portaal-home-card"
           >
             <div>
-              <div style={{
-                width: 48,
-                height: 48,
-                borderRadius: 12,
-                background: '#162544',
-                color: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '1.35rem',
-                marginBottom: 18,
-              }}>
+              <div
+                className="portaal-home-card-icon"
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  background: '#162544',
+                  color: '#FFFFFF',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '1.35rem',
+                  marginBottom: 18,
+                  transition: 'all 0.2s ease',
+                }}
+              >
                 <i className="fa-solid fa-globe"></i>
               </div>
               <strong style={{
@@ -375,7 +387,7 @@ export default function LeidingPanel({ isGroepsleiding = false, settings, unappr
               color: '#243B6B',
             }}>
               <span>Website bewerken</span>
-              <i className="fa-solid fa-arrow-right" style={{ transition: 'transform 0.2s ease' }}></i>
+              <i className="fa-solid fa-arrow-right portaal-home-card-arrow" style={{ transition: 'transform 0.2s ease' }}></i>
             </div>
           </Link>
         )}

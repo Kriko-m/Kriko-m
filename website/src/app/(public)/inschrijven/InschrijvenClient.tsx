@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import CopyButton from '@/components/CopyButton'
+import EditableText from '@/components/editing/EditableText'
 
 interface Props {
   email: string
@@ -57,7 +58,11 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
               transition: 'color 0.2s ease',
             }}
           ></i>
-          Nieuw lid bij Kriko-M
+          <EditableText
+            blockKey="inschrijven.tab.nieuw"
+            page="inschrijven"
+            defaultValue="Nieuw lid bij Kriko-M"
+          />
         </button>
 
         <button
@@ -89,7 +94,11 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
               transition: 'color 0.2s ease',
             }}
           ></i>
-          Reeds lid (Herinschrijving)
+          <EditableText
+            blockKey="inschrijven.tab.bestaand"
+            page="inschrijven"
+            defaultValue="Reeds lid (Herinschrijving)"
+          />
         </button>
       </div>
 
@@ -113,14 +122,29 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
               <div style={{ flex: 1, minWidth: 280 }}>
                 <div style={{ display: 'inline-block', backgroundColor: 'var(--color-primary)', color: '#fff', padding: '4px 12px', borderRadius: 'var(--border-radius-sm)', fontSize: '0.85rem', fontWeight: 800, marginBottom: 8 }}>
-                  Stap 1
+                  <EditableText
+                    blockKey="inschrijven.stap1.badge"
+                    page="inschrijven"
+                    defaultValue="Stap 1"
+                  />
                 </div>
-                <h2 style={{ margin: 0, fontSize: '1.4rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}>
-                  Inschrijvingsformulier invullen
-                </h2>
-                <p style={{ margin: '8px 0 0 0', fontSize: '0.98rem', color: 'var(--color-text-dark)', lineHeight: 1.6 }}>
-                  Vul het officiële inschrijvingsformulier van Scouts en Gidsen Vlaanderen in met de gegevens van het nieuwe lid en de contactgegevens van de ouders.
-                </p>
+                <EditableText
+                  blockKey="inschrijven.stap1.title"
+                  page="inschrijven"
+                  field="title"
+                  defaultValue="Inschrijvingsformulier invullen"
+                  as="h2"
+                  style={{ margin: 0, fontSize: '1.4rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}
+                />
+                <EditableText
+                  blockKey="inschrijven.stap1.desc"
+                  page="inschrijven"
+                  field="content"
+                  defaultValue="Vul het officiële inschrijvingsformulier van Scouts en Gidsen Vlaanderen in met de gegevens van het nieuwe lid en de contactgegevens van de ouders."
+                  as="p"
+                  multiline
+                  style={{ margin: '8px 0 0 0', fontSize: '0.98rem', color: 'var(--color-text-dark)', lineHeight: 1.6 }}
+                />
               </div>
 
               <button
@@ -178,9 +202,13 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, paddingTop: 4 }}>
-                  <span style={{ fontSize: '0.92rem', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>
-                    Lukt het invullen hier niet of open je het formulier liever op een groter scherm?
-                  </span>
+                  <EditableText
+                    blockKey="inschrijven.stap1.external_help"
+                    page="inschrijven"
+                    defaultValue="Lukt het invullen hier niet of open je het formulier liever op een groter scherm?"
+                    as="span"
+                    style={{ fontSize: '0.92rem', color: 'var(--color-text-muted)', lineHeight: 1.4 }}
+                  />
                   <a
                     href="https://groepsadmin.scoutsengidsenvlaanderen.be/groepsadmin/frontend/formulier/lidworden/O3108G"
                     target="_blank"
@@ -188,7 +216,12 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
                     className="btn btn-secondary"
                     style={{ padding: '10px 20px', fontSize: '0.92rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 8 }}
                   >
-                    <i className="fa-solid fa-arrow-up-right-from-square"></i> Open hetzelfde inschrijvingsformulier in nieuw tabblad &raquo;
+                    <i className="fa-solid fa-arrow-up-right-from-square"></i>
+                    <EditableText
+                      blockKey="inschrijven.stap1.external_btn"
+                      page="inschrijven"
+                      defaultValue="Open hetzelfde inschrijvingsformulier in nieuw tabblad »"
+                    />
                   </a>
                 </div>
               </div>
@@ -211,14 +244,29 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
           >
             <div>
               <div style={{ display: 'inline-block', backgroundColor: 'var(--color-primary)', color: '#fff', padding: '4px 12px', borderRadius: 'var(--border-radius-sm)', fontSize: '0.85rem', fontWeight: 800, marginBottom: 8 }}>
-                Stap 2
+                <EditableText
+                  blockKey="inschrijven.stap2.badge"
+                  page="inschrijven"
+                  defaultValue="Stap 2"
+                />
               </div>
-              <h2 style={{ margin: 0, fontSize: '1.4rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}>
-                Lidgeld overschrijven (€ 50)
-              </h2>
-              <p style={{ margin: '8px 0 0 0', fontSize: '0.98rem', color: 'var(--color-text-dark)', lineHeight: 1.6 }}>
-                Na het versturen van het inschrijvingsformulier stort je het lidgeld. Het bedrag is <strong>€ 50</strong> per kind per jaar (€ 38 voor de verzekering via Scouts en Gidsen Vlaanderen + € 12 voor de algemene werking en materiaal van Kriko-M).
-              </p>
+              <EditableText
+                blockKey="inschrijven.stap2.title"
+                page="inschrijven"
+                field="title"
+                defaultValue="Lidgeld overschrijven (€ 50)"
+                as="h2"
+                style={{ margin: 0, fontSize: '1.4rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}
+              />
+              <EditableText
+                blockKey="inschrijven.stap2.desc"
+                page="inschrijven"
+                field="content"
+                defaultValue="Na het versturen van het inschrijvingsformulier stort je het lidgeld. Het bedrag is € 50 per kind per jaar (€ 38 voor de verzekering via Scouts en Gidsen Vlaanderen + € 12 voor de algemene werking en materiaal van Kriko-M)."
+                as="p"
+                multiline
+                style={{ margin: '8px 0 0 0', fontSize: '0.98rem', color: 'var(--color-text-dark)', lineHeight: 1.6 }}
+              />
             </div>
 
             <div
@@ -236,7 +284,14 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
             >
               <div>
                 <span style={{ fontSize: '1.05rem', display: 'block', marginBottom: 2 }}>
-                  <strong>IBAN:</strong> <code style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-primary-dark)' }}>BE59 7360 6413 2626</code>
+                  <strong>IBAN:</strong>{' '}
+                  <EditableText
+                    blockKey="inschrijven.stap2.iban"
+                    page="inschrijven"
+                    defaultValue="BE59 7360 6413 2626"
+                    as="code"
+                    style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-primary-dark)' }}
+                  />
                 </span>
                 <span style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)' }}>
                   <strong>Begunstigde:</strong> Scouts Kriko-M &nbsp;|&nbsp; <strong>Vermelding:</strong> <code>[Naam Kind] + [Tak]</code>
@@ -248,14 +303,18 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
             </div>
 
             <div style={{ backgroundColor: 'rgba(101, 11, 25, 0.04)', borderRadius: 'var(--border-radius-sm)', padding: '12px 16px', borderLeft: '4px solid var(--color-primary)' }}>
-              <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--color-primary-dark)', fontWeight: 600, lineHeight: 1.5 }}>
-                <i className="fa-solid fa-user-check" style={{ marginRight: 8 }}></i>
-                Na ontvangst van het formulier en de betaling wordt de inschrijving goedgekeurd door onze verantwoordelijke.
+              <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--color-primary-dark)', fontWeight: 600, lineHeight: 1.5, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <i className="fa-solid fa-user-check"></i>
+                <EditableText
+                  blockKey="inschrijven.stap2.bevestiging"
+                  page="inschrijven"
+                  defaultValue="Na ontvangst van het formulier en de betaling wordt de inschrijving goedgekeurd door onze verantwoordelijke."
+                />
               </p>
             </div>
           </div>
 
-          {/* STAP 3: Individuele Steekkaart (Informatie) */}
+          {/* STAP 3: Individuele Steekkaart */}
           <div
             className="inschrijven-step-box"
             style={{
@@ -271,22 +330,41 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
           >
             <div>
               <div style={{ display: 'inline-block', backgroundColor: 'var(--color-primary)', color: '#fff', padding: '4px 12px', borderRadius: 'var(--border-radius-sm)', fontSize: '0.85rem', fontWeight: 800, marginBottom: 8 }}>
-                Stap 3
+                <EditableText
+                  blockKey="inschrijven.stap3.badge"
+                  page="inschrijven"
+                  defaultValue="Stap 3"
+                />
               </div>
-              <h2 style={{ margin: 0, fontSize: '1.4rem', color: 'var(--color-primary-dark)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 10 }}>
-                Individuele Steekkaart (na ontvangst lidnummer)
-              </h2>
+              <EditableText
+                blockKey="inschrijven.stap3.title"
+                page="inschrijven"
+                field="title"
+                defaultValue="Individuele Steekkaart (na ontvangst lidnummer)"
+                as="h2"
+                style={{ margin: 0, fontSize: '1.4rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}
+              />
             </div>
 
             <div style={{ backgroundColor: 'rgba(237, 232, 208, 0.4)', border: '1px solid var(--color-border)', borderRadius: 'var(--border-radius-md)', padding: '16px 20px' }}>
               <p style={{ margin: 0, fontSize: '0.96rem', color: 'var(--color-text-dark)', lineHeight: 1.6 }}>
-                <strong>Let op:</strong> Deze stap is pas van toepassing nadat je na een week of 2 à 3 je persoonlijk lidnummer per e-mail hebt ontvangen!
+                <strong>Let op:</strong>{' '}
+                <EditableText
+                  blockKey="inschrijven.stap3.opmerking"
+                  page="inschrijven"
+                  defaultValue="Deze stap is pas van toepassing nadat je na een week of 2 à 3 je persoonlijk lidnummer per e-mail hebt ontvangen!"
+                />
               </p>
             </div>
 
-            <p style={{ margin: 0, fontSize: '0.96rem', lineHeight: 1.6, color: 'var(--color-text-dark)' }}>
-              Met het lidnummer kun je inloggen op de Groepsadministratie van Scouts en Gidsen Vlaanderen om de <strong>Individuele Steekkaart</strong> van je kind in te vullen. Hierop geef je belangrijke medische gegevens, dieetwensen en noodnummers door voor een veilige werking.
-            </p>
+            <EditableText
+              blockKey="inschrijven.stap3.desc"
+              page="inschrijven"
+              defaultValue="Met het lidnummer kun je inloggen op de Groepsadministratie van Scouts en Gidsen Vlaanderen om de Individuele Steekkaart van je kind in te vullen. Hierop geef je belangrijke medische gegevens, dieetwensen en noodnummers door voor een veilige werking."
+              as="p"
+              multiline
+              style={{ margin: 0, fontSize: '0.96rem', lineHeight: 1.6, color: 'var(--color-text-dark)' }}
+            />
 
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 4 }}>
               <a
@@ -296,7 +374,12 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
                 className="btn btn-secondary"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', fontSize: '0.95rem', fontWeight: 700 }}
               >
-                <i className="fa-solid fa-arrow-up-right-from-square"></i> Info Individuele Steekkaart &raquo;
+                <i className="fa-solid fa-arrow-up-right-from-square"></i>
+                <EditableText
+                  blockKey="inschrijven.stap3.btn1"
+                  page="inschrijven"
+                  defaultValue="Info Individuele Steekkaart »"
+                />
               </a>
               <a
                 href="https://groepsadmin.scoutsengidsenvlaanderen.be/groepsadmin/client/"
@@ -305,13 +388,18 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
                 className="btn btn-primary"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', fontSize: '0.95rem', fontWeight: 700 }}
               >
-                <i className="fa-solid fa-right-to-bracket"></i> Naar Groepsadministratie &raquo;
+                <i className="fa-solid fa-right-to-bracket"></i>
+                <EditableText
+                  blockKey="inschrijven.stap3.btn2"
+                  page="inschrijven"
+                  defaultValue="Naar Groepsadministratie »"
+                />
               </a>
             </div>
           </div>
         </>
       ) : (
-        /* REEDS LID (HERINSCHRIJVING) - COMPACT & ESSENTIEEL */
+        /* REEDS LID (HERINSCHRIJVING) */
         <div
           style={{
             backgroundColor: '#fff',
@@ -325,12 +413,22 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
           }}
         >
           <div>
-            <h2 style={{ margin: 0, fontSize: '1.4rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}>
-              Herinschrijving voor bestaande leden
-            </h2>
-            <p style={{ margin: '6px 0 0 0', fontSize: '0.98rem', color: 'var(--color-text-dark)', lineHeight: 1.5 }}>
-              Je blijft in principe <strong>voor altijd ingeschreven</strong> bij Kriko-M tot wanneer je jezelf formeel uitschrijft of je lidgeld niet meer betaalt.
-            </p>
+            <EditableText
+              blockKey="inschrijven.her.title"
+              page="inschrijven"
+              field="title"
+              defaultValue="Herinschrijving voor bestaande leden"
+              as="h2"
+              style={{ margin: 0, fontSize: '1.4rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}
+            />
+            <EditableText
+              blockKey="inschrijven.her.desc"
+              page="inschrijven"
+              field="content"
+              defaultValue="Je blijft in principe voor altijd ingeschreven bij Kriko-M tot wanneer je jezelf formeel uitschrijft of je lidgeld niet meer betaalt."
+              as="p"
+              style={{ margin: '6px 0 0 0', fontSize: '0.98rem', color: 'var(--color-text-dark)', lineHeight: 1.5 }}
+            />
           </div>
 
           {/* Enkel Lidgeld Betaling */}
@@ -345,9 +443,13 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
               gap: 16,
             }}
           >
-            <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}>
-              Om te herinschrijven hoef je enkel het lidgeld (€ 50) over te schrijven:
-            </h3>
+            <EditableText
+              blockKey="inschrijven.her.betaal_title"
+              page="inschrijven"
+              defaultValue="Om te herinschrijven hoef je enkel het lidgeld (€ 50) over te schrijven:"
+              as="h3"
+              style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}
+            />
 
             <div
               style={{
@@ -378,12 +480,20 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
 
           {/* Steekkaart herinnering */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 4 }}>
-            <h4 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}>
-              Individuele Steekkaart controleren
-            </h4>
-            <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--color-text-dark)', lineHeight: 1.6 }}>
-              Vergeet niet om jaarlijks eventuele nieuwe medische of contactgegevens van je kind aan te passen op de Groepsadministratie.
-            </p>
+            <EditableText
+              blockKey="inschrijven.her.steekkaart_title"
+              page="inschrijven"
+              defaultValue="Individuele Steekkaart controleren"
+              as="h4"
+              style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}
+            />
+            <EditableText
+              blockKey="inschrijven.her.steekkaart_desc"
+              page="inschrijven"
+              defaultValue="Vergeet niet om jaarlijks eventuele nieuwe medische of contactgegevens van je kind aan te passen op de Groepsadministratie."
+              as="p"
+              style={{ margin: 0, fontSize: '0.95rem', color: 'var(--color-text-dark)', lineHeight: 1.6 }}
+            />
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', marginTop: 4 }}>
               <a
                 href="https://www.scoutsengidsenvlaanderen.be/ouders/praktisch/inschrijven/individuele-steekkaart"
@@ -423,12 +533,21 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
         }}
       >
         <div>
-          <h4 style={{ margin: 0, fontSize: '1.05rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}>
-            Vragen over de inschrijving?
-          </h4>
-          <p style={{ margin: '2px 0 0 0', fontSize: '0.92rem', color: 'var(--color-text-dark)' }}>
-            De groepsleiding en inschrijvingsverantwoordelijke helpen je graag verder.
-          </p>
+          <EditableText
+            blockKey="inschrijven.vragen.title"
+            page="inschrijven"
+            field="title"
+            defaultValue="Vragen over de inschrijving?"
+            as="h4"
+            style={{ margin: 0, fontSize: '1.05rem', color: 'var(--color-primary-dark)', fontWeight: 800 }}
+          />
+          <EditableText
+            blockKey="inschrijven.vragen.desc"
+            page="inschrijven"
+            defaultValue="De groepsleiding en inschrijvingsverantwoordelijke helpen je graag verder."
+            as="p"
+            style={{ margin: '2px 0 0 0', fontSize: '0.92rem', color: 'var(--color-text-dark)' }}
+          />
         </div>
         <CopyButton text={email} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '0.88rem' }}>
           <i className="fas fa-envelope" style={{ marginRight: 6 }}></i> {email}
@@ -438,4 +557,3 @@ export default function InschrijvenClient({ email, year: _year }: Props) {
     </div>
   )
 }
-
