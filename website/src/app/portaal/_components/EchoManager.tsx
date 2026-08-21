@@ -143,7 +143,7 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
   }
 
   return (
-    <div style={{ maxWidth: 1320, margin: '0 auto', width: '100%', padding: '24px 20px 60px', boxSizing: 'border-box' }}>
+    <div style={{ maxWidth: 1320, margin: '0 auto', width: '100%', padding: '28px 20px 60px', boxSizing: 'border-box' }} className="portaal-page-container">
 
       {/* Tak Filters: 4 takken side-by-side on 1 line (taller / more square) */}
       <div className="portaal-echo-takken-row" style={{
@@ -152,7 +152,7 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
         gap: 14,
         width: '100%',
         maxWidth: 780,
-        margin: `0 auto ${flash ? 24 : 44}px auto`,
+        margin: `0 auto ${flash ? 20 : 28}px auto`,
       }}>
         {FOUR_TAKKEN.map(tak => {
           const isActive = activeTak === tak
