@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit, Nunito, Rubik_Dirt } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -12,6 +12,13 @@ const nunito = Nunito({ subsets: ["latin"], weight: ["600", "700", "800", "900"]
 const rubikDirt = Rubik_Dirt({ subsets: ["latin"], weight: ["400"], variable: "--font-londrina", display: "swap" });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.kriko-m.be";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
