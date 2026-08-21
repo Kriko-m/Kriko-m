@@ -7854,10 +7854,16 @@ html, body {
 
   .portaal-dashboard-sidebar {
     transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    box-shadow: none !important;
   }
 
   .portaal-dashboard-sidebar.mobile-open {
     transform: translateX(0);
+    visibility: visible !important;
+    pointer-events: auto !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.35) !important;
   }
 
   .portaal-mobile-floating-toggle {
@@ -7918,12 +7924,13 @@ html, body {
 .portaal-echo-takken-row {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
 }
 
 .portaal-tak-btn {
-  padding: 11px 16px;
+  padding: 16px 14px;
+  min-height: 56px;
 }
 
 .portaal-shop-beheer-grid {
@@ -7956,15 +7963,48 @@ html, body {
 @media (max-width: 900px) {
   .portaal-echo-grid {
     grid-template-columns: 1fr !important;
-    gap: 20px !important;
+    gap: 24px !important;
   }
   
   .portaal-echo-upload-card {
-    padding: 22px 18px !important;
+    padding: 24px 18px !important;
   }
 
   .portaal-shop-beheer-grid {
     grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .portal-cal-grid-cell {
+    min-height: 58px !important;
+    padding: 4px 3px !important;
+  }
+
+  .portal-cal-grid-day-number {
+    font-size: 0.82rem !important;
+  }
+
+  .portal-cal-grid-today-tag {
+    display: none !important;
+  }
+
+  .portal-cal-event-pill {
+    padding: 2px 3px !important;
+    font-size: 0.62rem !important;
+    border-radius: 4px !important;
+    gap: 2px !important;
+  }
+
+  .portal-cal-event-pill-title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+  }
+
+  .portal-pill-icon {
+    display: none !important;
   }
 }
 
@@ -7989,17 +8029,18 @@ html, body {
   }
 
   .portaal-tak-btn {
-    padding: 8px 4px !important;
-    font-size: 0.78rem !important;
-    border-radius: 10px !important;
+    padding: 10px 4px !important;
+    font-size: 0.8rem !important;
+    min-height: 48px !important;
+    border-radius: 12px !important;
   }
 
   .portaal-tak-badge {
-    width: 17px !important;
-    height: 17px !important;
-    font-size: 0.68rem !important;
-    top: -4px !important;
-    right: -4px !important;
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 0.7rem !important;
+    top: -5px !important;
+    right: -5px !important;
   }
 
   .portaal-product-form-grid {
@@ -8029,14 +8070,32 @@ html, body {
   }
 }
 
+@media (max-width: 480px) {
+  .portal-cal-grid-cell {
+    min-height: 48px !important;
+    padding: 2px 1px !important;
+  }
+
+  .portal-cal-grid-day-number {
+    font-size: 0.72rem !important;
+  }
+
+  .portal-cal-event-pill {
+    padding: 1px 2px !important;
+    font-size: 0.56rem !important;
+  }
+}
+
 @media (max-width: 380px) {
   .portaal-echo-takken-row {
     gap: 4px !important;
   }
 
   .portaal-tak-btn {
-    padding: 7px 2px !important;
-    font-size: 0.7rem !important;
+    padding: 8px 2px !important;
+    font-size: 0.72rem !important;
+    min-height: 44px !important;
+    border-radius: 10px !important;
   }
 }
 

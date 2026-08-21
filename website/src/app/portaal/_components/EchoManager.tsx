@@ -145,14 +145,14 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
   return (
     <div style={{ maxWidth: 1320, margin: '0 auto', width: '100%', padding: '24px 20px 60px', boxSizing: 'border-box' }}>
 
-      {/* Tak Filters: 4 takken side-by-side on 1 line */}
+      {/* Tak Filters: 4 takken side-by-side on 1 line (taller / more square) */}
       <div className="portaal-echo-takken-row" style={{
         display: 'flex',
         justifyContent: 'center',
-        gap: 12,
-        marginBottom: flash ? 16 : 28,
+        gap: 14,
+        marginBottom: flash ? 24 : 42,
         width: '100%',
-        maxWidth: 720,
+        maxWidth: 780,
         margin: '0 auto',
       }}>
         {FOUR_TAKKEN.map(tak => {
@@ -168,20 +168,24 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                 className="portaal-tak-btn"
                 style={{
                   width: '100%',
-                  borderRadius: 12,
-                  border: isActive ? `2px solid ${customColor}` : '1px solid #CCCCCC',
+                  minHeight: 56,
+                  borderRadius: 14,
+                  border: isActive ? `2.5px solid ${customColor}` : '1.5px solid #CCCCCC',
                   background: isActive ? customColor : '#FFFFFF',
                   color: isActive ? (tak === 'kapoenen' ? '#3A2A00' : '#FFFFFF') : '#1A1A1A',
                   fontWeight: 900,
-                  fontSize: '0.96rem',
+                  fontSize: '1.02rem',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
-                  boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.14)' : '0 1px 3px rgba(0,0,0,0.03)',
+                  boxShadow: isActive ? '0 6px 16px rgba(0,0,0,0.14)' : '0 2px 6px rgba(0,0,0,0.04)',
                   textAlign: 'center',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  padding: '11px 12px',
+                  padding: '16px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
                 {TAK_NAMEN[tak] ?? tak}
@@ -193,17 +197,17 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                   className="portaal-tak-badge"
                   style={{
                     position: 'absolute',
-                    top: -5,
-                    right: -5,
+                    top: -6,
+                    right: -6,
                     background: customColor,
                     color: tak === 'kapoenen' ? '#3A2A00' : '#FFFFFF',
                     borderRadius: '50%',
-                    width: 20,
-                    height: 20,
+                    width: 22,
+                    height: 22,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '0.74rem',
+                    fontSize: '0.78rem',
                     fontWeight: 900,
                     boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
                     border: '2px solid #FFFFFF',
