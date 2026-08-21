@@ -7926,6 +7926,7 @@ html, body {
   justify-content: center;
   gap: 14px;
   width: 100%;
+  margin-bottom: 44px;
 }
 
 .portaal-tak-btn {
@@ -8026,6 +8027,7 @@ html, body {
 @media (max-width: 600px) {
   .portaal-echo-takken-row {
     gap: 6px !important;
+    margin-bottom: 32px !important;
   }
 
   .portaal-tak-btn {

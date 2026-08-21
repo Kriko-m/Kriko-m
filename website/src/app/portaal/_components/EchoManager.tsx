@@ -150,10 +150,9 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
         display: 'flex',
         justifyContent: 'center',
         gap: 14,
-        marginBottom: flash ? 24 : 42,
         width: '100%',
         maxWidth: 780,
-        margin: '0 auto',
+        margin: `0 auto ${flash ? 24 : 44}px auto`,
       }}>
         {FOUR_TAKKEN.map(tak => {
           const isActive = activeTak === tak
