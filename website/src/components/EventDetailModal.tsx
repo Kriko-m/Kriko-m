@@ -116,51 +116,17 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit, isPortal }:
           )}
 
           <div className="cal-modal-content-inner">
-            {/* Header: Linksboven (Titel + Tags inline) en Rechtsboven (Klok/Dagen + Bewerken + Sluiten) */}
-            <div className="cal-modal-title-wrap" style={{ paddingRight: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-                {/* Linksboven: Titel + Tags inline */}
-                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 10, flex: 1, minWidth: 0 }}>
-                  <h3 style={{ margin: 0, color: titleColor, fontSize: '1.75rem', fontWeight: 900, lineHeight: 1.2, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
-                    {event.title}
-                  </h3>
-                  {event.audience && event.audience.length > 0 && (
-                    <div style={{ display: 'inline-flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                      {event.audience.map((tag) => {
-                        const isYellow = tag === 'kapoenen'
-                        const tagBg = isYellow ? '#FEF3D6' : `${(isPortal ? PORTAAL_AUDIENCE_KLEUREN[tag] : AUDIENCE_KLEUREN[tag]) || '#1A3D2A'}1E`
-                        const tagColor = isYellow ? '#8C6700' : ((isPortal ? PORTAAL_AUDIENCE_KLEUREN[tag] : AUDIENCE_KLEUREN[tag]) || '#1A3D2A')
-                        return (
-                          <span
-                            key={tag}
-                            style={{
-                              padding: '3px 10px',
-                              borderRadius: 20,
-                              fontSize: '11px',
-                              fontWeight: 800,
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.4px',
-                              background: isPortal ? tagBg : `${AUDIENCE_KLEUREN[tag] || '#1A3D2A'}18`,
-                              color: isPortal ? tagColor : (AUDIENCE_KLEUREN[tag] || '#1A3D2A'),
-                              border: isPortal ? 'none' : `1px solid ${AUDIENCE_KLEUREN[tag] || '#1A3D2A'}40`,
-                              lineHeight: 1.3,
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {AUDIENCE_NAMEN[tag] || tag}
-                          </span>
-                        )
-                      })}
-                    </div>
-                  )}
+            {/* Header: Top Action Bar (Countdown + Edit + Close) + Title & Audience Tags below */}
+            <div className="cal-modal-title-wrap" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Top Row: Countdown Pill on left, Edit & Close Buttons on right */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, width: '100%' }}>
+                <div>
+                  <span style={{ fontSize: '.78rem', fontWeight: 700, padding: '5px 12px', borderRadius: 99, background: countdownBg, color: countdownColor, border: countdownBorder, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <i className="fa-regular fa-clock" style={{ fontSize: '.74rem' }}></i> {countdown}
+                  </span>
                 </div>
 
-                {/* Rechtsboven: (klokicoon x dagen) (bewerken) (x) */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  <span style={{ fontSize: '.8rem', fontWeight: 700, padding: '5px 12px', borderRadius: 99, background: countdownBg, color: countdownColor, border: countdownBorder, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                    <i className="fa-regular fa-clock" style={{ fontSize: '.76rem' }}></i> {countdown}
-                  </span>
-
                   {onEdit && (
                     <button
                       type="button"
@@ -213,6 +179,42 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit, isPortal }:
                     ✕
                   </button>
                 </div>
+              </div>
+
+              {/* Title & Audience Tags */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <h3 style={{ margin: 0, color: titleColor, fontSize: 'clamp(1.35rem, 4.5vw, 1.8rem)', fontWeight: 900, lineHeight: 1.2, fontFamily: 'var(--font-heading, Nunito, sans-serif)', wordBreak: 'break-word' }}>
+                  {event.title}
+                </h3>
+                {event.audience && event.audience.length > 0 && (
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+                    {event.audience.map((tag) => {
+                      const isYellow = tag === 'kapoenen'
+                      const tagBg = isYellow ? '#FEF3D6' : `${(isPortal ? PORTAAL_AUDIENCE_KLEUREN[tag] : AUDIENCE_KLEUREN[tag]) || '#1A3D2A'}1E`
+                      const tagColor = isYellow ? '#8C6700' : ((isPortal ? PORTAAL_AUDIENCE_KLEUREN[tag] : AUDIENCE_KLEUREN[tag]) || '#1A3D2A')
+                      return (
+                        <span
+                          key={tag}
+                          style={{
+                            padding: '3px 10px',
+                            borderRadius: 20,
+                            fontSize: '11px',
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.4px',
+                            background: isPortal ? tagBg : `${AUDIENCE_KLEUREN[tag] || '#1A3D2A'}18`,
+                            color: isPortal ? tagColor : (AUDIENCE_KLEUREN[tag] || '#1A3D2A'),
+                            border: isPortal ? 'none' : `1px solid ${AUDIENCE_KLEUREN[tag] || '#1A3D2A'}40`,
+                            lineHeight: 1.3,
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {AUDIENCE_NAMEN[tag] || tag}
+                        </span>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 

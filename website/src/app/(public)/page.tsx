@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import { getPublicCalendarEvents, getSettings, getSiteContent } from '@/lib/db'
 import HeroCTA from '@/components/HeroCTA'
 import UpcomingEvent from '@/components/EventDetailModal'

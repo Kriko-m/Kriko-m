@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useTransition } from 'react'
+import { useEffect, useState, useTransition, useCallback } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import PortaalSidebar from './_components/PortaalSidebar'
@@ -18,6 +18,10 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+
+  const handleCloseMobile = useCallback(() => {
+    setMobileSidebarOpen(false)
+  }, [])
 
   const showNav = pathname !== '/portaal' && pathname !== '/portaal/'
   const isHomePage = pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/'
@@ -104,7 +108,7 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
             naam={naam}
             role={role}
             mobileOpen={mobileSidebarOpen}
-            onCloseMobile={() => setMobileSidebarOpen(false)}
+            onCloseMobile={handleCloseMobile}
           />
 
           {/* Floating Hamburger Toggle Button for Mobile Screens */}
@@ -113,10 +117,10 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
             className="portaal-mobile-floating-toggle"
             style={{
               position: 'fixed',
-              top: 14,
+              top: 13,
               left: 14,
-              width: 42,
-              height: 42,
+              width: 38,
+              height: 38,
               borderRadius: 10,
               background: '#162544',
               color: '#FFFFFF',
@@ -124,9 +128,9 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
               display: 'none',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1.2rem',
+              fontSize: '1.1rem',
               cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.2)',
+              boxShadow: '0 3px 10px rgba(0,0,0,0.2)',
               zIndex: 135,
             }}
             title="Open menu"
@@ -140,7 +144,7 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
               backgroundColor: isHomePage ? '#162544' : '#D9D9D9',
               position: 'relative',
               minHeight: '100vh',
-              overflow: 'hidden',
+              overflowX: 'hidden',
             }}
           >
             {isHomePage && (
@@ -180,37 +184,43 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
                   top: 0,
                   left: 260,
                   right: 0,
-                  height: 60,
+                  height: 64,
                   background: '#FFFFFF',
                   borderBottom: '1px solid #CCCCCC',
-                  padding: '0 32px',
+                  padding: '0 28px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
                   zIndex: 100,
                   transition: 'left 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  gap: 12,
                 }}
               >
                 <h1 style={{
                   margin: 0,
-                  fontSize: '1.35rem',
+                  fontSize: 'clamp(1.02rem, 3.2vw, 1.35rem)',
                   fontWeight: 900,
                   color: '#162544',
                   fontFamily: 'var(--font-heading, Nunito, sans-serif)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
+                  minWidth: 0,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}>
                   {pathname === '/portaal/website-beheer' && searchParams.get('tab') === 'instellingen' ? (
                     <>
                       <Link
                         href="/portaal/website-beheer"
+                        className="portaal-breadcrumb-parent"
                         style={{ color: '#243B6B', textDecoration: 'none', fontWeight: 800 }}
                       >
                         Website Beheer
                       </Link>
-                      <span style={{ color: '#94A3B8', fontWeight: 400 }}>/</span>
+                      <span className="portaal-breadcrumb-sep" style={{ color: '#94A3B8', fontWeight: 400 }}>/</span>
                       <span>Portaal Instellingen</span>
                     </>
                   ) : (
@@ -227,12 +237,12 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
               style={{
                 width: '100%',
                 backgroundColor: isHomePage ? 'transparent' : '#D9D9D9',
-                minHeight: isHomePage ? '100vh' : 'calc(100vh - 60px)',
+                minHeight: isHomePage ? '100vh' : 'calc(100vh - 64px)',
                 display: isHomePage ? 'flex' : 'block',
                 flexDirection: isHomePage ? 'column' : undefined,
                 justifyContent: isHomePage ? 'center' : undefined,
                 alignItems: isHomePage ? 'center' : undefined,
-                paddingTop: isHomePage ? 0 : 60,
+                paddingTop: isHomePage ? 0 : 64,
                 boxSizing: 'border-box',
                 position: 'relative',
                 zIndex: 2,

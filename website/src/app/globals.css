@@ -3807,7 +3807,7 @@ body.portal-theme .tak-hero.primair {
 /* â”€â”€ Bosgroen portaalthema â€” gedeeld door login Â· admin Â· ouderportaal Â· leiding
    Alleen actief als body.portal-theme aanwezig is; hoofdsite blijft bordeaux. */
 body.portal-theme {
-    padding-top: 76px; /* portaal-nav hoogte */
+    padding-top: 0;
     --color-primary: #1A3D2A;
     --color-primary-light: #2A5C3F;
     --color-primary-dark: #1A3D2A;
@@ -7307,7 +7307,7 @@ html, body {
     }
 
     body.portal-theme {
-        padding-top: 60px !important;
+        padding-top: 0 !important;
     }
 
     .portaal-page-container {
@@ -7878,8 +7878,9 @@ html, body {
 
   .portaal-topbar-header {
     left: 0 !important;
-    padding-left: 68px !important;
-    padding-right: 16px !important;
+    height: 64px !important;
+    padding-left: 62px !important;
+    padding-right: 14px !important;
   }
 
   .portaal-loading-overlay {
@@ -7901,3 +7902,141 @@ html, body {
 .portaal-login-role-option:hover {
   background: rgba(36, 59, 107, 0.06) !important;
 }
+
+/* ─── Leidingsportaal Responsive Grids & Components ────────────────────── */
+.portaal-echo-grid {
+  display: grid;
+  grid-template-columns: minmax(380px, 1.5fr) minmax(280px, 0.85fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.portaal-echo-upload-card {
+  padding: 32px 32px;
+}
+
+.portaal-echo-takken-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.portaal-tak-btn {
+  padding: 11px 16px;
+}
+
+.portaal-shop-beheer-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.portaal-product-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 140px 110px;
+  gap: 12px;
+}
+
+.portaal-account-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.cal-filter-tags-scroll-row {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.cal-filter-tags-scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .portaal-echo-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  
+  .portaal-echo-upload-card {
+    padding: 22px 18px !important;
+  }
+
+  .portaal-shop-beheer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 650px) {
+  .portaal-breadcrumb-parent,
+  .portaal-breadcrumb-sep {
+    display: none !important;
+  }
+
+  .portaal-back-full-text {
+    display: none !important;
+  }
+
+  .portaal-back-short-text {
+    display: inline !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .portaal-echo-takken-row {
+    gap: 6px !important;
+  }
+
+  .portaal-tak-btn {
+    padding: 8px 4px !important;
+    font-size: 0.78rem !important;
+    border-radius: 10px !important;
+  }
+
+  .portaal-tak-badge {
+    width: 17px !important;
+    height: 17px !important;
+    font-size: 0.68rem !important;
+    top: -4px !important;
+    right: -4px !important;
+  }
+
+  .portaal-product-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .portaal-account-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .portaal-modal-card {
+    width: 94% !important;
+    max-width: 94% !important;
+    border-radius: 16px !important;
+  }
+
+  .portaal-modal-header {
+    padding: 14px 16px !important;
+  }
+
+  .portaal-modal-body {
+    padding: 16px 14px !important;
+  }
+
+  .portaal-modal-footer {
+    padding: 12px 14px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .portaal-echo-takken-row {
+    gap: 4px !important;
+  }
+
+  .portaal-tak-btn {
+    padding: 7px 2px !important;
+    font-size: 0.7rem !important;
+  }
+}
+

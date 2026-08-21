@@ -44,16 +44,16 @@ export default function ConfirmDialog({
         onClick={e => e.stopPropagation()}
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-          <div style={{ width: 38, height: 38, borderRadius: '50%', background: danger ? '#FEE9EC' : '#EEF5F1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <i className={`fa-solid ${danger ? 'fa-triangle-exclamation' : 'fa-circle-info'}`} style={{ color: danger ? '#B23A4D' : '#1A3D2A', fontSize: '1rem' }} />
+          <div style={{ width: 38, height: 38, borderRadius: '50%', background: danger ? '#FEE9EC' : '#EBF0F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <i className={`fa-solid ${danger ? 'fa-triangle-exclamation' : 'fa-circle-info'}`} style={{ color: danger ? '#B23A4D' : '#243B6B', fontSize: '1rem' }} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingTop: 4 }}>
             {title && (
-              <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#1a1a1a' }}>
+              <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#162544' }}>
                 {title}
               </h4>
             )}
-            <p style={{ margin: 0, fontSize: '.95rem', color: '#4a4a4a', lineHeight: 1.5, fontWeight: 500 }}>
+            <p style={{ margin: 0, fontSize: '.95rem', color: '#64748B', lineHeight: 1.5, fontWeight: 500 }}>
               {message}
             </p>
           </div>
@@ -63,7 +63,7 @@ export default function ConfirmDialog({
             <button
               type="button"
               onClick={onCancel}
-              style={{ padding: '8px 20px', background: '#f5f5f5', border: 'none', borderRadius: 9, fontFamily: 'inherit', fontWeight: 600, fontSize: '.88rem', color: '#555', cursor: 'pointer' }}
+              style={{ padding: '8px 20px', background: '#f5f5f5', border: 'none', borderRadius: 9, fontFamily: 'inherit', fontWeight: 600, fontSize: '.88rem', color: '#64748B', cursor: 'pointer' }}
             >
               {cancelLabel}
             </button>
@@ -71,7 +71,7 @@ export default function ConfirmDialog({
           <button
             type="button"
             onClick={onConfirm}
-            style={{ padding: '8px 20px', background: danger ? '#B23A4D' : '#1A3D2A', color: '#fff', border: 'none', borderRadius: 9, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}
+            style={{ padding: '8px 20px', background: danger ? '#B23A4D' : '#243B6B', color: '#fff', border: 'none', borderRadius: 9, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}
           >
             {confirmLabel}
           </button>

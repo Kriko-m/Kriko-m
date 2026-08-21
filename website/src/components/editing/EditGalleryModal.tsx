@@ -16,7 +16,6 @@ export default function EditGalleryModal({
 }: EditGalleryModalProps) {
   const [photos, setPhotos] = useState<string[]>(initialPhotos)
   const [uploading, setUploading] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 

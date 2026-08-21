@@ -71,7 +71,6 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   const [modalFlash, setModalFlash] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // Modal display state
-  const [showPortalModal, setShowPortalModal] = useState(false)
   const [showShopModal, setShowShopModal] = useState(false)
   const [activeShopTab, setActiveShopTab] = useState<'bestellingen' | 'beheer'>('bestellingen')
 
@@ -683,18 +682,18 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
         {activeTabToUse === 'bestellingen' && (
           <div>
             {loadingOrders ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#6A8A75' }}>Bestellingen laden…</div>
+              <div style={{ padding: 40, textAlign: 'center', color: '#64748B' }}>Bestellingen laden…</div>
             ) : orders.length === 0 ? (
-              <div style={{ backgroundColor: '#F8FAF8', border: '1.5px dashed #CBD5E1', borderRadius: 14, padding: 36, textAlign: 'center', color: '#6A8A75' }}>
-                <strong style={{ display: 'block', fontSize: '1rem', color: '#1A3D2A', marginBottom: 4 }}>Er zijn nog geen bestellingen geplaatst.</strong>
+              <div style={{ backgroundColor: '#F8FAFC', border: '1.5px dashed #CBD5E1', borderRadius: 14, padding: 36, textAlign: 'center', color: '#64748B' }}>
+                <strong style={{ display: 'block', fontSize: '1rem', color: '#162544', marginBottom: 4 }}>Er zijn nog geen bestellingen geplaatst.</strong>
                 <span style={{ fontSize: '0.86rem' }}>Wanneer een koper een bestelling plaatst via de webshop, verschijnt deze hier direct in de lijst.</span>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 
                 {/* Top Action Bar with Export to Excel */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8FAF8', padding: '12px 18px', borderRadius: 12, border: '1.5px solid #E2E8F0' }}>
-                  <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#1A3D2A' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8FAFC', padding: '12px 18px', borderRadius: 12, border: '1.5px solid #E2E8F0' }}>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#162544' }}>
                     Totaal {orders.length} bestelling{orders.length === 1 ? '' : 'en'}
                   </span>
                   <button
@@ -703,7 +702,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                     style={{
                       padding: '11px 22px',
                       borderRadius: 10,
-                      backgroundColor: '#800020',
+                      backgroundColor: '#243B6B',
                       color: '#fff',
                       border: 'none',
                       fontWeight: 900,
@@ -712,7 +711,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 10,
-                      boxShadow: '0 4px 14px rgba(128, 0, 32, 0.28)',
+                      boxShadow: '0 4px 14px rgba(36, 59, 107, 0.28)',
                       transition: 'all 0.2s ease',
                     }}
                     className="action-card-hover"
@@ -732,9 +731,9 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                   <div key={ord.id} style={{ backgroundColor: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 16, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
                     
                     {/* Order Header Row */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid #F0F4F1', paddingBottom: 12, marginBottom: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid #E2E8F0', paddingBottom: 12, marginBottom: 14 }}>
                       <div>
-                        <strong style={{ fontSize: '1.15rem', color: '#1A3D2A', marginRight: 12 }}>
+                        <strong style={{ fontSize: '1.15rem', color: '#162544', marginRight: 12 }}>
                           Bestelling {ord.order_ref || `KM-${ord.id.slice(0, 6)}`}
                         </strong>
                         <span style={{ fontSize: '0.84rem', color: '#64748B', fontWeight: 600 }}>
@@ -745,9 +744,9 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
 
                     {/* Customer Info Box with Clickable Copy Button */}
                     <div style={{ marginBottom: 16 }}>
-                      <div style={{ backgroundColor: '#F8FAF8', padding: '12px 16px', borderRadius: 10, border: '1px solid #E2E8F0' }}>
-                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#6A8A75', textTransform: 'uppercase', marginBottom: 4 }}>Koper</div>
-                        <div style={{ fontWeight: 800, color: '#1A3D2A', fontSize: '0.95rem' }}>{ord.customer_name}</div>
+                      <div style={{ backgroundColor: '#F8FAFC', padding: '12px 16px', borderRadius: 10, border: '1px solid #E2E8F0' }}>
+                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: 4 }}>Koper</div>
+                        <div style={{ fontWeight: 800, color: '#162544', fontSize: '0.95rem' }}>{ord.customer_name}</div>
                         <div style={{ marginTop: 6 }}>
                           <CopyButton text={ord.email} variant="inline">
                             {ord.email}
@@ -758,15 +757,15 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
 
                     {/* Ordered Items Table */}
                     <div style={{ marginBottom: 14 }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 6 }}>Bestelde artikelen</div>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 6 }}>Bestelde artikelen</div>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
                         <tbody>
                           {Array.isArray(ord.items) && ord.items.map((item: OrderItem, idx: number) => (
-                            <tr key={idx} style={{ borderBottom: '1px solid #F0F4F1' }}>
-                              <td style={{ padding: '6px 0', color: '#1A3D2A', fontWeight: 700 }}>
+                            <tr key={idx} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                              <td style={{ padding: '6px 0', color: '#162544', fontWeight: 700 }}>
                                 {item.quantity}× {item.name} <span style={{ color: '#64748B', fontWeight: 600 }}>(Maat: {item.size})</span>
                               </td>
-                              <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 800, color: '#1A3D2A' }}>
+                              <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 800, color: '#162544' }}>
                                 €{(item.price * item.quantity).toFixed(2).replace('.', ',')}
                               </td>
                             </tr>
@@ -776,8 +775,8 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                     </div>
 
                     {/* Total & Footer Actions */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: '1.5px solid #F0F4F1' }}>
-                      <div style={{ fontSize: '1rem', fontWeight: 900, color: '#1A3D2A' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: '1.5px solid #E2E8F0' }}>
+                      <div style={{ fontSize: '1rem', fontWeight: 900, color: '#162544' }}>
                         Totaalbedrag: <span style={{ color: '#800020' }}>€{(ord.total || 0).toFixed(2).replace('.', ',')}</span>
                       </div>
 
@@ -803,11 +802,11 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             
             {/* Webshop Notificatie E-mailadres Instelling */}
-            <div style={{ backgroundColor: '#F8FAF8', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '14px 18px' }}>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+            <div style={{ backgroundColor: '#F8FAFC', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '14px 18px' }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                 E-mailadres voor Bestelnotificaties
               </label>
-              <p style={{ margin: '0 0 10px', fontSize: '0.82rem', color: '#6A8A75' }}>
+              <p style={{ margin: '0 0 10px', fontSize: '0.82rem', color: '#64748B' }}>
                 Aan wie moeten de meldingen van nieuwe webshopbestellingen gestuurd worden?
               </p>
               <div style={{ display: 'flex', gap: 10 }}>
@@ -816,13 +815,13 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                   value={webshopEmail}
                   onChange={e => setWebshopEmail(e.target.value)}
                   placeholder="bestellingen@kriko-m.be"
-                  style={{ flex: 1, padding: '8px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
+                  style={{ flex: 1, padding: '8px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
                 />
                 <button
                   type="button"
                   onClick={handleSavePortalSettings}
                   disabled={saving}
-                  style={{ padding: '8px 18px', borderRadius: 8, backgroundColor: '#1A3D2A', color: '#fff', fontWeight: 800, fontSize: '0.86rem', border: 'none', cursor: 'pointer' }}
+                  style={{ padding: '8px 18px', borderRadius: 8, backgroundColor: '#243B6B', color: '#fff', fontWeight: 800, fontSize: '0.86rem', border: 'none', cursor: 'pointer' }}
                 >
                   {saving ? 'Opslaan…' : 'E-mail Opslaan'}
                 </button>
@@ -830,12 +829,12 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
             </div>
 
             {loadingShopProducts ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#6A8A75' }}>Producten laden…</div>
+              <div style={{ padding: 40, textAlign: 'center', color: '#64748B' }}>Producten laden…</div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 20, alignItems: 'start' }}>
+              <div className="portaal-shop-beheer-grid">
                 
                 {/* Left sidebar product list */}
-                <div style={{ backgroundColor: '#F8FAF8', borderRadius: 14, border: '1.5px solid #E2E8F0', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ backgroundColor: '#F8FAFC', borderRadius: 14, border: '1.5px solid #E2E8F0', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   
                   <button
                     type="button"
@@ -846,18 +845,18 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                       borderRadius: 8,
                       fontSize: '0.86rem',
                       fontWeight: 800,
-                      backgroundColor: '#C9963A',
-                      color: '#1A3D2A',
+                      backgroundColor: '#243B6B',
+                      color: '#FFFFFF',
                       border: 'none',
                       cursor: 'pointer',
                       marginBottom: 8,
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                      boxShadow: '0 2px 6px rgba(36,59,107,0.2)',
                     }}
                   >
                     + Nieuw Artikel Toevoegen
                   </button>
 
-                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', padding: '4px 8px' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', padding: '4px 8px' }}>
                     Kledij
                   </span>
                   {shopProducts.filter(p => p.category !== 'kentekens').map(p => (
@@ -871,8 +870,8 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                         borderRadius: 8,
                         fontSize: '0.86rem',
                         fontWeight: selectedProductId === p.id ? 800 : 600,
-                        backgroundColor: selectedProductId === p.id ? '#1A3D2A' : '#fff',
-                        color: selectedProductId === p.id ? '#fff' : '#1A3D2A',
+                        backgroundColor: selectedProductId === p.id ? '#243B6B' : '#fff',
+                        color: selectedProductId === p.id ? '#fff' : '#162544',
                         border: '1px solid #CBD5E1',
                         cursor: 'pointer',
                       }}
@@ -881,7 +880,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                     </button>
                   ))}
 
-                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', padding: '12px 8px 4px' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', padding: '12px 8px 4px' }}>
                     Kentekens
                   </span>
                   {shopProducts.filter(p => p.category === 'kentekens').map(p => (
@@ -895,8 +894,8 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                         borderRadius: 8,
                         fontSize: '0.82rem',
                         fontWeight: selectedProductId === p.id ? 800 : 600,
-                        backgroundColor: selectedProductId === p.id ? '#1A3D2A' : '#fff',
-                        color: selectedProductId === p.id ? '#fff' : '#1A3D2A',
+                        backgroundColor: selectedProductId === p.id ? '#243B6B' : '#fff',
+                        color: selectedProductId === p.id ? '#fff' : '#162544',
                         border: '1px solid #CBD5E1',
                         cursor: 'pointer',
                       }}
@@ -909,13 +908,13 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                 {/* Right side product editor */}
                 {(() => {
                   const product = shopProducts.find(p => p.id === selectedProductId)
-                  if (!product) return <div style={{ color: '#666' }}>Selecteer een artikel uit de lijst.</div>
+                  if (!product) return <div style={{ color: '#64748B' }}>Selecteer een artikel uit de lijst.</div>
 
                   return (
                     <div style={{ backgroundColor: '#fff', borderRadius: 14, border: '1.5px solid #E2E8F0', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
                       
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid #E8F0EB', paddingBottom: 12 }}>
-                        <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#1A3D2A' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid #E2E8F0', paddingBottom: 12 }}>
+                        <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#162544' }}>
                           {product.name}
                         </h4>
                         <button
@@ -929,7 +928,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
 
                       {/* Foto Preview & Upload */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 8 }}>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 8 }}>
                           Artikel Foto
                         </label>
                         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
@@ -959,7 +958,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                             <label style={{
                               padding: '8px 14px',
                               borderRadius: 8,
-                              backgroundColor: '#1A3D2A',
+                              backgroundColor: '#243B6B',
                               color: '#fff',
                               fontWeight: 800,
                               fontSize: '0.84rem',
@@ -1001,33 +1000,33 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                       </div>
 
                       {/* Naam, Categorie & Prijs */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 110px', gap: 12 }}>
+                      <div className="portaal-product-form-grid">
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                             Naam Artikel
                           </label>
                           <input
                             type="text"
                             value={product.name}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, name: e.target.value } : p))}
-                            style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
                           />
                         </div>
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                             Sectie / Categorie
                           </label>
                           <select
                             value={product.category || 'kledij'}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, category: e.target.value } : p))}
-                            style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#1A3D2A' }}
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
                           >
                             <option value="kledij">Kledij</option>
                             <option value="kentekens">Kentekens</option>
                           </select>
                         </div>
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                             Prijs (€)
                           </label>
                           <input
@@ -1035,27 +1034,27 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                             step="1"
                             value={product.price}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: parseFloat(e.target.value) || 0 } : p))}
-                            style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
                           />
                         </div>
                       </div>
 
                       {/* Beschrijving */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                           Omschrijving
                         </label>
                         <textarea
                           rows={3}
                           value={product.description || ''}
                           onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, description: e.target.value } : p))}
-                          style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', fontFamily: 'inherit', color: '#1A3D2A' }}
+                          style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.88rem', fontFamily: 'inherit', color: '#162544' }}
                         />
                       </div>
 
                       {/* Maten */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                           Beschikbare Maten (Gescheiden door komma)
                         </label>
                         <input
@@ -1066,7 +1065,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                             setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, sizes: val } : p))
                           }}
                           placeholder="Bijv. S, M, L, XL of 6j, 8j, 10j"
-                          style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#1A3D2A' }}
+                          style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
                         />
                       </div>
 
@@ -1075,7 +1074,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                         type="button"
                         onClick={() => handleProductSave(product)}
                         disabled={savingProduct}
-                        style={{ padding: '12px 20px', borderRadius: 10, backgroundColor: '#1A3D2A', color: '#fff', fontWeight: 900, fontSize: '0.92rem', border: 'none', cursor: 'pointer', marginTop: 8 }}
+                        style={{ padding: '12px 20px', borderRadius: 10, backgroundColor: '#243B6B', color: '#fff', fontWeight: 900, fontSize: '0.92rem', border: 'none', cursor: 'pointer', marginTop: 8 }}
                       >
                         {savingProduct ? 'Opslaan…' : `Artikel "${product.name}" Opslaan`}
                       </button>
@@ -1131,13 +1130,13 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
 
       {role === 'webshop' ? (
         /* DEDICATED INLINE WEBSHOP VIEW */
-        <div style={{ backgroundColor: '#ffffff', borderRadius: 24, border: '1px solid #CCCCCC', padding: '28px 32px', color: '#162544', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)', width: '100%' }}>
+        <div style={{ backgroundColor: '#ffffff', borderRadius: 24, border: '1px solid #CBD5E1', padding: '28px 32px', color: '#162544', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)', width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #E2E8F0', paddingBottom: 16, marginBottom: 24 }}>
             <div>
-              <h2 style={{ margin: '0 0 4px', fontSize: '1.6rem', fontWeight: 900, color: '#1A3D2A' }}>
+              <h2 style={{ margin: '0 0 4px', fontSize: '1.6rem', fontWeight: 900, color: '#162544' }}>
                 {currentShopTab === 'bestellingen' ? '📦 Alle Bestellingen' : '👕 Artikelen & Assortiment'}
               </h2>
-              <p style={{ margin: 0, fontSize: '0.88rem', color: '#6A8A75' }}>
+              <p style={{ margin: 0, fontSize: '0.88rem', color: '#64748B' }}>
                 {currentShopTab === 'bestellingen'
                   ? 'Overzicht van alle ingekomen bestellingen in de webshop. Exporteer eenvoudig naar Excel.'
                   : 'Beheer artikelen, prijzen, maten en foto\'s van de webshop en uniformen.'}
@@ -1150,7 +1149,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                 style={{
                   padding: '11px 22px',
                   borderRadius: 10,
-                  backgroundColor: '#800020',
+                  backgroundColor: '#243B6B',
                   color: '#fff',
                   border: 'none',
                   fontWeight: 900,
@@ -1159,7 +1158,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 10,
-                  boxShadow: '0 4px 14px rgba(128, 0, 32, 0.28)',
+                  boxShadow: '0 4px 14px rgba(36, 59, 107, 0.28)',
                   transition: 'all 0.2s ease',
                 }}
                 className="action-card-hover"
@@ -1185,23 +1184,27 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
           {topbarContainer && createPortal(
             <Link
               href="/portaal/website-beheer"
+              className="portaal-topbar-back-link"
               style={{
-                padding: '7px 14px',
-                borderRadius: 9,
+                padding: '6px 12px',
+                borderRadius: 8,
                 backgroundColor: '#F1F5F9',
                 color: '#162544',
                 fontWeight: 800,
                 border: '1.5px solid #CBD5E1',
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 8,
+                gap: 6,
                 textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
             >
-              <i className="fa-solid fa-arrow-left" style={{ fontSize: '0.78rem' }}></i>
-              <span>Terug naar Beheer</span>
+              <i className="fa-solid fa-arrow-left" style={{ fontSize: '0.75rem' }}></i>
+              <span className="portaal-back-full-text">Terug naar Beheer</span>
+              <span className="portaal-back-short-text" style={{ display: 'none' }}>Terug</span>
             </Link>,
             topbarContainer
           )}
@@ -1593,7 +1596,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                         </button>
                       </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      <div className="portaal-account-form-grid">
                         <div>
                           <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                             Weergavenaam ({editingAccountRole === 'leiding' ? 'Leiding' : editingAccountRole === 'groepsleiding' ? 'Groepsleiding' : 'Webshop'})

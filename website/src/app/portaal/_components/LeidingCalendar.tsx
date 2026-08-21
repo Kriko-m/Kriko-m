@@ -542,8 +542,8 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
   }
   function FilterBar() {
     return (
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 16, minHeight: 34 }}>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="cal-filter-bar-wrap" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 16, minHeight: 34, flexWrap: 'wrap' }}>
+        <div className="cal-filter-tags-scroll-row" style={{ display: 'flex', gap: 5, alignItems: 'center', overflowX: 'auto', maxWidth: '100%', WebkitOverflowScrolling: 'touch', paddingBottom: 2 }}>
           {(['groep', 'leiding'] as const).map(tag => {
             const isActive = filter.has(tag)
             const tagColor = PORTAAL_AUDIENCE_KLEUREN[tag]
@@ -553,23 +553,25 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                 type="button"
                 onClick={() => toggleFilter(tag)}
                 style={{
-                  padding: '5px 12px',
+                  padding: '4px 10px',
                   borderRadius: 20,
-                  border: `2px solid ${tagColor}`,
+                  border: `1.5px solid ${tagColor}`,
                   cursor: 'pointer',
-                  fontSize: '.76rem',
+                  fontSize: '.74rem',
                   fontWeight: 800,
                   background: isActive ? tagColor : '#FFFFFF',
                   color: isActive ? '#FFFFFF' : tagColor,
-                  boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.2)' : '0 2px 6px rgba(0,0,0,0.08)',
+                  boxShadow: isActive ? '0 3px 8px rgba(0,0,0,0.18)' : '0 1px 4px rgba(0,0,0,0.06)',
                   transition: 'all 0.15s ease',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
                 {AUDIENCE_NAMEN[tag]}
               </button>
             )
           })}
-          <span style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.35)', alignSelf: 'center', margin: '0 4px', flexShrink: 0 }} />
+          <span style={{ width: 1, height: 16, background: 'rgba(22,37,68,0.25)', alignSelf: 'center', margin: '0 2px', flexShrink: 0 }} />
           {(['kapoenen', 'welpen', 'jonggivers', 'givers'] as const).map(tag => {
             const isActive = filter.has(tag)
             const tagColor = PORTAAL_AUDIENCE_KLEUREN[tag]
@@ -579,16 +581,18 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                 type="button"
                 onClick={() => toggleFilter(tag)}
                 style={{
-                  padding: '5px 12px',
+                  padding: '4px 9px',
                   borderRadius: 20,
-                  border: `2px solid ${tagColor}`,
+                  border: `1.5px solid ${tagColor}`,
                   cursor: 'pointer',
-                  fontSize: '.76rem',
+                  fontSize: '.74rem',
                   fontWeight: 800,
                   background: isActive ? tagColor : '#FFFFFF',
                   color: isActive ? (tag === 'kapoenen' ? '#3a2a00' : '#FFFFFF') : tagColor,
-                  boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.2)' : '0 2px 6px rgba(0,0,0,0.08)',
+                  boxShadow: isActive ? '0 3px 8px rgba(0,0,0,0.18)' : '0 1px 4px rgba(0,0,0,0.06)',
                   transition: 'all 0.15s ease',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
                 {AUDIENCE_NAMEN[tag]}
@@ -599,15 +603,16 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
             <button
               onClick={() => setFilter(new Set())}
               style={{
-                padding: '5px 12px',
+                padding: '4px 9px',
                 borderRadius: 20,
-                border: '1.5px solid rgba(255,255,255,0.4)',
+                border: '1.5px solid #CBD5E1',
                 cursor: 'pointer',
-                fontSize: '.75rem',
-                fontWeight: 700,
-                color: '#FFFFFF',
-                background: 'rgba(255,255,255,0.18)',
-                backdropFilter: 'blur(4px)',
+                fontSize: '.72rem',
+                fontWeight: 800,
+                color: '#64748B',
+                background: '#FFFFFF',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
               }}
             >
               ✕ Wis
@@ -617,9 +622,9 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
         <SubscribeCalendarButton
           feedPath={`/api/leiding/ics/${icsToken}`}
           calendarName="Scouts Kriko-M — Leiding"
-          buttonText="Abonneer (in agenda)"
+          buttonText="Abonneer"
           buttonClassName=""
-          buttonStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: '#243B6B', border: 'none', borderRadius: 10, color: '#FFFFFF', fontSize: '.82rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 6px rgba(107,23,36,0.2)', flexShrink: 0 }}
+          buttonStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#243B6B', border: 'none', borderRadius: 10, color: '#FFFFFF', fontSize: '.78rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 6px rgba(36,59,107,0.2)', flexShrink: 0, whiteSpace: 'nowrap' }}
         />
       </div>
     )

@@ -42,13 +42,6 @@ export default function EditableText({
   const [isHovered, setIsHovered] = useState(false)
   const textRef = useRef<HTMLElement | null>(null)
 
-  // Set initial text into DOM ref on mount
-  useEffect(() => {
-    if (textRef.current && textRef.current.innerText !== currentText) {
-      textRef.current.innerText = currentText
-    }
-  }, [])
-
   // Keep DOM innerText in sync if value changed externally while NOT focused
   useEffect(() => {
     if (textRef.current && !isFocused) {
@@ -67,7 +60,7 @@ export default function EditableText({
         </a>
       )
     }
-    const Tag = Component as any
+    const Tag = Component as React.ElementType
     return (
       <Tag className={className} style={style}>
         {currentText || children}
@@ -111,7 +104,7 @@ export default function EditableText({
     e.stopPropagation()
   }
 
-  const Tag = Component as any
+  const Tag = Component as React.ElementType
 
   return (
     <Tag

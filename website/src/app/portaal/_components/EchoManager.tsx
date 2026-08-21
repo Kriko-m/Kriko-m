@@ -57,7 +57,6 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
   }
 
   const takEchos = echos.filter(e => e.tak === activeTak && e.approved)
-  const unapprovedEchos = echos.filter(e => !e.approved)
 
   async function handleUploadEchoSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -146,13 +145,15 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
   return (
     <div style={{ maxWidth: 1320, margin: '0 auto', width: '100%', padding: '24px 20px 60px', boxSizing: 'border-box' }}>
 
-      {/* Tak Filters: CENTERED on page & SLIGHTLY LARGER */}
-      <div style={{
+      {/* Tak Filters: 4 takken side-by-side on 1 line */}
+      <div className="portaal-echo-takken-row" style={{
         display: 'flex',
         justifyContent: 'center',
-        gap: 14,
-        flexWrap: 'wrap',
-        marginBottom: flash ? 20 : 32,
+        gap: 12,
+        marginBottom: flash ? 16 : 28,
+        width: '100%',
+        maxWidth: 720,
+        margin: '0 auto',
       }}>
         {FOUR_TAKKEN.map(tak => {
           const isActive = activeTak === tak
@@ -160,21 +161,27 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
           const unapprovedCount = echos.filter(e => !e.approved && e.tak === tak).length
 
           return (
-            <div key={tak} style={{ position: 'relative' }}>
+            <div key={tak} style={{ position: 'relative', flex: 1, minWidth: 0 }}>
               <button
                 type="button"
                 onClick={() => setActiveTak(tak)}
+                className="portaal-tak-btn"
                 style={{
-                  padding: '12px 28px',
+                  width: '100%',
                   borderRadius: 12,
                   border: isActive ? `2px solid ${customColor}` : '1px solid #CCCCCC',
                   background: isActive ? customColor : '#FFFFFF',
                   color: isActive ? (tak === 'kapoenen' ? '#3A2A00' : '#FFFFFF') : '#1A1A1A',
                   fontWeight: 900,
-                  fontSize: '1rem',
+                  fontSize: '0.96rem',
                   cursor: 'pointer',
                   transition: 'all 0.15s ease',
                   boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.14)' : '0 1px 3px rgba(0,0,0,0.03)',
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  padding: '11px 12px',
                 }}
               >
                 {TAK_NAMEN[tak] ?? tak}
@@ -183,19 +190,20 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
               {isGroepsleiding && unapprovedCount > 0 && (
                 <span
                   title={`${unapprovedCount} nog goed te keuren`}
+                  className="portaal-tak-badge"
                   style={{
                     position: 'absolute',
-                    top: -6,
-                    right: -6,
+                    top: -5,
+                    right: -5,
                     background: customColor,
                     color: tak === 'kapoenen' ? '#3A2A00' : '#FFFFFF',
                     borderRadius: '50%',
-                    width: 22,
-                    height: 22,
+                    width: 20,
+                    height: 20,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '0.78rem',
+                    fontSize: '0.74rem',
                     fontWeight: 900,
                     boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
                     border: '2px solid #FFFFFF',
@@ -229,20 +237,14 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
       )}
 
       {/* 2-Column Layout: Balanced Uploadzone Left (1.5fr), Compact List Right (0.85fr) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'minmax(420px, 1.5fr) minmax(280px, 0.85fr)',
-        gap: 28,
-        alignItems: 'start',
-      }} className="portaal-echo-grid">
+      <div className="portaal-echo-grid">
         
         {/* LEFT COLUMN: Uploadzone */}
-        <div style={{
+        <div className="portaal-echo-upload-card" style={{
           background: '#FFFFFF',
           borderRadius: 18,
           border: '1px solid #CCCCCC',
           boxShadow: '0 4px 14px rgba(0,0,0,0.04)',
-          padding: '32px 32px',
           minHeight: 480,
           display: 'flex',
           flexDirection: 'column',
@@ -595,13 +597,13 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
               justifyContent: 'space-between',
               fontFamily: 'var(--font-heading, Nunito, sans-serif)',
             }}>
-              <span>Kriko Echo's</span>
+              <span>Kriko Echo&apos;s</span>
               <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#555555' }}>({takEchos.length})</span>
             </h3>
 
             {takEchos.length === 0 ? (
               <div style={{ padding: '14px 0', textAlign: 'center', color: '#666666', fontSize: '0.84rem', fontStyle: 'italic' }}>
-                Nog geen goedgekeurde Kriko Echo's.
+                Nog geen goedgekeurde Kriko Echo&apos;s.
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

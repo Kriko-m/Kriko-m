@@ -289,7 +289,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
       headerRow.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: '1A3D2A' },
+        fgColor: { argb: '162544' },
       }
       headerRow.alignment = { vertical: 'middle', horizontal: 'center' }
 
@@ -398,18 +398,18 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
         {activeTab === 'bestellingen' && (
           <div>
             {loadingOrders ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#6A8A75', fontWeight: 600 }}>Bestellingen laden…</div>
+              <div style={{ padding: 40, textAlign: 'center', color: '#64748B', fontWeight: 600 }}>Bestellingen laden…</div>
             ) : orders.length === 0 ? (
-              <div style={{ backgroundColor: '#F8FAF8', border: '1.5px dashed #CBD5E1', borderRadius: 14, padding: 36, textAlign: 'center', color: '#6A8A75' }}>
-                <strong style={{ display: 'block', fontSize: '1rem', color: '#1A3D2A', marginBottom: 4 }}>Er zijn nog geen bestellingen geplaatst.</strong>
+              <div style={{ backgroundColor: '#F8FAFC', border: '1.5px dashed #CBD5E1', borderRadius: 14, padding: 36, textAlign: 'center', color: '#64748B' }}>
+                <strong style={{ display: 'block', fontSize: '1rem', color: '#162544', marginBottom: 4 }}>Er zijn nog geen bestellingen geplaatst.</strong>
                 <span style={{ fontSize: '0.86rem' }}>Wanneer een koper een bestelling plaatst via de webshop, verschijnt deze hier direct in de lijst.</span>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 
                 {/* Top Count Bar */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8FAF8', padding: '12px 18px', borderRadius: 12, border: '1.5px solid #E2E8F0' }}>
-                  <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#1A3D2A' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F8FAFC', padding: '12px 18px', borderRadius: 12, border: '1.5px solid #E2E8F0' }}>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#162544' }}>
                     Totaal {orders.length} bestelling{orders.length === 1 ? '' : 'en'}
                   </span>
                 </div>
@@ -418,9 +418,9 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                   <div key={ord.id} style={{ backgroundColor: '#fff', border: '1.5px solid #E2E8F0', borderRadius: 16, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
                     
                     {/* Order Header Row */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid #F0F4F1', paddingBottom: 12, marginBottom: 14 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid #E2E8F0', paddingBottom: 12, marginBottom: 14 }}>
                       <div>
-                        <strong style={{ fontSize: '1.15rem', color: '#1A3D2A', marginRight: 12 }}>
+                        <strong style={{ fontSize: '1.15rem', color: '#162544', marginRight: 12 }}>
                           Bestelling {ord.order_ref || `KM-${ord.id.slice(0, 6)}`}
                         </strong>
                         <span style={{ fontSize: '0.84rem', color: '#64748B', fontWeight: 600 }}>
@@ -431,9 +431,9 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
 
                     {/* Customer Info Box */}
                     <div style={{ marginBottom: 16 }}>
-                      <div style={{ backgroundColor: '#F8FAF8', padding: '12px 16px', borderRadius: 10, border: '1px solid #E2E8F0' }}>
-                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#6A8A75', textTransform: 'uppercase', marginBottom: 4 }}>Koper</div>
-                        <div style={{ fontWeight: 800, color: '#1A3D2A', fontSize: '0.95rem' }}>{ord.customer_name}</div>
+                      <div style={{ backgroundColor: '#F8FAFC', padding: '12px 16px', borderRadius: 10, border: '1px solid #E2E8F0' }}>
+                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: 4 }}>Koper</div>
+                        <div style={{ fontWeight: 800, color: '#162544', fontSize: '0.95rem' }}>{ord.customer_name}</div>
                         <div style={{ marginTop: 6 }}>
                           <CopyButton text={ord.email} variant="inline">
                             {ord.email}
@@ -444,15 +444,15 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
 
                     {/* Ordered Items Table */}
                     <div style={{ marginBottom: 14 }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 6 }}>Bestelde artikelen</div>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 6 }}>Bestelde artikelen</div>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
                         <tbody>
                           {Array.isArray(ord.items) && ord.items.map((item: OrderItem, idx: number) => (
-                            <tr key={idx} style={{ borderBottom: '1px solid #F0F4F1' }}>
-                              <td style={{ padding: '6px 0', color: '#1A3D2A', fontWeight: 700 }}>
+                            <tr key={idx} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                              <td style={{ padding: '6px 0', color: '#162544', fontWeight: 700 }}>
                                 {item.quantity}× {item.name} <span style={{ color: '#64748B', fontWeight: 600 }}>(Maat: {item.size})</span>
                               </td>
-                              <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 800, color: '#1A3D2A' }}>
+                              <td style={{ padding: '6px 0', textAlign: 'right', fontWeight: 800, color: '#162544' }}>
                                 €{(item.price * item.quantity).toFixed(2).replace('.', ',')}
                               </td>
                             </tr>
@@ -462,8 +462,8 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                     </div>
 
                     {/* Total & Delete Button */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: '1.5px solid #F0F4F1' }}>
-                      <div style={{ fontSize: '1rem', fontWeight: 900, color: '#1A3D2A' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10, borderTop: '1.5px solid #E2E8F0' }}>
+                      <div style={{ fontSize: '1rem', fontWeight: 900, color: '#162544' }}>
                         Totaalbedrag: <span style={{ color: '#800020' }}>€{(ord.total || 0).toFixed(2).replace('.', ',')}</span>
                       </div>
 
@@ -486,13 +486,13 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
 
         {/* TAB 2: ARTIKELEN & ASSORTIMENT */}
         {activeTab === 'artikelen' && (
-          <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1px solid #CCCCCC', padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1px solid #CBD5E1', padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
             
-            <div style={{ marginBottom: 24, padding: '16px 20px', borderRadius: 12, backgroundColor: '#F8FAF8', border: '1px solid #CCCCCC' }}>
+            <div style={{ marginBottom: 24, padding: '16px 20px', borderRadius: 12, backgroundColor: '#F8FAFC', border: '1px solid #CBD5E1' }}>
               <strong style={{ display: 'block', fontSize: '0.92rem', color: '#162544', marginBottom: 4 }}>
                 E-mailadres voor Bestellingsmeldingen
               </strong>
-              <span style={{ display: 'block', fontSize: '0.82rem', color: '#555555', marginBottom: 12 }}>
+              <span style={{ display: 'block', fontSize: '0.82rem', color: '#64748B', marginBottom: 12 }}>
                 Ontvang automatisch een e-mailbevestiging wanneer een koper een bestelling plaatst.
               </span>
               <div style={{ display: 'flex', gap: 10, maxWidth: 480 }}>
@@ -501,7 +501,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                   value={webshopEmail}
                   onChange={e => setWebshopEmail(e.target.value)}
                   placeholder="bestellingen@kriko-m.be"
-                  style={{ flex: 1, padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
+                  style={{ flex: 1, padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
                 />
                 <button
                   type="button"
@@ -515,12 +515,12 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
             </div>
 
             {loadingShopProducts ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#555555', fontWeight: 600 }}>Producten laden…</div>
+              <div style={{ padding: 40, textAlign: 'center', color: '#64748B', fontWeight: 600 }}>Producten laden…</div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 20, alignItems: 'start' }}>
+              <div className="portaal-shop-beheer-grid">
                 
                 {/* Left sidebar product list */}
-                <div style={{ backgroundColor: '#F8FAF8', borderRadius: 14, border: '1px solid #CCCCCC', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ backgroundColor: '#F8FAFC', borderRadius: 14, border: '1px solid #CBD5E1', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <button
                     type="button"
                     onClick={handleProductAdd}
@@ -593,11 +593,11 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                 {/* Right side product editor */}
                 {(() => {
                   const product = shopProducts.find(p => p.id === selectedProductId)
-                  if (!product) return <div style={{ color: '#666' }}>Selecteer een artikel uit de lijst.</div>
+                  if (!product) return <div style={{ color: '#64748B' }}>Selecteer een artikel uit de lijst.</div>
 
                   return (
-                    <div style={{ backgroundColor: '#fff', borderRadius: 14, border: '1px solid #CCCCCC', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #CCCCCC', paddingBottom: 12 }}>
+                    <div style={{ backgroundColor: '#fff', borderRadius: 14, border: '1px solid #CBD5E1', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #E2E8F0', paddingBottom: 12 }}>
                         <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
                           {product.name}
                         </h4>
@@ -684,7 +684,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                       </div>
 
                       {/* Name, Category & Price */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 110px', gap: 12 }}>
+                      <div className="portaal-product-form-grid">
                         <div>
                           <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                             Naam Artikel
@@ -693,7 +693,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                             type="text"
                             value={product.name}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, name: e.target.value } : p))}
-                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
                           />
                         </div>
                         <div>
@@ -703,7 +703,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                           <select
                             value={product.category || 'kledij'}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, category: e.target.value } : p))}
-                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
                           >
                             <option value="kledij">Kledij</option>
                             <option value="kentekens">Kentekens</option>
@@ -718,7 +718,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                             step="1"
                             value={product.price}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: parseFloat(e.target.value) || 0 } : p))}
-                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
                           />
                         </div>
                       </div>
@@ -732,7 +732,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                           rows={3}
                           value={product.description || ''}
                           onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, description: e.target.value } : p))}
-                          style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.88rem', fontFamily: 'inherit', color: '#162544' }}
+                          style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.88rem', fontFamily: 'inherit', color: '#162544' }}
                         />
                       </div>
 
@@ -749,7 +749,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                             setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, sizes: val } : p))
                           }}
                           placeholder="Bijv. S, M, L, XL of 6j, 8j, 10j"
-                          style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
+                          style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
                         />
                       </div>
 

@@ -28,7 +28,9 @@ export function eventToEntry(ev: CalendarEvent): CalendarEntry {
   return { ...ev, source: 'event' }
 }
 
-export const AUDIENCE_PRIORITY: ('groep' | 'leiding' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers')[] = [
+export type AudienceTag = 'groep' | 'leiding' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
+
+export const AUDIENCE_PRIORITY: AudienceTag[] = [
   'groep',
   'leiding',
   'kapoenen',
@@ -37,11 +39,12 @@ export const AUDIENCE_PRIORITY: ('groep' | 'leiding' | 'kapoenen' | 'welpen' | '
   'givers',
 ]
 
-export function getPrimaryAudienceTag(audience?: string[]): 'groep' | 'leiding' | 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' {
+export function getPrimaryAudienceTag(audience?: string[]): AudienceTag {
   if (!audience || audience.length === 0) return 'leiding'
   for (const tag of AUDIENCE_PRIORITY) {
     if (audience.includes(tag)) return tag
   }
-  return (audience[0] as any) || 'leiding'
+  const first = audience[0] as AudienceTag
+  return AUDIENCE_PRIORITY.includes(first) ? first : 'leiding'
 }
 

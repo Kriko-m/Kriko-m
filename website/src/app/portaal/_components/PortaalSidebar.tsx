@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase-browser'
 
 interface Props {
@@ -47,8 +47,14 @@ export default function PortaalSidebar({ naam, role, mobileOpen = false, onClose
   const [modalError, setModalError] = useState('')
   const [modalSuccess, setModalSuccess] = useState('')
 
+  const onCloseMobileRef = useRef(onCloseMobile)
   useEffect(() => {
-    if (onCloseMobile) onCloseMobile()
+    onCloseMobileRef.current = onCloseMobile
+  })
+
+  // Only close mobile sidebar and profile dropdown when navigating to a new page
+  useEffect(() => {
+    onCloseMobileRef.current?.()
     setProfileDropdownOpen(false)
   }, [pathname])
 

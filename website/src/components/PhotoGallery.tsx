@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import { useEditMode } from './editing/EditContext'
 import EditGalleryModal from './editing/EditGalleryModal'
@@ -15,7 +15,7 @@ export default function PhotoGallery({ photos: initialPhotos }: { photos: string
 
   // Get dynamic photos from site_content if available
   const galleryJson = getContent?.('verhuur.gallery.photos', 'content', '')
-  const dynamicPhotos = (() => {
+  const dynamicPhotos = useMemo(() => {
     if (galleryJson) {
       try {
         const parsed = JSON.parse(galleryJson)
@@ -23,13 +23,13 @@ export default function PhotoGallery({ photos: initialPhotos }: { photos: string
       } catch {}
     }
     return initialPhotos
-  })()
+  }, [galleryJson, initialPhotos])
 
   const [activePhotos, setActivePhotos] = useState<string[]>(dynamicPhotos)
 
   useEffect(() => {
     setActivePhotos(dynamicPhotos)
-  }, [galleryJson, initialPhotos])
+  }, [dynamicPhotos])
 
   const handlePrev = useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation()
