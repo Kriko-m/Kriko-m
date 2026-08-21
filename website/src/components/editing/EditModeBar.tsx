@@ -53,40 +53,44 @@ export default function EditModeBar() {
       position: 'sticky',
       top: 0,
       zIndex: 99999,
-      backgroundColor: '#650B19',
-      color: '#fff',
-      padding: '10px 20px',
+      backgroundColor: '#162544',
+      color: '#ffffff',
+      padding: '10px 24px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       fontSize: '0.88rem',
       fontWeight: 700,
-      fontFamily: 'var(--font-body, Outfit, sans-serif)',
-      boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+      fontFamily: 'var(--font-heading, Nunito, sans-serif)',
+      boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
       flexWrap: 'wrap',
       gap: 12,
-      borderBottom: '2px solid #C9963A',
+      borderBottom: '2px solid #243B6B',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span style={{ backgroundColor: '#C9963A', color: '#1A3D2A', padding: '3px 10px', borderRadius: 6, fontSize: '0.76rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '.05em' }}>
+        <span style={{ backgroundColor: '#243B6B', color: '#FFFFFF', padding: '4px 12px', borderRadius: 8, fontSize: '0.76rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '.06em', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}>
           GROEPSLEIDING
         </span>
-        <span style={{ fontSize: '0.92rem' }}>
+        <span style={{ fontSize: '0.92rem', color: '#FFFFFF' }}>
           ✏️ <strong>Live Bewerkmodus Actief</strong> — Surfen op de site blijft bewerkbaar tot je afsluit.
         </span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <Link
           href="/portaal/website-beheer"
           style={{
-            color: 'rgba(255,255,255,0.9)',
+            color: '#FFFFFF',
             textDecoration: 'none',
-            fontSize: '0.84rem',
-            fontWeight: 700,
+            fontSize: '0.86rem',
+            fontWeight: 800,
             display: 'flex',
             alignItems: 'center',
-            gap: 4,
+            gap: 6,
+            padding: '6px 12px',
+            borderRadius: 8,
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            transition: 'all 0.15s ease',
           }}
         >
           &larr; Naar Portaal
@@ -96,16 +100,16 @@ export default function EditModeBar() {
           onClick={handleStopEditing}
           type="button"
           style={{
-            backgroundColor: '#C9963A',
-            color: '#1A3D2A',
-            border: 'none',
-            padding: '7px 16px',
-            borderRadius: 8,
+            backgroundColor: '#243B6B',
+            color: '#FFFFFF',
+            border: '1px solid rgba(255,255,255,0.2)',
+            padding: '8px 18px',
+            borderRadius: 10,
             fontWeight: 900,
             cursor: 'pointer',
             fontSize: '0.84rem',
             boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-            transition: 'transform 0.15s ease',
+            transition: 'all 0.15s ease',
           }}
         >
           ✕ Sluiten &amp; Bekijken als Bezoeker

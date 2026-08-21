@@ -336,9 +336,9 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
           display: 'flex',
           alignItems: 'center',
           gap: 12,
-          backgroundColor: flashMessage.type === 'success' ? '#EEF5F1' : '#FDF0F2',
-          color: flashMessage.type === 'success' ? '#1A3D2A' : '#B23A4D',
-          border: `1.5px solid ${flashMessage.type === 'success' ? '#C2D9C9' : '#E0C0C4'}`,
+          backgroundColor: flashMessage.type === 'success' ? '#EBF0F9' : '#FDF0F2',
+          color: flashMessage.type === 'success' ? '#162544' : '#B23A4D',
+          border: `1.5px solid ${flashMessage.type === 'success' ? '#CBD5E1' : '#E0C0C4'}`,
           boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
         }}>
           <span>{flashMessage.text}</span>
@@ -346,15 +346,15 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
       )}
 
       {/* Main Container */}
-      <div style={{ backgroundColor: '#ffffff', borderRadius: 24, border: '1.5px solid #C2D9C9', padding: '28px 32px', color: '#1A3D2A', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)', width: '100%' }}>
+      <div style={{ backgroundColor: '#ffffff', borderRadius: 24, border: '1px solid #CBD5E1', padding: '28px 32px', color: '#162544', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)', width: '100%' }}>
         
         {/* Header Title Bar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #E2E8F0', paddingBottom: 16, marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <h1 style={{ margin: '0 0 4px', fontSize: '1.65rem', fontWeight: 900, color: '#1A3D2A', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+            <h1 style={{ margin: '0 0 4px', fontSize: '1.65rem', fontWeight: 900, color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
               {activeTab === 'bestellingen' ? '📦 Alle Bestellingen' : '👕 Artikelen & Assortiment'}
             </h1>
-            <p style={{ margin: 0, fontSize: '0.9rem', color: '#6A8A75' }}>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748B' }}>
               {activeTab === 'bestellingen'
                 ? 'Overzicht van alle ingekomen bestellingen in de webshop. Exporteer eenvoudig naar Excel.'
                 : 'Beheer artikelen, prijzen, maten en foto\'s van de webshop en uniformen.'}
@@ -368,7 +368,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
               style={{
                 padding: '11px 22px',
                 borderRadius: 10,
-                backgroundColor: '#800020',
+                backgroundColor: '#243B6B',
                 color: '#fff',
                 border: 'none',
                 fontWeight: 900,
@@ -486,29 +486,28 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
 
         {/* TAB 2: ARTIKELEN & ASSORTIMENT */}
         {activeTab === 'artikelen' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ backgroundColor: '#fff', borderRadius: 16, border: '1px solid #CCCCCC', padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
             
-            {/* Notification Email Field */}
-            <div style={{ backgroundColor: '#F8FAF8', border: '1.5px solid #E2E8F0', borderRadius: 14, padding: '14px 18px' }}>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                E-mailadres voor Bestelnotificaties
-              </label>
-              <p style={{ margin: '0 0 10px', fontSize: '0.82rem', color: '#6A8A75' }}>
-                Aan wie moeten de meldingen van nieuwe webshopbestellingen gestuurd worden?
-              </p>
-              <div style={{ display: 'flex', gap: 10 }}>
+            <div style={{ marginBottom: 24, padding: '16px 20px', borderRadius: 12, backgroundColor: '#F8FAF8', border: '1px solid #CCCCCC' }}>
+              <strong style={{ display: 'block', fontSize: '0.92rem', color: '#162544', marginBottom: 4 }}>
+                E-mailadres voor Bestellingsmeldingen
+              </strong>
+              <span style={{ display: 'block', fontSize: '0.82rem', color: '#555555', marginBottom: 12 }}>
+                Ontvang automatisch een e-mailbevestiging wanneer een koper een bestelling plaatst.
+              </span>
+              <div style={{ display: 'flex', gap: 10, maxWidth: 480 }}>
                 <input
                   type="email"
                   value={webshopEmail}
                   onChange={e => setWebshopEmail(e.target.value)}
                   placeholder="bestellingen@kriko-m.be"
-                  style={{ flex: 1, padding: '8px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
+                  style={{ flex: 1, padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
                 />
                 <button
                   type="button"
                   onClick={handleSaveSettings}
                   disabled={saving}
-                  style={{ padding: '8px 18px', borderRadius: 8, backgroundColor: '#1A3D2A', color: '#fff', fontWeight: 800, fontSize: '0.86rem', border: 'none', cursor: 'pointer' }}
+                  style={{ padding: '9px 18px', borderRadius: 8, backgroundColor: '#243B6B', color: '#fff', fontWeight: 800, fontSize: '0.86rem', border: 'none', cursor: 'pointer' }}
                 >
                   {saving ? 'Opslaan…' : 'E-mail Opslaan'}
                 </button>
@@ -516,33 +515,33 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
             </div>
 
             {loadingShopProducts ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#6A8A75', fontWeight: 600 }}>Producten laden…</div>
+              <div style={{ padding: 40, textAlign: 'center', color: '#555555', fontWeight: 600 }}>Producten laden…</div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 20, alignItems: 'start' }}>
                 
                 {/* Left sidebar product list */}
-                <div style={{ backgroundColor: '#F8FAF8', borderRadius: 14, border: '1.5px solid #E2E8F0', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ backgroundColor: '#F8FAF8', borderRadius: 14, border: '1px solid #CCCCCC', padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <button
                     type="button"
                     onClick={handleProductAdd}
                     disabled={savingProduct}
                     style={{
-                      padding: '9px 12px',
+                      padding: '10px 14px',
                       borderRadius: 8,
-                      fontSize: '0.86rem',
+                      fontSize: '0.88rem',
                       fontWeight: 800,
-                      backgroundColor: '#C9963A',
-                      color: '#1A3D2A',
+                      backgroundColor: '#243B6B',
+                      color: '#FFFFFF',
                       border: 'none',
                       cursor: 'pointer',
                       marginBottom: 8,
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                      boxShadow: '0 2px 6px rgba(36,59,107,0.2)',
                     }}
                   >
                     + Nieuw Artikel Toevoegen
                   </button>
 
-                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', padding: '4px 8px' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', padding: '4px 8px' }}>
                     Kledij
                   </span>
                   {shopProducts.filter(p => p.category !== 'kentekens').map(p => (
@@ -556,8 +555,8 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                         borderRadius: 8,
                         fontSize: '0.86rem',
                         fontWeight: selectedProductId === p.id ? 800 : 600,
-                        backgroundColor: selectedProductId === p.id ? '#1A3D2A' : '#fff',
-                        color: selectedProductId === p.id ? '#fff' : '#1A3D2A',
+                        backgroundColor: selectedProductId === p.id ? '#243B6B' : '#fff',
+                        color: selectedProductId === p.id ? '#fff' : '#162544',
                         border: '1px solid #CBD5E1',
                         cursor: 'pointer',
                       }}
@@ -566,7 +565,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                     </button>
                   ))}
 
-                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', padding: '12px 8px 4px' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', padding: '12px 8px 4px' }}>
                     Kentekens
                   </span>
                   {shopProducts.filter(p => p.category === 'kentekens').map(p => (
@@ -580,8 +579,8 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                         borderRadius: 8,
                         fontSize: '0.82rem',
                         fontWeight: selectedProductId === p.id ? 800 : 600,
-                        backgroundColor: selectedProductId === p.id ? '#1A3D2A' : '#fff',
-                        color: selectedProductId === p.id ? '#fff' : '#1A3D2A',
+                        backgroundColor: selectedProductId === p.id ? '#243B6B' : '#fff',
+                        color: selectedProductId === p.id ? '#fff' : '#162544',
                         border: '1px solid #CBD5E1',
                         cursor: 'pointer',
                       }}
@@ -597,15 +596,15 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                   if (!product) return <div style={{ color: '#666' }}>Selecteer een artikel uit de lijst.</div>
 
                   return (
-                    <div style={{ backgroundColor: '#fff', borderRadius: 14, border: '1.5px solid #E2E8F0', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1.5px solid #E8F0EB', paddingBottom: 12 }}>
-                        <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#1A3D2A' }}>
+                    <div style={{ backgroundColor: '#fff', borderRadius: 14, border: '1px solid #CCCCCC', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #CCCCCC', paddingBottom: 12 }}>
+                        <h4 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
                           {product.name}
                         </h4>
                         <button
                           type="button"
                           onClick={() => handleProductDelete(product.id)}
-                          style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: '#FDF0F2', color: '#B23A4D', border: '1.5px solid #E0C0C4', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+                          style={{ padding: '6px 12px', borderRadius: 8, backgroundColor: '#FDF0F2', color: '#B91C1C', border: '1px solid #F8C8D4', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
                         >
                           Verwijderen
                         </button>
@@ -613,7 +612,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
 
                       {/* Photo Preview & Upload */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 8 }}>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 8 }}>
                           Artikel Foto
                         </label>
                         <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
@@ -622,7 +621,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                             height: 90,
                             borderRadius: 12,
                             backgroundColor: '#E2E8F0',
-                            border: '1.5px solid #CBD5E1',
+                            border: '1px solid #CBD5E1',
                             overflow: 'hidden',
                             display: 'flex',
                             alignItems: 'center',
@@ -643,7 +642,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                             <label style={{
                               padding: '8px 14px',
                               borderRadius: 8,
-                              backgroundColor: '#1A3D2A',
+                              backgroundColor: '#243B6B',
                               color: '#fff',
                               fontWeight: 800,
                               fontSize: '0.84rem',
@@ -670,8 +669,8 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                                   padding: '7px 12px',
                                   borderRadius: 8,
                                   backgroundColor: '#FDF0F2',
-                                  color: '#B23A4D',
-                                  border: '1.5px solid #E0C0C4',
+                                  color: '#B91C1C',
+                                  border: '1px solid #F8C8D4',
                                   fontWeight: 700,
                                   fontSize: '0.8rem',
                                   cursor: 'pointer',
@@ -687,31 +686,31 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                       {/* Name, Category & Price */}
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 110px', gap: 12 }}>
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                             Naam Artikel
                           </label>
                           <input
                             type="text"
                             value={product.name}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, name: e.target.value } : p))}
-                            style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
                           />
                         </div>
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                             Sectie / Categorie
                           </label>
                           <select
                             value={product.category || 'kledij'}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, category: e.target.value } : p))}
-                            style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#1A3D2A' }}
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
                           >
                             <option value="kledij">Kledij</option>
                             <option value="kentekens">Kentekens</option>
                           </select>
                         </div>
                         <div>
-                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                             Prijs (€)
                           </label>
                           <input
@@ -719,27 +718,27 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                             step="1"
                             value={product.price}
                             onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, price: parseFloat(e.target.value) || 0 } : p))}
-                            style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#1A3D2A' }}
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.9rem', fontWeight: 700, color: '#162544' }}
                           />
                         </div>
                       </div>
 
                       {/* Description */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                           Omschrijving
                         </label>
                         <textarea
                           rows={3}
                           value={product.description || ''}
                           onChange={e => setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, description: e.target.value } : p))}
-                          style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', fontFamily: 'inherit', color: '#1A3D2A' }}
+                          style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.88rem', fontFamily: 'inherit', color: '#162544' }}
                         />
                       </div>
 
                       {/* Sizes */}
                       <div>
-                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                           Beschikbare Maten (Gescheiden door komma)
                         </label>
                         <input
@@ -750,7 +749,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                             setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, sizes: val } : p))
                           }}
                           placeholder="Bijv. S, M, L, XL of 6j, 8j, 10j"
-                          style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#1A3D2A' }}
+                          style={{ width: '100%', padding: '9px 12px', border: '1px solid #CCCCCC', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
                         />
                       </div>
 
@@ -759,7 +758,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                         type="button"
                         onClick={() => handleProductSave(product)}
                         disabled={savingProduct}
-                        style={{ padding: '12px 20px', borderRadius: 10, backgroundColor: '#1A3D2A', color: '#fff', fontWeight: 900, fontSize: '0.92rem', border: 'none', cursor: 'pointer', marginTop: 8 }}
+                        style={{ padding: '12px 20px', borderRadius: 10, backgroundColor: '#243B6B', color: '#fff', fontWeight: 900, fontSize: '0.92rem', border: 'none', cursor: 'pointer', marginTop: 8 }}
                       >
                         {savingProduct ? 'Opslaan…' : `Artikel "${product.name}" Opslaan`}
                       </button>

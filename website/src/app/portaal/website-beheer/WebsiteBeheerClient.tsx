@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import ExcelJS from 'exceljs'
@@ -57,6 +58,13 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   const currentShopTab: 'bestellingen' | 'beheer' = role === 'webshop'
     ? (tabParam === 'artikelen' ? 'beheer' : 'bestellingen')
     : 'bestellingen'
+
+  const isInstellingenTab = tabParam === 'instellingen'
+  const [topbarContainer, setTopbarContainer] = useState<HTMLElement | null>(null)
+
+  useEffect(() => {
+    setTopbarContainer(document.getElementById('portaal-topbar-actions'))
+  }, [])
 
   const [saving, setSaving] = useState(false)
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -131,11 +139,83 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   const [homeSubtitleGroepsleiding, setHomeSubtitleGroepsleiding] = useState<string>(
     initialSettings?.home_subtitle_groepsleiding || initialSettings?.home_subtitle || ''
   )
+  const [homeLeidingFoto, setHomeLeidingFoto] = useState<string>(
+    initialSettings?.home_leiding_foto || '/images/leiding_25-26.jpg'
+  )
+  const [uploadingHomeFoto, setUploadingHomeFoto] = useState(false)
+  const [portalLoginFoto, setPortalLoginFoto] = useState<string>(
+    initialSettings?.portal_login_foto || '/images/hero-nieuw.webp'
+  )
+  const [uploadingLoginFoto, setUploadingLoginFoto] = useState(false)
   const [webshopEmail, setWebshopEmail] = useState<string>(
     initialSettings?.webshop_email || 'groepsleiding@kriko-m.be'
   )
 
   const [activeTitleRoleTab, setActiveTitleRoleTab] = useState<'leiding' | 'groepsleiding'>('leiding')
+
+  async function handleHomeFotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingHomeFoto(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('type', 'home-leiding-foto')
+      if (homeLeidingFoto && homeLeidingFoto.startsWith('http')) {
+        formData.append('oldUrl', homeLeidingFoto)
+      }
+
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Uploaden foto mislukt')
+      }
+      const data = await res.json()
+      if (data.url) {
+        setHomeLeidingFoto(data.url)
+        showModalNotification('success', 'Nieuwe leidingsfoto geüpload! Vergeet niet hieronder op Opslaan te klikken.')
+      }
+    } catch (err: unknown) {
+      const errorText = err instanceof Error ? err.message : 'Fout bij uploaden foto'
+      showModalNotification('error', errorText)
+    } finally {
+      setUploadingHomeFoto(false)
+      e.target.value = ''
+    }
+  }
+
+  async function handleLoginFotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingLoginFoto(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('type', 'portal-login-foto')
+      if (portalLoginFoto && portalLoginFoto.startsWith('http')) {
+        formData.append('oldUrl', portalLoginFoto)
+      }
+
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Uploaden foto mislukt')
+      }
+      const data = await res.json()
+      if (data.url) {
+        setPortalLoginFoto(data.url)
+        showModalNotification('success', 'Nieuwe login-achtergrondfoto geüpload! Vergeet niet hieronder op Opslaan te klikken.')
+      }
+    } catch (err: unknown) {
+      const errorText = err instanceof Error ? err.message : 'Fout bij uploaden foto'
+      showModalNotification('error', errorText)
+    } finally {
+      setUploadingLoginFoto(false)
+      e.target.value = ''
+    }
+  }
 
   // Accountbeheer State inside Portaal Instellingen
   const [accounts, setAccounts] = useState<AccountInfo[]>([])
@@ -390,6 +470,8 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
         home_subtitle_leiding: homeSubtitleLeiding,
         home_title_groepsleiding: homeTitleGroepsleiding,
         home_subtitle_groepsleiding: homeSubtitleGroepsleiding,
+        home_leiding_foto: homeLeidingFoto,
+        portal_login_foto: portalLoginFoto,
         webshop_email: webshopEmail,
       }
 
@@ -1009,11 +1091,26 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
   }
 
   return (
-    <div style={{ maxWidth: 1240, margin: '0 auto', width: '100%', padding: '24px 20px 48px' }} className="portaal-page-container">
+    <div
+      style={{
+        maxWidth: 1100,
+        margin: '0 auto',
+        width: '100%',
+        padding: '32px 20px 48px',
+        minHeight: role === 'webshop' ? undefined : 'calc(100vh - 120px)',
+        display: role === 'webshop' ? 'block' : 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        boxSizing: 'border-box',
+      }}
+      className="portaal-page-container"
+    >
 
       {/* Notification Toast Outside Modal */}
       {flashMessage && (
         <div style={{
+          width: '100%',
           padding: '14px 22px',
           borderRadius: 14,
           marginBottom: 24,
@@ -1022,10 +1119,11 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
           display: 'flex',
           alignItems: 'center',
           gap: 12,
-          backgroundColor: flashMessage.type === 'success' ? '#EEF5F1' : '#FDF0F2',
-          color: flashMessage.type === 'success' ? '#1A3D2A' : '#B23A4D',
-          border: `1.5px solid ${flashMessage.type === 'success' ? '#C2D9C9' : '#E0C0C4'}`,
+          backgroundColor: flashMessage.type === 'success' ? '#EBF0F9' : '#FDF0F2',
+          color: flashMessage.type === 'success' ? '#162544' : '#B23A4D',
+          border: `1.5px solid ${flashMessage.type === 'success' ? '#CBD5E1' : '#E0C0C4'}`,
           boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+          boxSizing: 'border-box',
         }}>
           <span>{flashMessage.text}</span>
         </div>
@@ -1033,7 +1131,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
 
       {role === 'webshop' ? (
         /* DEDICATED INLINE WEBSHOP VIEW */
-        <div style={{ backgroundColor: '#ffffff', borderRadius: 24, border: '1.5px solid #C2D9C9', padding: '28px 32px', color: '#1A3D2A', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)', width: '100%' }}>
+        <div style={{ backgroundColor: '#ffffff', borderRadius: 24, border: '1px solid #CCCCCC', padding: '28px 32px', color: '#162544', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)', width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #E2E8F0', paddingBottom: 16, marginBottom: 24 }}>
             <div>
               <h2 style={{ margin: '0 0 4px', fontSize: '1.6rem', fontWeight: 900, color: '#1A3D2A' }}>
@@ -1080,37 +1178,526 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
 
           {renderShopTabBody(currentShopTab)}
         </div>
+      ) : isInstellingenTab ? (
+        /* IN-PAGE INSTELLINGEN VIEW */
+        <>
+          {/* Topbar Back Button */}
+          {topbarContainer && createPortal(
+            <Link
+              href="/portaal/website-beheer"
+              style={{
+                padding: '7px 14px',
+                borderRadius: 9,
+                backgroundColor: '#F1F5F9',
+                color: '#162544',
+                fontWeight: 800,
+                border: '1.5px solid #CBD5E1',
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                textDecoration: 'none',
+              }}
+            >
+              <i className="fa-solid fa-arrow-left" style={{ fontSize: '0.78rem' }}></i>
+              <span>Terug naar Beheer</span>
+            </Link>,
+            topbarContainer
+          )}
+
+          <div style={{ width: '100%', maxWidth: 960, display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {/* In-Page Main Settings Card */}
+            <div style={{ backgroundColor: '#ffffff', borderRadius: 24, border: '1px solid #CBD5E1', padding: '32px 36px', color: '#162544', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)', width: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #E2E8F0', paddingBottom: 20, marginBottom: 28 }}>
+                <div>
+                  <h2 style={{ margin: '0 0 4px', fontSize: '1.45rem', fontWeight: 900, color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                    ⚙️ Instellingen Leidingsportaal
+                  </h2>
+                  <p style={{ margin: 0, fontSize: '0.88rem', color: '#64748B' }}>
+                    Pas de welkomsttitels, achtergrondfoto&apos;s en account-wachtwoorden (Leiding, Groepsleiding, Webshop) van het portaal aan.
+                  </p>
+                </div>
+              </div>
+
+              {/* Flash Message inside Page */}
+              {modalFlash && (
+                <div style={{
+                  padding: '12px 18px',
+                  borderRadius: 12,
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  marginBottom: 24,
+                  backgroundColor: modalFlash.type === 'success' ? '#EBF0F9' : '#FDF0F2',
+                  color: modalFlash.type === 'success' ? '#162544' : '#B23A4D',
+                  border: `1.5px solid ${modalFlash.type === 'success' ? '#CBD5E1' : '#E0C0C4'}`,
+                }}>
+                  <span>{modalFlash.text}</span>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+                {/* SECTIE 1: STARTPAGINA TITELS PER ROL */}
+                <div style={{ backgroundColor: '#F8FAFC', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0' }}>
+                  <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                    Welkomsttitel Op Startpagina
+                  </h4>
+                  <p style={{ margin: '0 0 14px', fontSize: '0.84rem', color: '#64748B' }}>
+                    Stel een unieke hoofdtitel en subtitel in voor gewone Leiding vs. Groepsleiding.
+                  </p>
+
+                  {/* Role Tabs */}
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTitleRoleTab('leiding')}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 10,
+                        border: activeTitleRoleTab === 'leiding' ? '2px solid #243B6B' : '1.5px solid #CBD5E1',
+                        backgroundColor: activeTitleRoleTab === 'leiding' ? '#243B6B' : '#fff',
+                        color: activeTitleRoleTab === 'leiding' ? '#fff' : '#162544',
+                        fontWeight: 800,
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      Voor Leiding
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTitleRoleTab('groepsleiding')}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 10,
+                        border: activeTitleRoleTab === 'groepsleiding' ? '2px solid #243B6B' : '1.5px solid #CBD5E1',
+                        backgroundColor: activeTitleRoleTab === 'groepsleiding' ? '#243B6B' : '#fff',
+                        color: activeTitleRoleTab === 'groepsleiding' ? '#fff' : '#162544',
+                        fontWeight: 800,
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      Voor Groepsleiding
+                    </button>
+                  </div>
+
+                  {activeTitleRoleTab === 'leiding' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
+                          Hoofdtitel voor Leiding
+                        </label>
+                        <input
+                          type="text"
+                          value={homeTitleLeiding}
+                          onChange={e => setHomeTitleLeiding(e.target.value)}
+                          style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', background: '#fff', fontWeight: 700, color: '#162544' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
+                          Subtitel voor Leiding (Optioneel)
+                        </label>
+                        <textarea
+                          value={homeSubtitleLeiding}
+                          onChange={e => setHomeSubtitleLeiding(e.target.value)}
+                          rows={2}
+                          style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', fontFamily: 'inherit', resize: 'vertical', background: '#fff', color: '#162544' }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
+                          Hoofdtitel voor Groepsleiding
+                        </label>
+                        <input
+                          type="text"
+                          value={homeTitleGroepsleiding}
+                          onChange={e => setHomeTitleGroepsleiding(e.target.value)}
+                          style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', background: '#fff', fontWeight: 700, color: '#162544' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
+                          Subtitel voor Groepsleiding (Optioneel)
+                        </label>
+                        <textarea
+                          value={homeSubtitleGroepsleiding}
+                          onChange={e => setHomeSubtitleGroepsleiding(e.target.value)}
+                          rows={2}
+                          style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', fontFamily: 'inherit', resize: 'vertical', background: '#fff', color: '#162544' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* SECTIE 2: ACHTERGRONDFOTO'S PORTAAL */}
+                <div style={{ backgroundColor: '#F8FAFC', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  <div>
+                    <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                      📸 Achtergrondfoto&apos;s Portaal
+                    </h4>
+                    <p style={{ margin: 0, fontSize: '0.84rem', color: '#64748B' }}>
+                      Beheer de achtergrondfoto&apos;s voor de loginpagina en de startpagina van het leidingportaal.
+                    </p>
+                  </div>
+
+                  {/* FOTO 1: STARTPAGINA LEIDINGSFOTO */}
+                  <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: 16 }}>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#162544', marginBottom: 10 }}>
+                      1. Startpagina Achtergrondfoto (Leidingsfoto)
+                    </div>
+                    <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <div style={{
+                        width: 220,
+                        height: 120,
+                        borderRadius: 14,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        border: '2px solid #CBD5E1',
+                        backgroundImage: `url(${homeLeidingFoto || '/images/leiding_25-26.jpg'})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      }}>
+                        <div style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: 'linear-gradient(135deg, rgba(22, 37, 68, 0.45) 0%, rgba(36, 59, 107, 0.55) 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#FFFFFF', padding: '4px 10px', background: 'rgba(0,0,0,0.4)', borderRadius: 8, backdropFilter: 'blur(2px)' }}>
+                            Preview filter
+                          </span>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <label style={{
+                          padding: '10px 16px',
+                          borderRadius: 10,
+                          backgroundColor: '#243B6B',
+                          color: '#fff',
+                          fontWeight: 800,
+                          fontSize: '0.86rem',
+                          cursor: uploadingHomeFoto ? 'wait' : 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          transition: 'all 0.15s ease',
+                        }}>
+                          <i className="fa-solid fa-upload"></i>
+                          <span>{uploadingHomeFoto ? 'Foto verwerken…' : 'Nieuwe Leidingsfoto Uploaden'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingHomeFoto}
+                            onChange={handleHomeFotoUpload}
+                            style={{ display: 'none' }}
+                          />
+                        </label>
+
+                        {homeLeidingFoto && homeLeidingFoto !== '/images/leiding_25-26.jpg' && (
+                          <button
+                            type="button"
+                            onClick={() => setHomeLeidingFoto('/images/leiding_25-26.jpg')}
+                            style={{
+                              padding: '8px 14px',
+                              borderRadius: 8,
+                              backgroundColor: '#FDF0F2',
+                              color: '#B23A4D',
+                              border: '1.5px solid #E0C0C4',
+                              fontWeight: 700,
+                              fontSize: '0.82rem',
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                              width: 'fit-content',
+                            }}
+                          >
+                            Herstel naar standaardfoto (/images/leiding_25-26.jpg)
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* FOTO 2: LOGINPAGINA ACHTERGRONDFOTO */}
+                  <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: 16 }}>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#162544', marginBottom: 10 }}>
+                      2. Loginpagina Achtergrondfoto (/portaal)
+                    </div>
+                    <div style={{ display: 'flex', gap: 20, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <div style={{
+                        width: 220,
+                        height: 120,
+                        borderRadius: 14,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        border: '2px solid #CBD5E1',
+                        backgroundImage: `url(${portalLoginFoto || '/images/hero-nieuw.webp'})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                      }}>
+                        <div style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: 'linear-gradient(135deg, rgba(22, 37, 68, 0.45) 0%, rgba(36, 59, 107, 0.55) 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                          <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#FFFFFF', padding: '4px 10px', background: 'rgba(0,0,0,0.4)', borderRadius: 8, backdropFilter: 'blur(2px)' }}>
+                            Login preview
+                          </span>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <label style={{
+                          padding: '10px 16px',
+                          borderRadius: 10,
+                          backgroundColor: '#243B6B',
+                          color: '#fff',
+                          fontWeight: 800,
+                          fontSize: '0.86rem',
+                          cursor: uploadingLoginFoto ? 'wait' : 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          transition: 'all 0.15s ease',
+                        }}>
+                          <i className="fa-solid fa-upload"></i>
+                          <span>{uploadingLoginFoto ? 'Foto verwerken…' : 'Nieuwe Login-foto Uploaden'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            disabled={uploadingLoginFoto}
+                            onChange={handleLoginFotoUpload}
+                            style={{ display: 'none' }}
+                          />
+                        </label>
+
+                        {portalLoginFoto && portalLoginFoto !== '/images/hero-nieuw.webp' && (
+                          <button
+                            type="button"
+                            onClick={() => setPortalLoginFoto('/images/hero-nieuw.webp')}
+                            style={{
+                              padding: '8px 14px',
+                              borderRadius: 8,
+                              backgroundColor: '#FDF0F2',
+                              color: '#B23A4D',
+                              border: '1.5px solid #E0C0C4',
+                              fontWeight: 700,
+                              fontSize: '0.82rem',
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                              width: 'fit-content',
+                            }}
+                          >
+                            Herstel naar standaardfoto (/images/hero-nieuw.webp)
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SECTIE 3: ACCOUNTBEHEER & WACHTWOORDEN */}
+                <div style={{ backgroundColor: '#F8FAFC', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0' }}>
+                  <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                    👥 Accountbeheer — Rollen &amp; Wachtwoorden
+                  </h4>
+                  <p style={{ margin: '0 0 14px', fontSize: '0.84rem', color: '#64748B' }}>
+                    Pas de weergavenaam of het wachtwoord aan voor de 3 hoofdaccounts van de website (Leiding, Groepsleiding, Webshop).
+                  </p>
+
+                  {loadingAccounts ? (
+                    <div style={{ padding: 20, textAlign: 'center', color: '#64748B', fontWeight: 600 }}>Accounts laden…</div>
+                  ) : (
+                    <form onSubmit={handleSaveAccountInModal} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                      {accountError && (
+                        <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FDF0F2', color: '#B23A4D', border: '1px solid #E0C0C4', fontSize: '0.86rem', fontWeight: 700 }}>
+                          {accountError}
+                        </div>
+                      )}
+                      {accountSuccess && (
+                        <div style={{ padding: '10px 14px', borderRadius: 10, background: '#EBF0F9', color: '#162544', border: '1px solid #CBD5E1', fontSize: '0.86rem', fontWeight: 700 }}>
+                          {accountSuccess}
+                        </div>
+                      )}
+
+                      {/* Role Selector */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectAccountRole('leiding')}
+                          style={{
+                            padding: '10px 6px',
+                            borderRadius: 12,
+                            border: editingAccountRole === 'leiding' ? '2px solid #243B6B' : '1.5px solid #E2E8F0',
+                            background: editingAccountRole === 'leiding' ? '#EBF0F9' : '#FFFFFF',
+                            color: editingAccountRole === 'leiding' ? '#243B6B' : '#555555',
+                            fontWeight: editingAccountRole === 'leiding' ? 800 : 600,
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            fontSize: '0.85rem',
+                          }}
+                        >
+                          Leiding
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectAccountRole('groepsleiding')}
+                          style={{
+                            padding: '10px 6px',
+                            borderRadius: 12,
+                            border: editingAccountRole === 'groepsleiding' ? '2px solid #243B6B' : '1.5px solid #E2E8F0',
+                            background: editingAccountRole === 'groepsleiding' ? '#EBF0F9' : '#FFFFFF',
+                            color: editingAccountRole === 'groepsleiding' ? '#243B6B' : '#555555',
+                            fontWeight: editingAccountRole === 'groepsleiding' ? 800 : 600,
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            fontSize: '0.85rem',
+                          }}
+                        >
+                          Groepsleiding
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectAccountRole('webshop')}
+                          style={{
+                            padding: '10px 6px',
+                            borderRadius: 12,
+                            border: editingAccountRole === 'webshop' ? '2px solid #243B6B' : '1.5px solid #E2E8F0',
+                            background: editingAccountRole === 'webshop' ? '#EBF0F9' : '#FFFFFF',
+                            color: editingAccountRole === 'webshop' ? '#243B6B' : '#555555',
+                            fontWeight: editingAccountRole === 'webshop' ? 800 : 600,
+                            cursor: 'pointer',
+                            textAlign: 'center',
+                            fontSize: '0.85rem',
+                          }}
+                        >
+                          Webshop
+                        </button>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
+                            Weergavenaam ({editingAccountRole === 'leiding' ? 'Leiding' : editingAccountRole === 'groepsleiding' ? 'Groepsleiding' : 'Webshop'})
+                          </label>
+                          <input
+                            type="text"
+                            value={editAccountName}
+                            onChange={(e) => setEditAccountName(e.target.value)}
+                            required
+                            placeholder="Bijv. Leiding Kriko-M"
+                            disabled={savingAccount}
+                            style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', background: '#fff', fontWeight: 700, color: '#162544' }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
+                            Nieuw Wachtwoord (min. 6 tekens)
+                          </label>
+                          <input
+                            type="password"
+                            value={editAccountPassword}
+                            onChange={(e) => setEditAccountPassword(e.target.value)}
+                            placeholder="Laat leeg om niet te wijzigen"
+                            disabled={savingAccount}
+                            style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 8, fontSize: '0.9rem', background: '#fff', color: '#162544' }}
+                          />
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+                        <button
+                          type="submit"
+                          disabled={savingAccount || !editAccountName.trim()}
+                          style={{
+                            padding: '9px 18px',
+                            borderRadius: 8,
+                            backgroundColor: '#243B6B',
+                            color: '#fff',
+                            fontWeight: 800,
+                            fontSize: '0.86rem',
+                            border: 'none',
+                            cursor: savingAccount ? 'wait' : 'pointer',
+                          }}
+                        >
+                          {savingAccount ? 'Opslaan…' : 'Account Opslaan'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom Action Footer */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 32, borderTop: '2px solid #E2E8F0', paddingTop: 20 }}>
+                <button
+                  type="button"
+                  onClick={() => router.push('/portaal/website-beheer')}
+                  style={{ padding: '10px 20px', backgroundColor: '#F1F5F9', color: '#475569', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
+                >
+                  Annuleren
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSavePortalSettings}
+                  disabled={saving}
+                  style={{ padding: '10px 28px', backgroundColor: '#162544', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 900, cursor: saving ? 'wait' : 'pointer', fontSize: '0.9rem' }}
+                >
+                  {saving ? 'Opslaan…' : '💾 Wijzigingen Opslaan'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
       ) : (
-        /* THREE SEPARATE SECTION CARDS GRID FOR GROEPSLEIDING / ADMIN */
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
+        /* TWO SEPARATE SECTION CARDS GRID FOR GROEPSLEIDING / ADMIN */
+        <div style={{ width: '100%', maxWidth: 860, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, justifyContent: 'center' }}>
           
           {/* CARD 1: PUBLIEKE WEBSITE */}
           <div style={{
             backgroundColor: '#ffffff',
-            borderRadius: 24,
-            border: '1.5px solid #C2D9C9',
+            borderRadius: 20,
+            border: '1px solid #CCCCCC',
             padding: '32px 26px',
-            color: '#1A3D2A',
-            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)',
+            color: '#162544',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-start',
             textAlign: 'left',
             justifyContent: 'space-between',
             gap: 22,
-            transition: 'all 0.2s ease',
-          }}>
+            transition: 'all 0.2s ease-in-out',
+          }} className="portaal-home-card">
             <div>
               <div style={{
-                width: 50,
-                height: 50,
-                borderRadius: 14,
-                backgroundColor: '#FEF8EC',
-                border: '1.5px solid #F6D796',
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                backgroundColor: '#162544',
+                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#C9963A',
                 marginBottom: 18,
               }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -1118,10 +1705,10 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                   <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                 </svg>
               </div>
-              <h2 style={{ margin: '0 0 8px', fontSize: '1.5rem', fontWeight: 900, color: '#1A3D2A', letterSpacing: '-0.01em' }}>
+              <h2 style={{ margin: '0 0 8px', fontSize: '1.35rem', fontWeight: 900, color: '#162544', letterSpacing: '-0.01em', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
                 Publieke Website
               </h2>
-              <p style={{ margin: 0, fontSize: '0.88rem', color: '#6A8A75', lineHeight: 1.5 }}>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#555555', lineHeight: 1.5, fontWeight: 500 }}>
                 Bewerk live teksten, kalenderactiviteiten en foto&apos;s rechtstreeks op de openbare website.
               </p>
             </div>
@@ -1130,14 +1717,14 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
               href="/?edit=true"
               style={{
                 width: '100%',
-                padding: '15px 22px',
-                backgroundColor: '#C9963A',
-                color: '#1A3D2A',
-                borderRadius: 14,
+                padding: '14px 20px',
+                backgroundColor: '#243B6B',
+                color: '#FFFFFF',
+                borderRadius: 12,
                 fontWeight: 900,
-                fontSize: '1rem',
+                fontSize: '0.96rem',
                 textDecoration: 'none',
-                boxShadow: '0 6px 20px rgba(201, 150, 58, 0.35)',
+                boxShadow: '0 4px 14px rgba(36, 59, 107, 0.25)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1157,30 +1744,29 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
           {/* CARD 2: LEIDINGSPORTAAL */}
           <div style={{
             backgroundColor: '#ffffff',
-            borderRadius: 24,
-            border: '1.5px solid #C2D9C9',
+            borderRadius: 20,
+            border: '1px solid #CCCCCC',
             padding: '32px 26px',
-            color: '#1A3D2A',
-            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)',
+            color: '#162544',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-start',
             textAlign: 'left',
             justifyContent: 'space-between',
             gap: 22,
-            transition: 'all 0.2s ease',
-          }}>
+            transition: 'all 0.2s ease-in-out',
+          }} className="portaal-home-card">
             <div>
               <div style={{
-                width: 50,
-                height: 50,
-                borderRadius: 14,
-                backgroundColor: '#EEF5F1',
-                border: '1.5px solid #C2D9C9',
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                backgroundColor: '#162544',
+                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#1A3D2A',
                 marginBottom: 18,
               }}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -1188,28 +1774,28 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                   <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                 </svg>
               </div>
-              <h2 style={{ margin: '0 0 8px', fontSize: '1.5rem', fontWeight: 900, color: '#1A3D2A', letterSpacing: '-0.01em' }}>
-                Leidingsportaal
+              <h2 style={{ margin: '0 0 8px', fontSize: '1.35rem', fontWeight: 900, color: '#162544', letterSpacing: '-0.01em', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                Portaal Instellingen
               </h2>
-              <p style={{ margin: 0, fontSize: '0.88rem', color: '#6A8A75', lineHeight: 1.5 }}>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#555555', lineHeight: 1.5, fontWeight: 500 }}>
                 Pas de welkomsttitels, achtergronden en account-wachtwoorden (Leiding, Groepsleiding, Webshop) van het portaal aan.
               </p>
             </div>
 
             <button
-              onClick={() => { setModalFlash(null); setShowPortalModal(true); fetchAccounts(); }}
+              onClick={() => { setModalFlash(null); router.push('/portaal/website-beheer?tab=instellingen'); fetchAccounts(); }}
               type="button"
               style={{
                 width: '100%',
-                padding: '15px 22px',
-                backgroundColor: '#1A3D2A',
+                padding: '14px 20px',
+                backgroundColor: '#243B6B',
                 color: '#fff',
                 border: 'none',
-                borderRadius: 14,
+                borderRadius: 12,
                 fontWeight: 900,
-                fontSize: '1rem',
+                fontSize: '0.96rem',
                 cursor: 'pointer',
-                boxShadow: '0 6px 20px rgba(26, 61, 42, 0.22)',
+                boxShadow: '0 4px 14px rgba(36, 59, 107, 0.25)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1233,357 +1819,6 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
             </button>
           </div>
 
-          {/* CARD 3: WEBSHOP */}
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 24,
-            border: '1.5px solid #C2D9C9',
-            padding: '32px 26px',
-            color: '#1A3D2A',
-            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            textAlign: 'left',
-            justifyContent: 'space-between',
-            gap: 22,
-            transition: 'all 0.2s ease',
-          }}>
-            <div>
-              <div style={{
-                width: 50,
-                height: 50,
-                borderRadius: 14,
-                backgroundColor: '#FDF0F2',
-                border: '1.5px solid #E0C0C4',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#800020',
-                marginBottom: 18,
-              }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <path d="M16 10a4 4 0 0 1-8 0"></path>
-                </svg>
-              </div>
-              <h2 style={{ margin: '0 0 8px', fontSize: '1.5rem', fontWeight: 900, color: '#1A3D2A', letterSpacing: '-0.01em' }}>
-                Webshop Beheer
-              </h2>
-              <p style={{ margin: 0, fontSize: '0.88rem', color: '#6A8A75', lineHeight: 1.5 }}>
-                Bekijk bestellingen, beheer artikelen &amp; prijzen en exporteer bestellingen als Excel.
-              </p>
-            </div>
-
-            <Link
-              href="/portaal/webshop/bestellingen"
-              style={{
-                width: '100%',
-                padding: '15px 22px',
-                backgroundColor: '#1A3D2A',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 14,
-                fontWeight: 900,
-                fontSize: '1rem',
-                textDecoration: 'none',
-                boxShadow: '0 6px 20px rgba(26, 61, 42, 0.22)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 10,
-                transition: 'all 0.2s ease',
-              }}
-              className="action-card-hover"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="9" cy="21" r="1"></circle>
-                <circle cx="20" cy="21" r="1"></circle>
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-              </svg>
-              <span>Naar Webshop Beheer &rarr;</span>
-            </Link>
-          </div>
-
-        </div>
-      )}
-
-      {/* MODAL FOR LEIDINGPORTAAL INSTELLINGEN */}
-      {showPortalModal && (
-        <div className="portaal-modal-overlay">
-          <div className="portaal-modal-card" style={{ width: '94%', maxWidth: 940, maxHeight: '88vh', display: 'flex', flexDirection: 'column' }}>
-            <div className="portaal-modal-header" style={{ padding: '20px 28px' }}>
-              <h3 className="portaal-modal-title" style={{ fontSize: '1.25rem' }}>Instellingen Leidingsportaal</h3>
-              <button className="portaal-modal-close" onClick={() => setShowPortalModal(false)}>&times;</button>
-            </div>
-            
-            <div className="portaal-modal-body" style={{ flex: 1, overflowY: 'auto', padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 28 }}>
-              
-              {/* Flash Message inside Modal */}
-              {modalFlash && (
-                <div style={{
-                  padding: '12px 18px',
-                  borderRadius: 12,
-                  fontSize: '0.9rem',
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  backgroundColor: modalFlash.type === 'success' ? '#EEF5F1' : '#FDF0F2',
-                  color: modalFlash.type === 'success' ? '#1A3D2A' : '#B23A4D',
-                  border: `1.5px solid ${modalFlash.type === 'success' ? '#C2D9C9' : '#E0C0C4'}`,
-                }}>
-                  <span>{modalFlash.text}</span>
-                </div>
-              )}
-
-              {/* SECTIE 1: STARTPAGINA TITELS PER ROL */}
-              <div style={{ backgroundColor: '#F8FAF8', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0' }}>
-                <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A' }}>
-                  Welkomsttitel Op Startpagina
-                </h4>
-                <p style={{ margin: '0 0 14px', fontSize: '0.84rem', color: '#6A8A75' }}>
-                  Stel een unieke hoofdtitel en subtitel in voor gewone Leiding vs. Groepsleiding.
-                </p>
-
-                {/* Role Tabs */}
-                <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTitleRoleTab('leiding')}
-                    style={{
-                      padding: '8px 14px',
-                      borderRadius: 10,
-                      border: activeTitleRoleTab === 'leiding' ? '2px solid #1A3D2A' : '1.5px solid #CBD5E1',
-                      backgroundColor: activeTitleRoleTab === 'leiding' ? '#1A3D2A' : '#fff',
-                      color: activeTitleRoleTab === 'leiding' ? '#fff' : '#1A3D2A',
-                      fontWeight: 800,
-                      fontSize: '0.85rem',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Voor Leiding
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTitleRoleTab('groepsleiding')}
-                    style={{
-                      padding: '8px 14px',
-                      borderRadius: 10,
-                      border: activeTitleRoleTab === 'groepsleiding' ? '2px solid #1A3D2A' : '1.5px solid #CBD5E1',
-                      backgroundColor: activeTitleRoleTab === 'groepsleiding' ? '#1A3D2A' : '#fff',
-                      color: activeTitleRoleTab === 'groepsleiding' ? '#fff' : '#1A3D2A',
-                      fontWeight: 800,
-                      fontSize: '0.85rem',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Voor Groepsleiding
-                  </button>
-                </div>
-
-                {activeTitleRoleTab === 'leiding' ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                        Hoofdtitel voor Leiding
-                      </label>
-                      <input
-                        type="text"
-                        value={homeTitleLeiding}
-                        onChange={e => setHomeTitleLeiding(e.target.value)}
-                        style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', background: '#fff', fontWeight: 700, color: '#1A3D2A' }}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                        Subtitel voor Leiding (Optioneel)
-                      </label>
-                      <textarea
-                        value={homeSubtitleLeiding}
-                        onChange={e => setHomeSubtitleLeiding(e.target.value)}
-                        rows={2}
-                        style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontFamily: 'inherit', resize: 'vertical', background: '#fff', color: '#1A3D2A' }}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                        Hoofdtitel voor Groepsleiding
-                      </label>
-                      <input
-                        type="text"
-                        value={homeTitleGroepsleiding}
-                        onChange={e => setHomeTitleGroepsleiding(e.target.value)}
-                        style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', background: '#fff', fontWeight: 700, color: '#1A3D2A' }}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                        Subtitel voor Groepsleiding (Optioneel)
-                      </label>
-                      <textarea
-                        value={homeSubtitleGroepsleiding}
-                        onChange={e => setHomeSubtitleGroepsleiding(e.target.value)}
-                        rows={2}
-                        style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', fontFamily: 'inherit', resize: 'vertical', background: '#fff', color: '#1A3D2A' }}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
-
-
-              {/* SECTIE 3: ACCOUNTBEHEER & WACHTWOORDEN */}
-              <div style={{ backgroundColor: '#F8FAF8', padding: 20, borderRadius: 16, border: '1.5px solid #E2E8F0' }}>
-                <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 900, color: '#1A3D2A' }}>
-                  👥 Accountbeheer — Rollen &amp; Wachtwoorden
-                </h4>
-                <p style={{ margin: '0 0 14px', fontSize: '0.84rem', color: '#6A8A75' }}>
-                  Pas de weergavenaam of het wachtwoord aan voor de 3 hoofdaccounts van de website (Leiding, Groepsleiding, Webshop).
-                </p>
-
-                {loadingAccounts ? (
-                  <div style={{ padding: 20, textAlign: 'center', color: '#6A8A75', fontWeight: 600 }}>Accounts laden…</div>
-                ) : (
-                  <form onSubmit={handleSaveAccountInModal} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    {accountError && (
-                      <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FDF0F2', color: '#B23A4D', border: '1px solid #E0C0C4', fontSize: '0.86rem', fontWeight: 700 }}>
-                        {accountError}
-                      </div>
-                    )}
-                    {accountSuccess && (
-                      <div style={{ padding: '10px 14px', borderRadius: 10, background: '#EEF5F1', color: '#1A3D2A', border: '1px solid #C2D9C9', fontSize: '0.86rem', fontWeight: 700 }}>
-                        {accountSuccess}
-                      </div>
-                    )}
-
-                    {/* Role Selector */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                      <button
-                        type="button"
-                        onClick={() => handleSelectAccountRole('leiding')}
-                        style={{
-                          padding: '10px 6px',
-                          borderRadius: 12,
-                          border: editingAccountRole === 'leiding' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
-                          background: editingAccountRole === 'leiding' ? '#EEF5F1' : '#FAFAFA',
-                          color: '#1A3D2A',
-                          fontWeight: editingAccountRole === 'leiding' ? 800 : 600,
-                          cursor: 'pointer',
-                          textAlign: 'center',
-                          fontSize: '0.85rem',
-                        }}
-                      >
-                        Leiding
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleSelectAccountRole('groepsleiding')}
-                        style={{
-                          padding: '10px 6px',
-                          borderRadius: 12,
-                          border: editingAccountRole === 'groepsleiding' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
-                          background: editingAccountRole === 'groepsleiding' ? '#EEF5F1' : '#FAFAFA',
-                          color: '#1A3D2A',
-                          fontWeight: editingAccountRole === 'groepsleiding' ? 800 : 600,
-                          cursor: 'pointer',
-                          textAlign: 'center',
-                          fontSize: '0.85rem',
-                        }}
-                      >
-                        Groepsleiding
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleSelectAccountRole('webshop')}
-                        style={{
-                          padding: '10px 6px',
-                          borderRadius: 12,
-                          border: editingAccountRole === 'webshop' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
-                          background: editingAccountRole === 'webshop' ? '#EEF5F1' : '#FAFAFA',
-                          color: '#1A3D2A',
-                          fontWeight: editingAccountRole === 'webshop' ? 800 : 600,
-                          cursor: 'pointer',
-                          textAlign: 'center',
-                          fontSize: '0.85rem',
-                        }}
-                      >
-                        Webshop
-                      </button>
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                          Weergavenaam ({editingAccountRole === 'leiding' ? 'Leiding' : editingAccountRole === 'groepsleiding' ? 'Groepsleiding' : 'Webshop'})
-                        </label>
-                        <input
-                          type="text"
-                          value={editAccountName}
-                          onChange={(e) => setEditAccountName(e.target.value)}
-                          required
-                          placeholder="Bijv. Leiding Kriko-M"
-                          disabled={savingAccount}
-                          style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', background: '#fff', fontWeight: 700, color: '#1A3D2A' }}
-                        />
-                      </div>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
-                          Nieuw Wachtwoord (min. 6 tekens)
-                        </label>
-                        <input
-                          type="password"
-                          value={editAccountPassword}
-                          onChange={(e) => setEditAccountPassword(e.target.value)}
-                          placeholder="Laat leeg om niet te wijzigen"
-                          disabled={savingAccount}
-                          style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.9rem', background: '#fff', color: '#1A3D2A' }}
-                        />
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
-                      <button
-                        type="submit"
-                        disabled={savingAccount || !editAccountName.trim()}
-                        style={{
-                          padding: '9px 18px',
-                          borderRadius: 8,
-                          backgroundColor: '#1A3D2A',
-                          color: '#fff',
-                          fontWeight: 800,
-                          fontSize: '0.86rem',
-                          border: 'none',
-                          cursor: savingAccount ? 'wait' : 'pointer',
-                        }}
-                      >
-                        {savingAccount ? 'Opslaan…' : 'Account Opslaan'}
-                      </button>
-                    </div>
-                  </form>
-                )}
-              </div>
-
-            </div>
-
-            <div className="portaal-modal-footer" style={{ padding: '16px 28px' }}>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={handleSavePortalSettings}
-                disabled={saving}
-                style={{ padding: '10px 22px', fontSize: '0.92rem' }}
-              >
-                {saving ? 'Opslaan…' : 'Wijzigingen Opslaan'}
-              </button>
-            </div>
-
-          </div>
         </div>
       )}
 
@@ -1610,8 +1845,8 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                   border: 'none',
                   background: 'none',
                   cursor: 'pointer',
-                  borderBottom: activeShopTab === 'bestellingen' ? '3px solid #1A3D2A' : '3px solid transparent',
-                  color: activeShopTab === 'bestellingen' ? '#1A3D2A' : '#6A8A75',
+                  borderBottom: activeShopTab === 'bestellingen' ? '3px solid #243B6B' : '3px solid transparent',
+                  color: activeShopTab === 'bestellingen' ? '#162544' : '#64748B',
                   marginBottom: -2,
                 }}
               >
@@ -1627,8 +1862,8 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                   border: 'none',
                   background: 'none',
                   cursor: 'pointer',
-                  borderBottom: activeShopTab === 'beheer' ? '3px solid #1A3D2A' : '3px solid transparent',
-                  color: activeShopTab === 'beheer' ? '#1A3D2A' : '#6A8A75',
+                  borderBottom: activeShopTab === 'beheer' ? '3px solid #243B6B' : '3px solid transparent',
+                  color: activeShopTab === 'beheer' ? '#162544' : '#64748B',
                   marginBottom: -2,
                 }}
               >

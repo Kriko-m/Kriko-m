@@ -107,7 +107,7 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit }: { event: 
                 padding: '0 14px',
                 borderRadius: 18,
                 border: 'none',
-                background: '#1A3D2A',
+                background: '#243B6B',
                 color: '#fff',
                 fontSize: '.82rem',
                 fontWeight: 700,
@@ -159,45 +159,45 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit }: { event: 
                 </div>
               )}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-                <h3 style={{ margin: 0, color: 'var(--color-primary-dark, #3a0710)', fontSize: '1.8rem', fontWeight: 900, lineHeight: 1.15 }}>
+                <h3 style={{ margin: 0, color: '#162544', fontSize: '1.8rem', fontWeight: 900, lineHeight: 1.15, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
                   {event.title}
                 </h3>
-                <span style={{ fontSize: '.78rem', fontWeight: 700, padding: '4px 12px', borderRadius: 99, background: 'var(--color-accent-light, #E2C58D)', color: '#3a0710', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                <span style={{ fontSize: '.78rem', fontWeight: 700, padding: '4px 12px', borderRadius: 99, background: '#EBF0F9', color: '#162544', border: '1px solid #D0DCEE', whiteSpace: 'nowrap', flexShrink: 0 }}>
                   {countdown}
                 </span>
               </div>
             </div>
 
             {/* Key Details Meta Box */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, background: '#faf9f7', border: '1px solid #ede9e1', borderRadius: 14, padding: '16px 20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, background: '#EBF0F9', border: '1.5px solid #D0DCEE', borderRadius: 14, padding: '16px 20px' }}>
               {dateInfo.isMultiDay ? (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
-                    <i className="fa-regular fa-calendar-check" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#162544' }}>
+                    <i className="fa-regular fa-calendar-check" style={{ color: '#243B6B', width: 16, textAlign: 'center' }}></i>
                     <span style={{ fontWeight: 700 }}>{dateInfo.startLine}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
-                    <i className="fa-solid fa-flag-checkered" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#162544' }}>
+                    <i className="fa-solid fa-flag-checkered" style={{ color: '#243B6B', width: 16, textAlign: 'center' }}></i>
                     <span style={{ fontWeight: 700 }}>{dateInfo.endLine}</span>
                   </div>
                 </>
               ) : (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
-                    <i className="fa-regular fa-calendar" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#162544' }}>
+                    <i className="fa-regular fa-calendar" style={{ color: '#243B6B', width: 16, textAlign: 'center' }}></i>
                     <span style={{ fontWeight: 700 }}>{dateInfo.singleDateStr}</span>
                   </div>
                   {dateInfo.timeStr && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
-                      <i className="fa-regular fa-clock" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#162544' }}>
+                      <i className="fa-regular fa-clock" style={{ color: '#243B6B', width: 16, textAlign: 'center' }}></i>
                       <span><strong>Tijdstip:</strong> {dateInfo.timeStr}</span>
                     </div>
                   )}
                 </>
               )}
               {event.location && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#222' }}>
-                  <i className="fa-solid fa-location-dot" style={{ color: 'var(--color-accent)', width: 16, textAlign: 'center' }}></i>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '.95rem', color: '#162544' }}>
+                  <i className="fa-solid fa-location-dot" style={{ color: '#243B6B', width: 16, textAlign: 'center' }}></i>
                   <span><strong>Locatie:</strong> {event.location}</span>
                 </div>
               )}
@@ -318,7 +318,7 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
       </div>
       <div className="event-card-compact-info">
         <div className="event-card-compact-header">
-          <h4 className="event-card-compact-title" style={{ fontSize: '1.15rem', fontWeight: 900, color: '#1A3D2A', lineHeight: 1.2 }}>{event.title}</h4>
+          <h4 className="event-card-compact-title" style={{ fontSize: '1.15rem', fontWeight: 900, color: '#162544', lineHeight: 1.2 }}>{event.title}</h4>
           <span className={`event-card-compact-badge ${event.is_evenement ? 'badge-star' : isNoMeeting ? 'badge-neutral' : 'badge-primary'}`}>
             <i className="fa-regular fa-clock"></i> {countdown}
           </span>

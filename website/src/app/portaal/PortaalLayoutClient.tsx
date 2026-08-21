@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useTransition } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
-import PortaalNav from './_components/PortaalNav'
+import { useEffect, useState, useTransition } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import PortaalSidebar from './_components/PortaalSidebar'
 
 interface Props {
   children: React.ReactNode
@@ -11,14 +12,17 @@ interface Props {
   settings?: import('@/lib/types').Settings | null
 }
 
-export default function PortaalLayoutClient({ children, naam, role, settings: _settings }: Props) {
+export default function PortaalLayoutClient({ children, naam, role, settings }: Props) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
   const showNav = pathname !== '/portaal' && pathname !== '/portaal/'
+  const isHomePage = pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/'
 
-
+  const homeBgUrl = settings?.home_leiding_foto || '/images/leiding_25-26.jpg'
 
   // Clear website edit mode whenever navigating inside the portal
   useEffect(() => {
@@ -28,23 +32,22 @@ export default function PortaalLayoutClient({ children, naam, role, settings: _s
     } catch {}
   }, [])
 
-  const activeColor = '#F2F6F4'
+  const canvasBgColor = '#D9D9D9' // Lichtgrijs theme color for portaal canvas
 
   useEffect(() => {
     if (!showNav) return
-    document.body.style.backgroundColor = activeColor
-    document.documentElement.style.backgroundColor = activeColor
+    document.body.style.backgroundColor = canvasBgColor
+    document.documentElement.style.backgroundColor = canvasBgColor
     document.body.style.backgroundImage = ''
     return () => {
       document.body.style.backgroundImage = ''
     }
-  }, [showNav, activeColor])
+  }, [showNav, canvasBgColor])
 
   useEffect(() => {
     if (!showNav) return
 
     const handleGlobalClick = (e: MouseEvent) => {
-      // Ignore clicks with modifiers
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
 
       const anchor = (e.target as HTMLElement).closest('a')
@@ -59,7 +62,6 @@ export default function PortaalLayoutClient({ children, naam, role, settings: _s
       const download = anchor.getAttribute('download')
       if (download !== null) return
 
-      // Ignore hash links
       if (href.startsWith('#') || (href.includes('#') && href.split('#')[0] === window.location.pathname)) return
 
       try {
@@ -84,51 +86,192 @@ export default function PortaalLayoutClient({ children, naam, role, settings: _s
     return () => document.removeEventListener('click', handleGlobalClick)
   }, [showNav, router])
 
+  const getPageTitle = (path: string) => {
+    if (path === '/portaal/echos') return 'Kriko Echo'
+    if (path === '/portaal/algemene-info') return 'Documenten & Links'
+    if (path === '/portaal/leiding/agenda') return 'Kalender & Activiteiten'
+    if (path === '/portaal/website-beheer') return 'Website Beheer'
+    if (path === '/portaal/webshop/artikelen') return 'Webshop Artikelen'
+    if (path.startsWith('/portaal/webshop')) return 'Webshop Bestellingen'
+    return 'Leidingsportaal'
+  }
+
   return (
     <>
-      {showNav && <PortaalNav naam={naam} role={role} />}
       {showNav ? (
-        <div
-          className="portaal-page-layout portaal-page-layout--no-sidebar"
-        >
-          <main
-            className="portaal-page-main portaal-page-main--anchor"
+        <div className="portaal-dashboard-shell">
+          <PortaalSidebar
+            naam={naam}
+            role={role}
+            mobileOpen={mobileSidebarOpen}
+            onCloseMobile={() => setMobileSidebarOpen(false)}
+          />
+
+          {/* Floating Hamburger Toggle Button for Mobile Screens */}
+          <button
+            onClick={() => setMobileSidebarOpen(prev => !prev)}
+            className="portaal-mobile-floating-toggle"
             style={{
-              width: '100%',
-              backgroundColor: '#F2F6F4',
+              position: 'fixed',
+              top: 14,
+              left: 14,
+              width: 42,
+              height: 42,
+              borderRadius: 10,
+              background: '#162544',
+              color: '#FFFFFF',
+              border: 'none',
+              display: 'none',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.2rem',
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.2)',
+              zIndex: 135,
+            }}
+            title="Open menu"
+          >
+            <i className="fa-solid fa-bars"></i>
+          </button>
+
+          <div
+            className="portaal-dashboard-content-area"
+            style={{
+              backgroundColor: isHomePage ? '#162544' : '#D9D9D9',
+              position: 'relative',
+              minHeight: '100vh',
+              overflow: 'hidden',
             }}
           >
-            {children}
-            {isPending && (
-              <div
-                className="portaal-loading-overlay"
+            {isHomePage && (
+              <>
+                {/* Leidingsfoto achtergrondafbeelding */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage: `url(${homeBgUrl})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center center',
+                    backgroundRepeat: 'no-repeat',
+                    zIndex: 0,
+                  }}
+                />
+                {/* Donkerblauwe filter overlay (zoals op het inlogscherm) */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'linear-gradient(135deg, rgba(22, 37, 68, 0.45) 0%, rgba(36, 59, 107, 0.55) 100%)',
+                    backdropFilter: 'blur(2px)',
+                    WebkitBackdropFilter: 'blur(2px)',
+                    zIndex: 1,
+                  }}
+                />
+              </>
+            )}
+
+            {/* Topbar: Rendered on ALL pages EXCEPT home/overzicht! */}
+            {!isHomePage && (
+              <header
+                className="portaal-topbar-header"
                 style={{
                   position: 'fixed',
-                  top: 76,
-                  left: 0,
+                  top: 0,
+                  left: 260,
                   right: 0,
-                  bottom: 0,
-                  backdropFilter: 'blur(6px)',
-                  WebkitBackdropFilter: 'blur(6px)',
-                  background: 'rgba(240, 236, 228, 0.35)',
+                  height: 60,
+                  background: '#FFFFFF',
+                  borderBottom: '1px solid #CCCCCC',
+                  padding: '0 32px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 110,
+                  justifyContent: 'space-between',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+                  zIndex: 100,
+                  transition: 'left 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/logo-finaal.png" alt="" aria-hidden="true" style={{ width: 64, height: 64, objectFit: 'contain', animation: 'portaal-pulse 1.5s infinite ease-in-out' }} />
-                  <div style={{ width: 120, height: 4, background: 'rgba(194,217,201,0.8)', borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
-                    <div style={{ position: 'absolute', height: '100%', width: '50%', background: '#1A3D2A', borderRadius: 2, animation: 'portaal-loading-bar 1.2s infinite ease-in-out' }} />
+                <h1 style={{
+                  margin: 0,
+                  fontSize: '1.35rem',
+                  fontWeight: 900,
+                  color: '#162544',
+                  fontFamily: 'var(--font-heading, Nunito, sans-serif)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}>
+                  {pathname === '/portaal/website-beheer' && searchParams.get('tab') === 'instellingen' ? (
+                    <>
+                      <Link
+                        href="/portaal/website-beheer"
+                        style={{ color: '#243B6B', textDecoration: 'none', fontWeight: 800 }}
+                      >
+                        Website Beheer
+                      </Link>
+                      <span style={{ color: '#94A3B8', fontWeight: 400 }}>/</span>
+                      <span>Portaal Instellingen</span>
+                    </>
+                  ) : (
+                    getPageTitle(pathname)
+                  )}
+                </h1>
+
+                <div id="portaal-topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: 10 }} />
+              </header>
+            )}
+
+            <main
+              className="portaal-page-main portaal-page-main--anchor"
+              style={{
+                width: '100%',
+                backgroundColor: isHomePage ? 'transparent' : '#D9D9D9',
+                minHeight: isHomePage ? '100vh' : 'calc(100vh - 60px)',
+                display: isHomePage ? 'flex' : 'block',
+                flexDirection: isHomePage ? 'column' : undefined,
+                justifyContent: isHomePage ? 'center' : undefined,
+                alignItems: isHomePage ? 'center' : undefined,
+                paddingTop: isHomePage ? 0 : 60,
+                boxSizing: 'border-box',
+                position: 'relative',
+                zIndex: 2,
+              }}
+            >
+              {children}
+              {isPending && (
+                <div
+                  className="portaal-loading-overlay"
+                  style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 260,
+                    right: 0,
+                    bottom: 0,
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    background: 'rgba(22, 37, 68, 0.45)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 110,
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/logo-finaal.png" alt="" aria-hidden="true" style={{ width: 64, height: 64, objectFit: 'contain', animation: 'portaal-pulse 1.5s infinite ease-in-out' }} />
+                    <div style={{ width: 120, height: 4, background: 'rgba(255, 255, 255, 0.25)', borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
+                      <div style={{ position: 'absolute', height: '100%', width: '50%', background: '#FFFFFF', borderRadius: 2, animation: 'portaal-loading-bar 1.2s infinite ease-in-out' }} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </main>
+              )}
+            </main>
+          </div>
         </div>
-      ) : children}
+      ) : (
+        children
+      )}
     </>
   )
 }

@@ -74,16 +74,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const { type, category, label, description, url, icon, sort_order } = body
 
-    if (!label || !type) {
-      return NextResponse.json({ error: 'Titel en type zijn verplicht' }, { status: 400 })
+    const resourceType = type || 'document'
+    if (!label) {
+      return NextResponse.json({ error: 'Titel is verplicht' }, { status: 400 })
     }
 
     const admin = createAdminClient()
     const { data, error } = await admin
       .from('portal_resources')
       .insert({
-        type: type === 'quicklink' ? 'quicklink' : 'document',
-        category: category?.trim() || (type === 'quicklink' ? 'Snelkoppelingen' : 'Algemeen'),
+        type: resourceType === 'quicklink' ? 'quicklink' : 'document',
+        category: category?.trim() || (resourceType === 'quicklink' ? 'Snelkoppelingen' : 'Algemeen'),
         label: String(label).trim().slice(0, 200),
         description: String(description || '').trim().slice(0, 500),
         url: String(url || '').trim().slice(0, 1000),

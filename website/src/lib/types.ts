@@ -37,6 +37,7 @@ export interface Settings {
   home_subtitle_leiding?: string
   home_title_groepsleiding?: string
   home_subtitle_groepsleiding?: string
+  portal_login_foto?: string
 
   takken: Record<string, TakConfig>
   // Geheim token voor de private leiding-ICS-feed (zie /api/leiding/ics).
@@ -183,4 +184,16 @@ export interface TodoItem {
   tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers' | 'groepsleiding'
   werkjaar: string
   created_at?: string
+}
+
+export interface PortalResource {
+  id: string
+  type?: 'quicklink' | 'document'
+  label: string
+  url?: string
+  description?: string
+  category?: string
+  icon: string
+  sort_order?: number
+  order?: number
 }

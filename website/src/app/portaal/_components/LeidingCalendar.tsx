@@ -1,8 +1,8 @@
 'use client'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CalendarEvent, AudienceTag } from '@/lib/types'
-import { AUDIENCE_TAGS, AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
+import { AUDIENCE_TAGS, AUDIENCE_NAMEN, PORTAAL_AUDIENCE_KLEUREN } from '@/lib/constants'
 import { getEventIcon } from '@/lib/calendar'
 import SubscribeCalendarButton from '@/components/SubscribeCalendarButton'
 import ConfirmDialog from './ConfirmDialog'
@@ -50,6 +50,35 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
   const [calYear, setCalYear] = useState(today.getFullYear())
   const [calMonth, setCalMonth] = useState(today.getMonth()) // 0-indexed
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+
+  const rightColumnRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!twoColumn) return
+
+    const handleGlobalWheel = (e: WheelEvent) => {
+      const rightCol = rightColumnRef.current
+      if (!rightCol) return
+
+      if (window.innerWidth <= 992) return
+
+      if (document.querySelector('.portaal-modal-overlay') || document.querySelector('.event-modal-overlay')) {
+        return
+      }
+
+      if (rightCol.contains(e.target as Node)) {
+        return
+      }
+
+      e.preventDefault()
+      rightCol.scrollTop += e.deltaY
+    }
+
+    window.addEventListener('wheel', handleGlobalWheel, { passive: false })
+    return () => {
+      window.removeEventListener('wheel', handleGlobalWheel)
+    }
+  }, [twoColumn])
 
   function showFlash(msg: string) { setFlash(msg); setTimeout(() => setFlash(''), 3000) }
 
@@ -151,8 +180,8 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
       <span className="cal-tag-chips-wrap">
         {tags.map(t => {
           const isYellow = t === 'kapoenen'
-          const tagBg = isYellow ? '#FEF3D6' : `${AUDIENCE_KLEUREN[t]}1E`
-          const tagColor = isYellow ? '#3A2A00' : AUDIENCE_KLEUREN[t]
+          const tagBg = isYellow ? '#FEF3D6' : `${PORTAAL_AUDIENCE_KLEUREN[t]}1E`
+          const tagColor = isYellow ? '#3A2A00' : PORTAAL_AUDIENCE_KLEUREN[t]
           return (
             <span key={t} style={{
               padding: compact ? '2px 7px' : '2px 9px',
@@ -163,7 +192,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
               letterSpacing: '0.4px',
               background: tagBg,
               color: tagColor,
-              border: isYellow ? '1px solid #F5B82E' : 'none',
+              border: isYellow ? '1.5px solid #F5B82E' : 'none',
               lineHeight: 1.3,
               whiteSpace: 'nowrap',
             }}>
@@ -181,10 +210,10 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
 
     return (
       <div style={{ background: '#fff', borderRadius: 18, border: 'none', overflow: 'hidden', boxShadow: '0 10px 32px rgba(0,0,0,0.16)' }}>
-        {/* Dark green header bar with compact public title style */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', background: '#1A3D2A', color: '#fff', flexWrap: 'wrap', gap: 10 }}>
+        {/* Bordeaux header bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', background: '#243B6B', color: '#fff', flexWrap: 'wrap', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <h2 className="cal-grid-month-title" style={{ color: '#fff', fontSize: '1.45rem', margin: 0, fontWeight: 800 }}>
+            <h2 className="cal-grid-month-title" style={{ color: '#fff', fontSize: '1.45rem', margin: 0, fontWeight: 800, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
               <i className="fa-regular fa-calendar-days" style={{ fontSize: '1.25rem', marginRight: 6 }}></i> {MAANDEN[calMonth + 1]} {calYear}
             </h2>
           </div>
@@ -262,24 +291,33 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                 {hasEvents && (
                   <div className="cal-grid-cell-events">
                     {dayEvents.map(ev => {
-                      const primaryTag = ev.audience[0] as AudienceTag
+                      const primaryTag = (ev.audience[0] || 'groep') as AudienceTag
                       const isImportant = ev.is_evenement
                       const isNoMeeting = ev.title.toLowerCase().includes('geen vergadering')
                       const iconClass = getEventIcon(ev)
-                      const tagColor = isImportant ? '#D6AB42' : AUDIENCE_KLEUREN[primaryTag] || '#1A3D2A'
+                      const tagColor = PORTAAL_AUDIENCE_KLEUREN[primaryTag] || '#243B6B'
+                      const isYellow = primaryTag === 'kapoenen'
 
-                      let pillClass = 'pill-primary'
                       let pillStyle: React.CSSProperties = {}
 
                       if (isImportant) {
-                        pillClass = 'pill-featured'
-                      } else if (isNoMeeting) {
-                        pillClass = 'pill-nomeeting'
-                      } else if (tagColor) {
                         pillStyle = {
-                          background: `${tagColor}1E`,
-                          color: '#1A3D2A',
-                          borderLeft: `3.5px solid ${tagColor}`
+                          background: tagColor,
+                          color: isYellow ? '#3A2A00' : '#FFFFFF',
+                          border: `1px solid ${tagColor}`,
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.18)',
+                        }
+                      } else if (isNoMeeting) {
+                        pillStyle = {
+                          background: '#F0F0F0',
+                          color: '#777777',
+                          border: '1px solid #CCCCCC',
+                        }
+                      } else {
+                        pillStyle = {
+                          background: isYellow ? '#FEF3D6' : `${tagColor}1E`,
+                          color: isYellow ? '#3A2A00' : '#162544',
+                          borderLeft: `3.5px solid ${tagColor}`,
                         }
                       }
 
@@ -295,8 +333,8 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                         <button
                           key={ev.id}
                           type="button"
-                          className={`cal-event-pill ${pillClass}`}
-                          style={Object.keys(pillStyle).length > 0 ? pillStyle : undefined}
+                          className="cal-event-pill"
+                          style={pillStyle}
                           onClick={(e) => {
                             e.stopPropagation()
                             setActiveViewEvent(ev)
@@ -332,9 +370,9 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
       flexShrink: 0,
       width: isMultiDay && !sameMonth ? 62 : 54,
       minHeight: 52,
-      background: isImportant ? '#FFF9E6' : '#EEF5F1',
+      background: isImportant ? '#162544' : '#EBF0F9',
       borderRadius: 12,
-      border: isImportant ? '1.5px solid #EAD8AB' : '1.5px solid #C2D9C9',
+      border: isImportant ? '1.5px solid #162544' : '1.5px solid #D0DCEE',
       padding: '6px 4px',
       textAlign: 'center',
       display: 'flex',
@@ -348,10 +386,10 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
     if (!isMultiDay) {
       return (
         <div style={boxStyle}>
-          <span style={{ fontSize: 20, fontWeight: 900, color: isImportant ? '#A0761C' : '#1A3D2A', lineHeight: 1 }}>
+          <span style={{ fontSize: 20, fontWeight: 900, color: isImportant ? '#FFFFFF' : '#162544', lineHeight: 1 }}>
             {String(startDay).padStart(2, '0')}
           </span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: isImportant ? '#B5892D' : '#5A7E68', lineHeight: 1, textTransform: 'lowercase' }}>{startMaand}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: isImportant ? '#EBF0F9' : '#243B6B', lineHeight: 1, textTransform: 'lowercase' }}>{startMaand}</span>
         </div>
       )
     }
@@ -363,17 +401,17 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
       <div style={boxStyle}>
         {sameMonth ? (
           <>
-            <span style={{ fontSize: 15, fontWeight: 900, color: isImportant ? '#A0761C' : '#1A3D2A', lineHeight: 1.1, letterSpacing: '-0.3px' }}>
+            <span style={{ fontSize: 15, fontWeight: 900, color: isImportant ? '#FFFFFF' : '#162544', lineHeight: 1.1, letterSpacing: '-0.3px' }}>
               {startDay}–{endDay}
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: isImportant ? '#B5892D' : '#5A7E68', lineHeight: 1, textTransform: 'lowercase' }}>{startMaand}</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: isImportant ? '#EBF0F9' : '#243B6B', lineHeight: 1, textTransform: 'lowercase' }}>{startMaand}</span>
           </>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-            <span style={{ fontSize: 11, fontWeight: 800, color: isImportant ? '#A0761C' : '#1A3D2A', lineHeight: 1.15, whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: isImportant ? '#FFFFFF' : '#162544', lineHeight: 1.15, whiteSpace: 'nowrap' }}>
               {startDay} {startMaand}
             </span>
-            <span style={{ fontSize: 10.5, fontWeight: 700, color: isImportant ? '#A0761C' : '#1A3D2A', lineHeight: 1.15, whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: isImportant ? '#EBF0F9' : '#162544', lineHeight: 1.15, whiteSpace: 'nowrap' }}>
               – {endDay} {endMaand}
             </span>
           </div>
@@ -387,7 +425,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {listEntries.length === 0 && (
-          <p style={{ color: '#6A8A75', fontSize: '.9rem', textAlign: 'center', padding: '32px 0', background: '#fff', borderRadius: 14, border: '1.5px solid #C2D9C9' }}>
+          <p style={{ color: '#666666', fontSize: '.9rem', textAlign: 'center', padding: '32px 0', background: '#fff', borderRadius: 14, border: '1px solid #D9D9D9' }}>
             {selectedDate ? 'Geen activiteiten op deze dag.' : 'Geen activiteiten gevonden.'}
           </p>
         )}
@@ -405,8 +443,8 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                 background: '#fff',
                 borderRadius: 14,
                 padding: '14px 16px',
-                border: highlighted ? '2px solid #C9963A' : '1.5px solid #C2D9C9',
-                boxShadow: highlighted ? '0 4px 14px rgba(201,150,58,.22)' : '0 2px 8px rgba(26,61,42,0.04)',
+                border: highlighted ? '2px solid #C9963A' : '1px solid #D9D9D9',
+                boxShadow: highlighted ? '0 4px 14px rgba(201,150,58,.22)' : '0 2px 8px rgba(0,0,0,0.04)',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
@@ -419,26 +457,26 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                   <strong style={{
                     fontSize: '1.15rem',
                     fontWeight: 900,
-                    color: '#1A3D2A',
+                    color: '#162544',
                     fontFamily: 'var(--font-heading, Nunito, sans-serif)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
                     lineHeight: 1.25,
                   }}>
-                    {iconClass ? <i className={`fa-solid ${iconClass}`} style={{ color: '#1A3D2A', fontSize: '1.05rem', flexShrink: 0 }}></i> : null}
+                    {iconClass ? <i className={`fa-solid ${iconClass}`} style={{ color: '#243B6B', fontSize: '1.05rem', flexShrink: 0 }}></i> : null}
                     <span style={{ wordBreak: 'break-word' }}>{ev.title}</span>
                   </strong>
                   {((!isMultiDay && ev.time) || ev.location) && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 3, fontSize: '.78rem', color: '#5A7E68', fontWeight: 600, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 3, fontSize: '.78rem', color: '#666666', fontWeight: 600, flexWrap: 'wrap' }}>
                       {!isMultiDay && ev.time && (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                          <i className="fa-regular fa-clock" style={{ fontSize: '.72rem', color: '#5A7E68' }}></i> {ev.time}
+                          <i className="fa-regular fa-clock" style={{ fontSize: '.72rem', color: '#243B6B' }}></i> {ev.time}
                         </span>
                       )}
                       {ev.location && (
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                          <i className="fa-solid fa-location-dot" style={{ fontSize: '.72rem', color: '#5A7E68' }}></i> {ev.location}
+                          <i className="fa-solid fa-location-dot" style={{ fontSize: '.72rem', color: '#243B6B' }}></i> {ev.location}
                         </span>
                       )}
                     </div>
@@ -456,12 +494,12 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
                         setShowForm(true)
                       }}
                       title="Bewerken"
-                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: '50%', background: '#EEF5F1', color: '#1A3D2A', fontSize: '.8rem', border: '1.5px solid #C2D9C9', cursor: 'pointer', flexShrink: 0, transition: 'all 0.15s ease' }}
+                      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: '50%', background: '#EBF0F9', color: '#243B6B', fontSize: '.8rem', border: 'none', cursor: 'pointer', flexShrink: 0, transition: 'all 0.15s ease' }}
                     >
                       <i className="fas fa-pen"></i>
                     </button>
                   )}
-                  <span style={{ fontSize: '.85rem', color: '#6A8A75', fontWeight: 800 }}>
+                  <span style={{ fontSize: '.85rem', color: '#243B6B', fontWeight: 800 }}>
                     <i className="fa-solid fa-chevron-right"></i>
                   </span>
                 </div>
@@ -478,7 +516,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
           {(['groep', 'leiding'] as const).map(tag => {
             const isActive = filter.has(tag)
-            const tagColor = AUDIENCE_KLEUREN[tag]
+            const tagColor = PORTAAL_AUDIENCE_KLEUREN[tag]
             return (
               <button
                 key={tag}
@@ -504,7 +542,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
           <span style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.35)', alignSelf: 'center', margin: '0 4px', flexShrink: 0 }} />
           {(['kapoenen', 'welpen', 'jonggivers', 'givers'] as const).map(tag => {
             const isActive = filter.has(tag)
-            const tagColor = AUDIENCE_KLEUREN[tag]
+            const tagColor = PORTAAL_AUDIENCE_KLEUREN[tag]
             return (
               <button
                 key={tag}
@@ -551,7 +589,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
           calendarName="Scouts Kriko-M — Leiding"
           buttonText="Abonneer (in agenda)"
           buttonClassName=""
-          buttonStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 13px', background: '#fff', border: 'none', borderRadius: 10, color: '#1A3D2A', fontSize: '.8rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 8px rgba(0,0,0,0.12)', flexShrink: 0 }}
+          buttonStyle={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: '#243B6B', border: 'none', borderRadius: 10, color: '#FFFFFF', fontSize: '.82rem', fontWeight: 800, cursor: 'pointer', fontFamily: 'inherit', boxShadow: '0 2px 6px rgba(107,23,36,0.2)', flexShrink: 0 }}
         />
       </div>
     )
@@ -561,7 +599,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
   return (
     <div>
       {flash && !showForm && (
-        <div style={{ background: '#FFFFFF', border: '2px solid #3F7D5A', color: '#1A3D2A', padding: '12px 18px', borderRadius: 12, marginBottom: 16, fontWeight: 700, boxShadow: '0 6px 20px rgba(0,0,0,0.12)' }}>
+        <div style={{ background: '#FFFFFF', border: '1px solid #243B6B', color: '#243B6B', padding: '12px 18px', borderRadius: 12, marginBottom: 16, fontWeight: 700, boxShadow: '0 2px 8px rgba(107,23,36,0.1)' }}>
           {flash}
         </div>
       )}
@@ -572,28 +610,29 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
           {/* Left: filter bar + calendar grid */}
           <div className="portal-agenda-left-column">
             {FilterBar()}
-            {CalendarGrid()}
             {selectedDate && (
-              <div style={{ marginTop: 10, padding: '8px 14px', background: '#FFFFFF', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                <span style={{ fontSize: '.82rem', fontWeight: 800, color: '#1A3D2A' }}>
-                  {(() => { const d = new Date(selectedDate); return `${d.getDate()} ${MAANDEN[d.getMonth() + 1]} ${d.getFullYear()}` })()}
+              <div style={{ marginBottom: 12, padding: '8px 14px', background: '#EBF0F9', border: '1.5px solid #D0DCEE', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <span style={{ fontSize: '.84rem', fontWeight: 800, color: '#162544' }}>
+                  Geselecteerde dag: {(() => { const d = new Date(selectedDate); return `${d.getDate()} ${MAANDEN[d.getMonth() + 1]} ${d.getFullYear()}` })()}
                 </span>
-                <button onClick={() => setSelectedDate(null)} style={{ background: 'none', border: 'none', color: '#B91C1C', cursor: 'pointer', fontSize: '.78rem', fontWeight: 700 }}>× Alle tonen</button>
+                <button onClick={() => setSelectedDate(null)} style={{ background: '#243B6B', border: 'none', borderRadius: 6, color: '#FFFFFF', cursor: 'pointer', fontSize: '.76rem', fontWeight: 700, padding: '4px 12px' }}>
+                  Alle tonen
+                </button>
               </div>
             )}
+            {CalendarGrid()}
           </div>
 
           {/* Right: activity list */}
-          <div>
+          <div className="portal-agenda-right-column" ref={rightColumnRef}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, minHeight: 34, gap: 8 }}>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#1A3D2A', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
-                {selectedDate ? 'Activiteiten op deze dag' : 'Alle activiteiten'}
-                {rightEntries.length > 0 && <span style={{ marginLeft: 8, fontSize: '.85rem', fontWeight: 700, color: '#5A7E68' }}>({rightEntries.length})</span>}
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 900, color: '#162544', margin: 0, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                {selectedDate ? 'Activiteiten op deze dag' : 'Activiteiten'}
               </h3>
               {!readOnly && !showForm && (
                 <button onClick={() => { setEditId(null); setShowForm(true) }}
-                  style={{ padding: '8px 16px', background: '#1A3D2A', color: '#FFFFFF', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 800, fontSize: '.84rem', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(26,61,42,0.2)' }}>
-                  + Toevoegen
+                  style={{ padding: '8px 16px', background: '#243B6B', color: '#FFFFFF', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 800, fontSize: '.84rem', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 2px 6px rgba(36,59,107,0.3)' }}>
+                  + Activiteit toevoegen
                 </button>
               )}
             </div>
@@ -606,7 +645,7 @@ export default function LeidingCalendar({ initialCalendar, highlightTak, canPubl
           {FilterBar()}
           {!readOnly && (
             <button onClick={() => { setEditId(null); setShowForm(true) }}
-              style={{ marginBottom: 16, padding: '9px 18px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
+              style={{ marginBottom: 16, padding: '9px 18px', background: '#243B6B', color: '#FFFFFF', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, fontSize: '.88rem', cursor: 'pointer' }}>
               + Activiteit toevoegen
             </button>
           )}

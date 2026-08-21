@@ -62,31 +62,31 @@ export default function SubscribeCalendarButton({
               <i className="fa-solid fa-xmark"></i>
             </button>
             <div className="cal-modal-body">
-              <span className="cal-modal-eyebrow">
+              <span className="cal-modal-eyebrow" style={{ color: '#243B6B' }}>
                 <i className="fa-solid fa-calendar-days"></i> Kalender koppelen
               </span>
-              <h3 className="cal-modal-title">Abonneer op de agenda</h3>
-              <p className="cal-modal-desc" style={{ fontSize: '0.9rem', marginBottom: '18px' }}>
+              <h3 className="cal-modal-title" style={{ color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontWeight: 900 }}>Abonneer op de agenda</h3>
+              <p className="cal-modal-desc" style={{ fontSize: '0.9rem', marginBottom: '18px', color: '#555' }}>
                 Koppel de agenda van {calendarName} aan jouw persoonlijke agenda-app. Nieuwe activiteiten en wijzigingen worden dan automatisch gesynchroniseerd!
               </p>
 
               <div className="cal-sub-grid">
-                <a href={googleUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline cal-sub-btn">
+                <a href={googleUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline cal-sub-btn" style={{ borderColor: '#D0DCEE', borderRadius: 10 }}>
                   <i className="fa-brands fa-google" style={{ color: '#4285F4' }}></i> Google Agenda
                 </a>
-                <a href={webcalUrl} className="btn btn-outline cal-sub-btn">
+                <a href={webcalUrl} className="btn btn-outline cal-sub-btn" style={{ borderColor: '#D0DCEE', borderRadius: 10 }}>
                   <i className="fa-brands fa-apple" style={{ color: '#000' }}></i> Apple / Outlook
                 </a>
-                <a href={outlookUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline cal-sub-btn">
+                <a href={outlookUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline cal-sub-btn" style={{ borderColor: '#D0DCEE', borderRadius: 10 }}>
                   <i className="fa-brands fa-microsoft" style={{ color: '#0078D4' }}></i> Outlook Web
                 </a>
-                <a href={downloadUrl} className="btn btn-outline cal-sub-btn">
+                <a href={downloadUrl} className="btn btn-outline cal-sub-btn" style={{ borderColor: '#D0DCEE', borderRadius: 10 }}>
                   <i className="fa-solid fa-download"></i> Download .ics
                 </a>
               </div>
 
               <div className="cal-sub-divider">
-                <label className="cal-sub-copy-title">Handmatige link (URL kopiëren):</label>
+                <label className="cal-sub-copy-title" style={{ color: '#162544' }}>Handmatige link (URL kopiëren):</label>
                 <div className="cal-sub-copy-box">
                   <input
                     type="text"
@@ -95,7 +95,7 @@ export default function SubscribeCalendarButton({
                     className="cal-sub-input"
                     onClick={(e) => (e.target as HTMLInputElement).select()}
                   />
-                  <button onClick={handleCopy} className="btn btn-secondary" style={{ padding: '8px 16px', fontSize: '0.82rem', whiteSpace: 'nowrap' }}>
+                  <button onClick={handleCopy} style={{ padding: '8px 16px', fontSize: '0.82rem', whiteSpace: 'nowrap', background: '#243B6B', color: '#FFFFFF', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>
                     {copied ? 'Gekopieerd!' : 'Kopieer link'}
                   </button>
                 </div>

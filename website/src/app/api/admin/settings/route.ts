@@ -33,6 +33,7 @@ export async function PATCH(req: NextRequest) {
     'home_subtitle_leiding',
     'home_title_groepsleiding',
     'home_subtitle_groepsleiding',
+    'portal_login_foto',
   ]
 
   let pbChanged = false

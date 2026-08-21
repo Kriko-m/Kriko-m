@@ -7,67 +7,65 @@ interface Props {
   isGroepsleiding?: boolean
   naam?: string
   settings?: Settings | null
+  unapprovedEchosCount?: number
 }
 
-export default function LeidingPanel({ isGroepsleiding = false, naam, settings }: Props) {
-  const defaultTitle = isGroepsleiding ? `Welkom, ${naam || 'Groepsleiding'}!` : `Welkom, ${naam || 'Leiding'}!`
-  const customTitle = isGroepsleiding ? settings?.home_title_groepsleiding : settings?.home_title_leiding
-  const homeTitle = customTitle || (settings?.home_title && settings.home_title !== 'Leidingportaal' ? settings.home_title : defaultTitle)
+export default function LeidingPanel({ isGroepsleiding = false, settings, unapprovedEchosCount = 0 }: Props) {
+  const pageTitle = isGroepsleiding
+    ? (settings?.home_title_groepsleiding || 'Groepsleiding')
+    : (settings?.home_title_leiding || 'Leiding')
+  const pageSubtitle = isGroepsleiding
+    ? (settings?.home_subtitle_groepsleiding || '')
+    : (settings?.home_subtitle_leiding || '')
 
-  const customSubtitle = isGroepsleiding ? settings?.home_subtitle_groepsleiding : settings?.home_subtitle_leiding
-  const homeSubtitle = customSubtitle !== undefined ? customSubtitle : (settings?.home_subtitle || 'Je centrale dashboard voor documenten, de Kriko Echo, kalender en beheer.')
   return (
     <div style={{
-      maxWidth: 1100,
+      maxWidth: 1200,
       margin: '0 auto',
       width: '100%',
-      minHeight: 'calc(100vh - 120px)',
+      padding: '40px 24px',
+      boxSizing: 'border-box',
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
-      padding: '40px 20px 60px',
-      boxSizing: 'border-box',
     }}>
       
-      {/* Centered Welcome Title & Description (without emojis or badges) */}
+      {/* Central Title & Subtitle */}
       <div style={{
         textAlign: 'center',
         marginBottom: 44,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 10,
       }}>
         <h1 style={{
           fontFamily: 'var(--font-heading, Nunito, sans-serif)',
-          fontSize: '2.2rem',
+          fontSize: 'clamp(2.5rem, 5vw, 3.6rem)',
           fontWeight: 900,
-          color: '#1A3D2A',
+          color: '#FFFFFF',
+          textShadow: '0 2px 8px rgba(0,0,0,0.4)',
           margin: 0,
+          letterSpacing: '-0.01em',
           lineHeight: 1.15,
-          letterSpacing: '-0.02em',
         }}>
-          {homeTitle}
+          {pageTitle}
         </h1>
-        {homeSubtitle && (
+        {pageSubtitle && (
           <p style={{
-            margin: 0,
-            fontSize: '1.02rem',
-            color: '#4A6855',
+            fontSize: '1.1rem',
+            color: 'rgba(255, 255, 255, 0.9)',
             fontWeight: 600,
-            maxWidth: 640,
-            lineHeight: 1.5,
+            textShadow: '0 1px 4px rgba(0,0,0,0.3)',
+            marginTop: 10,
+            marginBottom: 0,
           }}>
-            {homeSubtitle}
+            {pageSubtitle}
           </p>
         )}
       </div>
 
-      {/* Main Action Cards Grid (Narrower vertical cards, uniform green) */}
+      {/* Core Cards Grid (Only the 4 core section cards) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(auto-fit, minmax(210px, 1fr))`,
-        gap: 22,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        gap: 24,
         width: '100%',
       }}>
         
@@ -76,67 +74,91 @@ export default function LeidingPanel({ isGroepsleiding = false, naam, settings }
           href="/portaal/echos"
           style={{
             background: '#FFFFFF',
-            borderRadius: 20,
-            padding: '28px 20px',
-            border: '1.5px solid #C2D9C9',
-            boxShadow: '0 4px 16px rgba(26,61,42,0.05)',
+            borderRadius: 16,
+            padding: '28px 24px',
+            border: '1px solid #CCCCCC',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
             textDecoration: 'none',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
             transition: 'all 0.2s ease-in-out',
-            minHeight: 250,
+            minHeight: 220,
+            position: 'relative',
           }}
           className="portaal-home-card"
         >
           <div>
-            <div style={{
-              width: 48,
-              height: 48,
-              borderRadius: 14,
-              background: '#EEF5F1',
-              border: '1.5px solid #C2D9C9',
-              color: '#1A3D2A',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.3rem',
-              marginBottom: 20,
-            }}>
-              <i className="fa-solid fa-newspaper"></i>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+              <div style={{
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                background: '#162544',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1.35rem',
+              }}>
+                <i className="fa-solid fa-newspaper"></i>
+              </div>
+
+              {isGroepsleiding && unapprovedEchosCount > 0 && (
+                <span
+                  title={`${unapprovedEchosCount} Kriko Echo('s) te keuren`}
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: '50%',
+                    background: '#243B6B',
+                    color: '#FFFFFF',
+                    fontSize: '0.78rem',
+                    fontWeight: 900,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    lineHeight: 1,
+                    boxShadow: '0 2px 6px rgba(36,59,107,0.25)',
+                  }}
+                >
+                  {unapprovedEchosCount}
+                </span>
+              )}
             </div>
+
             <strong style={{
               display: 'block',
               fontFamily: 'var(--font-heading, Nunito, sans-serif)',
-              fontSize: '1.2rem',
+              fontSize: '1.25rem',
               fontWeight: 900,
-              color: '#1A3D2A',
-              marginBottom: 8,
-              lineHeight: 1.25,
+              color: '#162544',
+              marginBottom: 6,
+              lineHeight: 1.2,
             }}>
               Kriko Echo
             </strong>
             <p style={{
               margin: 0,
-              fontSize: '0.88rem',
-              color: '#4A6855',
+              fontSize: '0.9rem',
+              color: '#555555',
               lineHeight: 1.45,
               fontWeight: 500,
             }}>
-              Upload en beheer de maandelijkse edities per tak.
+              Upload en beheer de maandelijkse edities per tak in een overzichtelijke indeling.
             </p>
           </div>
 
           <div style={{
-            marginTop: 20,
+            marginTop: 24,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingTop: 14,
-            borderTop: '1px solid #EEF5F1',
-            fontSize: '0.84rem',
+            borderTop: '1px solid #EEEEEE',
+            fontSize: '0.86rem',
             fontWeight: 800,
-            color: '#1A3D2A',
+            color: '#243B6B',
           }}>
             <span>Echo beheer</span>
             <i className="fa-solid fa-arrow-right" style={{ transition: 'transform 0.2s ease' }}></i>
@@ -148,16 +170,16 @@ export default function LeidingPanel({ isGroepsleiding = false, naam, settings }
           href="/portaal/algemene-info"
           style={{
             background: '#FFFFFF',
-            borderRadius: 20,
-            padding: '28px 20px',
-            border: '1.5px solid #C2D9C9',
-            boxShadow: '0 4px 16px rgba(26,61,42,0.05)',
+            borderRadius: 16,
+            padding: '28px 24px',
+            border: '1px solid #CCCCCC',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
             textDecoration: 'none',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
             transition: 'all 0.2s ease-in-out',
-            minHeight: 250,
+            minHeight: 220,
           }}
           className="portaal-home-card"
         >
@@ -165,52 +187,51 @@ export default function LeidingPanel({ isGroepsleiding = false, naam, settings }
             <div style={{
               width: 48,
               height: 48,
-              borderRadius: 14,
-              background: '#EEF5F1',
-              border: '1.5px solid #C2D9C9',
-              color: '#1A3D2A',
+              borderRadius: 12,
+              background: '#162544',
+              color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1.3rem',
-              marginBottom: 20,
+              fontSize: '1.35rem',
+              marginBottom: 18,
             }}>
               <i className="fa-solid fa-folder-open"></i>
             </div>
             <strong style={{
               display: 'block',
               fontFamily: 'var(--font-heading, Nunito, sans-serif)',
-              fontSize: '1.2rem',
+              fontSize: '1.25rem',
               fontWeight: 900,
-              color: '#1A3D2A',
-              marginBottom: 8,
-              lineHeight: 1.25,
+              color: '#162544',
+              marginBottom: 6,
+              lineHeight: 1.2,
             }}>
               Documenten &amp; Links
             </strong>
             <p style={{
               margin: 0,
-              fontSize: '0.88rem',
-              color: '#4A6855',
+              fontSize: '0.9rem',
+              color: '#555555',
               lineHeight: 1.45,
               fontWeight: 500,
             }}>
-              Sjablonen, checklists, formulieren &amp; snelkoppelingen.
+              Overzicht van sjablonen, draaiboeken, formulieren en externe links.
             </p>
           </div>
 
           <div style={{
-            marginTop: 20,
+            marginTop: 24,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingTop: 14,
-            borderTop: '1px solid #EEF5F1',
-            fontSize: '0.84rem',
+            borderTop: '1px solid #EEEEEE',
+            fontSize: '0.86rem',
             fontWeight: 800,
-            color: '#1A3D2A',
+            color: '#243B6B',
           }}>
-            <span>Documenten</span>
+            <span>Documenten bekijken</span>
             <i className="fa-solid fa-arrow-right" style={{ transition: 'transform 0.2s ease' }}></i>
           </div>
         </Link>
@@ -220,16 +241,16 @@ export default function LeidingPanel({ isGroepsleiding = false, naam, settings }
           href="/portaal/leiding/agenda"
           style={{
             background: '#FFFFFF',
-            borderRadius: 20,
-            padding: '28px 20px',
-            border: '1.5px solid #C2D9C9',
-            boxShadow: '0 4px 16px rgba(26,61,42,0.05)',
+            borderRadius: 16,
+            padding: '28px 24px',
+            border: '1px solid #CCCCCC',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
             textDecoration: 'none',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
             transition: 'all 0.2s ease-in-out',
-            minHeight: 250,
+            minHeight: 220,
           }}
           className="portaal-home-card"
         >
@@ -237,72 +258,71 @@ export default function LeidingPanel({ isGroepsleiding = false, naam, settings }
             <div style={{
               width: 48,
               height: 48,
-              borderRadius: 14,
-              background: '#EEF5F1',
-              border: '1.5px solid #C2D9C9',
-              color: '#1A3D2A',
+              borderRadius: 12,
+              background: '#162544',
+              color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1.3rem',
-              marginBottom: 20,
+              fontSize: '1.35rem',
+              marginBottom: 18,
             }}>
               <i className="fa-solid fa-calendar-days"></i>
             </div>
             <strong style={{
               display: 'block',
               fontFamily: 'var(--font-heading, Nunito, sans-serif)',
-              fontSize: '1.2rem',
+              fontSize: '1.25rem',
               fontWeight: 900,
-              color: '#1A3D2A',
-              marginBottom: 8,
-              lineHeight: 1.25,
+              color: '#162544',
+              marginBottom: 6,
+              lineHeight: 1.2,
             }}>
               Kalender &amp; Activiteiten
             </strong>
             <p style={{
               margin: 0,
-              fontSize: '0.88rem',
-              color: '#4A6855',
+              fontSize: '0.9rem',
+              color: '#555555',
               lineHeight: 1.45,
               fontWeight: 500,
             }}>
-              Bekijk en plan activiteiten &amp; synchroniseer met je telefoon.
+              Plan vergaderingen en evenementen en abonneer op de kalender.
             </p>
           </div>
 
           <div style={{
-            marginTop: 20,
+            marginTop: 24,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingTop: 14,
-            borderTop: '1px solid #EEF5F1',
-            fontSize: '0.84rem',
+            borderTop: '1px solid #EEEEEE',
+            fontSize: '0.86rem',
             fontWeight: 800,
-            color: '#1A3D2A',
+            color: '#243B6B',
           }}>
-            <span>Kalender</span>
+            <span>Naar kalender</span>
             <i className="fa-solid fa-arrow-right" style={{ transition: 'transform 0.2s ease' }}></i>
           </div>
         </Link>
 
-        {/* Card 4: Website Beheer (Uniform Groen) */}
+        {/* Card 4: Website Beheer (Groepsleiding) */}
         {isGroepsleiding && (
           <Link
             href="/portaal/website-beheer"
             style={{
               background: '#FFFFFF',
-              borderRadius: 20,
-              padding: '28px 20px',
-              border: '1.5px solid #C2D9C9',
-              boxShadow: '0 4px 16px rgba(26,61,42,0.05)',
+              borderRadius: 16,
+              padding: '28px 24px',
+              border: '1px solid #CCCCCC',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
               textDecoration: 'none',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
               transition: 'all 0.2s ease-in-out',
-              minHeight: 250,
+              minHeight: 220,
             }}
             className="portaal-home-card"
           >
@@ -310,52 +330,51 @@ export default function LeidingPanel({ isGroepsleiding = false, naam, settings }
               <div style={{
                 width: 48,
                 height: 48,
-                borderRadius: 14,
-                background: '#EEF5F1',
-                border: '1.5px solid #C2D9C9',
-                color: '#1A3D2A',
+                borderRadius: 12,
+                background: '#162544',
+                color: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1.3rem',
-                marginBottom: 20,
+                fontSize: '1.35rem',
+                marginBottom: 18,
               }}>
                 <i className="fa-solid fa-globe"></i>
               </div>
               <strong style={{
                 display: 'block',
                 fontFamily: 'var(--font-heading, Nunito, sans-serif)',
-                fontSize: '1.2rem',
+                fontSize: '1.25rem',
                 fontWeight: 900,
-                color: '#1A3D2A',
-                marginBottom: 8,
-                lineHeight: 1.25,
+                color: '#162544',
+                marginBottom: 6,
+                lineHeight: 1.2,
               }}>
                 Website Beheer
               </strong>
               <p style={{
                 margin: 0,
-                fontSize: '0.88rem',
-                color: '#4A6855',
+                fontSize: '0.9rem',
+                color: '#555555',
                 lineHeight: 1.45,
                 fontWeight: 500,
               }}>
-                Live website bewerken, instellingen en accounts beheren.
+                Beheer live pagina-inhoud, banners en accountinstellingen.
               </p>
             </div>
 
             <div style={{
-              marginTop: 20,
+              marginTop: 24,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               paddingTop: 14,
-              borderTop: '1px solid #EEF5F1',
-              fontSize: '0.84rem',
+              borderTop: '1px solid #EEEEEE',
+              fontSize: '0.86rem',
               fontWeight: 800,
-              color: '#1A3D2A',
+              color: '#243B6B',
             }}>
-              <span>Website beheer</span>
+              <span>Website bewerken</span>
               <i className="fa-solid fa-arrow-right" style={{ transition: 'transform 0.2s ease' }}></i>
             </div>
           </Link>

@@ -64,10 +64,27 @@ export const AUDIENCE_KLEUREN: Record<string, string> = {
   groep: '#C9963A',   // goud
 }
 
-export const MAANDEN = [
-  'januari', 'februari', 'maart', 'april', 'mei', 'juni',
-  'juli', 'augustus', 'september', 'oktober', 'november', 'december',
-]
+// Kleuren per audience-tag specifiek voor het leidingsportaal
+export const PORTAAL_AUDIENCE_KLEUREN: Record<string, string> = {
+  ...TAK_KLEUREN,
+  groep: '#650B19',   // bordeaux (Groep in leidingsportaal)
+  leiding: '#243B6B', // donkerblauw (Leiding in leidingsportaal)
+}
+
+export const MAANDEN: Record<number, string> = {
+  1: 'januari',
+  2: 'februari',
+  3: 'maart',
+  4: 'april',
+  5: 'mei',
+  6: 'juni',
+  7: 'juli',
+  8: 'augustus',
+  9: 'september',
+  10: 'oktober',
+  11: 'november',
+  12: 'december',
+}
 
 // Productie-URL — fallback wanneer leiding lokaal test, zodat gekopieerde
 // uitnodigingslinks nooit naar localhost wijzen.

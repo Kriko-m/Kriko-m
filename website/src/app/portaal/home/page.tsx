@@ -22,12 +22,19 @@ export default async function HomePage() {
   const naam = verified.user_metadata?.naam || (isGroepsleiding ? 'Groepsleiding' : 'Leiding')
 
   let settings: Settings | null = null
+  let unapprovedEchosCount = 0
   try {
     const admin = createAdminClient()
-    const { data } = await admin.from('settings').select('*').eq('id', 1).single()
-    if (data) settings = normalizeSettings(data) as Settings
+    const [settingsRes, echosRes] = await Promise.all([
+      admin.from('settings').select('*').eq('id', 1).single(),
+      isGroepsleiding
+        ? admin.from('echos').select('*', { count: 'exact', head: true }).eq('approved', false)
+        : Promise.resolve({ count: 0 }),
+    ])
+    if (settingsRes.data) settings = normalizeSettings(settingsRes.data) as Settings
+    if (echosRes.count) unapprovedEchosCount = echosRes.count
   } catch (err) {
-    console.error('Error loading settings on portaal home:', err)
+    console.error('Error loading data on portaal home:', err)
   }
 
   return (
@@ -35,6 +42,7 @@ export default async function HomePage() {
       isGroepsleiding={isGroepsleiding}
       naam={naam}
       settings={settings}
+      unapprovedEchosCount={unapprovedEchosCount}
     />
   )
 }

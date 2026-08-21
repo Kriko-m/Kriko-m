@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { CalendarEvent, AudienceTag } from '@/lib/types'
-import { AUDIENCE_TAGS, AUDIENCE_NAMEN, AUDIENCE_KLEUREN } from '@/lib/constants'
+import { AUDIENCE_TAGS, AUDIENCE_NAMEN, PORTAAL_AUDIENCE_KLEUREN } from '@/lib/constants'
 import { PRESET_EVENT_ICONS } from '@/lib/calendar'
 
 type FormState = {
@@ -147,25 +147,25 @@ export default function KalenderActiviteitModal({
   }
 
   const inputStyle = {
-    width: '100%', padding: '10px 14px', border: '1.5px solid #C2D9C9', borderRadius: 10,
+    width: '100%', padding: '10px 14px', border: '1.5px solid #D0DCEE', borderRadius: 10,
     fontFamily: 'inherit', fontSize: '.9rem', boxSizing: 'border-box' as const, background: '#FFF'
   }
-  const labelStyle = { display: 'block', fontSize: '.82rem', fontWeight: 800, color: '#1A3D2A', marginBottom: 6 }
+  const labelStyle = { display: 'block', fontSize: '.82rem', fontWeight: 800, color: '#162544', marginBottom: 6 }
   const errorOutline = (f: string): React.CSSProperties => validationErrors.has(f)
     ? { boxShadow: '0 0 0 2px #e74c3c, 0 0 10px rgba(231,76,60,.35)', borderRadius: 10 }
     : {}
 
   return (
     <>
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(10,20,15,0.45)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)', zIndex: 1200 }} onClick={onClose} />
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(22,37,68,0.5)', backdropFilter: 'blur(5px)', WebkitBackdropFilter: 'blur(5px)', zIndex: 1200 }} onClick={onClose} />
       <div style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1201, padding: 16, pointerEvents: 'none' }}>
         <div style={{ pointerEvents: 'auto', width: '95%', maxWidth: 720, maxHeight: '90vh', overflow: 'auto', background: '#fff', borderRadius: 20, padding: 32, boxShadow: '0 24px 60px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12, borderBottom: '1px solid #E8F0EA' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 12, borderBottom: '1px solid #EDE8D0' }}>
             <div>
-              <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.3rem', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
-                {editEvent ? '✏️ Activiteit bewerken' : '➕ Nieuwe activiteit'}
+              <h3 style={{ margin: 0, color: '#162544', fontWeight: 900, fontSize: '1.3rem', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                {editEvent ? 'Activiteit bewerken' : 'Nieuwe activiteit'}
               </h3>
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -176,14 +176,14 @@ export default function KalenderActiviteitModal({
                 </button>
               )}
               <button type="button" onClick={onClose}
-                style={{ width: 34, height: 34, border: '1.5px solid #C2D9C9', borderRadius: '50%', background: '#F8FAF9', color: '#6A8A75', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                style={{ width: 34, height: 34, border: '1px solid #D0DCEE', borderRadius: '50%', background: '#F0ECE4', color: '#1A1A1A', fontSize: '1.1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 ✕
               </button>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <div style={{ display: 'flex', gap: 8, borderBottom: '2px solid #E8F0EA', paddingBottom: 8 }}>
+          <div style={{ display: 'flex', gap: 8, borderBottom: '2px solid #EDE8D0', paddingBottom: 8 }}>
             <button
               type="button"
               onClick={() => setActiveTab('basis')}
@@ -191,15 +191,15 @@ export default function KalenderActiviteitModal({
                 padding: '8px 18px',
                 borderRadius: 10,
                 border: 'none',
-                background: activeTab === 'basis' ? '#1A3D2A' : '#EEF5F1',
-                color: activeTab === 'basis' ? '#fff' : '#1A3D2A',
+                background: activeTab === 'basis' ? '#243B6B' : '#EBF0F9',
+                color: activeTab === 'basis' ? '#fff' : '#243B6B',
                 fontWeight: 800,
                 fontSize: '.88rem',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
               }}
             >
-              📋 Basisgegevens
+              Basisgegevens
             </button>
             <button
               type="button"
@@ -208,8 +208,8 @@ export default function KalenderActiviteitModal({
                 padding: '8px 18px',
                 borderRadius: 10,
                 border: 'none',
-                background: activeTab === 'opties' ? '#1A3D2A' : '#EEF5F1',
-                color: activeTab === 'opties' ? '#fff' : '#1A3D2A',
+                background: activeTab === 'opties' ? '#243B6B' : '#EBF0F9',
+                color: activeTab === 'opties' ? '#fff' : '#243B6B',
                 fontWeight: 800,
                 fontSize: '.88rem',
                 cursor: 'pointer',
@@ -219,15 +219,15 @@ export default function KalenderActiviteitModal({
                 gap: 6,
               }}
             >
-              ⚙️ Opties & Links
+              Opties & Links
               {(form.icon || form.is_evenement || form.external_link_url || form.document_url || form.facebook_event_url) ? (
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#C9963A', display: 'inline-block' }} />
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#162544', display: 'inline-block' }} />
               ) : null}
             </button>
           </div>
 
           {flash && (
-            <div style={{ background: 'hsla(145,33%,36%,.1)', border: '1.5px solid #3F7D5A', color: '#2C5A40', padding: '10px 14px', borderRadius: 10, fontWeight: 600, fontSize: '.9rem' }}>
+            <div style={{ background: '#EBF0F9', border: '1.5px solid #243B6B', color: '#162544', padding: '10px 14px', borderRadius: 10, fontWeight: 600, fontSize: '.9rem' }}>
               {flash}
             </div>
           )}
@@ -243,10 +243,11 @@ export default function KalenderActiviteitModal({
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {selectableTags.map(tag => {
                       const on = form.audience.includes(tag)
+                      const tagColor = PORTAAL_AUDIENCE_KLEUREN[tag]
                       return (
                         <button key={tag} type="button" onClick={() => toggleAudience(tag)}
-                          style={{ padding: '6px 14px', borderRadius: 20, border: `1.5px solid ${AUDIENCE_KLEUREN[tag]}`, cursor: 'pointer', fontSize: '.8rem', fontWeight: 700,
-                            background: on ? AUDIENCE_KLEUREN[tag] : 'transparent', color: on ? '#fff' : AUDIENCE_KLEUREN[tag], transition: 'all 0.15s ease' }}>
+                          style={{ padding: '6px 14px', borderRadius: 20, border: `1.5px solid ${tagColor}`, cursor: 'pointer', fontSize: '.8rem', fontWeight: 700,
+                            background: on ? tagColor : 'transparent', color: on ? (tag === 'kapoenen' ? '#3a2a00' : '#fff') : tagColor, transition: 'all 0.15s ease' }}>
                           {on ? '✓ ' : ''}{AUDIENCE_NAMEN[tag]}
                         </button>
                       )
@@ -269,7 +270,7 @@ export default function KalenderActiviteitModal({
                     <label style={labelStyle}>Tijdstip (van – tot)</label>
                     <div style={{ display: 'flex', gap: 6, alignItems: 'center', ...errorOutline('time') }}>
                       <input type="time" style={{ ...inputStyle, flex: 1 }} value={form.timeStart} onChange={e => setForm(p => ({ ...p, timeStart: e.target.value }))} />
-                      <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
+                      <span style={{ color: '#666666', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
                       <input type="time" style={{ ...inputStyle, flex: 1 }} value={form.timeEnd} onChange={e => setForm(p => ({ ...p, timeEnd: e.target.value }))} />
                     </div>
                   </div>
@@ -281,7 +282,7 @@ export default function KalenderActiviteitModal({
                       </div>
                       {isMeerdaags ? (
                         <>
-                          <span style={{ color: '#6A8A75', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
+                          <span style={{ color: '#666666', fontWeight: 600, fontSize: '.85rem', flexShrink: 0 }}>–</span>
                           <div style={{ flex: 1 }}>
                             <input type="date" style={{ ...inputStyle, width: '100%', background: '#fafaf8', fontSize: '.85rem' }} value={form.datum_tot} onChange={e => setForm(p => ({ ...p, datum_tot: e.target.value }))} />
                           </div>
@@ -290,7 +291,7 @@ export default function KalenderActiviteitModal({
                         </>
                       ) : (
                         <button type="button" onClick={() => { setIsMeerdaags(true); setForm(p => ({ ...p, datum_tot: p.date || new Date().toISOString().split('T')[0] })) }}
-                          style={{ flexShrink: 0, background: 'none', border: 'none', color: '#1A3D2A', cursor: 'pointer', fontSize: '.75rem', fontWeight: 700, padding: '5px 8px', whiteSpace: 'nowrap', textDecoration: 'underline' }}>
+                          style={{ flexShrink: 0, background: 'none', border: 'none', color: '#243B6B', cursor: 'pointer', fontSize: '.75rem', fontWeight: 700, padding: '5px 8px', whiteSpace: 'nowrap', textDecoration: 'underline' }}>
                           + meerdaags
                         </button>
                       )}
@@ -317,9 +318,9 @@ export default function KalenderActiviteitModal({
               <>
                 {/* Belangrijk checkbox */}
                 <div>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#8A6310', fontSize: '.88rem', background: '#FFF9E6', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #EAD8AB' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#162544', fontSize: '.88rem', background: '#EBF0F9', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #D0DCEE' }}>
                     <input type="checkbox" checked={form.is_evenement} onChange={e => setForm(p => ({ ...p, is_evenement: e.target.checked }))} style={{ width: 16, height: 16, cursor: 'pointer' }} />
-                    Markeer als belangrijk evenement (subtiele gele datum)
+                    Markeer als belangrijk evenement (subtiele blauwe datum)
                   </label>
                 </div>
 
@@ -341,9 +342,9 @@ export default function KalenderActiviteitModal({
                             gap: 6,
                             padding: '5px 12px',
                             borderRadius: 8,
-                            border: selected ? '1.5px solid #1A3D2A' : '1.5px solid #E0E5E1',
-                            background: selected ? '#1A3D2A' : '#FAFBF9',
-                            color: selected ? '#FFF' : '#333',
+                            border: selected ? '1.5px solid #243B6B' : '1.5px solid #D0DCEE',
+                            background: selected ? '#243B6B' : '#F0ECE4',
+                            color: selected ? '#FFF' : '#1A1A1A',
                             fontSize: '.8rem',
                             fontWeight: 700,
                             cursor: 'pointer',
@@ -359,15 +360,15 @@ export default function KalenderActiviteitModal({
 
                 {/* Option Toggles */}
                 <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#1A3D2A', fontSize: '.85rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#162544', fontSize: '.85rem' }}>
                     <input type="checkbox" checked={externalLinkOpen} onChange={e => setExternalLinkOpen(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
                     📝 Inschrijflink / Formulier?
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#1A3D2A', fontSize: '.85rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#162544', fontSize: '.85rem' }}>
                     <input type="checkbox" checked={documentOpen} onChange={e => setDocumentOpen(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
                     📄 Uitnodiging (Flyer / PDF)?
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#1A3D2A', fontSize: '.85rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontWeight: 700, color: '#162544', fontSize: '.85rem' }}>
                     <input type="checkbox" checked={facebookLinkOpen} onChange={e => setFacebookLinkOpen(e.target.checked)} style={{ width: 16, height: 16, cursor: 'pointer' }} />
                     Facebook link?
                   </label>
@@ -375,7 +376,7 @@ export default function KalenderActiviteitModal({
 
                 {/* Inschrijflink */}
                 {externalLinkOpen && (
-                  <div style={{ padding: '12px 16px', background: '#F0F5FF', border: '1.5px solid #C0D4FF', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ padding: '12px 16px', background: '#EBF0F9', border: '1.5px solid #D0DCEE', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <label style={labelStyle}>Invulformulier / Inschrijflink (URL)</label>
                     <input style={inputStyle} value={form.external_link_url} onChange={e => setForm(p => ({ ...p, external_link_url: e.target.value }))} placeholder="https://forms.google.com/... of inschrijf-URL" />
                   </div>
@@ -388,7 +389,7 @@ export default function KalenderActiviteitModal({
                     <input type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={handleDocumentChange} style={{ fontSize: '.8rem' }} />
                     {form.document_url && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
-                        <a href={form.document_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.82rem', color: '#1A3D2A', fontWeight: 700, textDecoration: 'underline' }}>
+                        <a href={form.document_url} target="_blank" rel="noopener noreferrer" style={{ fontSize: '.82rem', color: '#243B6B', fontWeight: 700, textDecoration: 'underline' }}>
                           📄 Huidige uitnodiging bekijken
                         </a>
                         <button type="button" onClick={() => setForm(p => ({ ...p, document_url: '' }))}
@@ -402,7 +403,7 @@ export default function KalenderActiviteitModal({
 
                 {/* Facebook links */}
                 {facebookLinkOpen && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 16px', background: '#F0F4FA', border: '1.5px solid #D0DCF0', borderRadius: 12 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '12px 16px', background: '#EBF0F9', border: '1.5px solid #D0DCEE', borderRadius: 12 }}>
                     <div>
                       <label style={labelStyle}>Facebook evenement link</label>
                       <input style={inputStyle} value={form.facebook_event_url} onChange={e => setForm(p => ({ ...p, facebook_event_url: e.target.value }))} placeholder="https://facebook.com/events/..." />
@@ -416,8 +417,8 @@ export default function KalenderActiviteitModal({
 
                 {/* Cover foto voor publieke kalender */}
                 {canPublish && form.audience.includes('groep') && (
-                  <div style={{ padding: '12px 16px', background: '#FDF9F0', border: '1.5px solid #E2C58D', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <span style={{ fontSize: '.8rem', fontWeight: 800, color: '#9A6B12' }}>📸 Coverfoto voor publieke kalender (optioneel)</span>
+                  <div style={{ padding: '12px 16px', background: '#EBF0F9', border: '1.5px solid #D0DCEE', borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <span style={{ fontSize: '.8rem', fontWeight: 800, color: '#162544' }}>📸 Coverfoto voor publieke kalender (optioneel)</span>
                     <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleBannerChange} style={{ fontSize: '.8rem' }} />
                     {form.banner_image && (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
@@ -435,13 +436,13 @@ export default function KalenderActiviteitModal({
             )}
 
             {/* Modal Actions */}
-            <div style={{ display: 'flex', gap: 12, paddingTop: 10, borderTop: '1px solid #E8F0EA' }}>
+            <div style={{ display: 'flex', gap: 12, paddingTop: 10, borderTop: '1px solid #EDE8D0' }}>
               <button type="submit" disabled={loading}
-                style={{ padding: '12px 24px', background: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 800, cursor: 'pointer', fontSize: '.95rem', flex: 1, boxShadow: '0 4px 12px rgba(26,61,42,0.2)' }}>
-                {loading ? 'Bezig…' : editEvent ? '💾 Wijzigingen Opslaan' : '➕ Activiteit Opslaan'}
+                style={{ padding: '12px 24px', background: '#243B6B', color: '#fff', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 800, cursor: 'pointer', fontSize: '.95rem', flex: 1, boxShadow: '0 4px 12px rgba(36,59,107,0.25)' }}>
+                {loading ? 'Bezig…' : editEvent ? 'Wijzigingen opslaan' : 'Activiteit opslaan'}
               </button>
               <button type="button" onClick={onClose}
-                style={{ padding: '12px 24px', background: '#F4F7F5', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, color: '#6A8A75', cursor: 'pointer', fontSize: '.95rem' }}>
+                style={{ padding: '12px 24px', background: '#F0ECE4', border: 'none', borderRadius: 10, fontFamily: 'inherit', fontWeight: 700, color: '#1A1A1A', cursor: 'pointer', fontSize: '.95rem' }}>
                 Annuleren
               </button>
             </div>

@@ -1,110 +1,43 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
-import type { PortalResource } from '@/app/api/admin/portal-resources/route'
+import { PortalResource } from '@/lib/types'
+import ConfirmDialog from '../_components/ConfirmDialog'
+
+const DEFAULT_CATEGORIES = [
+  'Algemeen',
+]
 
 interface Props {
   initialResources: PortalResource[]
-  isGroepsleiding: boolean
+  isGroepsleiding?: boolean
 }
 
-const PRESET_CATEGORIES = [
-  '🏕️ Kamp',
-  '💶 Financieel',
-  '🎲 Spel & Activiteiten',
-  '📑 Veiligheid & Formulieren',
-  'Algemeen'
-]
-
-const ICON_OPTIONS = [
-  { label: 'Scouts Lelie', icon: 'scouts-lelie' },
-  { label: 'Huis / Lokaal', icon: 'fa-solid fa-house' },
-  { label: 'Kampas (Jeugdverblijven)', icon: 'kampas' },
-  { label: 'Tent / Kamp', icon: 'fa-solid fa-tent' },
-  { label: 'Scoutsklaver', icon: 'fa-solid fa-clover' },
-  { label: 'Geld / Biljet', icon: 'fa-solid fa-money-bill-wave' },
-  { label: 'Muntstukken / Geld', icon: 'fa-solid fa-coins' },
-  { label: 'Portemonnee', icon: 'fa-solid fa-wallet' },
-  { label: 'Euro Teken', icon: 'fa-solid fa-euro-sign' },
-  { label: 'Rekenmachine', icon: 'fa-solid fa-calculator' },
-  { label: 'Kassabon', icon: 'fa-solid fa-receipt' },
-  { label: 'Map / Bestanden', icon: 'fa-brands fa-google-drive' },
-  { label: 'Checklist', icon: 'fa-solid fa-clipboard-check' },
-  { label: 'Spel / Document', icon: 'fa-solid fa-file-pen' },
-  { label: 'Lijst / Overzicht', icon: 'fa-solid fa-list-check' },
-  { label: 'Ideeën / Lamp', icon: 'fa-solid fa-lightbulb' },
-  { label: 'Medisch', icon: 'fa-solid fa-notes-medical' },
-  { label: 'Telefoon / Nood', icon: 'fa-solid fa-phone-volume' },
-  { label: 'Administratie / Tandwiel', icon: 'fa-solid fa-users-gear' },
-  { label: 'Scouts & Gidsen VL Logo', icon: 'scouts-gidsen-vl' },
-  { label: 'Kompas', icon: 'fa-solid fa-compass-drafting' },
-  { label: 'Facebook', icon: 'fa-brands fa-facebook' },
-  { label: 'Standaard Bestand', icon: 'fa-solid fa-file' },
-]
+function ScoutsLelieIcon() {
+  return (
+    <svg width="1.15em" height="1.15em" viewBox="0 0 100 100" fill="currentColor" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+      <path d="M50 8 C54 22 66 28 66 40 C66 48 59 55 50 55 C41 55 34 48 34 40 C34 28 46 22 50 8 Z" />
+      <path d="M40 34 C28 30 17 37 18 49 C19 57 27 61 35 57 C43 53 45 43 40 34 Z" />
+      <path d="M60 34 C72 30 83 37 82 49 C81 57 73 61 65 57 C57 53 55 43 60 34 Z" />
+      <rect x="32" y="57" width="36" height="7" rx="3.5" />
+      <path d="M44 64 C44 73 50 79 50 79 C50 79 56 73 56 64 Z" />
+    </svg>
+  )
+}
 
 function RenderIcon({ icon }: { icon: string }) {
-  if (icon === 'scouts-lelie' || icon === 'fa-solid fa-fleur-de-lis' || icon === '/images/scouts-lelie.png') {
-    return (
-      <svg width="22" height="22" viewBox="0 0 100 100" fill="#1A3D2A" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-        {/* Main Central Pointed Petal */}
-        <path d="M50 4 C50 4 67 22 67 44 H33 C33 22 47 4 50 4 Z" />
-        {/* Inner Diamond slit in central petal */}
-        <path d="M50 12 L56 41 H44 Z" fill="#EEF5F1" />
-
-        {/* Left Wing Petal */}
-        <path d="M37 43 C22 43 10 33 13 18 C15 7 28 12 36 24 C38 29 40 37 40 43 Z" />
-        {/* Left Star Cutout */}
-        <polygon points="23,22 25,27 30,27 26,30 28,35 23,32 18,35 20,30 16,27 21,27" fill="#EEF5F1" />
-
-        {/* Right Wing Petal */}
-        <path d="M63 43 C78 43 90 33 87 18 C85 7 72 12 64 24 C62 29 60 37 60 43 Z" />
-        {/* Right Star Cutout */}
-        <polygon points="77,22 79,27 84,27 80,30 82,35 77,32 72,35 74,30 70,27 75,27" fill="#EEF5F1" />
-
-        {/* Horizontal Tie Ring */}
-        <rect x="29" y="47" width="42" height="7" rx="3.5" />
-
-        {/* Lower Base Cutouts & Tail */}
-        <path d="M35 56 C28 66 35 78 44 75 C44 68 39 60 39 56 Z" />
-        <path d="M65 56 C72 66 65 78 56 75 C56 68 61 60 61 56 Z" />
-        <path d="M44 56 L50 86 L56 56 Z" />
-      </svg>
-    )
+  if (icon === 'scouts-lelie') {
+    return <ScoutsLelieIcon />
   }
-
-  if (icon === 'kampas' || icon === 'kampas-logo' || icon === '/images/kampas-logo.svg') {
-    return (
-      /* eslint-disable-next-line @next/next/no-img-element */
-      <img
-        src="/images/kampas-logo.svg"
-        alt="Kampas Logo"
-        width={24}
-        height={24}
-        style={{ width: 24, height: 24, objectFit: 'contain', borderRadius: 4, display: 'block', flexShrink: 0 }}
-      />
-    )
+  if (icon === 'kampas') {
+    return <i className="fa-solid fa-tent" />
   }
-
-  if (
-    icon === 'scouts-gidsen-vl' ||
-    icon === 'scouts-gidsen-vlaanderen' ||
-    icon === 'fa-solid fa-compass-drafting' ||
-    icon === '/images/scouts-gidsen-vl.svg'
-  ) {
-    return (
-      /* eslint-disable-next-line @next/next/no-img-element */
-      <img
-        src="/images/scouts-gidsen-vl.svg"
-        alt="Scouts & Gidsen Vlaanderen Logo"
-        width={24}
-        height={24}
-        style={{ width: 24, height: 24, objectFit: 'contain', display: 'block', flexShrink: 0 }}
-      />
-    )
+  if (icon === 'scouts-gidsen-vl') {
+    return <i className="fa-solid fa-compass" />
   }
-
-  return <i className={icon || 'fa-solid fa-file'}></i>
+  return <i className={icon || 'fa-solid fa-file'} />
 }
 
 function ResourceCard({
@@ -113,18 +46,12 @@ function ResourceCard({
   onEdit,
   onDelete,
   isDeleting,
-  onDragStart,
-  onDragEnd,
-  isDragging,
 }: {
   item: PortalResource
   showEditControls: boolean
   onEdit: (item: PortalResource) => void
   onDelete: (item: PortalResource) => void
   isDeleting: boolean
-  onDragStart: (e: React.DragEvent) => void
-  onDragEnd: () => void
-  isDragging: boolean
 }) {
   const handleClick = () => {
     if (item.url) {
@@ -135,138 +62,324 @@ function ResourceCard({
   return (
     <div
       onClick={handleClick}
-      draggable={showEditControls}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
       style={{
         position: 'relative',
         display: 'flex',
         alignItems: 'center',
-        gap: 16,
-        padding: '18px 20px',
-        borderRadius: 18,
-        background: '#fff',
-        border: showEditControls ? '2px solid #1A3D2A' : '1.5px solid #C2D9C9',
-        boxShadow: '0 6px 20px rgba(0,0,0,0.08)',
-        cursor: showEditControls ? 'grab' : item.url ? 'pointer' : 'default',
-        opacity: isDragging ? 0.4 : 1,
-        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        gap: 14,
+        padding: '14px 16px',
+        minHeight: 72,
+        borderRadius: 16, // Matching the old round-corner cards in screenshot!
+        background: '#FFFFFF',
+        border: '1px solid #CCCCCC',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        cursor: item.url ? 'pointer' : 'default',
+        transition: 'all 0.15s ease-in-out',
+        boxSizing: 'border-box',
+        width: '100%',
       }}
       className="action-card-hover"
     >
+      {/* Icon Badge */}
       <div
         style={{
-          width: 46,
-          height: 46,
-          borderRadius: 14,
-          background: 'linear-gradient(135deg, #EEF5F1 0%, #E3EFE8 100%)',
-          color: '#1A3D2A',
+          width: 42,
+          height: 42,
+          borderRadius: 12,
+          background: '#EBF0F9',
+          color: '#243B6B',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '1.25rem',
+          fontSize: '1.15rem',
           flexShrink: 0,
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8)',
         }}
       >
         <RenderIcon icon={item.icon} />
       </div>
 
-      <div style={{ flex: 1, minWidth: 0, paddingRight: showEditControls ? 64 : 4 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-          {showEditControls && (
-            <i className="fa-solid fa-grip-vertical" style={{ color: '#A0A0A0', fontSize: '.8rem', marginRight: 2, cursor: 'grab' }}></i>
-          )}
-          <strong style={{ fontSize: '.98rem', fontWeight: 800, color: '#1A3D2A', lineHeight: 1.3 }}>
-            {item.label}
-          </strong>
-        </div>
+      {/* Label & Description */}
+      <div style={{ flex: 1, minWidth: 0, paddingRight: showEditControls ? 56 : 24 }}>
+        <strong style={{
+          fontSize: '.94rem',
+          fontWeight: 800,
+          color: '#162544',
+          display: 'block',
+          lineHeight: 1.25,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}>
+          {item.label}
+        </strong>
 
         {item.description && (
-          <p style={{ margin: '2px 0 0', fontSize: '.82rem', color: '#4A6855', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          <p style={{
+            margin: '2px 0 0',
+            fontSize: '.78rem',
+            color: '#666666',
+            lineHeight: 1.25,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}>
             {item.description}
           </p>
         )}
       </div>
 
-      {!showEditControls && item.url && (
-        <div style={{
-          width: 32,
-          height: 32,
-          borderRadius: '50%',
-          background: '#EEF5F1',
-          color: '#1A3D2A',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '0.85rem',
-          flexShrink: 0,
-          transition: 'transform 0.15s ease, background 0.15s ease',
-        }}>
-          <i className="fa-solid fa-chevron-right"></i>
-        </div>
-      )}
-
-      {showEditControls && (
-        <div
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            position: 'absolute',
-            right: 12,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            display: 'flex',
-            gap: 4,
-            background: '#fff',
-            padding: '4px 6px',
-            borderRadius: 10,
-            border: '1.5px solid #C2D9C9',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-          }}
-        >
+      {/* Edit Controls or Chevron Right Badge */}
+      {showEditControls ? (
+        <div style={{ display: 'flex', gap: 4, position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)' }}>
           <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onEdit(item)
-            }}
+            onClick={(e) => { e.stopPropagation(); onEdit(item) }}
             title="Bewerken"
-            style={{
-              background: 'none',
-              border: 'none',
-              borderRadius: 6,
-              padding: '4px 6px',
-              fontSize: '.78rem',
-              color: '#1A3D2A',
-              cursor: 'pointer',
-              fontWeight: 700,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
+            style={{ background: '#EBF0F9', border: 'none', borderRadius: '50%', width: 28, height: 28, color: '#243B6B', cursor: 'pointer', fontSize: '.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <i className="fa-solid fa-pen-to-square"></i>
           </button>
           <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onDelete(item)
-            }}
+            onClick={(e) => { e.stopPropagation(); onDelete(item) }}
             disabled={isDeleting}
             title="Verwijderen"
-            style={{
-              background: 'none',
-              border: 'none',
-              borderRadius: 6,
-              padding: '4px 6px',
-              fontSize: '.78rem',
-              color: '#B91C1C',
-              cursor: 'pointer',
-            }}
+            style={{ background: '#FFF0F3', border: 'none', borderRadius: '50%', width: 28, height: 28, color: '#B91C1C', cursor: 'pointer', fontSize: '.78rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <i className="fa-solid fa-trash-can"></i>
           </button>
         </div>
+      ) : (
+        <div style={{
+          position: 'absolute',
+          right: 14,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: 28,
+          height: 28,
+          borderRadius: '50%',
+          background: '#F0ECE4',
+          color: '#243B6B',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '0.72rem',
+          fontWeight: 800,
+          flexShrink: 0,
+        }}>
+          <i className="fa-solid fa-chevron-right"></i>
+        </div>
       )}
+    </div>
+  )
+}
+
+const AVAILABLE_ICONS = [
+  { id: 'scouts-lelie', label: 'Scouts Lelie' },
+  { id: 'kampas', label: 'Kampas' },
+  { id: 'scouts-gidsen-vl', label: 'Groepsadmin / SGV' },
+  { id: 'fa-solid fa-file', label: 'Document' },
+  { id: 'fa-solid fa-file-pdf', label: 'PDF Bestand' },
+  { id: 'fa-solid fa-file-excel', label: 'Excel / Sheet' },
+  { id: 'fa-solid fa-file-word', label: 'Word Document' },
+  { id: 'fa-solid fa-link', label: 'Link / Externe Site' },
+  { id: 'fa-solid fa-folder', label: 'Map / Drive' },
+  { id: 'fa-brands fa-google-drive', label: 'Google Drive' },
+  { id: 'fa-brands fa-facebook', label: 'Facebook' },
+  { id: 'fa-solid fa-users-gear', label: 'Administratie' },
+  { id: 'fa-solid fa-tent', label: 'Kamp' },
+  { id: 'fa-solid fa-clipboard-check', label: 'Checklist' },
+  { id: 'fa-solid fa-calculator', label: 'Kasboek' },
+  { id: 'fa-solid fa-receipt', label: 'Afrekening' },
+  { id: 'fa-solid fa-file-pen', label: 'Spelvoorbereiding' },
+  { id: 'fa-solid fa-list-check', label: 'Spel Checklist' },
+  { id: 'fa-solid fa-lightbulb', label: 'Spelideeën' },
+  { id: 'fa-solid fa-notes-medical', label: 'Medische Fiche' },
+  { id: 'fa-solid fa-phone-volume', label: 'Noodnummers' },
+  { id: 'fa-solid fa-shield-halved', label: 'Veiligheid' },
+  { id: 'fa-solid fa-calendar-days', label: 'Agenda' },
+  { id: 'fa-solid fa-location-dot', label: 'Locatie' },
+  { id: 'fa-solid fa-graduation-cap', label: 'Vorming' },
+  { id: 'fa-solid fa-utensils', label: 'Kookploeg' },
+  { id: 'fa-solid fa-bus', label: 'Transport' },
+  { id: 'fa-solid fa-shirt', label: 'Uniform' },
+  { id: 'fa-solid fa-bullhorn', label: 'Aankondiging' },
+  { id: 'fa-solid fa-coins', label: 'Lidgeld' },
+]
+
+function IconPickerGrid({
+  selectedIcon,
+  onSelect,
+}: {
+  selectedIcon: string
+  onSelect: (icon: string) => void
+}) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(44px, 1fr))',
+        gap: 8,
+        maxHeight: 180,
+        overflowY: 'auto',
+        padding: 10,
+        background: '#F8FAFC',
+        borderRadius: 12,
+        border: '1px solid #E2E8F0',
+      }}
+    >
+      {AVAILABLE_ICONS.map((item) => {
+        const isSelected = selectedIcon === item.id
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onSelect(item.id)}
+            title={item.label}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.15rem',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease-in-out',
+              border: isSelected ? '2px solid #162544' : '1px solid #C5D5EA',
+              background: isSelected ? '#243B6B' : '#EBF0F9',
+              color: isSelected ? '#FFFFFF' : '#243B6B',
+              boxShadow: isSelected ? '0 3px 8px rgba(36, 59, 107, 0.35)' : 'none',
+              transform: isSelected ? 'scale(1.05)' : 'scale(1)',
+            }}
+          >
+            <RenderIcon icon={item.id} />
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+function ResourceModal({
+  item,
+  categories,
+  defaultCategory,
+  onSave,
+  onClose,
+}: {
+  item: PortalResource | null
+  categories: string[]
+  defaultCategory: string
+  onSave: (data: Partial<PortalResource>) => void
+  onClose: () => void
+}) {
+  const [label, setLabel] = useState(item?.label || '')
+  const [url, setUrl] = useState(item?.url || '')
+  const [description, setDescription] = useState(item?.description || '')
+  const [category, setCategory] = useState(item?.category || defaultCategory)
+  const [icon, setIcon] = useState(item?.icon || 'fa-solid fa-file')
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    let formattedUrl = url.trim()
+    if (formattedUrl && !/^https?:\/\//i.test(formattedUrl) && !/^mailto:/i.test(formattedUrl)) {
+      formattedUrl = `https://${formattedUrl}`
+    }
+    onSave({ label, url: formattedUrl, description, category, icon, type: item?.type || 'document' })
+  }
+
+  return (
+    <div className="portaal-modal-overlay">
+      <div className="portaal-modal-card" style={{ maxWidth: 520, borderRadius: 20, borderTop: '5px solid #243B6B', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
+        <div className="portaal-modal-header" style={{ padding: '20px 24px', borderBottom: '1px solid #E2E8F0', background: '#F8FAFC' }}>
+          <h3 className="portaal-modal-title" style={{ color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontSize: '1.2rem', fontWeight: 800, margin: 0 }}>
+            {item ? 'Item Bewerken' : 'Nieuw Item Toevoegen'}
+          </h3>
+          <button className="portaal-modal-close" onClick={onClose} style={{ fontSize: '1.5rem', color: '#64748B', background: 'none', border: 'none', cursor: 'pointer' }}>&times;</button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="portaal-modal-body" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontWeight: 700, color: '#1E293B', fontSize: '.88rem', marginBottom: 6, display: 'block' }}>Titel / Label *</label>
+              <input type="text" className="form-control" value={label} onChange={e => setLabel(e.target.value)} required style={{ borderRadius: 10, padding: '10px 14px', border: '1px solid #CBD5E1' }} placeholder="Bijv. Kampgids 2026" />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontWeight: 700, color: '#1E293B', fontSize: '.88rem', marginBottom: 6, display: 'block' }}>URL / Link (optioneel)</label>
+              <input type="text" className="form-control" value={url} onChange={e => setUrl(e.target.value)} placeholder="https://... of www.voorbeeld.be" style={{ borderRadius: 10, padding: '10px 14px', border: '1px solid #CBD5E1' }} />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontWeight: 700, color: '#1E293B', fontSize: '.88rem', marginBottom: 6, display: 'block' }}>Beschrijving (optioneel)</label>
+              <textarea className="form-control" rows={2} value={description} onChange={e => setDescription(e.target.value)} style={{ borderRadius: 10, padding: '10px 14px', border: '1px solid #CBD5E1' }} placeholder="Korte toelichting..." />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontWeight: 700, color: '#1E293B', fontSize: '.88rem', marginBottom: 6, display: 'block' }}>Categorie</label>
+              <select className="form-control" value={category} onChange={e => setCategory(e.target.value)} style={{ borderRadius: 10, padding: '10px 14px', border: '1px solid #CBD5E1' }}>
+                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontWeight: 700, color: '#1E293B', fontSize: '.88rem', marginBottom: 6, display: 'block' }}>Kies Icoon</label>
+              <IconPickerGrid selectedIcon={icon} onSelect={setIcon} />
+            </div>
+          </div>
+          <div className="portaal-modal-footer" style={{ padding: '16px 24px', borderTop: '1px solid #E2E8F0', background: '#F8FAFC', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <button type="button" onClick={onClose} style={{ padding: '9px 18px', borderRadius: 10, background: '#FFFFFF', color: '#475569', border: '1px solid #CBD5E1', fontWeight: 700, cursor: 'pointer' }}>Annuleren</button>
+            <button type="submit" style={{ padding: '9px 22px', borderRadius: 10, background: '#243B6B', color: '#fff', border: 'none', fontWeight: 800, cursor: 'pointer', boxShadow: '0 2px 6px rgba(36,59,107,0.3)' }}>Opslaan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+function CategoryModal({
+  oldName,
+  onSave,
+  onDelete,
+  onClose,
+}: {
+  oldName: string | null
+  onSave: (name: string) => void
+  onDelete: (name: string) => void
+  onClose: () => void
+}) {
+  const [name, setName] = useState(oldName || '')
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (name.trim()) onSave(name.trim())
+  }
+
+  return (
+    <div className="portaal-modal-overlay">
+      <div className="portaal-modal-card" style={{ maxWidth: 460, borderRadius: 20, borderTop: '5px solid #243B6B', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
+        <div className="portaal-modal-header" style={{ padding: '20px 24px', borderBottom: '1px solid #E2E8F0', background: '#F8FAFC' }}>
+          <h3 className="portaal-modal-title" style={{ color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)', fontSize: '1.2rem', fontWeight: 800, margin: 0 }}>
+            {oldName ? 'Categorie Bewerken' : 'Nieuwe Categorie'}
+          </h3>
+          <button className="portaal-modal-close" onClick={onClose} style={{ fontSize: '1.5rem', color: '#64748B', background: 'none', border: 'none', cursor: 'pointer' }}>&times;</button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="portaal-modal-body" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" style={{ fontWeight: 700, color: '#1E293B', fontSize: '.88rem', marginBottom: 6, display: 'block' }}>Categorienaam *</label>
+              <input type="text" className="form-control" value={name} onChange={e => setName(e.target.value)} required placeholder="Bijv. Kampen, Spellen, Algemeen..." style={{ borderRadius: 10, padding: '10px 14px', border: '1px solid #CBD5E1' }} />
+            </div>
+          </div>
+          <div className="portaal-modal-footer" style={{ padding: '16px 24px', borderTop: '1px solid #E2E8F0', background: '#F8FAFC', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {oldName ? (
+              <button type="button" onClick={() => onDelete(oldName)} style={{ padding: '9px 16px', borderRadius: 10, background: '#FFF0F3', color: '#B91C1C', border: '1px solid #F8C8D4', fontWeight: 700, fontSize: '.84rem', cursor: 'pointer' }}>Verwijderen</button>
+            ) : <div />}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button type="button" onClick={onClose} style={{ padding: '9px 18px', borderRadius: 10, background: '#FFFFFF', color: '#475569', border: '1px solid #CBD5E1', fontWeight: 700, cursor: 'pointer' }}>Annuleren</button>
+              <button type="submit" style={{ padding: '9px 22px', borderRadius: 10, background: '#243B6B', color: '#fff', border: 'none', fontWeight: 800, cursor: 'pointer', boxShadow: '0 2px 6px rgba(36,59,107,0.3)' }}>Opslaan</button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
@@ -275,258 +388,78 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
   const router = useRouter()
   const [resources, setResources] = useState<PortalResource[]>(initialResources)
   const [editMode, setEditMode] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  // Separate Modal states
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Modal States
   const [itemModalOpen, setItemModalOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<PortalResource | null>(null)
+  const [defaultCatForNewItem, setDefaultCatForNewItem] = useState<string>('Algemeen')
+
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
-  const [editCategoryModalOpen, setEditCategoryModalOpen] = useState(false)
+  const [editingCategoryOldName, setEditingCategoryOldName] = useState<string | null>(null)
 
-  // Custom In-Page Confirm Modal state (Rendered at top z-index: 1200)
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false)
-  const [confirmTitle, setConfirmTitle] = useState('')
-  const [confirmMessage, setConfirmMessage] = useState('')
-  const [confirmBtnText, setConfirmBtnText] = useState('Verwijderen')
-  const [confirmAction, setConfirmAction] = useState<(() => Promise<void> | void) | null>(null)
-
-  const [newCategoryInput, setNewCategoryInput] = useState('')
-  const [editingCategoryName, setEditingCategoryName] = useState('')
-  const [editCategoryInput, setEditCategoryInput] = useState('')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => void } | null>(null)
 
   const [userCreatedCategories, setUserCreatedCategories] = useState<string[]>([])
-  const [editingItem, setEditingItem] = useState<PortalResource | null>(null)
+  const [removedCategories, setRemovedCategories] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('kriko_deleted_categories')
+        return saved ? JSON.parse(saved) : []
+      } catch {
+        return []
+      }
+    }
+    return []
+  })
 
-  // Drag and Drop states
-  const [draggedId, setDraggedId] = useState<string | null>(null)
-  const [dragOverCat, setDragOverCat] = useState<string | null>(null)
+  const existingCategories = Array.from(new Set(resources.map(r => r.category || 'Algemeen')))
+  const allCategoriesList = Array.from(new Set([...DEFAULT_CATEGORIES, ...existingCategories, ...userCreatedCategories]))
+    .filter(cat => !removedCategories.includes(cat))
 
-  // Item Form states
-  const [label, setLabel] = useState('')
-  const [description, setDescription] = useState('')
-  const [category, setCategory] = useState('🏕️ Kamp')
-  const [url, setUrl] = useState('')
-  const [icon, setIcon] = useState('fa-solid fa-file')
+  const categoriesMap = allCategoriesList.reduce((acc, cat) => {
+    acc[cat] = resources.filter(r => (r.category || 'Algemeen') === cat)
+    return acc
+  }, {} as Record<string, PortalResource[]>)
 
-  // UI states
-  const [submitting, setSubmitting] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState('')
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [isDeletingCategory, setIsDeletingCategory] = useState(false)
+  const showEditControls = Boolean(isGroepsleiding && editMode)
 
-  // Dynamic category list (Presets + active DB categories + user-created categories)
-  const allCategoriesList = Array.from(
-    new Set([
-      ...PRESET_CATEGORIES,
-      ...resources.map(r => r.category),
-      ...userCreatedCategories,
-    ])
-  )
-
-  function showConfirmDialog(title: string, message: string, btnText: string, action: () => Promise<void> | void) {
-    setConfirmTitle(title)
-    setConfirmMessage(message)
-    setConfirmBtnText(btnText)
-    setConfirmAction(() => action)
-    setConfirmModalOpen(true)
-  }
-
-  function openNewItemModal(presetCategory?: string) {
+  function openNewItemModal(cat?: string) {
     setEditingItem(null)
-    setLabel('')
-    setDescription('')
-    setUrl('')
-    setIcon('scouts-lelie')
-    setError('')
-
-    const target = presetCategory || '🏕️ Kamp'
-    setCategory(allCategoriesList.includes(target) ? target : '🏕️ Kamp')
+    setDefaultCatForNewItem(cat || 'Algemeen')
     setItemModalOpen(true)
   }
 
   function openEditItemModal(item: PortalResource) {
     setEditingItem(item)
-    setLabel(item.label)
-    setDescription(item.description)
-    setUrl(item.url)
-    setIcon(item.icon)
-    setError('')
-    setCategory(item.category || 'Algemeen')
     setItemModalOpen(true)
   }
 
   function openCategoryModal() {
-    setNewCategoryInput('')
-    setError('')
+    setEditingCategoryOldName(null)
     setCategoryModalOpen(true)
   }
 
-  function openEditCategoryModal(catName: string) {
-    setEditingCategoryName(catName)
-    setEditCategoryInput(catName)
-    setError('')
-    setEditCategoryModalOpen(true)
+  function openEditCategoryModal(oldName: string) {
+    setEditingCategoryOldName(oldName)
+    setCategoryModalOpen(true)
   }
 
-  function handleCreateCategory(e: React.FormEvent) {
-    e.preventDefault()
-    if (!newCategoryInput.trim()) return
-
-    const newCat = newCategoryInput.trim()
-    if (!userCreatedCategories.includes(newCat)) {
-      setUserCreatedCategories(prev => [...prev, newCat])
-    }
-    setCategoryModalOpen(false)
-    setNewCategoryInput('')
-  }
-
-  async function handleRenameCategorySubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!editCategoryInput.trim()) return
-
-    const rawOld = editingCategoryName
-    const trimmedNew = editCategoryInput.trim()
-
-    if (trimmedNew === editingCategoryName) {
-      setEditCategoryModalOpen(false)
-      return
-    }
-
-    setSubmitting(true)
-    setError('')
-
+  async function handleSaveItem(formData: Partial<PortalResource>) {
     try {
-      const res = await fetch('/api/admin/portal-resources/rename-category', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ oldCategory: rawOld, newCategory: trimmedNew }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Fout bij hernoemen van categorie')
-
-      setResources(prev => prev.map(r => r.category === rawOld ? { ...r, category: trimmedNew } : r))
-      setUserCreatedCategories(prev => prev.map(c => c === editingCategoryName ? trimmedNew : c))
-      setEditCategoryModalOpen(false)
-      router.refresh()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fout bij hernoemen van categorie')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  function requestDeleteCategory() {
-    if (!editingCategoryName) return
-    const rawCategory = editingCategoryName
-    const count = resources.filter(r => r.category === rawCategory).length
-
-    const confirmMsg = count > 0
-      ? `Weet je zeker dat je de categorie "${editingCategoryName}" én alle ${count} items daarin wilt verwijderen?`
-      : `Weet je zeker dat je de categorie "${editingCategoryName}" wilt verwijderen?`
-
-    showConfirmDialog(
-      '⚠️ Categorie Verwijderen',
-      confirmMsg,
-      'Ja, Categorie Verwijderen',
-      async () => {
-        setIsDeletingCategory(true)
-        setError('')
-        try {
-          const res = await fetch('/api/admin/portal-resources/delete-category', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ category: rawCategory }),
-          })
-
-          const data = await res.json()
-          if (!res.ok) throw new Error(data.error || 'Fout bij verwijderen van categorie')
-
-          setResources(prev => prev.filter(r => r.category !== rawCategory))
-          setUserCreatedCategories(prev => prev.filter(c => c !== editingCategoryName && c !== rawCategory))
-          setEditCategoryModalOpen(false)
-          router.refresh()
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Verwijderen mislukt')
-        } finally {
-          setIsDeletingCategory(false)
-        }
+      const payload = {
+        type: editingItem?.type || 'document',
+        ...formData,
       }
-    )
-  }
-
-  async function handleDropToCategory(resourceId: string, targetCat: string) {
-    setDraggedId(null)
-    const item = resources.find(r => r.id === resourceId)
-    if (!item || item.category === targetCat) return
-
-    // Optimistic update
-    setResources(prev => prev.map(r => r.id === resourceId ? { ...r, category: targetCat } : r))
-
-    try {
-      const res = await fetch(`/api/admin/portal-resources/${resourceId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: targetCat }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Fout bij verplaatsen')
-      router.refresh()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Verplaatsen mislukt')
-      // Revert state
-      setResources(prev => prev.map(r => r.id === resourceId ? item : r))
-    }
-  }
-
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    setUploading(true)
-    setError('')
-
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('type', 'portal-document')
-
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Fout bij uploaden')
-
-      setUrl(data.url)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Bestand kon niet geüpload worden')
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  async function handleItemSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!label.trim()) return
-
-    setSubmitting(true)
-    setError('')
-
-    const payload = {
-      type: 'document',
-      label: label.trim(),
-      description: description.trim(),
-      category: category || 'Algemeen',
-      url: url.trim(),
-      icon,
-      sort_order: editingItem?.sort_order ?? 10,
-    }
-
-    try {
-      let res: Response
+      let res
       if (editingItem) {
         res = await fetch(`/api/admin/portal-resources/${editingItem.id}`, {
-          method: 'PUT',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         })
@@ -538,613 +471,291 @@ export default function DocumentenClient({ initialResources, isGroepsleiding }: 
         })
       }
 
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Fout bij opslaan')
-
-      if (editingItem) {
-        setResources(prev => prev.map(r => (r.id === editingItem.id ? data : r)))
-      } else {
-        setResources(prev => [...prev, data])
+      if (res.ok) {
+        setItemModalOpen(false)
+        router.refresh()
+        const refreshed = await fetch('/api/admin/portal-resources').then(r => r.json()).catch(() => null)
+        if (refreshed && Array.isArray(refreshed)) setResources(refreshed)
       }
-
-      setItemModalOpen(false)
-      router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Er is een fout ingetreden')
-    } finally {
-      setSubmitting(false)
+      console.error(err)
     }
   }
 
   function requestDeleteItem(item: PortalResource) {
-    showConfirmDialog(
-      '⚠️ Item Verwijderen',
-      `Weet je zeker dat je "${item.label}" wilt verwijderen?`,
-      'Ja, Verwijderen',
-      async () => {
+    setConfirmDialog({
+      message: `Weet je zeker dat je "${item.label}" wilt verwijderen?`,
+      onConfirm: async () => {
+        setConfirmDialog(null)
         setDeletingId(item.id)
         try {
-          const res = await fetch(`/api/admin/portal-resources/${item.id}`, {
-            method: 'DELETE',
-          })
-          const data = await res.json()
-          if (!res.ok) throw new Error(data.error || 'Fout bij verwijderen')
-
-          setResources(prev => prev.filter(r => r.id !== item.id))
-          router.refresh()
+          const res = await fetch(`/api/admin/portal-resources/${item.id}`, { method: 'DELETE' })
+          if (res.ok) {
+            setResources(prev => prev.filter(r => r.id !== item.id))
+          }
         } catch (err) {
-          setError(err instanceof Error ? err.message : 'Verwijderen mislukt')
+          console.error(err)
         } finally {
           setDeletingId(null)
         }
-      }
-    )
+      },
+    })
   }
 
-  // Group items by category (including empty user-created categories)
-  const categoryNames = Array.from(
-    new Set([
-      ...Object.keys(
-        resources.reduce((acc, item) => {
-          const cat = item.category || 'Algemeen'
-          acc[cat] = true
-          return acc
-        }, {} as Record<string, boolean>)
-      ),
-      ...userCreatedCategories,
-    ])
-  )
+  async function handleSaveCategory(name: string) {
+    if (editingCategoryOldName) {
+      const oldName = editingCategoryOldName
+      try {
+        const res = await fetch('/api/admin/portal-resources/rename-category', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ oldCategory: oldName, newCategory: name }),
+        })
+        if (res.ok) {
+          setResources(prev => prev.map(r => (r.category || 'Algemeen') === oldName ? { ...r, category: name } : r))
+          setUserCreatedCategories(prev => prev.map(c => c === oldName ? name : c))
+          setRemovedCategories(prev => {
+            const next = Array.from(new Set([...prev, oldName])).filter(c => c !== name)
+            try { localStorage.setItem('kriko_deleted_categories', JSON.stringify(next)) } catch {}
+            return next
+          })
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    } else {
+      if (!allCategoriesList.includes(name)) {
+        setUserCreatedCategories(prev => [...prev, name])
+      }
+      setRemovedCategories(prev => {
+        const next = prev.filter(c => c !== name)
+        try { localStorage.setItem('kriko_deleted_categories', JSON.stringify(next)) } catch {}
+        return next
+      })
+    }
+    setCategoryModalOpen(false)
+  }
 
-  const categoriesMap = categoryNames.reduce((acc, cat) => {
-    acc[cat] = resources.filter(r => (r.category || 'Algemeen') === cat)
-    return acc
-  }, {} as Record<string, PortalResource[]>)
-
-  const showEditControls = isGroepsleiding && editMode
+  async function handleDeleteCategory(name: string) {
+    setCategoryModalOpen(false)
+    setConfirmDialog({
+      message: `Weet je zeker dat je de categorie "${name}" wilt verwijderen? Geassocieerde items worden verplaatst naar "Algemeen".`,
+      onConfirm: async () => {
+        setConfirmDialog(null)
+        try {
+          const res = await fetch('/api/admin/portal-resources/delete-category', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ category: name }),
+          })
+          if (res.ok) {
+            setResources(prev => prev.map(r => (r.category || 'Algemeen') === name ? { ...r, category: 'Algemeen' } : r))
+            setUserCreatedCategories(prev => prev.filter(c => c !== name))
+            setRemovedCategories(prev => {
+              const next = Array.from(new Set([...prev, name]))
+              try { localStorage.setItem('kriko_deleted_categories', JSON.stringify(next)) } catch {}
+              return next
+            })
+          }
+        } catch (err) {
+          console.error(err)
+        }
+      },
+    })
+  }
 
   return (
-    <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%', padding: '24px 20px 48px' }} className="portaal-page-container">
+    <div style={{ maxWidth: 1240, margin: '0 auto', width: '100%', padding: '32px 24px 60px' }}>
       
-      {/* Documenten & Sjablonen per Categorie */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-        {Object.entries(categoriesMap).map(([catName, items], index) => {
+      {/* Topbar Controls via React Portal into header right side slot */}
+      {mounted && isGroepsleiding && typeof document !== 'undefined' && document.getElementById('portaal-topbar-actions') &&
+        createPortal(
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button
+              onClick={() => setEditMode(!editMode)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '7px 14px',
+                borderRadius: 8,
+                background: editMode ? '#243B6B' : '#FFFFFF',
+                color: editMode ? '#FFFFFF' : '#243B6B',
+                border: '1px solid #243B6B',
+                fontWeight: 800,
+                fontSize: '.84rem',
+                cursor: 'pointer',
+              }}
+            >
+              <i className={editMode ? 'fa-solid fa-check' : 'fa-solid fa-pen-to-square'}></i>
+              <span>{editMode ? 'Klaar' : 'Bewerken'}</span>
+            </button>
+
+            {editMode && (
+              <>
+                <button
+                  onClick={openCategoryModal}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '7px 12px',
+                    borderRadius: 8,
+                    background: '#FFFFFF',
+                    color: '#162544',
+                    border: '1px solid #CCCCCC',
+                    fontWeight: 800,
+                    fontSize: '.84rem',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <i className="fa-solid fa-folder-plus"></i>
+                  <span>Categorie</span>
+                </button>
+
+                <button
+                  onClick={() => openNewItemModal()}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '7px 14px',
+                    borderRadius: 8,
+                    background: '#243B6B',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    fontWeight: 800,
+                    fontSize: '.84rem',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <i className="fa-solid fa-plus"></i>
+                  <span>Item</span>
+                </button>
+              </>
+            )}
+          </div>,
+          document.getElementById('portaal-topbar-actions')!
+        )
+      }
+
+      {/* CATEGORY SECTIONS: Matching old design in screenshot media_1787305299614.png */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
+        {Object.entries(categoriesMap).map(([catName, items]) => {
           if (items.length === 0 && !showEditControls) return null
 
           return (
-            <section
-              key={catName}
-              style={{
-                padding: dragOverCat === catName ? '12px' : '0px',
-                borderRadius: 18,
-                border: dragOverCat === catName ? '2px dashed #FFFFFF' : '2px solid transparent',
-                background: dragOverCat === catName ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
-                transition: 'all 0.15s ease',
-              }}
-              onDragOver={(e) => {
-                if (!showEditControls) return
-                e.preventDefault()
-                e.dataTransfer.dropEffect = 'move'
-                if (dragOverCat !== catName) setDragOverCat(catName)
-              }}
-              onDragLeave={(e) => {
-                if (!showEditControls) return
-                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-                  setDragOverCat(null)
-                }
-              }}
-              onDrop={(e) => {
-                if (!showEditControls) return
-                e.preventDefault()
-                setDragOverCat(null)
-                setDraggedId(null)
-                const resId = e.dataTransfer.getData('text/plain') || draggedId
-                if (resId) handleDropToCategory(resId, catName)
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-                <h2 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#1A3D2A', margin: 0, display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
-                  <span>{catName}</span>
-                  {showEditControls && (
-                    <button
-                      onClick={() => openEditCategoryModal(catName)}
-                      title="Categorie bewerken of verwijderen"
-                      style={{
-                        background: '#FFFFFF',
-                        border: '1.5px solid #C2D9C9',
-                        borderRadius: 8,
-                        padding: '4px 10px',
-                        fontSize: '.75rem',
-                        color: '#1A3D2A',
-                        cursor: 'pointer',
-                        fontWeight: 700,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 5,
-                        marginLeft: 6,
-                        boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
-                      }}
-                    >
-                      <i className="fa-solid fa-gear"></i> Categorie bewerken
-                    </button>
-                  )}
+            <div key={catName} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              
+              {/* Category Title: Clean, bold text */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <h2 style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 900,
+                  color: '#162544',
+                  margin: 0,
+                  fontFamily: 'var(--font-heading, Nunito, sans-serif)',
+                  letterSpacing: '0.01em',
+                }}>
+                  {catName}
                 </h2>
 
-                {index === 0 && isGroepsleiding && (
-                  <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-                    <button
-                      onClick={() => setEditMode(!editMode)}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        padding: '7px 16px',
-                        borderRadius: 12,
-                        background: editMode ? '#F5B82E' : '#FFFFFF',
-                        color: editMode ? '#3a2a00' : '#1A3D2A',
-                        border: editMode ? '1.5px solid #E6A71B' : '1.5px solid #C2D9C9',
-                        fontWeight: 900,
-                        fontSize: '.84rem',
-                        cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      <i className={editMode ? 'fa-solid fa-check' : 'fa-solid fa-pen-to-square'}></i>
-                      <span>{editMode ? 'Klaar met bewerken' : 'Bewerken'}</span>
-                    </button>
-
-                    {editMode && (
-                      <>
-                        <button
-                          onClick={openCategoryModal}
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            padding: '7px 16px',
-                            borderRadius: 12,
-                            background: '#FFFFFF',
-                            color: '#1A3D2A',
-                            border: '1.5px solid #C2D9C9',
-                            fontWeight: 800,
-                            fontSize: '.84rem',
-                            cursor: 'pointer',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                            transition: 'all 0.15s ease',
-                          }}
-                        >
-                          <i className="fa-solid fa-folder-plus" style={{ color: '#1A3D2A' }}></i>
-                          <span>Nieuwe Categorie</span>
-                        </button>
-
-                        <button
-                          onClick={() => openNewItemModal()}
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            padding: '7px 16px',
-                            borderRadius: 12,
-                            background: '#1A3D2A',
-                            color: '#FFFFFF',
-                            border: 'none',
-                            fontWeight: 800,
-                            fontSize: '.84rem',
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 12px rgba(26,61,42,0.2)',
-                            transition: 'all 0.15s ease',
-                          }}
-                        >
-                          <i className="fa-solid fa-plus"></i>
-                          <span>Nieuw Item</span>
-                        </button>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Resource cards list */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: 16,
-              }}>
-                {items.map((item) => (
-                  <ResourceCard
-                    key={item.id}
-                    item={item}
-                    showEditControls={showEditControls}
-                    onEdit={openEditItemModal}
-                    onDelete={requestDeleteItem}
-                    isDeleting={deletingId === item.id}
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData('text/plain', item.id)
-                      setDraggedId(item.id)
-                    }}
-                    onDragEnd={() => setDraggedId(null)}
-                    isDragging={draggedId === item.id}
-                  />
-                ))}
-
-                {/* Skeleton Add Card at the end of Category in Edit Mode */}
                 {showEditControls && (
-                  <div
-                    onClick={() => openNewItemModal(catName)}
+                  <button
+                    onClick={() => openEditCategoryModal(catName)}
+                    title="Categorie bewerken"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      padding: '16px 18px',
-                      borderRadius: 16,
-                      border: '2px dashed #C2D9C9',
-                      background: '#FFFFFF',
-                      color: '#1A3D2A',
+                      background: 'none',
+                      border: 'none',
+                      fontSize: '.82rem',
+                      color: '#243B6B',
                       cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                      fontWeight: 800,
                     }}
-                    className="action-card-hover"
                   >
-                    <div
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 12,
-                        background: '#EEF5F1',
-                        border: '1.5px dashed #C2D9C9',
-                        color: '#1A3D2A',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '1.1rem',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <i className="fa-solid fa-plus"></i>
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <strong style={{ fontSize: '.9rem', fontWeight: 800, color: '#1A3D2A', display: 'block' }}>
-                        Item toevoegen
-                      </strong>
-                      <span style={{ fontSize: '.78rem', color: '#6A8A75' }}>
-                        Toevoegen aan {catName}
-                      </span>
-                    </div>
-                  </div>
+                    <i className="fa-solid fa-gear"></i>
+                  </button>
                 )}
               </div>
-            </section>
+
+              {/* Items Grid: 4-Column Responsive Grid matching screenshot */}
+              {items.length === 0 ? (
+                <div style={{ color: '#666666', fontSize: '0.86rem', fontStyle: 'italic' }}>
+                  Nog geen documenten in deze categorie.
+                </div>
+              ) : (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                  gap: 16,
+                  width: '100%',
+                }}>
+                  {items.map((item) => (
+                    <ResourceCard
+                      key={item.id}
+                      item={item}
+                      showEditControls={showEditControls}
+                      onEdit={openEditItemModal}
+                      onDelete={requestDeleteItem}
+                      isDeleting={deletingId === item.id}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {showEditControls && (
+                <button
+                  onClick={() => openNewItemModal(catName)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '9px 16px',
+                    borderRadius: 12,
+                    border: '1px dashed #243B6B',
+                    background: '#FFFFFF',
+                    color: '#243B6B',
+                    fontSize: '0.84rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    alignSelf: 'flex-start',
+                  }}
+                >
+                  <i className="fa-solid fa-plus"></i>
+                  <span>Item toevoegen</span>
+                </button>
+              )}
+            </div>
           )
         })}
       </div>
 
-      {/* Dedicated Modal for Creating a New Category */}
-      {categoryModalOpen && (
-        <div className="portaal-modal-overlay" style={{ zIndex: 1100 }}>
-          <div className="portaal-modal-card" style={{ maxWidth: 440 }}>
-            <div className="portaal-modal-header">
-              <h3 className="portaal-modal-title">📁 Nieuwe Categorie Maken</h3>
-              <button className="portaal-modal-close" onClick={() => setCategoryModalOpen(false)}>&times;</button>
-            </div>
-
-            <form onSubmit={handleCreateCategory}>
-              <div className="portaal-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div>
-                  <label className="form-label" htmlFor="new_cat_input">Categorienaam *</label>
-                  <input
-                    type="text"
-                    id="new_cat_input"
-                    className="form-control"
-                    placeholder="bijv. ⛺ Vlottenbouw & Technieken"
-                    value={newCategoryInput}
-                    onChange={(e) => setNewCategoryInput(e.target.value)}
-                    required
-                    autoFocus
-                  />
-                  <span style={{ fontSize: '.75rem', color: '#6A8A75', marginTop: 6, display: 'block' }}>
-                    Tip: Gebruik een emoji aan het begin voor een mooie uitstraling.
-                  </span>
-                </div>
-              </div>
-
-              <div className="portaal-modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={() => setCategoryModalOpen(false)}
-                >
-                  Annuleren
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-secondary"
-                  disabled={!newCategoryInput.trim()}
-                >
-                  Categorie Aanmaken
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Dedicated Modal for Editing / Renaming / Deleting a Category */}
-      {editCategoryModalOpen && (
-        <div className="portaal-modal-overlay" style={{ zIndex: 1100 }}>
-          <div className="portaal-modal-card" style={{ maxWidth: 460 }}>
-            <div className="portaal-modal-header">
-              <h3 className="portaal-modal-title">⚙️ Categorie Bewerken</h3>
-              <button className="portaal-modal-close" onClick={() => setEditCategoryModalOpen(false)}>&times;</button>
-            </div>
-
-            <form onSubmit={handleRenameCategorySubmit}>
-              <div className="portaal-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {error && (
-                  <div className="portaal-modal-alert error">
-                    {error}
-                  </div>
-                )}
-
-                <div>
-                  <label className="form-label" htmlFor="edit_cat_input">Categorienaam *</label>
-                  <input
-                    type="text"
-                    id="edit_cat_input"
-                    className="form-control"
-                    value={editCategoryInput}
-                    onChange={(e) => setEditCategoryInput(e.target.value)}
-                    required
-                    autoFocus
-                  />
-                </div>
-              </div>
-
-              <div className="portaal-modal-footer" style={{ justifyContent: 'space-between' }}>
-                <button
-                  type="button"
-                  onClick={requestDeleteCategory}
-                  disabled={isDeletingCategory || submitting}
-                  style={{
-                    background: '#FEE2E2',
-                    color: '#991B1B',
-                    border: '1px solid #FCA5A5',
-                    borderRadius: 10,
-                    padding: '8px 14px',
-                    fontSize: '.82rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                >
-                  <i className="fa-solid fa-trash-can"></i>
-                  <span>{isDeletingCategory ? 'Verwijderen…' : 'Verwijderen'}</span>
-                </button>
-
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button
-                    type="button"
-                    className="btn btn-outline"
-                    onClick={() => setEditCategoryModalOpen(false)}
-                    disabled={submitting}
-                  >
-                    Annuleren
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn btn-secondary"
-                    disabled={submitting || !editCategoryInput.trim()}
-                  >
-                    {submitting ? 'Opslaan…' : 'Opslaan'}
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal for Adding / Editing a Resource Item */}
       {itemModalOpen && (
-        <div className="portaal-modal-overlay" style={{ zIndex: 1100 }}>
-          <div className="portaal-modal-card" style={{ maxWidth: 540 }}>
-            <div className="portaal-modal-header">
-              <h3 className="portaal-modal-title">
-                {editingItem ? '✏️ Item Bewerken' : '➕ Nieuw Item Toevoegen'}
-              </h3>
-              <button className="portaal-modal-close" onClick={() => setItemModalOpen(false)}>&times;</button>
-            </div>
-
-            <form onSubmit={handleItemSubmit}>
-              <div className="portaal-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {error && (
-                  <div className="portaal-modal-alert error">
-                    {error}
-                  </div>
-                )}
-
-                {/* 1. Title / Label */}
-                <div>
-                  <label className="form-label" htmlFor="res_label">Titel / Naam *</label>
-                  <input
-                    type="text"
-                    id="res_label"
-                    className="form-control"
-                    placeholder="bijv. Kampgids 2026 of Groepsadmin link"
-                    value={label}
-                    onChange={(e) => setLabel(e.target.value)}
-                    required
-                  />
-                </div>
-
-                {/* 2. Description */}
-                <div>
-                  <label className="form-label" htmlFor="res_desc">Korte Beschrijving</label>
-                  <input
-                    type="text"
-                    id="res_desc"
-                    className="form-control"
-                    placeholder="bijv. Handleiding en stappenplan voor het kamp."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-
-                {/* 3. Category Selection */}
-                <div>
-                  <label className="form-label" htmlFor="res_cat">Categorie *</label>
-                  <select
-                    id="res_cat"
-                    className="form-control"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                  >
-                    {allCategoriesList.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 4. URL / Link / File Upload */}
-                <div>
-                  <label className="form-label" htmlFor="res_url">Link / URL (Google Drive, website of bestand)</label>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <input
-                      type="url"
-                      id="res_url"
-                      className="form-control"
-                      placeholder="https://drive.google.com/..."
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                      style={{ flex: 1 }}
-                    />
-                    <label style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '0 14px',
-                      borderRadius: 10,
-                      background: '#EEF5F1',
-                      border: '1.5px solid #C2D9C9',
-                      fontSize: '.85rem',
-                      fontWeight: 700,
-                      color: '#1A3D2A',
-                      cursor: uploading ? 'wait' : 'pointer',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      <i className={uploading ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-upload'}></i>
-                      <span>{uploading ? 'Uploaden...' : 'Upload'}</span>
-                      <input
-                        type="file"
-                        onChange={handleFileUpload}
-                        disabled={uploading}
-                        style={{ display: 'none' }}
-                        accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
-                      />
-                    </label>
-                  </div>
-                  <span style={{ fontSize: '.75rem', color: '#6A8A75', marginTop: 4, display: 'block' }}>
-                    Plak een Google Drive link of upload rechtstreeks een PDF/bestand.
-                  </span>
-                </div>
-
-                {/* 5. Icon Selection */}
-                <div>
-                  <label className="form-label">Icoontje</label>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 120, overflowY: 'auto', padding: 6, border: '1px solid #C2D9C9', borderRadius: 10, background: '#FAFDFB' }}>
-                    {ICON_OPTIONS.map(opt => (
-                      <button
-                        key={opt.icon}
-                        type="button"
-                        onClick={() => setIcon(opt.icon)}
-                        style={{
-                          width: 38,
-                          height: 38,
-                          borderRadius: 8,
-                          border: icon === opt.icon ? '2px solid #1A3D2A' : '1px solid #E0E0E0',
-                          background: icon === opt.icon ? '#EEF5F1' : '#fff',
-                          color: '#1A3D2A',
-                          fontSize: '1.15rem',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                        title={opt.label}
-                      >
-                        <RenderIcon icon={opt.icon} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-              </div>
-
-              <div className="portaal-modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-outline"
-                  onClick={() => setItemModalOpen(false)}
-                  disabled={submitting}
-                >
-                  Annuleren
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-secondary"
-                  disabled={submitting || !label.trim()}
-                >
-                  {submitting ? 'Opslaan…' : 'Opslaan'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ResourceModal
+          item={editingItem}
+          categories={allCategoriesList}
+          defaultCategory={defaultCatForNewItem}
+          onSave={handleSaveItem}
+          onClose={() => setItemModalOpen(false)}
+        />
       )}
 
-      {/* Custom In-Page Confirmation Modal (Rendered at top layer z-index: 1200) */}
-      {confirmModalOpen && (
-        <div className="portaal-modal-overlay" style={{ zIndex: 1200 }}>
-          <div className="portaal-modal-card" style={{ maxWidth: 440 }}>
-            <div className="portaal-modal-header">
-              <h3 className="portaal-modal-title">{confirmTitle}</h3>
-              <button className="portaal-modal-close" onClick={() => setConfirmModalOpen(false)}>&times;</button>
-            </div>
-
-            <div className="portaal-modal-body" style={{ padding: '16px 20px' }}>
-              <p style={{ margin: 0, fontSize: '.95rem', color: '#1A3D2A', lineHeight: 1.5 }}>
-                {confirmMessage}
-              </p>
-            </div>
-
-            <div className="portaal-modal-footer">
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => setConfirmModalOpen(false)}
-              >
-                Annuleren
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                style={{ background: '#B91C1C', borderColor: '#B91C1C', color: '#fff' }}
-                onClick={async () => {
-                  if (confirmAction) {
-                    await confirmAction()
-                  }
-                  setConfirmModalOpen(false)
-                }}
-              >
-                {confirmBtnText}
-              </button>
-            </div>
-          </div>
-        </div>
+      {categoryModalOpen && (
+        <CategoryModal
+          oldName={editingCategoryOldName}
+          onSave={handleSaveCategory}
+          onDelete={handleDeleteCategory}
+          onClose={() => setCategoryModalOpen(false)}
+        />
       )}
 
+      {confirmDialog && (
+        <ConfirmDialog
+          message={confirmDialog.message}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={() => setConfirmDialog(null)}
+        />
+      )}
     </div>
   )
 }

@@ -17,10 +17,10 @@ export async function POST(req: NextRequest) {
     const catName = String(category).trim()
     const admin = createAdminClient()
 
-    // Delete all resources associated with this category
+    // Move resources associated with this category to 'Algemeen'
     const { error } = await admin
       .from('portal_resources')
-      .delete()
+      .update({ category: 'Algemeen', updated_at: new Date().toISOString() })
       .eq('category', catName)
 
     if (error) {

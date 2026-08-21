@@ -11,6 +11,7 @@ export function normalizeSettings(data: any): any {
     home_subtitle_leiding: data.home_subtitle_leiding ?? pb.home_subtitle_leiding ?? null,
     home_title_groepsleiding: data.home_title_groepsleiding ?? pb.home_title_groepsleiding ?? null,
     home_subtitle_groepsleiding: data.home_subtitle_groepsleiding ?? pb.home_subtitle_groepsleiding ?? null,
+    portal_login_foto: data.portal_login_foto ?? pb.portal_login_foto ?? null,
   }
 }
 

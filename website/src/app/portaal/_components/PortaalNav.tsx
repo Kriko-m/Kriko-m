@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 interface Props {
   naam: string
   role?: string
+  onToggleMobileSidebar?: () => void
 }
 
 interface AccountInfo {
@@ -17,17 +18,15 @@ interface AccountInfo {
   naam: string
 }
 
-export default function PortaalNav({ naam, role }: Props) {
+export default function PortaalNav({ naam, role, onToggleMobileSidebar }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
 
   const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
   const isWebshop = role === 'webshop'
-  const isHomePage = pathname === '/portaal/home' || pathname === '/portaal/leiding' || pathname === '/portaal/home/' || pathname === '/portaal/leiding/'
 
   const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [showAccountsModal, setShowAccountsModal] = useState(false)
   const [displayName, setDisplayName] = useState(naam)
 
@@ -43,7 +42,6 @@ export default function PortaalNav({ naam, role }: Props) {
 
   useEffect(() => {
     setDropdownOpen(false)
-    setMobileMenuOpen(false)
   }, [pathname])
 
   useEffect(() => {
@@ -72,19 +70,6 @@ export default function PortaalNav({ naam, role }: Props) {
     window.addEventListener('click', closeMenu)
     return () => window.removeEventListener('click', closeMenu)
   }, [dropdownOpen])
-
-  // Click outside listener for mobile nav menu
-  useEffect(() => {
-    if (!mobileMenuOpen) return
-    const closeMobileMenu = (e: MouseEvent) => {
-      const target = e.target as HTMLElement
-      if (!target.closest('.portaal-mobile-menu-container')) {
-        setMobileMenuOpen(false)
-      }
-    }
-    window.addEventListener('click', closeMobileMenu)
-    return () => window.removeEventListener('click', closeMobileMenu)
-  }, [mobileMenuOpen])
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -161,317 +146,154 @@ export default function PortaalNav({ naam, role }: Props) {
     }
   }
 
-  const mobileDropdownItemStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 10,
-    padding: '12px 14px',
-    borderRadius: 10,
-    textDecoration: 'none',
-    color: '#1A3D2A',
-    fontWeight: 600,
-    fontSize: '0.9rem',
+  // Determine current page title / breadcrumb
+  const getPageTitle = () => {
+    if (pathname === '/portaal/home' || pathname === '/portaal/leiding') return 'Overzicht'
+    if (pathname === '/portaal/echos') return 'Kriko Echo Beheer'
+    if (pathname === '/portaal/algemene-info') return 'Documenten & Links'
+    if (pathname === '/portaal/leiding/agenda') return 'Agenda'
+    if (pathname === '/portaal/website-beheer') return 'Website Beheer'
+    if (pathname === '/portaal/webshop/artikelen') return 'Webshop Artikelen'
+    if (pathname.startsWith('/portaal/webshop')) return 'Webshop Bestellingen'
+    return 'Leidingportaal'
   }
 
   return (
     <>
-      <header className="portaal-nav">
-        <div className="portaal-nav-container">
-          
-          {/* Left: Clean Brand Title & Icon */}
-          <Link
-            href={isWebshop ? "/portaal/webshop/bestellingen" : "/portaal/home"}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              textDecoration: 'none',
-              flexShrink: 0,
-              padding: '4px 0',
-            }}
-            title={isWebshop ? "Webshop & Uniformen" : "Leidingportaal Home"}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo-finaal.png" alt="Kriko-M" width={34} height={34} style={{ objectFit: 'contain', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.3))' }} />
-            <span className="portaal-brand-title" style={{
-              fontFamily: 'var(--font-heading, Nunito, sans-serif)',
-              fontSize: '1.35rem',
-              fontWeight: 900,
-              color: '#FFFFFF',
-              letterSpacing: '0.05em',
-              lineHeight: 1,
-              textTransform: 'uppercase',
-              textShadow: '0 2px 4px rgba(0,0,0,0.2)',
-            }}>
-              {isWebshop ? 'Webshop & Uniformen' : 'Leidingportaal'}
-            </span>
-          </Link>
-
-          {/* Center: Centered Nav Tabs (Desktop only) */}
-          {(isWebshop || pathname.startsWith('/portaal/webshop')) ? (
-            <nav className="portaal-nav-center-tabs desktop-only-tabs">
-              <Link
-                href="/portaal/webshop/bestellingen"
-                className={`portaal-nav-tab${pathname === '/portaal/webshop/bestellingen' || pathname === '/portaal/webshop' ? ' active' : ''}`}
-              >
-                <i className="fa-solid fa-box-archive"></i>
-                <span>Bestellingen</span>
-              </Link>
-              <Link
-                href="/portaal/webshop/artikelen"
-                className={`portaal-nav-tab${pathname === '/portaal/webshop/artikelen' ? ' active' : ''}`}
-              >
-                <i className="fa-solid fa-shirt"></i>
-                <span>Artikelen &amp; Assortiment</span>
-              </Link>
-              {isGroepsleiding && (
-                <Link
-                  href="/portaal/home"
-                  className="portaal-nav-tab"
-                >
-                  <i className="fa-solid fa-house"></i>
-                  <span>Terug naar portaal</span>
-                </Link>
-              )}
-            </nav>
-          ) : !isHomePage && (
-            <nav className="portaal-nav-center-tabs desktop-only-tabs">
-              {/* 1. Kriko Echo */}
-              <Link
-                href="/portaal/echos"
-                className={`portaal-nav-tab${pathname === '/portaal/echos' ? ' active' : ''}`}
-              >
-                <i className="fa-solid fa-newspaper"></i>
-                <span>Kriko Echo</span>
-              </Link>
-
-              {/* 2. Documenten & Links */}
-              <Link
-                href="/portaal/algemene-info"
-                className={`portaal-nav-tab${pathname === '/portaal/algemene-info' ? ' active' : ''}`}
-              >
-                <i className="fa-solid fa-folder-open"></i>
-                <span>Documenten &amp; Links</span>
-              </Link>
-
-              {/* 3. Kalender */}
-              <Link
-                href="/portaal/leiding/agenda"
-                className={`portaal-nav-tab${pathname === '/portaal/leiding/agenda' ? ' active' : ''}`}
-              >
-                <i className="fa-solid fa-calendar-days"></i>
-                <span>Kalender</span>
-              </Link>
-
-              {/* 4. Website Beheer — Enkel voor Groepsleiding */}
-              {isGroepsleiding && (
-                <Link
-                  href="/portaal/website-beheer"
-                  className={`portaal-nav-tab${pathname === '/portaal/website-beheer' ? ' active' : ''}`}
-                >
-                  <i className="fa-solid fa-globe"></i>
-                  <span>Website Beheer</span>
-                </Link>
-              )}
-            </nav>
+      <header
+        style={{
+          height: 64,
+          background: '#FFFFFF',
+          borderBottom: '1px solid #EDE8D0',
+          padding: '0 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+        }}
+      >
+        {/* Left Side: Mobile Menu Button & Page Title Breadcrumb */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          {onToggleMobileSidebar && (
+            <button
+              onClick={onToggleMobileSidebar}
+              className="portaal-mobile-toggle-btn"
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 8,
+                border: '1px solid #EDE8D0',
+                background: '#F0ECE4',
+                color: '#650B19',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                fontSize: '1.1rem',
+              }}
+              title="Open menu"
+            >
+              <i className="fa-solid fa-bars"></i>
+            </button>
           )}
 
-          {/* Right: Actions, Mobile Nav Dropdown & User Button */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-            
-            {/* Desktop Terug naar website knop */}
-            <Link
-              href="/"
-              className="portaal-back-link desktop-only-back"
-              title="Terug naar de publieke website"
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'hsl(345, 10%, 45%)' }}>
+              Leidingportaal
+            </span>
+            <span style={{ color: 'hsl(345, 10%, 45%)', fontSize: '0.8rem' }}>/</span>
+            <h1 style={{
+              margin: 0,
+              fontSize: '1.1rem',
+              fontWeight: 800,
+              color: '#3a0710',
+              fontFamily: 'var(--font-heading, Nunito, sans-serif)',
+            }}>
+              {getPageTitle()}
+            </h1>
+          </div>
+        </div>
+
+        {/* Right Side: Quick User Icon / Profile Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="portaal-profile-container" style={{ position: 'relative' }}>
+            <button
+              onClick={() => setDropdownOpen(prev => !prev)}
+              title="Account menu"
+              aria-label="Account menu"
+              aria-expanded={dropdownOpen}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '6px 14px 6px 8px',
+                borderRadius: 24,
+                background: dropdownOpen ? '#F9F0F2' : '#F0ECE4',
+                color: '#1A1A1A',
+                border: '1px solid #EDE8D0',
+                cursor: 'pointer',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                transition: 'all 0.15s ease',
+              }}
             >
-              <i className="fa-solid fa-arrow-left"></i>
-              <span className="portaal-back-text">Terug naar website</span>
-            </Link>
-
-            {/* Mobile Navigation Dropdown Menu (Mobile Only) */}
-            <div className="portaal-mobile-menu-container portaal-mobile-only" style={{ position: 'relative' }}>
-              <button
-                onClick={() => setMobileMenuOpen(prev => !prev)}
-                title="Menu opties"
-                aria-label="Menu opties"
-                aria-expanded={mobileMenuOpen}
-                style={{
-                  height: 40,
-                  padding: '0 14px',
-                  borderRadius: 20,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: mobileMenuOpen ? 'rgba(255, 255, 255, 0.28)' : 'rgba(255, 255, 255, 0.14)',
-                  color: '#ffffff',
-                  border: '1.5px solid rgba(255, 255, 255, 0.35)',
-                  cursor: 'pointer',
-                  fontSize: '0.88rem',
-                  fontWeight: 800,
-                  transition: 'all 0.15s ease',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                }}
-              >
-                <i className="fa-solid fa-bars"></i>
-                <span>Menu</span>
-              </button>
-
-              {mobileMenuOpen && (
-                <div
-                  className="portaal-mobile-dropdown"
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 10px)',
-                    right: 0,
-                    width: 220,
-                    background: '#ffffff',
-                    borderRadius: 16,
-                    boxShadow: '0 12px 32px rgba(26,61,42,0.25)',
-                    border: '1.5px solid #C2D9C9',
-                    overflow: 'hidden',
-                    zIndex: 110,
-                    padding: 6,
-                    animation: 'dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                  }}
-                >
-                  {isWebshop ? (
-                    <>
-                      <Link href="/portaal/webshop/bestellingen" className={`portaal-dropdown-item${pathname === '/portaal/webshop/bestellingen' || pathname === '/portaal/webshop' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                        <i className="fa-solid fa-box-archive" style={{ color: '#6A8A75' }}></i>
-                        <span>Bestellingen</span>
-                      </Link>
-                      <Link href="/portaal/webshop/artikelen" className={`portaal-dropdown-item${pathname === '/portaal/webshop/artikelen' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                        <i className="fa-solid fa-shirt" style={{ color: '#6A8A75' }}></i>
-                        <span>Artikelen &amp; Assortiment</span>
-                      </Link>
-                    </>
-                  ) : (
-                    <>
-                      <Link href="/portaal/home" className={`portaal-dropdown-item${pathname === '/portaal/home' || pathname === '/portaal/leiding' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                        <i className="fa-solid fa-house" style={{ color: '#6A8A75' }}></i>
-                        <span>Portaal Home</span>
-                      </Link>
-                      <Link href="/portaal/echos" className={`portaal-dropdown-item${pathname === '/portaal/echos' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                        <i className="fa-solid fa-newspaper" style={{ color: '#6A8A75' }}></i>
-                        <span>Kriko Echo</span>
-                      </Link>
-                      <Link href="/portaal/algemene-info" className={`portaal-dropdown-item${pathname === '/portaal/algemene-info' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                        <i className="fa-solid fa-folder-open" style={{ color: '#6A8A75' }}></i>
-                        <span>Documenten &amp; Links</span>
-                      </Link>
-                      <Link href="/portaal/leiding/agenda" className={`portaal-dropdown-item${pathname === '/portaal/leiding/agenda' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                        <i className="fa-solid fa-calendar-days" style={{ color: '#6A8A75' }}></i>
-                        <span>Kalender</span>
-                      </Link>
-                      {isGroepsleiding && (
-                        <>
-                          <Link href="/portaal/website-beheer" className={`portaal-dropdown-item${pathname === '/portaal/website-beheer' ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                            <i className="fa-solid fa-globe" style={{ color: '#6A8A75' }}></i>
-                            <span>Website Beheer</span>
-                          </Link>
-                          <Link href="/portaal/webshop/bestellingen" className={`portaal-dropdown-item${pathname.startsWith('/portaal/webshop') ? ' active' : ''}`} style={mobileDropdownItemStyle}>
-                            <i className="fa-solid fa-store" style={{ color: '#6A8A75' }}></i>
-                            <span>Webshop Beheer</span>
-                          </Link>
-                        </>
-                      )}
-                    </>
-                  )}
-                  <div style={{ height: 1, background: '#C2D9C9', margin: '4px 6px' }} />
-                  <Link href="/" className="portaal-dropdown-item" style={{ ...mobileDropdownItemStyle, color: '#1A3D2A', fontWeight: 800 }}>
-                    <i className="fa-solid fa-arrow-left" style={{ color: '#C9963A' }}></i>
-                    <span>Terug naar website</span>
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Account Profile Dropdown */}
-            <div className="portaal-profile-container" style={{ position: 'relative' }}>
-              <button
-                onClick={() => setDropdownOpen(prev => !prev)}
-                title="Account menu"
-                aria-label="Account menu"
-                aria-expanded={dropdownOpen}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: dropdownOpen ? 'rgba(255, 255, 255, 0.28)' : 'rgba(255, 255, 255, 0.14)',
-                  color: '#ffffff',
-                  border: '1.5px solid rgba(255, 255, 255, 0.35)',
-                  cursor: 'pointer',
-                  fontSize: '1.15rem',
-                  transition: 'all 0.15s ease',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                }}
-              >
+              <div style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background: '#650B19',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.85rem',
+                fontWeight: 800,
+              }}>
                 <i className="fa-solid fa-user"></i>
-              </button>
+              </div>
+              <span className="portaal-user-name-text">
+                {displayName || (isWebshop ? 'Webshop' : isGroepsleiding ? 'Groepsleiding' : 'Leiding')}
+              </span>
+              <i className="fa-solid fa-chevron-down" style={{ fontSize: '0.75rem', color: 'hsl(345, 10%, 45%)', marginLeft: 2 }}></i>
+            </button>
 
-              {dropdownOpen && (
-                <div
-                  className="portaal-profile-dropdown"
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 10px)',
-                    right: 0,
-                    width: 230,
-                    background: '#ffffff',
-                    borderRadius: 16,
-                    boxShadow: '0 12px 32px rgba(26,61,42,0.2)',
-                    border: '1.5px solid #C2D9C9',
-                    overflow: 'hidden',
-                    zIndex: 100,
-                    animation: 'dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                  }}
-                >
-                  {/* Account Info Header */}
-                  <div style={{ padding: '14px 16px', background: '#EEF5F1', borderBottom: '1px solid #C2D9C9' }}>
-                    <span style={{ display: 'block', fontSize: '0.7rem', fontWeight: 700, color: '#6A8A75', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Ingelogd als
-                    </span>
-                    <strong style={{ display: 'block', fontSize: '0.98rem', fontWeight: 800, color: '#1A3D2A', marginTop: 2, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
-                      {displayName || (isWebshop ? 'Webshop & uniformen' : isGroepsleiding ? 'Groepsleiding' : 'Leiding')}
-                    </strong>
-                    <span style={{ display: 'inline-block', marginTop: 4, fontSize: '0.72rem', fontWeight: 700, color: '#1A3D2A', background: 'rgba(26,61,42,0.1)', padding: '2px 8px', borderRadius: 10 }}>
-                      {isWebshop ? 'Webshop & uniformen' : isGroepsleiding ? 'Groepsleiding' : 'Leiding'}
-                    </span>
-                  </div>
+            {dropdownOpen && (
+              <div
+                className="portaal-profile-dropdown"
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 8px)',
+                  right: 0,
+                  width: 230,
+                  background: '#FFFFFF',
+                  borderRadius: 14,
+                  boxShadow: '0 10px 28px rgba(0,0,0,0.1)',
+                  border: '1px solid #EDE8D0',
+                  overflow: 'hidden',
+                  zIndex: 120,
+                  animation: 'dropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                }}
+              >
+                {/* Account Info Header */}
+                <div style={{ padding: '14px 16px', background: '#F9F0F2', borderBottom: '1px solid #EDE8D0' }}>
+                  <span style={{ display: 'block', fontSize: '0.68rem', fontWeight: 700, color: '#650B19', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Ingelogd als
+                  </span>
+                  <strong style={{ display: 'block', fontSize: '.96rem', fontWeight: 800, color: '#3a0710', marginTop: 2, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                    {displayName || (isWebshop ? 'Webshop & uniformen' : isGroepsleiding ? 'Groepsleiding' : 'Leiding')}
+                  </strong>
+                  <span style={{ display: 'inline-block', marginTop: 4, fontSize: '0.72rem', fontWeight: 700, color: '#650B19', background: 'rgba(101, 11, 25, 0.1)', padding: '2px 8px', borderRadius: 8 }}>
+                    {isWebshop ? 'Webshop & uniformen' : isGroepsleiding ? 'Groepsleiding' : 'Leiding'}
+                  </span>
+                </div>
 
-                  <div style={{ padding: '6px' }}>
-                    {isGroepsleiding && (
-                      <button
-                        onClick={openAccountModal}
-                        className="portaal-dropdown-item"
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 10,
-                          padding: '10px 12px',
-                          borderRadius: 10,
-                          background: 'none',
-                          border: 'none',
-                          color: '#1A3D2A',
-                          fontWeight: 700,
-                          fontSize: '0.86rem',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                          transition: 'background 0.15s ease',
-                        }}
-                      >
-                        <i className="fa-solid fa-users-gear" style={{ color: '#6A8A75' }}></i>
-                        <span>Accountbeheer</span>
-                      </button>
-                    )}
-
+                <div style={{ padding: '6px' }}>
+                  {isGroepsleiding && (
                     <button
-                      onClick={handleLogout}
+                      onClick={openAccountModal}
                       className="portaal-dropdown-item"
                       style={{
                         width: '100%',
@@ -479,10 +301,10 @@ export default function PortaalNav({ naam, role }: Props) {
                         alignItems: 'center',
                         gap: 10,
                         padding: '10px 12px',
-                        borderRadius: 10,
+                        borderRadius: 8,
                         background: 'none',
                         border: 'none',
-                        color: '#B91C1C',
+                        color: '#1A1A1A',
                         fontWeight: 700,
                         fontSize: '0.86rem',
                         cursor: 'pointer',
@@ -490,15 +312,38 @@ export default function PortaalNav({ naam, role }: Props) {
                         transition: 'background 0.15s ease',
                       }}
                     >
-                      <i className="fa-solid fa-right-from-bracket"></i>
-                      <span>Uitloggen</span>
+                      <i className="fa-solid fa-users-gear" style={{ color: '#650B19' }}></i>
+                      <span>Accountbeheer</span>
                     </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+                  )}
 
+                  <button
+                    onClick={handleLogout}
+                    className="portaal-dropdown-item"
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: '10px 12px',
+                      borderRadius: 8,
+                      background: 'none',
+                      border: 'none',
+                      color: '#650B19',
+                      fontWeight: 700,
+                      fontSize: '0.86rem',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'background 0.15s ease',
+                    }}
+                  >
+                    <i className="fa-solid fa-right-from-bracket"></i>
+                    <span>Uitloggen</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -506,20 +351,22 @@ export default function PortaalNav({ naam, role }: Props) {
       {showAccountsModal && (
         <div className="portaal-modal-overlay">
           <div className="portaal-modal-card" style={{ maxWidth: 540 }}>
-            <div className="portaal-modal-header">
-              <h3 className="portaal-modal-title">👥 Accountbeheer — Rollen & Wachtwoorden</h3>
+            <div className="portaal-modal-header" style={{ borderBottom: '1px solid #EDE8D0' }}>
+              <h3 className="portaal-modal-title" style={{ color: '#3a0710', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
+                👥 Accountbeheer — Rollen &amp; Wachtwoorden
+              </h3>
               <button className="portaal-modal-close" onClick={() => setShowAccountsModal(false)}>&times;</button>
             </div>
             
             {loadingAccounts ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#1A3D2A', fontWeight: 600 }}>Accounts laden…</div>
+              <div style={{ padding: 40, textAlign: 'center', color: 'hsl(345, 10%, 45%)', fontWeight: 600 }}>Accounts laden…</div>
             ) : (
               <form onSubmit={handleSaveAccount}>
                 <div className="portaal-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   {modalError && <div className="portaal-modal-alert error">{modalError}</div>}
                   {modalSuccess && <div className="portaal-modal-alert success">{modalSuccess}</div>}
 
-                  <div style={{ fontSize: '0.86rem', color: '#6A8A75' }}>
+                  <div style={{ fontSize: '0.86rem', color: 'hsl(345, 10%, 45%)' }}>
                     Selecteer hieronder het account dat je wilt bewerken (naam of wachtwoord aanpassen):
                   </div>
 
@@ -530,10 +377,10 @@ export default function PortaalNav({ naam, role }: Props) {
                       onClick={() => handleSelectRoleToEdit('leiding')}
                       style={{
                         padding: '10px 6px',
-                        borderRadius: 12,
-                        border: editingRole === 'leiding' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
-                        background: editingRole === 'leiding' ? '#EEF5F1' : '#FAFAFA',
-                        color: '#1A3D2A',
+                        borderRadius: 10,
+                        border: editingRole === 'leiding' ? '2px solid #650B19' : '1px solid #EDE8D0',
+                        background: editingRole === 'leiding' ? '#F9F0F2' : '#FFFFFF',
+                        color: editingRole === 'leiding' ? '#650B19' : '#1A1A1A',
                         fontWeight: editingRole === 'leiding' ? 800 : 600,
                         cursor: 'pointer',
                         textAlign: 'center',
@@ -547,10 +394,10 @@ export default function PortaalNav({ naam, role }: Props) {
                       onClick={() => handleSelectRoleToEdit('groepsleiding')}
                       style={{
                         padding: '10px 6px',
-                        borderRadius: 12,
-                        border: editingRole === 'groepsleiding' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
-                        background: editingRole === 'groepsleiding' ? '#EEF5F1' : '#FAFAFA',
-                        color: '#1A3D2A',
+                        borderRadius: 10,
+                        border: editingRole === 'groepsleiding' ? '2px solid #650B19' : '1px solid #EDE8D0',
+                        background: editingRole === 'groepsleiding' ? '#F9F0F2' : '#FFFFFF',
+                        color: editingRole === 'groepsleiding' ? '#650B19' : '#1A1A1A',
                         fontWeight: editingRole === 'groepsleiding' ? 800 : 600,
                         cursor: 'pointer',
                         textAlign: 'center',
@@ -564,10 +411,10 @@ export default function PortaalNav({ naam, role }: Props) {
                       onClick={() => handleSelectRoleToEdit('webshop')}
                       style={{
                         padding: '10px 6px',
-                        borderRadius: 12,
-                        border: editingRole === 'webshop' ? '2px solid #1A3D2A' : '1.5px solid #E2E8F0',
-                        background: editingRole === 'webshop' ? '#EEF5F1' : '#FAFAFA',
-                        color: '#1A3D2A',
+                        borderRadius: 10,
+                        border: editingRole === 'webshop' ? '2px solid #650B19' : '1px solid #EDE8D0',
+                        background: editingRole === 'webshop' ? '#F9F0F2' : '#FFFFFF',
+                        color: editingRole === 'webshop' ? '#650B19' : '#1A1A1A',
                         fontWeight: editingRole === 'webshop' ? 800 : 600,
                         cursor: 'pointer',
                         textAlign: 'center',
@@ -588,6 +435,7 @@ export default function PortaalNav({ naam, role }: Props) {
                       required
                       placeholder="Bijv. Leiding Kriko-M"
                       disabled={savingAccount}
+                      style={{ borderRadius: 8, borderColor: '#EDE8D0' }}
                     />
                   </div>
 
@@ -600,25 +448,34 @@ export default function PortaalNav({ naam, role }: Props) {
                       onChange={(e) => setEditPassword(e.target.value)}
                       placeholder="Nieuw wachtwoord (minstens 6 tekens)"
                       disabled={savingAccount}
+                      style={{ borderRadius: 8, borderColor: '#EDE8D0' }}
                     />
                   </div>
                 </div>
 
-                <div className="portaal-modal-footer">
+                <div className="portaal-modal-footer" style={{ borderTop: '1px solid #EDE8D0' }}>
                   <button
                     type="button"
                     className="btn btn-outline"
                     onClick={() => setShowAccountsModal(false)}
                     disabled={savingAccount}
-                    style={{ padding: '8px 16px', fontSize: '0.9rem' }}
+                    style={{ padding: '8px 16px', fontSize: '0.9rem', borderRadius: 8, borderColor: '#EDE8D0', color: '#1A1A1A' }}
                   >
                     Sluiten
                   </button>
                   <button
                     type="submit"
-                    className="btn btn-secondary"
                     disabled={savingAccount || !editName.trim()}
-                    style={{ padding: '8px 20px', fontSize: '0.9rem' }}
+                    style={{
+                      padding: '8px 20px',
+                      fontSize: '0.9rem',
+                      borderRadius: 8,
+                      background: '#650B19',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
                   >
                     {savingAccount ? 'Opslaan…' : 'Wijzigingen Opslaan'}
                   </button>

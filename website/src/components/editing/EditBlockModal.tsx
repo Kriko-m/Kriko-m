@@ -204,19 +204,19 @@ export default function EditBlockModal({
         padding: 24,
         boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid #E8F0EB', paddingBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid #E2E8F0', paddingBottom: 12 }}>
           <div>
-            <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.25rem' }}>
+            <h3 style={{ margin: 0, color: '#162544', fontWeight: 900, fontSize: '1.25rem', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
               ✏️ {blockType === 'tak_card' ? 'Tak Inhoud Bewerken' : blockType === 'waariswat' ? 'Waar Vind Je Wat Bewerken' : 'Inhoud Bewerken'}
             </h3>
-            <span style={{ fontSize: '0.78rem', color: '#6A8A75', fontWeight: 600 }}>
+            <span style={{ fontSize: '0.78rem', color: '#64748B', fontWeight: 600 }}>
               Sleutel: {blockKey}
             </span>
           </div>
           <button
             onClick={onClose}
             type="button"
-            style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#6A8A75' }}
+            style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748B' }}
           >
             ✕
           </button>
@@ -231,7 +231,7 @@ export default function EditBlockModal({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {/* Titel */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
               Titel / Opschrift
             </label>
             <input
@@ -239,7 +239,7 @@ export default function EditBlockModal({
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="bv. Welkom bij Kriko-M!"
-              style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.95rem' }}
+              style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: '0.95rem', color: '#162544' }}
             />
           </div>
 
@@ -247,7 +247,7 @@ export default function EditBlockModal({
           {blockType === 'tak_card' && (
             <>
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                   🎨 Sfeer / Subtitel
                 </label>
                 <input
@@ -255,12 +255,12 @@ export default function EditBlockModal({
                   value={takSfeer}
                   onChange={e => setTakSfeer(e.target.value)}
                   placeholder="bv. Spel, fantasie & de allereerste scoutservaring."
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.92rem' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: '0.92rem', color: '#162544' }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                   🏷️ Leeftijdsgroep
                 </label>
                 <input
@@ -268,12 +268,12 @@ export default function EditBlockModal({
                   value={takAge}
                   onChange={e => setTakAge(e.target.value)}
                   placeholder="bv. 6 tot 8 jaar (1e & 2e leerjaar)"
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.92rem' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: '0.92rem', color: '#162544' }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                   📝 Uitleg / Beschrijving
                 </label>
                 <textarea
@@ -281,12 +281,12 @@ export default function EditBlockModal({
                   onChange={e => setContent(e.target.value)}
                   rows={4}
                   placeholder="Beschrijf de werking van deze tak..."
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.92rem', fontFamily: 'inherit', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: '0.92rem', fontFamily: 'inherit', resize: 'vertical', color: '#162544' }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                   🏕️ Zomerkamp Info
                 </label>
                 <input
@@ -294,7 +294,7 @@ export default function EditBlockModal({
                   value={takKamp}
                   onChange={e => setTakKamp(e.target.value)}
                   placeholder="bv. 5 dagen kamp (in een gebouw)"
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.92rem' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: '0.92rem', color: '#162544' }}
                 />
               </div>
             </>
@@ -304,7 +304,7 @@ export default function EditBlockModal({
           {blockType === 'waariswat' && (
             <>
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                   Introductietekst
                 </label>
                 <textarea
@@ -312,48 +312,48 @@ export default function EditBlockModal({
                   onChange={e => setContent(e.target.value)}
                   rows={2}
                   placeholder="Omdat we alle praktische zaken al overzichtelijk..."
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.92rem', fontFamily: 'inherit' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: '0.92rem', fontFamily: 'inherit', color: '#162544' }}
                 />
               </div>
 
-              <div style={{ backgroundColor: '#F9FBF9', padding: 14, borderRadius: 12, border: '1px solid #E8F0EB', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <h4 style={{ margin: 0, color: '#1A3D2A', fontSize: '0.9rem', fontWeight: 800 }}>
+              <div style={{ backgroundColor: '#F8FAFC', padding: 16, borderRadius: 12, border: '1px solid #E2E8F0', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <h4 style={{ margin: 0, color: '#162544', fontSize: '0.9rem', fontWeight: 800, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
                   🔗 Omschrijving per Navigatielink:
                 </h4>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75' }}>📅 1. Kalender Link</label>
-                  <input type="text" value={linkKalender} onChange={e => setLinkKalender(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.86rem' }} />
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#64748B' }}>📅 1. Kalender Link</label>
+                  <input type="text" value={linkKalender} onChange={e => setLinkKalender(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.86rem', color: '#162544' }} />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75' }}>📖 2. Kriko Echo Link</label>
-                  <input type="text" value={linkEcho} onChange={e => setLinkEcho(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.86rem' }} />
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#64748B' }}>📖 2. Kriko Echo Link</label>
+                  <input type="text" value={linkEcho} onChange={e => setLinkEcho(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.86rem', color: '#162544' }} />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75' }}>⚜️ 3. Onze Takken Link</label>
-                  <input type="text" value={linkTakken} onChange={e => setLinkTakken(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.86rem' }} />
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#64748B' }}>⚜️ 3. Onze Takken Link</label>
+                  <input type="text" value={linkTakken} onChange={e => setLinkTakken(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.86rem', color: '#162544' }} />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75' }}>📝 4. Inschrijven &amp; Lidgeld Link</label>
-                  <input type="text" value={linkInschrijven} onChange={e => setLinkInschrijven(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.86rem' }} />
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#64748B' }}>📝 4. Inschrijven &amp; Lidgeld Link</label>
+                  <input type="text" value={linkInschrijven} onChange={e => setLinkInschrijven(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.86rem', color: '#162544' }} />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75' }}>💚 5. Scouting op Maat Link</label>
-                  <input type="text" value={linkOpMaat} onChange={e => setLinkOpMaat(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.86rem' }} />
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#64748B' }}>💚 5. Scouting op Maat Link</label>
+                  <input type="text" value={linkOpMaat} onChange={e => setLinkOpMaat(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.86rem', color: '#162544' }} />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75' }}>👔 6. Uniform &amp; Webshop Link</label>
-                  <input type="text" value={linkUniform} onChange={e => setLinkUniform(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.86rem' }} />
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#64748B' }}>👔 6. Uniform &amp; Webshop Link</label>
+                  <input type="text" value={linkUniform} onChange={e => setLinkUniform(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.86rem', color: '#162544' }} />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#6A8A75' }}>👨‍👩‍👧‍👦 7. Oudertak Link</label>
-                  <input type="text" value={linkOudertak} onChange={e => setLinkOudertak(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.86rem' }} />
+                  <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 800, color: '#64748B' }}>👨‍👩‍👧‍👦 7. Oudertak Link</label>
+                  <input type="text" value={linkOudertak} onChange={e => setLinkOudertak(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.86rem', color: '#162544' }} />
                 </div>
               </div>
             </>
@@ -363,7 +363,7 @@ export default function EditBlockModal({
           {blockType === 'webshop_card' && (
             <>
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                   📝 Beschrijving
                 </label>
                 <textarea
@@ -371,12 +371,12 @@ export default function EditBlockModal({
                   onChange={e => setContent(e.target.value)}
                   rows={3}
                   placeholder="Bestel de officiële groepsdas..."
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.92rem', fontFamily: 'inherit' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: '0.92rem', fontFamily: 'inherit', color: '#162544' }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                   📞 Contactgegevens
                 </label>
                 <input
@@ -384,7 +384,7 @@ export default function EditBlockModal({
                   value={contactInfo}
                   onChange={e => setContactInfo(e.target.value)}
                   placeholder="bijv: Vragen over bestellingen? Neem contact op via webshop@kriko-m.be"
-                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.92rem' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: '0.92rem', color: '#162544' }}
                 />
               </div>
             </>
@@ -393,7 +393,7 @@ export default function EditBlockModal({
           {/* STANDARD TEXT FIELDS (For text_only & text_image) */}
           {(blockType === 'text_only' || blockType === 'text_image') && (
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                 Tekst / Inhoud
               </label>
               <textarea
@@ -401,7 +401,7 @@ export default function EditBlockModal({
                 onChange={e => setContent(e.target.value)}
                 rows={6}
                 placeholder="Voer de tekst in..."
-                style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #C2D9C9', borderRadius: 10, fontSize: '0.92rem', fontFamily: 'inherit', resize: 'vertical' }}
+                style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #CBD5E1', borderRadius: 10, fontSize: '0.92rem', fontFamily: 'inherit', resize: 'vertical', color: '#162544' }}
               />
             </div>
           )}
@@ -409,12 +409,12 @@ export default function EditBlockModal({
           {/* AFBEELDING FIELDS (ONLY FOR text_image or tak_card) */}
           {(blockType === 'text_image' || blockType === 'tak_card') && (
             <div>
-              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase', marginBottom: 4 }}>
+              <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
                 📷 Foto / Afbeelding
               </label>
 
               {imageUrl && (
-                <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 10, overflow: 'hidden', backgroundColor: '#F0ECE4', marginBottom: 10, border: '1px solid #E2C58D' }}>
+                <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 10, overflow: 'hidden', backgroundColor: '#F8FAFC', marginBottom: 10, border: '1px solid #CBD5E1' }}>
                   <Image
                     src={imageUrl}
                     alt="Voorbeeld"
@@ -431,15 +431,15 @@ export default function EditBlockModal({
                   value={imageUrl}
                   onChange={e => setImageUrl(e.target.value)}
                   placeholder="https://... of upload een bestand"
-                  style={{ flex: 1, padding: '8px 10px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.85rem' }}
+                  style={{ flex: 1, padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: 8, fontSize: '0.85rem', color: '#162544' }}
                 />
 
                 <label style={{
                   padding: '8px 14px',
-                  backgroundColor: '#EEF5F1',
-                  border: '1.5px dashed #1A3D2A',
+                  backgroundColor: '#EBF0F9',
+                  border: '1.5px dashed #243B6B',
                   borderRadius: 8,
-                  color: '#1A3D2A',
+                  color: '#243B6B',
                   fontWeight: 800,
                   fontSize: '0.82rem',
                   cursor: uploading ? 'wait' : 'pointer',
@@ -464,11 +464,11 @@ export default function EditBlockModal({
         </div>
 
         {/* Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24, borderTop: '1px solid #E8F0EB', paddingTop: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24, borderTop: '1px solid #E2E8F0', paddingTop: 16 }}>
           <button
             onClick={onClose}
             type="button"
-            style={{ padding: '10px 18px', backgroundColor: '#F0ECE4', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', color: '#555' }}
+            style={{ padding: '10px 18px', backgroundColor: '#F1F5F9', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', color: '#475569' }}
           >
             Annuleren
           </button>
@@ -477,7 +477,7 @@ export default function EditBlockModal({
             onClick={handleSave}
             disabled={saving}
             type="button"
-            style={{ padding: '10px 24px', backgroundColor: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 800, cursor: saving ? 'wait' : 'pointer' }}
+            style={{ padding: '10px 24px', backgroundColor: '#162544', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 900, cursor: saving ? 'wait' : 'pointer' }}
           >
             {saving ? 'Opslaan...' : '💾 Opslaan'}
           </button>

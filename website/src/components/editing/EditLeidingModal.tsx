@@ -129,19 +129,19 @@ export default function EditLeidingModal({
         boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
       }}>
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid #E8F0EB', paddingBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid #E2E8F0', paddingBottom: 12 }}>
           <div>
-            <h3 style={{ margin: 0, color: '#1A3D2A', fontWeight: 900, fontSize: '1.3rem' }}>
+            <h3 style={{ margin: 0, color: '#162544', fontWeight: 900, fontSize: '1.3rem', fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
               ✏️ Leidingsploeg &amp; Foto Bewerken ({takName})
             </h3>
-            <span style={{ fontSize: '0.8rem', color: '#6A8A75', fontWeight: 600 }}>
+            <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: 600 }}>
               Pas de leidingsfoto en leidingsleden aan voor {takName}
             </span>
           </div>
           <button
             onClick={onClose}
             type="button"
-            style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#6A8A75' }}
+            style={{ border: 'none', background: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#64748B' }}
           >
             ✕
           </button>
@@ -155,9 +155,9 @@ export default function EditLeidingModal({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {/* SECTIE 1: Groepsfoto van de Leidingsploeg */}
-          <div style={{ backgroundColor: '#F9FBF9', padding: 18, borderRadius: 12, border: '1px solid #C2D9C9' }}>
+          <div style={{ backgroundColor: '#F8FAFC', padding: 18, borderRadius: 12, border: '1px solid #E2E8F0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <h4 style={{ margin: 0, color: '#1A3D2A', fontSize: '1rem', fontWeight: 800 }}>
+              <h4 style={{ margin: 0, color: '#162544', fontSize: '1rem', fontWeight: 800, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
                 📷 Leidingsfoto ({takName})
               </h4>
               {photo ? (
@@ -184,7 +184,7 @@ export default function EditLeidingModal({
             </div>
 
             {photo && photo.trim() !== '' ? (
-              <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 10, overflow: 'hidden', backgroundColor: '#F0ECE4', marginBottom: 12, border: '1px solid #E2C58D' }}>
+              <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 10, overflow: 'hidden', backgroundColor: '#F8FAFC', marginBottom: 12, border: '1px solid #CBD5E1' }}>
                 <Image
                   src={photo}
                   alt={`Leidingsploeg ${takName}`}
@@ -194,7 +194,7 @@ export default function EditLeidingModal({
                 />
               </div>
             ) : (
-              <div style={{ padding: 14, backgroundColor: '#FFF', borderRadius: 8, border: '1px dashed #C2D9C9', color: '#6A8A75', fontSize: '0.88rem', fontStyle: 'italic', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ padding: 14, backgroundColor: '#FFF', borderRadius: 8, border: '1px dashed #CBD5E1', color: '#64748B', fontSize: '0.88rem', fontStyle: 'italic', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span>🚫</span>
                 <span>Geen foto ingesteld. Het geplakte foto-element wordt <strong>niet getoond</strong> op de publieke takpagina.</span>
               </div>
@@ -206,12 +206,12 @@ export default function EditLeidingModal({
                 value={photo}
                 onChange={e => setPhoto(e.target.value)}
                 placeholder="Foto URL (of upload hiernaast)"
-                style={{ flex: 1, minWidth: 200, padding: '8px 10px', border: '1.5px solid #C2D9C9', borderRadius: 8, fontSize: '0.85rem' }}
+                style={{ flex: 1, minWidth: 200, padding: '8px 10px', border: '1.5px solid #CBD5E1', borderRadius: 8, fontSize: '0.85rem', color: '#162544' }}
               />
 
               <label style={{
                 padding: '8px 14px',
-                backgroundColor: '#1A3D2A',
+                backgroundColor: '#162544',
                 border: 'none',
                 borderRadius: 8,
                 color: '#fff',
@@ -238,7 +238,7 @@ export default function EditLeidingModal({
             </div>
 
             <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <label style={{ fontSize: '0.85rem', color: '#1A3D2A', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
+              <label style={{ fontSize: '0.85rem', color: '#162544', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer', userSelect: 'none' }}>
                 <input
                   type="checkbox"
                   checked={!photo || photo.trim() === ''}
@@ -247,7 +247,7 @@ export default function EditLeidingModal({
                       setPhoto('')
                     }
                   }}
-                  style={{ accentColor: '#1A3D2A', width: 16, height: 16 }}
+                  style={{ accentColor: '#162544', width: 16, height: 16 }}
                 />
                 <span>Geen foto tonen op publieke takpagina</span>
               </label>
@@ -257,7 +257,7 @@ export default function EditLeidingModal({
           {/* SECTIE 2: Leidingsleden Lijst */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <h4 style={{ margin: 0, color: '#1A3D2A', fontSize: '1rem', fontWeight: 800 }}>
+              <h4 style={{ margin: 0, color: '#162544', fontSize: '1rem', fontWeight: 800, fontFamily: 'var(--font-heading, Nunito, sans-serif)' }}>
                 👥 Leidingsleden ({leaders.length})
               </h4>
 
@@ -265,10 +265,10 @@ export default function EditLeidingModal({
                 onClick={handleAddLeader}
                 type="button"
                 style={{
-                  padding: '6px 14px',
-                  backgroundColor: '#EEF5F1',
-                  color: '#1A3D2A',
-                  border: '1.5px solid #1A3D2A',
+                  padding: '7px 14px',
+                  backgroundColor: '#EBF0F9',
+                  color: '#243B6B',
+                  border: '1.5px solid #243B6B',
                   borderRadius: 8,
                   fontWeight: 800,
                   fontSize: '0.82rem',
@@ -276,6 +276,7 @@ export default function EditLeidingModal({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 6,
+                  transition: 'all 0.15s ease',
                 }}
               >
                 ➕ Leider/Leidster Toevoegen
@@ -284,7 +285,7 @@ export default function EditLeidingModal({
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {leaders.length === 0 ? (
-                <div style={{ padding: 16, backgroundColor: '#FFF', borderRadius: 8, border: '1px dashed #C2D9C9', color: '#6A8A75', fontSize: '0.88rem', fontStyle: 'italic', textAlign: 'center' }}>
+                <div style={{ padding: 16, backgroundColor: '#FFF', borderRadius: 8, border: '1px dashed #CBD5E1', color: '#64748B', fontSize: '0.88rem', fontStyle: 'italic', textAlign: 'center' }}>
                   Er zijn momenteel geen leidingsleden. Klik op &apos;➕ Leider/Leidster Toevoegen&apos; om iemand toe te voegen.
                 </div>
               ) : (
@@ -292,10 +293,11 @@ export default function EditLeidingModal({
                   <div
                     key={index}
                     style={{
-                      backgroundColor: '#F9FBF9',
+                      backgroundColor: '#FFFFFF',
                       padding: 14,
                       borderRadius: 12,
-                      border: '1px solid #E8F0EB',
+                      border: '1px solid #E2E8F0',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 8,
@@ -303,7 +305,7 @@ export default function EditLeidingModal({
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#1A3D2A', textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase' }}>
                         Leiding #{index + 1}
                       </span>
 
@@ -327,7 +329,7 @@ export default function EditLeidingModal({
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#6A8A75', marginBottom: 2 }}>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#64748B', marginBottom: 2 }}>
                         Naam *
                       </label>
                       <input
@@ -335,12 +337,12 @@ export default function EditLeidingModal({
                         value={leader.name}
                         onChange={e => handleLeaderChange(index, 'name', e.target.value)}
                         placeholder=""
-                        style={{ width: '100%', padding: '7px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.88rem' }}
+                        style={{ width: '100%', padding: '7px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.88rem', color: '#162544' }}
                       />
                     </div>
 
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#6A8A75', marginBottom: 2 }}>
+                      <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#64748B', marginBottom: 2 }}>
                         Telefoonnummer
                       </label>
                       <input
@@ -348,13 +350,13 @@ export default function EditLeidingModal({
                         value={leader.phone || ''}
                         onChange={e => handleLeaderChange(index, 'phone', e.target.value)}
                         placeholder=""
-                        style={{ width: '100%', padding: '7px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.88rem' }}
+                        style={{ width: '100%', padding: '7px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.88rem', color: '#162544' }}
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#6A8A75', marginBottom: 2 }}>
+                    <label style={{ display: 'block', fontSize: '0.72rem', fontWeight: 700, color: '#64748B', marginBottom: 2 }}>
                       Totem / Bijnaam
                     </label>
                     <input
@@ -362,7 +364,7 @@ export default function EditLeidingModal({
                       value={leader.totem || ''}
                       onChange={e => handleLeaderChange(index, 'totem', e.target.value)}
                       placeholder=""
-                      style={{ width: '100%', padding: '7px 10px', border: '1px solid #C2D9C9', borderRadius: 6, fontSize: '0.88rem' }}
+                      style={{ width: '100%', padding: '7px 10px', border: '1px solid #CBD5E1', borderRadius: 6, fontSize: '0.88rem', color: '#162544' }}
                     />
                   </div>
                 </div>
@@ -373,11 +375,11 @@ export default function EditLeidingModal({
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24, borderTop: '1px solid #E8F0EB', paddingTop: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24, borderTop: '1px solid #E2E8F0', paddingTop: 16 }}>
           <button
             onClick={onClose}
             type="button"
-            style={{ padding: '10px 18px', backgroundColor: '#F0ECE4', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', color: '#555' }}
+            style={{ padding: '10px 18px', backgroundColor: '#F1F5F9', border: 'none', borderRadius: 10, fontWeight: 700, cursor: 'pointer', color: '#475569' }}
           >
             Annuleren
           </button>
@@ -386,7 +388,7 @@ export default function EditLeidingModal({
             onClick={handleSave}
             disabled={saving}
             type="button"
-            style={{ padding: '10px 24px', backgroundColor: '#1A3D2A', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 800, cursor: saving ? 'wait' : 'pointer' }}
+            style={{ padding: '10px 24px', backgroundColor: '#162544', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 900, cursor: saving ? 'wait' : 'pointer' }}
           >
             {saving ? 'Opslaan...' : '💾 Opslaan'}
           </button>
