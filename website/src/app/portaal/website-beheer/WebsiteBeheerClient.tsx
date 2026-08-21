@@ -809,7 +809,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
               <p style={{ margin: '0 0 10px', fontSize: '0.82rem', color: '#64748B' }}>
                 Aan wie moeten de meldingen van nieuwe webshopbestellingen gestuurd worden?
               </p>
-              <div style={{ display: 'flex', gap: 10 }}>
+              <div className="portaal-email-notif-form">
                 <input
                   type="email"
                   value={webshopEmail}
@@ -821,7 +821,7 @@ export default function WebsiteBeheerClient({ initialSettings, role }: Props) {
                   type="button"
                   onClick={handleSavePortalSettings}
                   disabled={saving}
-                  style={{ padding: '8px 18px', borderRadius: 8, backgroundColor: '#243B6B', color: '#fff', fontWeight: 800, fontSize: '0.86rem', border: 'none', cursor: 'pointer' }}
+                  style={{ padding: '8px 18px', borderRadius: 8, backgroundColor: '#243B6B', color: '#fff', fontWeight: 800, fontSize: '0.86rem', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
                 >
                   {saving ? 'Opslaan…' : 'E-mail Opslaan'}
                 </button>

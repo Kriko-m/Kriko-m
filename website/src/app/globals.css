@@ -7953,6 +7953,13 @@ html, body {
   gap: 12px;
 }
 
+.portaal-email-notif-form {
+  display: flex;
+  gap: 10px;
+  max-width: 480px;
+  align-items: center;
+}
+
 .cal-filter-tags-scroll-row {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -8051,6 +8058,18 @@ html, body {
 
   .portaal-account-form-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  .portaal-email-notif-form {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    max-width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .portaal-email-notif-form button {
+    width: 100% !important;
+    padding: 10px 14px !important;
   }
 
   .portaal-modal-card {

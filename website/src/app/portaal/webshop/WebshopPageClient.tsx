@@ -495,7 +495,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
               <span style={{ display: 'block', fontSize: '0.82rem', color: '#64748B', marginBottom: 12 }}>
                 Ontvang automatisch een e-mailbevestiging wanneer een koper een bestelling plaatst.
               </span>
-              <div style={{ display: 'flex', gap: 10, maxWidth: 480 }}>
+              <div className="portaal-email-notif-form">
                 <input
                   type="email"
                   value={webshopEmail}
@@ -507,7 +507,7 @@ export default function WebshopPageClient({ initialSettings, role: _role, active
                   type="button"
                   onClick={handleSaveSettings}
                   disabled={saving}
-                  style={{ padding: '9px 18px', borderRadius: 8, backgroundColor: '#243B6B', color: '#fff', fontWeight: 800, fontSize: '0.86rem', border: 'none', cursor: 'pointer' }}
+                  style={{ padding: '9px 18px', borderRadius: 8, backgroundColor: '#243B6B', color: '#fff', fontWeight: 800, fontSize: '0.86rem', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}
                 >
                   {saving ? 'Opslaan…' : 'E-mail Opslaan'}
                 </button>
