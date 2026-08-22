@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = { title: '404 — Pagina niet gevonden | Scouts Kriko-M' }
+export const metadata: Metadata = { title: '404 — Pagina niet gevonden' }
 
 export default function NotFound() {
   return (

@@ -6,7 +6,7 @@ import CalendarMonthGrid from '@/components/CalendarMonthGrid'
 import EditableText from '@/components/editing/EditableText'
 import { CalendarEvent } from '@/lib/types'
 
-export const metadata: Metadata = { title: 'Kalender | Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Kalender' }
 
 export default async function KalenderPage() {
   const events = (await getPublicCalendarEvents()) as CalendarEvent[]

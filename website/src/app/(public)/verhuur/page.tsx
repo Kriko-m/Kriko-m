@@ -4,7 +4,7 @@ import PhotoGallery from '@/components/PhotoGallery'
 import EditableText from '@/components/editing/EditableText'
 import EditableImage from '@/components/editing/EditableImage'
 
-export const metadata: Metadata = { title: 'Verhuur lokaal | Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Verhuur lokaal' }
 
 const PHOTOS = Array.from({length: 8}, (_,i) => `/images/verhuur/lokaal-0${i+1}.jpg`)
 const KAMPAS_URL = 'https://www.kampas.be/nl/domein/scouts-kriko-m-lokaal-terrein'

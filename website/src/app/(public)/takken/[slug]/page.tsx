@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!VALID_TAKKEN.includes(slug)) return {}
   const settings = await getSettings()
   const tak = settings?.takken?.[slug]
-  return { title: `${tak?.name ?? slug} | Scouts Kriko-M` }
+  return { title: tak?.name ?? slug }
 }
 
 export default async function TakPage({ params }: { params: Promise<{ slug: string }> }) {

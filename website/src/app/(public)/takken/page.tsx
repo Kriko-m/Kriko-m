@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { getSiteContent } from '@/lib/db'
 import EditableText from '@/components/editing/EditableText'
 
-export const metadata: Metadata = { title: 'Onze Takken | Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Onze Takken' }
 
 const TAKKEN = [
   { slug: 'kapoenen',   name: 'Kapoenen' },

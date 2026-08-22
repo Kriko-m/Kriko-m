@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { Echo } from '@/lib/types'
 import EditableText from '@/components/editing/EditableText'
 
-export const metadata: Metadata = { title: "Kriko Echo | Scouts Kriko-M" }
+export const metadata: Metadata = { title: "Kriko Echo" }
 
 const MONTHS_NL: Record<number, string> = {
   1:'januari',2:'februari',3:'maart',4:'april',5:'mei',6:'juni',

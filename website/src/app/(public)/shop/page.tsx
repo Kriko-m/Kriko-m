@@ -6,7 +6,7 @@ import CartDrawer from '@/components/shop/CartDrawer'
 import EditableText from '@/components/editing/EditableText'
 import { Product } from '@/lib/types'
 
-export const metadata: Metadata = { title: 'Webshop – Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Webshop' }
 
 export default async function ShopPage() {
   const products = (await getShopProducts()) as Product[]

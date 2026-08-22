@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import EditableText from '@/components/editing/EditableText'
 
-export const metadata: Metadata = { title: 'Privacyverklaring | Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Privacyverklaring' }
 
 export default function PrivacyPage() {
   const sections = [

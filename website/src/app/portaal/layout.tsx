@@ -4,7 +4,7 @@ import PortaalLayoutClient from './PortaalLayoutClient'
 import { Settings } from '@/lib/types'
 import { normalizeSettings } from '@/lib/db'
 
-export const metadata: Metadata = { title: 'Leiding login – Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Leiding login' }
 
 export default async function PortaalLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createServerSupabaseClient()

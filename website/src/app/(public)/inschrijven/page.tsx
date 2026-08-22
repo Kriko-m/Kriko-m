@@ -3,8 +3,8 @@ import { getSettings } from '@/lib/db'
 import InschrijvenClient from './InschrijvenClient'
 
 export const metadata: Metadata = {
-  title: 'Inschrijven | Scouts Kriko-M',
-  description: 'Schrijf je in bij Scouts Kriko-M. Informatie en stappenplan voor nieuwe en bestaande leden.',
+  title: 'Inschrijven',
+  description: 'Schrijf je in bij Kriko-m. Informatie en stappenplan voor nieuwe en bestaande leden.',
 }
 
 export default async function InschrijvenPage() {

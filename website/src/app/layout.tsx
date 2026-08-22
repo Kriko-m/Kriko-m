@@ -23,23 +23,23 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Scouts Kriko-M",
-    template: "%s · Scouts Kriko-M",
+    default: "Kriko-m",
+    template: "%s | Kriko-m",
   },
-  description: "Scouts Kriko-M uit Sint-Niklaas — info over de takken, kalender, Kriko Echo, verhuur en de webshop.",
+  description: "Kriko-m uit Sint-Niklaas — info over de takken, kalender, Kriko Echo, verhuur en de webshop.",
   openGraph: {
-    title: "Scouts Kriko-M",
-    description: "Scouts Kriko-M uit Sint-Niklaas — takken, kalender, Kriko Echo, verhuur en webshop.",
+    title: "Kriko-m",
+    description: "Kriko-m uit Sint-Niklaas — takken, kalender, Kriko Echo, verhuur en webshop.",
     url: SITE_URL,
-    siteName: "Scouts Kriko-M",
+    siteName: "Kriko-m",
     locale: "nl_BE",
     type: "website",
-    images: [{ url: "/images/logo-finaal.png", width: 512, height: 512, alt: "Scouts Kriko-M" }],
+    images: [{ url: "/images/logo-finaal.png", width: 512, height: 512, alt: "Kriko-m" }],
   },
   twitter: {
     card: "summary",
-    title: "Scouts Kriko-M",
-    description: "Scouts Kriko-M uit Sint-Niklaas.",
+    title: "Kriko-m",
+    description: "Kriko-m uit Sint-Niklaas.",
     images: ["/images/logo-finaal.png"],
   },
 };

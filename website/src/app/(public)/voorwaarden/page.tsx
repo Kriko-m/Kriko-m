@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import EditableText from '@/components/editing/EditableText'
 
-export const metadata: Metadata = { title: 'Verkoopsvoorwaarden | Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Verkoopsvoorwaarden' }
 
 export default function VoorwaardenPage() {
   const sections = [

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import CheckoutForm from './CheckoutForm'
 
-export const metadata: Metadata = { title: 'Afrekenen – Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Afrekenen' }
 
 export default function CheckoutPage() {
   return (

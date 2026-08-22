@@ -6,7 +6,7 @@ import ContactGroepsleidingCard from './ContactGroepsleidingCard'
 import EditableText from '@/components/editing/EditableText'
 import { Leader } from '@/lib/types'
 
-export const metadata: Metadata = { title: 'Contact | Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Contact' }
 
 export default async function ContactPage() {
   const settings = await getSettings()

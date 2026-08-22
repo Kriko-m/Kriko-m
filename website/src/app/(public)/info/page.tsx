@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { getSettings, getSiteContent } from '@/lib/db'
 import InfoTabbedContent from './InfoTabbedContent'
 
-export const metadata: Metadata = { title: 'Algemene Info | Scouts Kriko-M' }
+export const metadata: Metadata = { title: 'Algemene Info' }
 
 export default async function InfoPage() {
   const [settings, siteContent] = await Promise.all([
