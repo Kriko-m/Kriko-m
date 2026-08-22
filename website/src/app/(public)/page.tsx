@@ -254,7 +254,12 @@ export default async function HomePage() {
           ) : (
             <div className="home-events-grid">
               {events.map((event: CalendarEvent) => (
-                <UpcomingEvent key={event.id} event={event} todayMs={today.getTime()} />
+                <UpcomingEvent
+                  key={event.id}
+                  event={event}
+                  todayMs={today.getTime()}
+                  showCountdown={false}
+                />
               ))}
             </div>
           )}

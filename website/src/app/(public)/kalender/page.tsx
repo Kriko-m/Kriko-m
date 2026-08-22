@@ -58,15 +58,22 @@ export default async function KalenderPage() {
             {/* Column 2: All Upcoming Events */}
             <div className="cal-col-sidebar">
               <div className="cal-sidebar-events">
-                {upcoming.map((event, index) => (
-                  <UpcomingEvent
-                    key={event.id}
-                    event={event}
-                    todayMs={today.getTime()}
-                    featured={index === 0}
-                    compact={index > 0}
-                  />
-                ))}
+                {upcoming.map((event) => {
+                  const isMajor = !!(event.is_evenement || event.banner_image)
+                  return (
+                    <UpcomingEvent
+                      key={event.id}
+                      event={event}
+                      todayMs={today.getTime()}
+                      featured={isMajor}
+                      compact={!isMajor}
+                      showBanner={false}
+                      showCountdown={false}
+                      showFooter={false}
+                      maxDescLines={3}
+                    />
+                  )
+                })}
               </div>
             </div>
           </div>

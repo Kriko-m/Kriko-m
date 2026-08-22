@@ -23,26 +23,11 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createAdminClient()
-    
-    // Bewaar het bericht in de database
-    try {
-      const { error } = await supabase.from('messages').insert({
-        name: name.trim(),
-        email: email.trim(),
-        subject: (subject ?? '').slice(0, 200),
-        message: message.slice(0, 5000),
-      })
-      if (error) {
-        console.error('⚠️ Fout bij opslaan bericht in database:', error)
-      }
-    } catch (dbErr) {
-      console.error('⚠️ Database insert fout bij contactbericht:', dbErr)
-    }
 
     // Zoek het contact e-mailadres uit de settings (standaard groepsleiding@kriko-m.be)
     let targetEmail = 'groepsleiding@kriko-m.be'
     try {
-      const { data: settings } = await supabase.from('settings').select('contact_email').eq('id', 1).single()
+      const { data: settings } = await supabase.from('settings').select('contact_email').single()
       if (settings?.contact_email && typeof settings.contact_email === 'string' && settings.contact_email.trim() !== '') {
         targetEmail = settings.contact_email.trim()
       }
@@ -58,7 +43,12 @@ export async function POST(req: NextRequest) {
       message: message.trim(),
     })
 
-    return NextResponse.json({ ok: true, emailSent: emailResult?.ok ?? false })
+    if (!emailResult?.ok) {
+      console.error('⚠️ Contactformulier e-mail verzenden mislukt:', emailResult?.error)
+      return NextResponse.json({ error: 'Het versturen van de e-mail is mislukt. Probeer het later opnieuw.' }, { status: 500 })
+    }
+
+    return NextResponse.json({ ok: true })
   } catch (err) {
     console.error('❌ Server error in /api/contact:', err)
     return NextResponse.json({ error: 'Server error' }, { status: 500 })

@@ -6114,11 +6114,6 @@ body.portal-theme .portaal-nav {
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.3s ease;
-}
-
-.event-card-v2:hover .event-card-v2-banner img {
-    transform: scale(1.04);
 }
 
 .event-card-v2-banner .event-card-v2-badge {
@@ -6301,12 +6296,12 @@ body.portal-theme .portaal-nav {
 }
 
 .event-card-v2-desc {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #4a4a4a;
-    line-height: 1.5;
+    line-height: 1.55;
     margin-bottom: 16px;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 7;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -7150,9 +7145,12 @@ body.portal-theme .portaal-nav {
 
 .cal-modal-title-wrap {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
     padding-right: 0;
+    width: 100%;
 }
 
 .cal-modal-datetime-grid {

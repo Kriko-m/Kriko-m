@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { CalendarEvent } from '@/lib/types'
-import { AUDIENCE_NAMEN, AUDIENCE_KLEUREN, PORTAAL_AUDIENCE_KLEUREN } from '@/lib/constants'
 import { useScrollLock } from '@/lib/useScrollLock'
 
 const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
@@ -113,105 +112,68 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit, isPortal }:
           )}
 
           <div className="cal-modal-content-inner">
-            {/* Header: Top Action Bar (Countdown + Edit + Close) + Title & Audience Tags below */}
-            <div className="cal-modal-title-wrap" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {/* Top Row: Countdown Pill on left, Edit & Close Buttons on right */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, width: '100%' }}>
-                <div>
-                  <span style={{ fontSize: '.78rem', fontWeight: 700, padding: '5px 12px', borderRadius: 99, background: countdownBg, color: countdownColor, border: countdownBorder, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                    <i className="fa-regular fa-clock" style={{ fontSize: '.74rem' }}></i> {countdown}
-                  </span>
-                </div>
+            {/* Header: Title on left, inline Countdown & Action Buttons on right */}
+            <div className="cal-modal-title-wrap" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16, width: '100%' }}>
+              <h3 style={{ margin: 0, color: titleColor, fontSize: 'clamp(1.35rem, 4.5vw, 1.8rem)', fontWeight: 900, lineHeight: 1.2, fontFamily: 'var(--font-heading, Nunito, sans-serif)', wordBreak: 'break-word', flex: '1 1 auto' }}>
+                {event.title}
+              </h3>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  {onEdit && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onClose()
-                        onEdit()
-                      }}
-                      style={{
-                        height: 32,
-                        padding: '0 14px',
-                        borderRadius: 16,
-                        border: 'none',
-                        background: '#243B6B',
-                        color: '#fff',
-                        fontSize: '.82rem',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        boxShadow: '0 2px 6px rgba(36,59,107,0.2)',
-                        fontFamily: 'inherit',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      <i className="fa-solid fa-pen" style={{ fontSize: '.75rem' }}></i> Bewerken
-                    </button>
-                  )}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 'auto' }}>
+                <span style={{ fontSize: '.78rem', fontWeight: 700, padding: '5px 12px', borderRadius: 99, background: countdownBg, color: countdownColor, border: countdownBorder, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <i className="fa-regular fa-clock" style={{ fontSize: '.74rem' }}></i> {countdown}
+                </span>
 
+                {onEdit && (
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={() => {
+                      onClose()
+                      onEdit()
+                    }}
                     style={{
-                      width: 32,
                       height: 32,
-                      borderRadius: '50%',
+                      padding: '0 14px',
+                      borderRadius: 16,
                       border: 'none',
-                      background: isPortal ? '#EBF0F9' : '#F0ECE4',
-                      color: isPortal ? '#162544' : '#555',
-                      fontSize: '.85rem',
-                      fontWeight: 800,
+                      background: '#243B6B',
+                      color: '#fff',
+                      fontSize: '.82rem',
+                      fontWeight: 700,
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
+                      gap: 6,
+                      boxShadow: '0 2px 6px rgba(36,59,107,0.2)',
+                      fontFamily: 'inherit',
                       transition: 'all 0.15s ease',
                     }}
-                    aria-label="Sluiten"
                   >
-                    ✕
+                    <i className="fa-solid fa-pen" style={{ fontSize: '.75rem' }}></i> Bewerken
                   </button>
-                </div>
-              </div>
-
-              {/* Title & Audience Tags */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <h3 style={{ margin: 0, color: titleColor, fontSize: 'clamp(1.35rem, 4.5vw, 1.8rem)', fontWeight: 900, lineHeight: 1.2, fontFamily: 'var(--font-heading, Nunito, sans-serif)', wordBreak: 'break-word' }}>
-                  {event.title}
-                </h3>
-                {event.audience && event.audience.length > 0 && (
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-                    {event.audience.map((tag) => {
-                      const isYellow = tag === 'kapoenen'
-                      const tagBg = isYellow ? '#FEF3D6' : `${(isPortal ? PORTAAL_AUDIENCE_KLEUREN[tag] : AUDIENCE_KLEUREN[tag]) || '#1A3D2A'}1E`
-                      const tagColor = isYellow ? '#8C6700' : ((isPortal ? PORTAAL_AUDIENCE_KLEUREN[tag] : AUDIENCE_KLEUREN[tag]) || '#1A3D2A')
-                      return (
-                        <span
-                          key={tag}
-                          style={{
-                            padding: '3px 10px',
-                            borderRadius: 20,
-                            fontSize: '11px',
-                            fontWeight: 800,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.4px',
-                            background: isPortal ? tagBg : `${AUDIENCE_KLEUREN[tag] || '#1A3D2A'}18`,
-                            color: isPortal ? tagColor : (AUDIENCE_KLEUREN[tag] || '#1A3D2A'),
-                            border: isPortal ? 'none' : `1px solid ${AUDIENCE_KLEUREN[tag] || '#1A3D2A'}40`,
-                            lineHeight: 1.3,
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {AUDIENCE_NAMEN[tag] || tag}
-                        </span>
-                      )
-                    })}
-                  </div>
                 )}
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    border: 'none',
+                    background: isPortal ? '#EBF0F9' : '#F0ECE4',
+                    color: isPortal ? '#162544' : '#555',
+                    fontSize: '.85rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s ease',
+                  }}
+                  aria-label="Sluiten"
+                >
+                  ✕
+                </button>
               </div>
             </div>
 
@@ -260,7 +222,7 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit, isPortal }:
                     rel="noopener noreferrer"
                     className="btn btn-primary cal-modal-action-btn"
                   >
-                    <i className="fa-solid fa-pen-to-square"></i> Inschrijven / Formulier
+                    <i className="fa-solid fa-pen-to-square"></i> Inschrijven
                   </a>
                 )}
                 {event.document_url && (
@@ -337,7 +299,25 @@ export function EventDetailDialog({ event, todayMs, onClose, onEdit, isPortal }:
   )
 }
 
-export default function UpcomingEvent({ event, todayMs, featured, compact }: { event: CalendarEvent; todayMs: number; featured?: boolean; compact?: boolean }) {
+export default function UpcomingEvent({
+  event,
+  todayMs,
+  featured,
+  compact,
+  showBanner = true,
+  showCountdown = true,
+  showFooter = true,
+  maxDescLines,
+}: {
+  event: CalendarEvent
+  todayMs: number
+  featured?: boolean
+  compact?: boolean
+  showBanner?: boolean
+  showCountdown?: boolean
+  showFooter?: boolean
+  maxDescLines?: number
+}) {
   const [open, setOpen] = useState(false)
 
   // Lokaal parsen
@@ -352,7 +332,7 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
 
   const card = compact ? (
     <article
-      className={`event-card-compact${event.is_evenement ? ' event-card-compact--featured' : ''}${isNoMeeting ? ' event-card-compact--nomeeting' : ''}`}
+      className={`event-card-compact${(featured || event.is_evenement) ? ' event-card-compact--featured' : ''}${isNoMeeting ? ' event-card-compact--nomeeting' : ''}`}
       id={`event-${event.id}`}
       onClick={() => setOpen(true)}
       role="button"
@@ -367,19 +347,28 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
       <div className="event-card-compact-info">
         <div className="event-card-compact-header">
           <h4 className="event-card-compact-title" style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--color-primary-dark, #40050E)', lineHeight: 1.2 }}>{event.title}</h4>
-          <span className={`event-card-compact-badge ${event.is_evenement ? 'badge-star' : isNoMeeting ? 'badge-neutral' : 'badge-primary'}`}>
-            <i className="fa-regular fa-clock"></i> {countdown}
-          </span>
-        </div>
-        {event.location && (
-          <div className="event-card-compact-meta" style={{ marginTop: 2, fontSize: '.73rem', color: '#777', fontWeight: 600 }}>
-            <span>
-              <i className="fa-solid fa-location-dot" style={{ fontSize: '.7rem', color: '#999', marginRight: 4 }}></i> {event.location}
+          {showCountdown && (
+            <span className={`event-card-compact-badge ${event.is_evenement ? 'badge-star' : isNoMeeting ? 'badge-neutral' : 'badge-primary'}`}>
+              <i className="fa-regular fa-clock"></i> {countdown}
             </span>
+          )}
+        </div>
+        {(event.time || event.location) && (
+          <div className="event-card-compact-meta" style={{ marginTop: 2, fontSize: '.73rem', color: '#777', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            {event.time && (
+              <span>
+                <i className="fa-regular fa-clock" style={{ fontSize: '.7rem', color: '#999', marginRight: 4 }}></i> {event.time}
+              </span>
+            )}
+            {event.location && (
+              <span>
+                <i className="fa-solid fa-location-dot" style={{ fontSize: '.7rem', color: '#999', marginRight: 4 }}></i> {event.location}
+              </span>
+            )}
           </div>
         )}
       </div>
-      <div className="event-card-compact-action">
+      <div className="event-card-compact-action" style={{ alignSelf: 'center', marginLeft: 'auto', flexShrink: 0, paddingLeft: 8 }}>
         <i className="fa-solid fa-chevron-right"></i>
       </div>
     </article>
@@ -394,7 +383,7 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
       aria-haspopup="dialog"
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true) } }}
     >
-      {event.banner_image && (
+      {showBanner && event.banner_image && (
         <div className="event-card-v2-banner">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={event.banner_image} alt={event.title} />
@@ -402,23 +391,30 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
       )}
 
       <div className="event-card-v2-content">
-        <div className="event-card-v2-top">
+        <div className="event-card-v2-top" style={{ alignItems: 'center' }}>
           <div className="event-card-v2-datebox" aria-hidden="true">
             <span className="event-card-v2-day">{day}</span>
             <span className="event-card-v2-month">{month}</span>
           </div>
-          <div className="event-card-v2-header-info">
-            <div className="event-card-v2-header-top" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
-              <span className={`event-card-v2-badge ${event.is_evenement ? 'badge-star' : isNoMeeting ? 'badge-neutral' : 'badge-primary'}`}>
-                <i className="fa-regular fa-clock"></i> {countdown}
-              </span>
-            </div>
-            <h3 className="event-card-v2-title" style={{ fontSize: featured ? '1.55rem' : '1.4rem', fontWeight: 900, marginTop: 0, color: 'var(--color-primary-dark, #40050E)' }}>{event.title}</h3>
+          <div className="event-card-v2-header-info" style={{ justifyContent: 'center' }}>
+            {showCountdown && (
+              <div className="event-card-v2-header-top" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
+                <span className={`event-card-v2-badge ${event.is_evenement ? 'badge-star' : isNoMeeting ? 'badge-neutral' : 'badge-primary'}`}>
+                  <i className="fa-regular fa-clock"></i> {countdown}
+                </span>
+              </div>
+            )}
+            <h3 className="event-card-v2-title" style={{ fontSize: featured ? '1.55rem' : '1.4rem', fontWeight: 900, margin: 0, color: 'var(--color-primary-dark, #40050E)' }}>{event.title}</h3>
           </div>
+          {!showFooter && (
+            <div className="event-card-compact-action" style={{ alignSelf: 'center', marginLeft: 'auto', flexShrink: 0, paddingLeft: 12 }}>
+              <i className="fa-solid fa-chevron-right" style={{ fontSize: '1.1rem' }}></i>
+            </div>
+          )}
         </div>
 
         {((featured && event.time) || event.location) && (
-          <div className="event-card-v2-meta" style={{ marginTop: 4, marginBottom: 6, fontSize: '.82rem', color: '#777', fontWeight: 600 }}>
+          <div className="event-card-v2-meta" style={{ marginTop: 4, marginBottom: 8, fontSize: '.84rem', color: '#777', fontWeight: 600 }}>
             {featured && event.time && (
               <span className="event-card-v2-meta-item">
                 <i className="fa-regular fa-clock"></i> {event.time}
@@ -433,28 +429,36 @@ export default function UpcomingEvent({ event, todayMs, featured, compact }: { e
         )}
 
         {event.description && (
-          <p className="event-card-v2-desc" style={featured ? { WebkitLineClamp: 3 } : undefined}>
+          <p
+            className="event-card-v2-desc"
+            style={{
+              marginBottom: showFooter ? undefined : 0,
+              WebkitLineClamp: maxDescLines ?? ((showBanner && event.banner_image) ? 3 : 7),
+            }}
+          >
             {event.description}
           </p>
         )}
 
-        <div className="event-card-v2-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            {event.external_link_url && (
-              <span className="event-card-v2-btn-pill">
-                <i className="fa-solid fa-pen-to-square"></i> Inschrijven
-              </span>
-            )}
-            {event.document_url && (
-              <span className="event-card-v2-btn-pill">
-                <i className="fa-solid fa-file-pdf"></i> Uitnodiging
-              </span>
-            )}
+        {showFooter && (
+          <div className="event-card-v2-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              {event.external_link_url && (
+                <span className="event-card-v2-btn-pill">
+                  <i className="fa-solid fa-pen-to-square"></i> Inschrijven
+                </span>
+              )}
+              {event.document_url && (
+                <span className="event-card-v2-btn-pill">
+                  <i className="fa-solid fa-file-pdf"></i> Uitnodiging
+                </span>
+              )}
+            </div>
+            <span style={{ fontSize: '.9rem', fontWeight: 800, color: 'var(--color-primary-dark)', marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', padding: '6px 2px' }}>
+              <i className="fa-solid fa-chevron-right"></i>
+            </span>
           </div>
-          <span style={{ fontSize: '.9rem', fontWeight: 800, color: 'var(--color-primary-dark)', marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', padding: '6px 2px' }}>
-            <i className="fa-solid fa-chevron-right"></i>
-          </span>
-        </div>
+        )}
       </div>
     </article>
   )

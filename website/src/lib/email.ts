@@ -4,7 +4,7 @@ import { OrderItem } from '@/lib/types'
 // Resend-client. Wordt alleen server-side gebruikt (API routes).
 // RESEND_API_KEY moet gezet zijn; RESEND_FROM moet een geverifieerd afzenderdomein zijn.
 const FROM_WEBSHOP = process.env.RESEND_FROM || 'Scouts Kriko-M Webshop <bestellingen@kriko-m.be>'
-const FROM_CONTACT = process.env.RESEND_FROM_CONTACT || 'Scouts Kriko-M <contact@kriko-m.be>'
+const FROM_CONTACT = process.env.RESEND_FROM_CONTACT || process.env.RESEND_FROM || 'Scouts Kriko-M <groepsleiding@kriko-m.be>'
 const BCC = process.env.RESEND_BCC || ''
 
 function getClient(): Resend | null {
