@@ -50,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="nl" className={`${outfit.variable} ${nunito.variable} ${rubikDirt.variable}`} suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="nl" className={`${outfit.variable} ${nunito.variable} ${rubikDirt.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/png" href="/images/logo-finaal.png" />
       </head>

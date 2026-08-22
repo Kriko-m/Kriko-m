@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Leader } from '@/lib/types'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 interface Props {
   slug: string
@@ -21,6 +22,7 @@ export default function EditLeidingModal({
   onClose,
   onSaved,
 }: Props) {
+  useScrollLock(true)
   const [photo, setPhoto] = useState<string>(initialPhoto || '')
   const [leaders, setLeaders] = useState<Leader[]>(initialLeaders)
 

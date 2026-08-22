@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useEditMode } from './editing/EditContext'
 import EditGalleryModal from './editing/EditGalleryModal'
 import EditableImage from './editing/EditableImage'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 export default function PhotoGallery({ photos: initialPhotos }: { photos: string[] }) {
   const { isEditMode, getContent, setDraftContent } = useEditMode()
@@ -12,6 +13,8 @@ export default function PhotoGallery({ photos: initialPhotos }: { photos: string
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+
+  useScrollLock(lightbox !== null || isEditModalOpen)
 
   // Get dynamic photos from site_content if available
   const galleryJson = getContent?.('verhuur.gallery.photos', 'content', '')
@@ -46,12 +49,9 @@ export default function PhotoGallery({ photos: initialPhotos }: { photos: string
     setLightbox(null)
   }, [])
 
-  // Keyboard navigation & body scroll lock
+  // Keyboard navigation
   useEffect(() => {
     if (lightbox === null) return
-
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
@@ -68,10 +68,9 @@ export default function PhotoGallery({ photos: initialPhotos }: { photos: string
 
     window.addEventListener('keydown', handleKeyDown)
     return () => {
-      document.body.style.overflow = originalOverflow
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [lightbox, activePhotos.length])
+  }, [activePhotos.length, lightbox])
 
   // Touch swipe support for mobile
   const minSwipeDistance = 40

@@ -90,13 +90,13 @@ export default function ContactGroepsleidingCard({
                 border: '1px solid var(--color-border)',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: '1.02rem', color: 'var(--color-primary-dark)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+                  <div style={{ fontWeight: 700, fontSize: '1.02rem', color: 'var(--color-primary-dark)', lineHeight: 1.3 }}>
                     {leader.name}
                   </div>
                   {leader.totem && (
-                    <div style={{ fontSize: '0.88rem', color: 'var(--color-text-dark)', fontStyle: 'italic', marginTop: 2 }}>
+                    <div style={{ fontSize: '0.86rem', color: 'var(--color-text-dark)', fontStyle: 'italic', marginTop: 2, lineHeight: 1.3 }}>
                       {leader.totem}
                     </div>
                   )}
@@ -109,7 +109,7 @@ export default function ContactGroepsleidingCard({
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 6,
-                      fontSize: '0.88rem',
+                      fontSize: '0.86rem',
                       fontWeight: 700,
                       color: 'var(--color-primary)',
                       backgroundColor: '#fff',
@@ -118,13 +118,15 @@ export default function ContactGroepsleidingCard({
                       border: '1px solid var(--color-border)',
                       textDecoration: 'none',
                       boxShadow: 'var(--shadow-sm)',
+                      flexShrink: 0,
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     <i className="fa-solid fa-phone" style={{ color: 'var(--color-secondary)', fontSize: '0.85em' }}></i>
                     {leader.phone}
                   </a>
                 ) : (
-                  <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontStyle: 'italic', flexShrink: 0 }}>
                     -
                   </span>
                 )}

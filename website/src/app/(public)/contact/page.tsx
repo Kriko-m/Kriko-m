@@ -83,7 +83,7 @@ export default async function ContactPage() {
                       gap: '6px'
                     }}
                   >
-                    {settings?.contact_email} <i className="fas fa-copy" style={{ fontSize: '0.85em', opacity: 0.7 }}></i>
+                    {settings?.contact_email}
                   </CopyButton>
                 </li>
                 <li className="contact-sidebar-item">

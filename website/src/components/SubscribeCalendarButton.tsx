@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 interface SubscribeCalendarButtonProps {
   feedPath?: string
@@ -20,6 +21,8 @@ export default function SubscribeCalendarButton({
   const [copied, setCopied] = useState(false)
   const [origin, setOrigin] = useState('')
 
+  useScrollLock(open)
+
   useEffect(() => {
     setOrigin(window.location.origin)
   }, [])
@@ -30,10 +33,8 @@ export default function SubscribeCalendarButton({
       if (e.key === 'Escape') setOpen(false)
     }
     document.addEventListener('keydown', onKey)
-    document.body.style.overflow = 'hidden'
     return () => {
       document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
     }
   }, [open])
 

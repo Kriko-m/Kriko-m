@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 interface EditTakContactModalProps {
   slug: string
@@ -19,6 +20,7 @@ export default function EditTakContactModal({
   onClose,
   onSaved,
 }: EditTakContactModalProps) {
+  useScrollLock(true)
   const [email, setEmail] = useState(initialEmail)
   const [whatsapp, setWhatsapp] = useState(initialWhatsapp)
   const [saving, setSaving] = useState(false)

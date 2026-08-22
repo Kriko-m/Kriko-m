@@ -5,11 +5,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import LoadingScreen from './LoadingScreen'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 export default function Header() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [takkenOpen, setTakkenOpen] = useState(false)
+
+  useScrollLock(menuOpen)
 
   useEffect(() => {
     setMenuOpen(false)

@@ -3,7 +3,8 @@ import { OrderItem } from '@/lib/types'
 
 // Resend-client. Wordt alleen server-side gebruikt (API routes).
 // RESEND_API_KEY moet gezet zijn; RESEND_FROM moet een geverifieerd afzenderdomein zijn.
-const FROM = process.env.RESEND_FROM || 'Scouts Kriko-M Webshop <bestellingen@kriko-m.be>'
+const FROM_WEBSHOP = process.env.RESEND_FROM || 'Scouts Kriko-M Webshop <bestellingen@kriko-m.be>'
+const FROM_CONTACT = process.env.RESEND_FROM_CONTACT || 'Scouts Kriko-M <contact@kriko-m.be>'
 const BCC = process.env.RESEND_BCC || ''
 
 function getClient(): Resend | null {
@@ -30,7 +31,7 @@ interface OrderConfirmationParams {
 export async function sendOrderConfirmation(params: OrderConfirmationParams) {
   const resend = getClient()
   if (!resend) {
-    console.warn('RESEND_API_KEY ontbreekt; bevestigingsmail niet verstuurd.')
+    console.warn('⚠️ RESEND_API_KEY ontbreekt in environment variables; bevestigingsmail niet verstuurd.')
     return
   }
 
@@ -103,14 +104,18 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     `Stevige linkerhand, Scouts Kriko-M`,
   ].join('\n')
 
-  await resend.emails.send({
-    from: FROM,
+  const res = await resend.emails.send({
+    from: FROM_WEBSHOP,
     to,
     ...(BCC ? { bcc: BCC.split(',').map((s) => s.trim()).filter(Boolean) } : {}),
     subject: `Bevestiging bestelling ${orderRef} — Scouts Kriko-M`,
     html,
     text,
   })
+
+  if (res.error) {
+    console.error('⚠️ Resend fout bij verzenden bestelbevestiging:', res.error)
+  }
 }
 
 interface WebshopOrderNotificationParams {
@@ -205,14 +210,98 @@ export async function sendWebshopOrderNotification(params: WebshopOrderNotificat
     `Communiceer met de koper via ${email} om af te spreken voor de afhaling.`,
   ].join('\n')
 
-  await resend.emails.send({
-    from: FROM,
+  const res = await resend.emails.send({
+    from: FROM_WEBSHOP,
     to,
     subject: `Nieuwe Webshop Bestelling ${orderRef} — ${customerName}`,
     html,
     text,
   })
+
+  if (res.error) {
+    console.error('⚠️ Resend fout bij verzenden bestelnotificatie naar webshop:', res.error)
+  }
 }
 
 // Alias for backwards compatibility
 export const sendKatrienNotification = sendWebshopOrderNotification
+
+interface ContactFormNotificationParams {
+  to?: string
+  name: string
+  email: string
+  subject?: string
+  message: string
+}
+
+export async function sendContactFormNotification(params: ContactFormNotificationParams) {
+  const resend = getClient()
+  if (!resend) {
+    console.warn('⚠️ RESEND_API_KEY ontbreekt in environment variables; contactmail niet verstuurd.')
+    return { ok: false, error: 'RESEND_API_KEY ontbreekt' }
+  }
+
+  const { name, email, subject, message } = params
+  const to = params.to || 'groepsleiding@kriko-m.be'
+  const emailSubject = subject?.trim()
+    ? `[Contactformulier] ${subject.trim()} — ${name}`
+    : `Nieuw bericht via het contactformulier — ${name}`
+
+  const html = `<!doctype html><html><body style="margin:0;background:#F0ECE4;font-family:Arial,Helvetica,sans-serif;color:#2b2b2b;">
+    <div style="max-width:600px;margin:0 auto;padding:24px;">
+      <div style="background:#650B19;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;">
+        <h1 style="margin:0;font-size:20px;">Nieuw Contactbericht</h1>
+        <p style="margin:6px 0 0;opacity:.9;font-size:14px;">Ontvangen via het contactformulier op de website</p>
+      </div>
+      <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <div style="background:#F0ECE4;border-radius:10px;padding:16px 18px;margin-bottom:20px;">
+          <h3 style="margin:0 0 10px;font-size:15px;color:#650B19;">Afzender</h3>
+          <table style="width:100%;border-collapse:collapse;font-size:14px;">
+            <tr><td style="padding:4px 0;color:#666;width:120px;">Naam:</td><td style="padding:4px 0;font-weight:bold;">${esc(name)}</td></tr>
+            <tr><td style="padding:4px 0;color:#666;">E-mailadres:</td><td style="padding:4px 0;"><a href="mailto:${esc(email)}" style="color:#650B19;font-weight:bold;">${esc(email)}</a></td></tr>
+            ${subject?.trim() ? `<tr><td style="padding:4px 0;color:#666;">Onderwerp:</td><td style="padding:4px 0;font-weight:bold;">${esc(subject.trim())}</td></tr>` : ''}
+          </table>
+        </div>
+
+        <h3 style="margin:0 0 10px;font-size:15px;color:#650B19;">Bericht</h3>
+        <div style="background:#FAF8F5;border:1px solid #E5DFD5;border-radius:8px;padding:16px;white-space:pre-wrap;line-height:1.6;font-size:14px;color:#2B2B2B;">${esc(message)}</div>
+
+        <p style="margin:24px 0 0;font-size:13px;color:#777;line-height:1.5;">
+          Je kan direct op deze e-mail antwoorden om contact op te nemen met <strong>${esc(name)}</strong> (<a href="mailto:${esc(email)}" style="color:#650B19;">${esc(email)}</a>).
+        </p>
+      </div>
+    </div>
+  </body></html>`
+
+  const text = [
+    `Nieuw bericht via het contactformulier van Scouts Kriko-M`,
+    ``,
+    `Naam: ${name}`,
+    `E-mailadres: ${email}`,
+    ...(subject?.trim() ? [`Onderwerp: ${subject.trim()}`] : []),
+    ``,
+    `Bericht:`,
+    message,
+    ``,
+    `---`,
+    `Beantwoord deze e-mail om rechtstreeks te antwoorden naar ${email}.`,
+  ].join('\n')
+
+  const res = await resend.emails.send({
+    from: FROM_CONTACT,
+    to,
+    replyTo: email,
+    subject: emailSubject,
+    html,
+    text,
+  })
+
+  if (res.error) {
+    console.error('⚠️ Resend fout bij verzenden contactmail:', res.error)
+    return { ok: false, error: res.error }
+  } else {
+    console.log('✅ Contactformulier e-mail succesvol verzonden van', FROM_CONTACT, 'naar:', to, 'ID:', res.data?.id)
+    return { ok: true, data: res.data }
+  }
+}
+

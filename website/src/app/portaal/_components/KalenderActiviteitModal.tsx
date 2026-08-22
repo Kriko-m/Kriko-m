@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { CalendarEvent, AudienceTag } from '@/lib/types'
 import { AUDIENCE_TAGS, AUDIENCE_NAMEN, PORTAAL_AUDIENCE_KLEUREN } from '@/lib/constants'
 import { PRESET_EVENT_ICONS } from '@/lib/calendar'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 type FormState = {
   title: string; date: string; datum_tot: string; timeStart: string; timeEnd: string
@@ -63,13 +64,10 @@ export default function KalenderActiviteitModal({
   const [documentOpen, setDocumentOpen] = useState(!!(editEvent?.document_url))
   const [isMeerdaags, setIsMeerdaags] = useState(!!(editEvent?.datum_tot))
 
+  useScrollLock(true)
+
   useEffect(() => {
     setMounted(true)
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = originalOverflow
-    }
   }, [])
 
   const selectableTags: AudienceTag[] = canPublish ? [...AUDIENCE_TAGS] : AUDIENCE_TAGS.filter(t => t !== 'groep')

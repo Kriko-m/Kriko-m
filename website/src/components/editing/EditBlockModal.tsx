@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 export type BlockType = 'text_only' | 'text_image' | 'tak_card' | 'waariswat' | 'webshop_card'
 
@@ -28,6 +29,7 @@ export default function EditBlockModal({
   onClose,
   onSaved,
 }: Props) {
+  useScrollLock(true)
   // Determine blockType automatically if not specified
   let blockType: BlockType = explicitBlockType || 'text_only'
   if (!explicitBlockType) {

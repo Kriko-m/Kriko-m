@@ -6,14 +6,28 @@ export default function ScrollTopButton() {
     const btn = document.getElementById('scroll-top-btn')
     if (!btn) return
 
-    const onScroll = () => btn.classList.toggle('visible', window.scrollY > 400)
+    let isVisible = false
+    let isOverFooter = false
+
+    const onScroll = () => {
+      const shouldBeVisible = window.scrollY > 400
+      if (shouldBeVisible !== isVisible) {
+        isVisible = shouldBeVisible
+        btn.classList.toggle('visible', isVisible)
+      }
+    }
     window.addEventListener('scroll', onScroll, { passive: true })
 
     const footer = document.querySelector('footer')
     let observer: IntersectionObserver | null = null
     if (footer) {
       observer = new IntersectionObserver(
-        ([entry]) => btn.classList.toggle('over-footer', entry.isIntersecting),
+        ([entry]) => {
+          if (entry.isIntersecting !== isOverFooter) {
+            isOverFooter = entry.isIntersecting
+            btn.classList.toggle('over-footer', isOverFooter)
+          }
+        },
         { threshold: 0 }
       )
       observer.observe(footer)

@@ -73,10 +73,6 @@
     padding: 0;
 }
 
-/* Hide scrollbars globally */
-html { scrollbar-width: none; }
-::-webkit-scrollbar { display: none; }
-
 /* Focus-ring alleen tonen bij toetsenbordnavigatie, niet bij muisklikken */
 :focus:not(:focus-visible) {
     outline: none;
@@ -89,24 +85,27 @@ html { scrollbar-width: none; }
 }
 
 html {
-    scroll-behavior: smooth;
     font-size: 16px;
     background-color: var(--color-bg-linen);
     color: var(--color-text-dark);
-    max-width: 100vw;
-    overflow-x: hidden;
-    overscroll-behavior-x: none;
 }
 
 body {
     font-family: var(--font-outfit), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     line-height: 1.6;
-    overflow-x: clip; /* clip i.p.v. hidden: voorkomt horizontaal scrollen zonder een scroll-container te maken die position:sticky breekt */
+    overflow-x: clip; /* clip voorkomt horizontaal scrollen zonder een scroll-container te maken die root scrolling of position:sticky breekt */
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    max-width: 100vw;
-    overscroll-behavior-x: none;
+    width: 100%;
+}
+
+/* Scroll locking when modals, dialogs, lightboxes or mobile menus are open */
+html.scroll-locked,
+body.scroll-locked {
+    overflow: hidden !important;
+    touch-action: none;
+    overscroll-behavior: none;
 }
 
 .public-layout-content {
@@ -133,20 +132,16 @@ a {
     transition: var(--transition-fast);
 }
 
-/* Custom Scrollbar */
+/* Scrollbar verbergen */
+html, body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
 ::-webkit-scrollbar {
-    width: 10px;
-}
-::-webkit-scrollbar-track {
-    background: var(--color-bg-linen);
-}
-::-webkit-scrollbar-thumb {
-    background: var(--color-primary-light);
-    border: 2px solid var(--color-bg-linen);
-    border-radius: 5px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary);
+    display: none;
+    width: 0 !important;
+    height: 0 !important;
 }
 
 /* Generic Layout Wrapper */
@@ -1995,7 +1990,7 @@ body.portal-theme .tak-hero.primair {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
     text-align: center;
 }
 
@@ -2008,6 +2003,7 @@ body.portal-theme .tak-hero.primair {
     text-transform: uppercase;
     text-shadow: 0 1px 6px rgba(0,0,0,0.5);
     line-height: 1.1;
+    margin-bottom: 4px;
 }
 
 .echo-card-leeftijd {
@@ -7094,46 +7090,40 @@ body.portal-theme .portaal-nav {
    Comprehensive Mobile-Proofing & Responsiveness Styles
    ========================================================================== */
 
-/* Global safeguard against horizontal overflow */
-html, body {
-    max-width: 100vw;
-    overflow-x: hidden;
-}
-
 /* Takken detail page leader photo & header */
 .tak-leader-photo-wrap {
     position: absolute;
-    top: 10px;
-    right: -130px;
+    top: 25px;
+    right: -320px;
     z-index: 10;
-    transform: rotate(7deg);
-    width: 220px;
-    transition: transform 0.3s ease;
+    transform: rotate(6.5deg);
+    width: 340px;
 }
 
 .tak-photo-tape {
     position: absolute;
-    top: -10px;
+    top: -12px;
     left: 50%;
     transform: translateX(-50%) rotate(-4deg);
-    width: 70px;
-    height: 22px;
-    background-color: rgba(240, 230, 210, 0.85);
-    border: 1px solid rgba(200, 190, 170, 0.5);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    width: 85px;
+    height: 26px;
+    background-color: rgba(240, 230, 210, 0.88);
+    border: 1px solid rgba(200, 190, 170, 0.55);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     z-index: 12;
     backdrop-filter: blur(2px);
 }
 
 .tak-leaders-header-info.has-photo {
-    padding-right: 120px;
+    padding-right: 0;
+    min-height: auto;
 }
 
 /* Contact page grid */
 .contact-page-grid {
     display: grid;
-    grid-template-columns: 3fr 2fr;
-    gap: 40px;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: 36px;
 }
 
 /* Inschrijven page layout */
@@ -7381,7 +7371,7 @@ html, body {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     /* Takken detail page leader photo stack */
     .tak-leader-photo-wrap {
         position: relative;
@@ -7389,8 +7379,8 @@ html, body {
         right: 0;
         transform: none;
         width: 100%;
-        max-width: 320px;
-        margin: 0 auto 20px;
+        max-width: 440px;
+        margin: 0 auto 24px;
     }
 
     .tak-photo-tape {
@@ -7400,6 +7390,9 @@ html, body {
     .tak-leaders-header-info.has-photo {
         padding-right: 0;
     }
+}
+
+@media (max-width: 768px) {
 
     .info-two-col-grid {
         grid-template-columns: 1fr;

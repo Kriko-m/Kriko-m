@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react'
 import Image from 'next/image'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 interface EditGalleryModalProps {
   initialPhotos: string[]
@@ -14,6 +15,7 @@ export default function EditGalleryModal({
   onClose,
   onSaved,
 }: EditGalleryModalProps) {
+  useScrollLock(true)
   const [photos, setPhotos] = useState<string[]>(initialPhotos)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)

@@ -278,7 +278,7 @@ export default function TakPageClient({
                   style={{
                     position: 'absolute',
                     top: 10,
-                    right: takPhotoSrc ? 230 : 10,
+                    right: takPhotoSrc ? 290 : 10,
                     zIndex: 999,
                     backgroundColor: '#162544',
                     color: '#ffffff',
@@ -306,19 +306,19 @@ export default function TakPageClient({
                   <div className="tak-photo-tape" />
                   <div style={{
                     backgroundColor: '#fff',
-                    padding: 6,
-                    borderRadius: 8,
-                    boxShadow: '0 12px 28px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
+                    padding: 8,
+                    borderRadius: 10,
+                    boxShadow: '0 16px 36px rgba(0,0,0,0.18), 0 4px 10px rgba(0,0,0,0.08)',
                     border: '1px solid var(--color-border)',
                   }}>
-                    <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', borderRadius: 5, overflow: 'hidden' }}>
+                    <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', borderRadius: 6, overflow: 'hidden' }}>
                       <Image
                         src={takPhotoSrc}
                         alt={`Leidingsploeg ${takName}`}
                         fill
                         unoptimized
                         style={{ objectFit: 'cover' }}
-                        sizes="220px"
+                        sizes="340px"
                       />
                     </div>
                   </div>
@@ -367,15 +367,14 @@ export default function TakPageClient({
                         borderRadius: 'var(--border-radius-md)',
                         border: '1px solid var(--color-border)',
                         gap: 16,
-                        flexWrap: 'wrap',
                       }}
                     >
-                      <div>
-                        <h4 style={{ fontSize: '1.15rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700 }}>
+                      <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+                        <h4 style={{ fontSize: '1.15rem', color: 'var(--color-primary-dark)', margin: 0, fontWeight: 700, lineHeight: 1.3 }}>
                           {leader.name}
                         </h4>
                         {leader.totem && (
-                          <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dark)', fontStyle: 'italic', margin: '4px 0 0 0' }}>
+                          <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dark)', fontStyle: 'italic', margin: '4px 0 0 0', lineHeight: 1.3 }}>
                             {leader.totem}
                           </p>
                         )}
@@ -397,13 +396,15 @@ export default function TakPageClient({
                             border: '1px solid var(--color-border)',
                             textDecoration: 'none',
                             boxShadow: 'var(--shadow-sm)',
+                            flexShrink: 0,
+                            whiteSpace: 'nowrap',
                           }}
                         >
                           <i className="fa-solid fa-phone" style={{ color: 'var(--color-secondary)' }}></i>
                           {leader.phone}
                         </a>
                       ) : (
-                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', fontStyle: 'italic', flexShrink: 0 }}>
                           -
                         </span>
                       )}

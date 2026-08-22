@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 interface Props {
   title?: string
@@ -23,6 +24,7 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }: Props) {
+  useScrollLock(true)
   const handleCancel = onCancel || onConfirm
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { CalendarEvent } from '@/lib/types'
 import { AUDIENCE_NAMEN, AUDIENCE_KLEUREN, PORTAAL_AUDIENCE_KLEUREN } from '@/lib/constants'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
 const MONTHS_SHORT: Record<number, string> = {1:'Jan',2:'Feb',3:'Mrt',4:'Apr',5:'Mei',6:'Jun',7:'Jul',8:'Aug',9:'Sep',10:'Okt',11:'Nov',12:'Dec'}
@@ -69,14 +70,10 @@ function googleCalUrl(event: CalendarEvent) {
 
 export function EventDetailDialog({ event, todayMs, onClose, onEdit, isPortal }: { event: CalendarEvent; todayMs: number; onClose: () => void; onEdit?: () => void; isPortal?: boolean }) {
   const [mounted, setMounted] = useState(false)
+  useScrollLock(true)
 
   useEffect(() => {
     setMounted(true)
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = originalOverflow
-    }
   }, [])
 
   const [yy, mm, dd] = event.date.split('-').map(Number)
