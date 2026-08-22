@@ -94,7 +94,7 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
       if (res.ok && data && !data.error) {
         setEchos(prev => [data, ...prev])
         setEchoDroppedFile(null)
-        showUploadFlash('Echo succesvol geüpload!', 'success')
+        showUploadFlash(isGroepsleiding ? 'Echo succesvol geüpload!' : 'Echo succesvol geüpload! Deze staat nu in afwachting van goedkeuring.', 'success')
       } else {
         showUploadFlash(data?.error || 'Fout bij het uploaden van de Echo.', 'error')
       }
@@ -428,8 +428,8 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
         {/* RIGHT COLUMN: Smaller Compact List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           
-          {/* Unapproved Section (Groepsleiding) — Filtered by activeTak */}
-          {isGroepsleiding && (() => {
+          {/* Unapproved Section — Filtered by activeTak */}
+          {(() => {
             const activeTakUnapprovedEchos = echos.filter(e => !e.approved && e.tak === activeTak)
             if (activeTakUnapprovedEchos.length === 0) return null
 
@@ -483,97 +483,157 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                           </strong>
                         </div>
 
-                        {/* Ultra-sleek Segmented Action Pill with Slanted Separator */}
-                        <div style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          borderRadius: 9999,
-                          border: '1.5px solid #CBD5E1',
-                          background: '#FFFFFF',
-                          overflow: 'hidden',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                          height: 28,
-                          flexShrink: 0,
-                        }}>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              handleApproveEcho(echo.id)
-                            }}
-                            title="Goedkeuren"
-                            aria-label="Goedkeuren"
-                            style={{
-                              padding: '0 11px 0 11px',
-                              height: '100%',
-                              background: 'transparent',
-                              color: '#16A34A',
-                              border: 'none',
-                              borderRight: '1.5px solid #CBD5E1',
-                              fontSize: '0.8rem',
-                              fontWeight: 800,
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              transition: 'all 0.15s ease',
-                              transform: 'skewX(-14deg)',
-                              marginLeft: -4,
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = '#16A34A'
-                              e.currentTarget.style.color = '#FFFFFF'
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = 'transparent'
-                              e.currentTarget.style.color = '#16A34A'
-                            }}
-                          >
-                            <span style={{ transform: 'skewX(14deg)', display: 'inline-flex' }}>
-                              <i className="fa-solid fa-check"></i>
-                            </span>
-                          </button>
+                        {isGroepsleiding ? (
+                          /* Ultra-sleek Segmented Action Pill for Groepsleiding */
+                          <div style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            borderRadius: 9999,
+                            border: '1.5px solid #CBD5E1',
+                            background: '#FFFFFF',
+                            overflow: 'hidden',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                            height: 28,
+                            flexShrink: 0,
+                          }}>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                handleApproveEcho(echo.id)
+                              }}
+                              title="Goedkeuren"
+                              aria-label="Goedkeuren"
+                              style={{
+                                padding: '0 11px 0 11px',
+                                height: '100%',
+                                background: 'transparent',
+                                color: '#16A34A',
+                                border: 'none',
+                                borderRight: '1.5px solid #CBD5E1',
+                                fontSize: '0.8rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.15s ease',
+                                transform: 'skewX(-14deg)',
+                                marginLeft: -4,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#16A34A'
+                                e.currentTarget.style.color = '#FFFFFF'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'transparent'
+                                e.currentTarget.style.color = '#16A34A'
+                              }}
+                            >
+                              <span style={{ transform: 'skewX(14deg)', display: 'inline-flex' }}>
+                                <i className="fa-solid fa-check"></i>
+                              </span>
+                            </button>
 
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              handleDeleteEcho(echo.id)
-                            }}
-                            title="Wis"
-                            aria-label="Wis"
-                            style={{
-                              padding: '0 11px 0 11px',
-                              height: '100%',
-                              background: 'transparent',
-                              color: '#DC2626',
-                              border: 'none',
-                              fontSize: '0.8rem',
-                              fontWeight: 800,
-                              cursor: 'pointer',
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                handleDeleteEcho(echo.id)
+                              }}
+                              title="Wis"
+                              aria-label="Wis"
+                              style={{
+                                padding: '0 11px 0 11px',
+                                height: '100%',
+                                background: 'transparent',
+                                color: '#DC2626',
+                                border: 'none',
+                                fontSize: '0.8rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.15s ease',
+                                transform: 'skewX(-14deg)',
+                                marginRight: -4,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#DC2626'
+                                e.currentTarget.style.color = '#FFFFFF'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = 'transparent'
+                                e.currentTarget.style.color = '#DC2626'
+                              }}
+                            >
+                              <span style={{ transform: 'skewX(14deg)', display: 'inline-flex' }}>
+                                <i className="fa-solid fa-xmark"></i>
+                              </span>
+                            </button>
+                          </div>
+                        ) : (
+                          /* Pending badge & Delete button for Regular Leiding */
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{
                               display: 'inline-flex',
                               alignItems: 'center',
-                              justifyContent: 'center',
-                              transition: 'all 0.15s ease',
-                              transform: 'skewX(-14deg)',
-                              marginRight: -4,
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = '#DC2626'
-                              e.currentTarget.style.color = '#FFFFFF'
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = 'transparent'
-                              e.currentTarget.style.color = '#DC2626'
-                            }}
-                          >
-                            <span style={{ transform: 'skewX(14deg)', display: 'inline-flex' }}>
-                              <i className="fa-solid fa-xmark"></i>
+                              gap: 6,
+                              padding: '4px 10px',
+                              borderRadius: 9999,
+                              background: '#FEF3C7',
+                              color: '#92400E',
+                              border: '1px solid #FDE68A',
+                              fontSize: '0.78rem',
+                              fontWeight: 800,
+                            }}>
+                              <i className="fa-regular fa-clock" style={{ fontSize: '0.75rem' }}></i>
+                              <span>In afwachting</span>
                             </span>
-                          </button>
-                        </div>
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                handleDeleteEcho(echo.id)
+                              }}
+                              title="Wis"
+                              aria-label="Wis"
+                              style={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: '50%',
+                                background: '#FFFFFF',
+                                color: '#DC2626',
+                                border: '1.5px solid #CBD5E1',
+                                fontSize: '0.78rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                transition: 'all 0.15s ease',
+                                flexShrink: 0,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = '#DC2626'
+                                e.currentTarget.style.color = '#FFFFFF'
+                                e.currentTarget.style.borderColor = '#DC2626'
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = '#FFFFFF'
+                                e.currentTarget.style.color = '#DC2626'
+                                e.currentTarget.style.borderColor = '#CBD5E1'
+                              }}
+                            >
+                              <i className="fa-solid fa-xmark"></i>
+                            </button>
+                          </div>
+                        )}
                       </a>
                     )
                   })}
