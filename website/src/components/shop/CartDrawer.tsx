@@ -1,11 +1,50 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useCart } from './CartProvider'
 
 export default function CartDrawer() {
   const [open, setOpen] = useState(false)
   const { items, removeItem, updateQty, totalQty, totalPrice } = useCart()
+  const panelRef = useRef<HTMLDivElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const panel = panelRef.current
+    if (!panel) return
+
+    const handleWheel = (e: WheelEvent) => {
+      const body = bodyRef.current
+      if (!body) return
+
+      const isScrollable = body.scrollHeight > body.clientHeight + 1
+      if (!isScrollable) return
+
+      const maxScroll = body.scrollHeight - body.clientHeight
+      const currentScroll = body.scrollTop
+
+      if (e.deltaY < 0) {
+        // Omhoog scrollen: scroll in het mandje zolang we niet bovenaan zijn
+        if (currentScroll > 0) {
+          e.preventDefault()
+          body.scrollTop = Math.max(0, currentScroll + e.deltaY)
+        }
+        // Als we al bovenaan zijn (currentScroll <= 0), laten we de pagina zelf scrollen
+      } else if (e.deltaY > 0) {
+        // Omlaag scrollen: scroll in het mandje zolang we niet onderaan zijn
+        if (currentScroll < maxScroll - 1) {
+          e.preventDefault()
+          body.scrollTop = Math.min(maxScroll, currentScroll + e.deltaY)
+        }
+        // Als we al onderaan zijn (currentScroll >= maxScroll - 1), laten we de pagina zelf scrollen
+      }
+    }
+
+    panel.addEventListener('wheel', handleWheel, { passive: false })
+    return () => {
+      panel.removeEventListener('wheel', handleWheel)
+    }
+  }, [])
 
   return (
     <div className={`shop-cart-dock${open ? '' : ' collapsed'}`} id="shop-cart">
@@ -21,8 +60,8 @@ export default function CartDrawer() {
         <span className="shop-cart-tab-label">Mandje</span>
       </button>
 
-      <div className="shop-cart-panel">
-        <div className="cart-drawer-body">
+      <div className="shop-cart-panel" ref={panelRef}>
+        <div className="cart-drawer-body" ref={bodyRef}>
           {items.length === 0 ? (
             <div className="shop-cart-empty">
               <i className="fa-solid fa-bag-shopping" style={{ fontSize: '2rem', opacity: 0.3, marginBottom: 12, display: 'block' }} />

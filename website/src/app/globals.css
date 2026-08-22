@@ -1215,6 +1215,21 @@ body.portal-theme .tak-hero.primair {
     cursor: pointer;
 }
 
+.kentekens-info-banner {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease !important;
+}
+
+.kentekens-info-banner:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary, #650B19) !important;
+    box-shadow: 0 6px 16px rgba(101, 11, 25, 0.08) !important;
+    background-color: #FAF8F5 !important;
+}
+
+.kentekens-info-banner:hover p {
+    color: var(--color-primary-dark, #3a0710) !important;
+}
+
 .portal-home-card {
     transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease !important;
 }
@@ -1238,6 +1253,7 @@ body.portal-theme .tak-hero.primair {
     padding: 20px;
     flex-grow: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -1396,6 +1412,7 @@ body.portal-theme .tak-hero.primair {
 .shop-cart-panel .cart-drawer-body {
     flex: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 16px 18px;
 }
 .shop-cart-empty {

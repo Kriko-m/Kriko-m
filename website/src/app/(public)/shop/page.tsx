@@ -118,19 +118,29 @@ export default async function ShopPage() {
           </div>
 
           {/* Richtlijnen opnaaien kentekens */}
-          <div style={{
-            background: '#fff',
-            border: '1.5px solid #C2D9C9',
-            borderRadius: 'var(--border-radius-md, 12px)',
-            padding: '12px 18px',
-            marginTop: 24,
-            display: 'flex',
-            gap: 12,
-            alignItems: 'center',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
-            <i className="fa-solid fa-compass" style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', flexShrink: 0 }} />
-            <p style={{ fontSize: '0.88rem', color: 'var(--color-text-dark)', margin: 0, lineHeight: 1.45 }}>
+          <a
+            href="https://www.scoutsengidsenvlaanderen.be/scouts-en-gidsenleden/praktisch/waar-horen-de-kentekens"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="kentekens-info-banner"
+            style={{
+              background: '#fff',
+              border: '1.5px solid #C2D9C9',
+              borderRadius: 'var(--border-radius-md, 12px)',
+              padding: '14px 20px',
+              marginTop: 24,
+              display: 'flex',
+              gap: 14,
+              alignItems: 'center',
+              boxShadow: 'var(--shadow-sm)',
+              textDecoration: 'none',
+              color: 'inherit',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer',
+            }}
+          >
+            <i className="fa-solid fa-compass" style={{ fontSize: '1.25rem', color: 'var(--color-primary-dark)', flexShrink: 0 }} />
+            <p style={{ fontSize: '0.9rem', color: 'var(--color-text-dark)', margin: 0, lineHeight: 1.45, flex: 1, fontWeight: 500 }}>
               <EditableText
                 blockKey="shop.kentekens.instructions"
                 page="shop"
@@ -139,7 +149,8 @@ export default async function ShopPage() {
                 as="span"
               />
             </p>
-          </div>
+            <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: '0.85rem', color: 'var(--color-primary)', flexShrink: 0, opacity: 0.8 }} />
+          </a>
         </div>
 
       </section>
