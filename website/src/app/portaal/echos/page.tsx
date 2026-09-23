@@ -22,13 +22,28 @@ export default async function EchosPortaalPage() {
   const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
 
   const admin = createAdminClient()
-  const { data: echosData } = await admin
-    .from('echos')
-    .select('*')
-    .order('year', { ascending: false })
-    .order('month', { ascending: false })
+  const [echosRes, storageFilesRes] = await Promise.all([
+    admin
+      .from('echos')
+      .select('*')
+      .order('year', { ascending: false })
+      .order('month', { ascending: false }),
+    admin.storage.from('echos').list(),
+  ])
 
-  const echos = (echosData ?? []) as Echo[]
+  const sizeMap: Record<string, number> = {}
+  if (storageFilesRes.data) {
+    for (const f of storageFilesRes.data) {
+      if (f.name && f.metadata?.size) {
+        sizeMap[f.name] = f.metadata.size
+      }
+    }
+  }
+
+  const echos: Echo[] = (echosRes.data ?? []).map((echo) => ({
+    ...echo,
+    file_size: sizeMap[echo.file_name] ?? undefined,
+  })) as Echo[]
 
   return <EchoManager initialEchos={echos} isGroepsleiding={isGroepsleiding} />
 }

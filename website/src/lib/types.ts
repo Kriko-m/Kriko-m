@@ -94,6 +94,7 @@ export interface Echo {
   tak: 'kapoenen' | 'welpen' | 'jonggivers' | 'givers'
   file_name: string
   approved: boolean
+  file_size?: number
   werkjaar?: string
   uploaded_at?: string
   created_at?: string

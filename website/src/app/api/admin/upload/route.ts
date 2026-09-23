@@ -313,9 +313,14 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Ongeldig uploadtype' }, { status: 400 })
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Upload API error:', err)
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Serverfout bij uploaden' }, { status: 500 })
+    const message = err instanceof Error
+      ? err.message
+      : typeof err === 'object' && err !== null && 'message' in err
+        ? String((err as { message: unknown }).message)
+        : 'Serverfout bij uploaden'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
 

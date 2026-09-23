@@ -24,6 +24,14 @@ const WERKJAAR_MAANDEN = [
 // EXACTLY 4 TAKKEN: Kapoenen, Welpen, Jonggivers, Givers
 const FOUR_TAKKEN = ['kapoenen', 'welpen', 'jonggivers', 'givers']
 
+function formatFileSize(bytes?: number): string {
+  if (!bytes || bytes <= 0) return ''
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
 interface Props {
   initialEchos: Echo[]
   isGroepsleiding?: boolean
@@ -46,17 +54,37 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
   const echoFileInputRef = useRef<HTMLInputElement>(null)
 
   const [uploadFlash, setUploadFlash] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
+  const uploadFlashTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   function showFlash(msg: string, type: 'success' | 'error' = 'success') {
     setToast({ text: msg, type })
   }
 
   function showUploadFlash(msg: string, type: 'success' | 'error' | 'info' = 'success') {
+    if (uploadFlashTimeoutRef.current) clearTimeout(uploadFlashTimeoutRef.current)
     setUploadFlash({ message: msg, type })
-    setTimeout(() => setUploadFlash(null), 4500)
+    const duration = type === 'error' ? 9000 : 4500
+    uploadFlashTimeoutRef.current = setTimeout(() => setUploadFlash(null), duration)
   }
 
   const takEchos = echos.filter(e => e.tak === activeTak && e.approved)
+
+  function validateAndSetEchoFile(f: File) {
+    const isPdf = f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+    if (!isPdf) {
+      showUploadFlash('Enkel PDF bestanden (.pdf) zijn toegestaan.', 'error')
+      return false
+    }
+
+    const sizeMB = f.size / (1024 * 1024)
+    if (sizeMB > 25) {
+      showUploadFlash(`Het gekozen bestand is te groot (${sizeMB.toFixed(1)} MB). Het maximum is 25 MB.`, 'error')
+      return false
+    }
+
+    setEchoDroppedFile(f)
+    return true
+  }
 
   async function handleUploadEchoSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -64,7 +92,14 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
 
     const file = echoDroppedFile
     if (!file || !file.size) {
-      showUploadFlash('Selecteer a.u.b. een PDF bestand.', 'error')
+      showUploadFlash('Selecteer a.u.b. eerst een PDF bestand.', 'error')
+      setLoading(false)
+      return
+    }
+
+    const sizeMB = file.size / (1024 * 1024)
+    if (sizeMB > 25) {
+      showUploadFlash(`Het gekozen bestand is te groot (${sizeMB.toFixed(1)} MB). Het maximum is 25 MB.`, 'error')
       setLoading(false)
       return
     }
@@ -80,27 +115,96 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
       return
     }
 
-    const uploadFd = new FormData()
-    uploadFd.append('file', file)
-    uploadFd.append('type', 'echo')
-    uploadFd.append('echoTak', activeTak)
-    uploadFd.append('echoMonth', String(uploadMonth))
-    uploadFd.append('echoYear', String(uploadYear))
-
     try {
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: uploadFd })
-      const data = await res.json().catch(() => null)
+      // Stap 1: Vraag een veilige signed upload URL aan bij de server
+      const urlRes = await fetch('/api/admin/echos/upload-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tak: activeTak,
+          month: uploadMonth,
+          year: uploadYear,
+          fileSize: file.size,
+          fileName: file.name,
+        }),
+      })
 
-      if (res.ok && data && !data.error) {
-        setEchos(prev => [data, ...prev])
-        setEchoDroppedFile(null)
-        showUploadFlash(isGroepsleiding ? 'Echo succesvol geüpload!' : 'Echo succesvol geüpload! Deze staat nu in afwachting van goedkeuring.', 'success')
-      } else {
-        showUploadFlash(data?.error || 'Fout bij het uploaden van de Echo.', 'error')
+      if (!urlRes.ok) {
+        let errorMsg = `Initialisatie van upload mislukt (HTTP ${urlRes.status})`
+        try {
+          const errData = await urlRes.json()
+          if (errData?.error) errorMsg = errData.error
+        } catch {
+          const text = await urlRes.text().catch(() => '')
+          if (text) errorMsg = `Serverfout (${urlRes.status}): ${text.slice(0, 160)}`
+        }
+        showUploadFlash(errorMsg, 'error')
+        setLoading(false)
+        return
       }
-    } catch (err) {
+
+      const { signedUrl, filename, title } = await urlRes.json()
+
+      // Stap 2: Upload bestand rechtstreeks naar Supabase Storage (bypasst Vercel serverless limiet)
+      const uploadRes = await fetch(signedUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/pdf',
+        },
+        body: file,
+      })
+
+      if (!uploadRes.ok) {
+        let uploadError = `Upload naar opslag mislukt (HTTP ${uploadRes.status}: ${uploadRes.statusText || 'Fout'})`
+        try {
+          const upErrData = await uploadRes.json()
+          if (upErrData?.message || upErrData?.error) {
+            uploadError = `Opslagfout: ${upErrData.message || upErrData.error}`
+          }
+        } catch {
+          const text = await uploadRes.text().catch(() => '')
+          if (text) uploadError = `Opslagfout (${uploadRes.status}): ${text.slice(0, 160)}`
+        }
+        showUploadFlash(uploadError, 'error')
+        setLoading(false)
+        return
+      }
+
+      // Stap 3: Registreer de geüploade Echo in de database
+      const registerRes = await fetch('/api/admin/echos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          tak: activeTak,
+          month: uploadMonth,
+          year: uploadYear,
+          filename,
+        }),
+      })
+
+      if (!registerRes.ok) {
+        let regError = `Fout bij registreren in database (HTTP ${registerRes.status})`
+        try {
+          const regData = await registerRes.json()
+          if (regData?.error) regError = regData.error
+        } catch {
+          const text = await registerRes.text().catch(() => '')
+          if (text) regError = `Databasefout (${registerRes.status}): ${text.slice(0, 160)}`
+        }
+        showUploadFlash(regError, 'error')
+        setLoading(false)
+        return
+      }
+
+      const newEcho = await registerRes.json()
+      setEchos(prev => [{ ...newEcho, file_size: file.size }, ...prev])
+      setEchoDroppedFile(null)
+      showUploadFlash(isGroepsleiding ? 'Echo succesvol geüpload!' : 'Echo succesvol geüpload! Deze staat nu in afwachting van goedkeuring.', 'success')
+    } catch (err: unknown) {
       console.error('Upload catch error:', err)
-      showUploadFlash('Netwerkfout bij uploaden.', 'error')
+      const errorText = err instanceof Error ? err.message : String(err)
+      showUploadFlash(`Netwerkfout bij uploaden: ${errorText}`, 'error')
     } finally {
       setLoading(false)
     }
@@ -270,8 +374,25 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                     ? '0 4px 12px rgba(22,163,74,0.12)'
                     : '0 4px 12px rgba(220,38,38,0.12)',
                 }}>
-                  <i className={`fa-solid ${uploadFlash.type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}`} style={{ fontSize: '1.35rem' }}></i>
-                  <span>{uploadFlash.message}</span>
+                  <i className={`fa-solid ${uploadFlash.type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'}`} style={{ fontSize: '1.35rem', flexShrink: 0 }}></i>
+                  <span style={{ flex: 1, lineHeight: 1.4 }}>{uploadFlash.message}</span>
+                  <button
+                    type="button"
+                    onClick={() => setUploadFlash(null)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'inherit',
+                      cursor: 'pointer',
+                      fontSize: '1.2rem',
+                      fontWeight: 800,
+                      padding: '2px 6px',
+                      opacity: 0.75,
+                    }}
+                    title="Sluiten"
+                  >
+                    ✕
+                  </button>
                 </div>
               )}
 
@@ -334,15 +455,14 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                   e.preventDefault()
                   setEchoDragOver(false)
                   const f = e.dataTransfer.files[0]
-                  if (f && f.type === 'application/pdf') setEchoDroppedFile(f)
-                  else showUploadFlash('Enkel PDF bestanden zijn toegestaan.', 'error')
+                  if (f) validateAndSetEchoFile(f)
                 }}
                 onClick={() => echoFileInputRef.current?.click()}
                 style={{
                   border: `2px dashed ${echoDragOver ? '#243B6B' : '#CCCCCC'}`,
                   borderRadius: 16,
                   background: echoDragOver ? '#EBF0F9' : '#F8FAF8',
-                  padding: '52px 24px',
+                  padding: '40px 24px',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -357,24 +477,70 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                   ref={echoFileInputRef}
                   type="file"
                   name="echoFile"
-                  accept=".pdf"
+                  accept=".pdf,application/pdf"
                   style={{ display: 'none' }}
                   onChange={e => {
                     const f = e.target.files?.[0]
-                    if (f) setEchoDroppedFile(f)
+                    if (f) validateAndSetEchoFile(f)
                   }}
                 />
                 {echoDroppedFile ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <i className="fa-solid fa-file-pdf" style={{ color: '#243B6B', fontSize: '2.8rem' }}></i>
-                    <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1A1A1A' }}>{echoDroppedFile.name}</span>
-                    <button
-                      type="button"
-                      onClick={e => { e.stopPropagation(); setEchoDroppedFile(null) }}
-                      style={{ background: 'none', border: 'none', color: '#B91C1C', cursor: 'pointer', fontSize: '1.3rem' }}
-                    >
-                      ✕
-                    </button>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, width: '100%' }}>
+                    <div style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 14,
+                      background: '#FFFFFF',
+                      padding: '10px 18px',
+                      borderRadius: 12,
+                      border: '1px solid #E2E8F0',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                    }}>
+                      <i className="fa-solid fa-file-pdf" style={{ color: '#243B6B', fontSize: '2.4rem' }}></i>
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ fontSize: '1rem', fontWeight: 800, color: '#1A1A1A', wordBreak: 'break-all' }}>
+                          {echoDroppedFile.name}
+                        </div>
+                        <div style={{ fontSize: '0.82rem', color: '#64748B', fontWeight: 600 }}>
+                          {(echoDroppedFile.size / (1024 * 1024)).toFixed(2)} MB
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={e => { e.stopPropagation(); setEchoDroppedFile(null) }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#B91C1C',
+                          cursor: 'pointer',
+                          fontSize: '1.25rem',
+                          padding: '4px 8px',
+                          borderRadius: 6,
+                          marginLeft: 8,
+                        }}
+                        title="Verwijder bestand"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {echoDroppedFile.size > 3.5 * 1024 * 1024 && (
+                      <div style={{
+                        marginTop: 4,
+                        padding: '10px 14px',
+                        borderRadius: 10,
+                        background: '#FEF3C7',
+                        border: '1px solid #FDE68A',
+                        color: '#92400E',
+                        fontSize: '0.84rem',
+                        fontWeight: 600,
+                        maxWidth: 420,
+                        textAlign: 'left',
+                        lineHeight: 1.45,
+                      }}>
+                        💡 <strong>Tip voor leiding:</strong> Dit bestand is {(echoDroppedFile.size / (1024 * 1024)).toFixed(1)} MB. Uploaden werkt gewoon, maar kies in Canva bij voorkeur voor &quot;PDF - Standaard&quot; i.p.v. Afdrukkwaliteit. Dan opent hij nóg sneller op de smartphone van ouders!
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <>
@@ -459,11 +625,16 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                           e.currentTarget.style.borderColor = '#E2E8F0'
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                           <i className="fa-solid fa-file-pdf" style={{ color: '#243B6B', fontSize: '1.4rem', flexShrink: 0 }}></i>
                           <strong style={{ fontSize: '1.02rem', color: '#162544', fontWeight: 700, textTransform: 'capitalize' }}>
                             {MAANDEN[echo.month]} {echo.year}
                           </strong>
+                          {echo.file_size ? (
+                            <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: 600 }}>
+                              ({formatFileSize(echo.file_size)})
+                            </span>
+                          ) : null}
                         </div>
 
                         {isGroepsleiding ? (
@@ -684,11 +855,16 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                         e.currentTarget.style.borderColor = '#E2E8F0'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                         <i className="fa-solid fa-file-pdf" style={{ color: '#243B6B', fontSize: '1.4rem', flexShrink: 0 }}></i>
                         <strong style={{ fontSize: '1.02rem', color: '#162544', fontWeight: 700, textTransform: 'capitalize' }}>
                           {MAANDEN[echo.month]} {echo.year}
                         </strong>
+                        {echo.file_size ? (
+                          <span style={{ fontSize: '0.8rem', color: '#64748B', fontWeight: 600 }}>
+                            ({formatFileSize(echo.file_size)})
+                          </span>
+                        ) : null}
                       </div>
 
                       {/* Inverted Wis Button with Cross Icon */}
