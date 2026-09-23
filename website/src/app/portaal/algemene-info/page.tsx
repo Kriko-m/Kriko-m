@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase'
 import DocumentenClient from './DocumentenClient'
-import { DEFAULT_RESOURCES, type PortalResource } from '@/app/api/admin/portal-resources/route'
+import { DEFAULT_RESOURCES, type PortalResource } from '@/lib/portal-resources'
 
 export const metadata = { title: 'Documenten & Links — Portaal' }
 

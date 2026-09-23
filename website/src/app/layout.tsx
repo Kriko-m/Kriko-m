@@ -8,9 +8,9 @@ import RouteProgressBar from "@/components/RouteProgressBar";
 
 // Zelf-gehoste fonts (next/font) i.p.v. de Google Fonts CDN — sneller en
 // GDPR-vriendelijk (geen verbinding met Google bij paginabezoek).
-const outfit = Outfit({ subsets: ["latin"], weight: ["400", "500", "600", "700", "800"], variable: "--font-outfit", display: "swap" });
-const nunito = Nunito({ subsets: ["latin"], weight: ["600", "700", "800", "900"], variable: "--font-nunito", display: "swap" });
-const rubikDirt = Rubik_Dirt({ subsets: ["latin"], weight: ["400"], variable: "--font-londrina", display: "swap" });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: "swap" });
+const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: "swap" });
+const rubikDirt = Rubik_Dirt({ subsets: ["latin"], weight: "400", variable: "--font-londrina", display: "swap" });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.kriko-m.be";
 
