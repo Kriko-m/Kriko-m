@@ -1,119 +1,222 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
+
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCart } from './CartProvider'
 import { formatPrice } from '@/lib/utils'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 export default function CartDrawer() {
-  const [open, setOpen] = useState(false)
-  const { items, removeItem, updateQty, totalQty, totalPrice } = useCart()
+  const {
+    items,
+    removeItem,
+    updateQty,
+    totalQty,
+    totalPrice,
+    isOpen,
+    closeCart,
+    toggleCart,
+  } = useCart()
+
   const panelRef = useRef<HTMLDivElement>(null)
-  const bodyRef = useRef<HTMLDivElement>(null)
 
+  // Vergrendel achtergrondscrollen op mobiel wanneer het mandje open staat
+  useScrollLock(isOpen)
+
+  // Sluit het winkelmandje met Escape-toets
   useEffect(() => {
-    const panel = panelRef.current
-    if (!panel) return
-
-    const handleWheel = (e: WheelEvent) => {
-      const body = bodyRef.current
-      if (!body) return
-
-      const isScrollable = body.scrollHeight > body.clientHeight + 1
-      if (!isScrollable) return
-
-      const maxScroll = body.scrollHeight - body.clientHeight
-      const currentScroll = body.scrollTop
-
-      if (e.deltaY < 0) {
-        // Omhoog scrollen: scroll in het mandje zolang we niet bovenaan zijn
-        if (currentScroll > 0) {
-          e.preventDefault()
-          body.scrollTop = Math.max(0, currentScroll + e.deltaY)
-        }
-        // Als we al bovenaan zijn (currentScroll <= 0), laten we de pagina zelf scrollen
-      } else if (e.deltaY > 0) {
-        // Omlaag scrollen: scroll in het mandje zolang we niet onderaan zijn
-        if (currentScroll < maxScroll - 1) {
-          e.preventDefault()
-          body.scrollTop = Math.min(maxScroll, currentScroll + e.deltaY)
-        }
-        // Als we al onderaan zijn (currentScroll >= maxScroll - 1), laten we de pagina zelf scrollen
-      }
+    if (!isOpen) return
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeCart()
     }
-
-    panel.addEventListener('wheel', handleWheel, { passive: false })
-    return () => {
-      panel.removeEventListener('wheel', handleWheel)
-    }
-  }, [])
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, closeCart])
 
   return (
-    <div className={`shop-cart-dock${open ? '' : ' collapsed'}`} id="shop-cart">
+    <>
+      {/* 1. Vlottende triggerknop (altijd zichtbaar) */}
       <button
         type="button"
-        className="shop-cart-tab"
-        onClick={() => setOpen(o => !o)}
-        aria-expanded={open}
-        aria-label="Winkelmandje openen of sluiten"
+        className={`cart-floating-trigger${totalQty > 0 ? ' has-items' : ''}${isOpen ? ' drawer-open' : ''}`}
+        onClick={toggleCart}
+        aria-expanded={isOpen}
+        aria-label={totalQty > 0 ? `Winkelmandje bekijken (${totalQty} artikelen)` : 'Winkelmandje bekijken'}
       >
-        <i className="fa-solid fa-bag-shopping" />
-        {totalQty > 0 && <span className="cart-count">{totalQty}</span>}
-        <span className="shop-cart-tab-label">Mandje</span>
+        <span className="cart-floating-icon-wrap">
+          <i className="fa-solid fa-bag-shopping" />
+        </span>
+        <span className="cart-floating-label">Mandje</span>
+        {totalQty > 0 && (
+          <span className="cart-floating-pill">{totalQty}</span>
+        )}
       </button>
 
-      <div className="shop-cart-panel" ref={panelRef}>
-        <div className="cart-drawer-body" ref={bodyRef}>
+      {/* 2. Donkere backdrop overlay */}
+      <div
+        className={`cart-backdrop${isOpen ? ' open' : ''}`}
+        onClick={closeCart}
+        aria-hidden="true"
+      />
+
+      {/* 3. Slide-over paneel */}
+      <aside
+        className={`cart-slide-panel${isOpen ? ' open' : ''}`}
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Winkelmandje"
+      >
+        {/* Header */}
+        <div className="cart-panel-header">
+          <div className="cart-panel-title-wrap">
+            <i className="fa-solid fa-bag-shopping cart-header-icon" />
+            <h2 className="cart-panel-title">Winkelmandje</h2>
+          </div>
+          <button
+            type="button"
+            className="cart-panel-close-btn"
+            onClick={closeCart}
+            aria-label="Winkelmandje sluiten"
+          >
+            <i className="fa-solid fa-xmark" />
+          </button>
+        </div>
+
+        {/* Inhoud / Artikelenlijst */}
+        <div className="cart-panel-body">
           {items.length === 0 ? (
-            <div className="shop-cart-empty">
-              <i className="fa-solid fa-bag-shopping" style={{ fontSize: '2rem', opacity: 0.3, marginBottom: 12, display: 'block' }} />
-              <p>Je winkelmandje is leeg.</p>
+            <div className="cart-empty-state">
+              <div className="cart-empty-icon-circle">
+                <i className="fa-solid fa-bag-shopping" />
+              </div>
+              <h3 className="cart-empty-title">Je winkelmandje is leeg</h3>
+              <p className="cart-empty-desc">
+                Voeg een trui, t-shirt, groepsdas of kentekens toe om een bestelling te plaatsen.
+              </p>
+              <button
+                type="button"
+                className="btn btn-outline cart-empty-action-btn"
+                onClick={closeCart}
+              >
+                Bekijk assortiment
+              </button>
             </div>
           ) : (
-            items.map(item => (
-              <div key={`${item.id}-${item.size}`} className="cart-item">
-                <div className="cart-item-details">
-                  <div className="cart-item-title">{item.name}</div>
-                  <div className="cart-item-meta">Maat: {item.size}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-                    <button
-                      onClick={() => updateQty(item.id, item.size, -1)}
-                      style={{ width: 24, height: 24, border: '1px solid var(--color-border)', background: 'var(--color-bg-linen)', borderRadius: 4, cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    >−</button>
-                    <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{item.quantity}</span>
-                    <button
-                      onClick={() => updateQty(item.id, item.size, 1)}
-                      style={{ width: 24, height: 24, border: '1px solid var(--color-border)', background: 'var(--color-bg-linen)', borderRadius: 4, cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    >+</button>
+            <div className="cart-items-list">
+              {items.map(item => {
+                const hasSpecificSize = item.size && item.size !== 'Standaard'
+                return (
+                  <div key={`${item.id}-${item.size}`} className="cart-item-card">
+                    {/* Thumbnail */}
+                    <div className="cart-item-thumb">
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          sizes="64px"
+                          style={{ objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div className="cart-item-thumb-placeholder">
+                          <i className="fa-solid fa-shirt" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Info & Prijs */}
+                    <div className="cart-item-content">
+                      <div className="cart-item-top">
+                        <h4 className="cart-item-title">{item.name}</h4>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(item.id, item.size)}
+                          className="cart-item-delete-btn"
+                          title="Verwijder uit mandje"
+                          aria-label={`Verwijder ${item.name} uit mandje`}
+                        >
+                          <i className="fa-regular fa-trash-can" />
+                        </button>
+                      </div>
+
+                      {hasSpecificSize && (
+                        <span className="cart-item-size-badge">
+                          Maat {item.size}
+                        </span>
+                      )}
+
+                      <div className="cart-item-bottom">
+                        {/* Stepper (+ / -) */}
+                        <div className="cart-stepper">
+                          <button
+                            type="button"
+                            onClick={() => updateQty(item.id, item.size, -1)}
+                            className="cart-stepper-btn"
+                            aria-label={`Verminder aantal van ${item.name}`}
+                          >
+                            <i className="fa-solid fa-minus" />
+                          </button>
+                          <span className="cart-stepper-value">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => updateQty(item.id, item.size, 1)}
+                            className="cart-stepper-btn"
+                            aria-label={`Vermeerder aantal van ${item.name}`}
+                          >
+                            <i className="fa-solid fa-plus" />
+                          </button>
+                        </div>
+
+                        {/* Prijs */}
+                        <div className="cart-item-pricing">
+                          {item.quantity > 1 && (
+                            <span className="cart-item-unit-price">
+                              {item.quantity} × {formatPrice(item.price)}
+                            </span>
+                          )}
+                          <span className="cart-item-total-price">
+                            {formatPrice(item.price * item.quantity)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div className="cart-item-price">{formatPrice(item.price * item.quantity)}</div>
-                  <button onClick={() => removeItem(item.id, item.size)} className="cart-item-remove" style={{ marginTop: 6 }}>
-                    Verwijder
-                  </button>
-                </div>
-              </div>
-            ))
+                )
+              })}
+            </div>
           )}
         </div>
 
-        <div className="shop-cart-foot">
-          <div className="cart-subtotal">
-            <span>Subtotaal</span>
-            <span className="cart-subtotal-value">{formatPrice(totalPrice)}</span>
+        {/* Footer */}
+        {items.length > 0 && (
+          <div className="cart-panel-footer">
+            <div className="cart-subtotal-row">
+              <span className="cart-subtotal-label">Subtotaal:</span>
+              <span className="cart-subtotal-amount">{formatPrice(totalPrice)}</span>
+            </div>
+
+
+            <Link
+              href="/webwinkel/afrekenen"
+              onClick={closeCart}
+              className="btn btn-secondary cart-checkout-btn"
+            >
+              <span>Bestelling afronden</span>
+              <i className="fa-solid fa-arrow-right" />
+            </Link>
+
+            <button
+              type="button"
+              onClick={closeCart}
+              className="cart-continue-btn"
+            >
+              ← Verder winkelen
+            </button>
           </div>
-          <p className="shop-cart-note">
-            Betaling via overschrijving. De gestructureerde mededeling verschijnt bij het afrekenen.
-          </p>
-          <Link
-            href="/shop/checkout"
-            className="btn btn-secondary btn-cart-checkout"
-            style={{ width: '100%', opacity: items.length === 0 ? 0.5 : 1, pointerEvents: items.length === 0 ? 'none' : 'auto' }}
-          >
-            Naar afrekenen
-          </Link>
-        </div>
-      </div>
-    </div>
+        )}
+      </aside>
+    </>
   )
 }

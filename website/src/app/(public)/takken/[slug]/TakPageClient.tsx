@@ -499,13 +499,13 @@ export default function TakPageClient({
               />
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <Link href="/shop" className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
+                <Link href="/webwinkel" className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
                   <i className="fa-solid fa-cart-shopping" style={{ marginRight: 6 }}></i>
                   <EditableText
                     blockKey={`takken.${slug}.uniform.btn1`}
                     page="takken"
                     section={slug}
-                    defaultValue="Kriko-M Webshop"
+                    defaultValue="Kriko-M Webwinkel"
                   />
                 </Link>
                 <a

@@ -77,7 +77,28 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { id, name, price, description, image, category, sizes, active } = body
+
+    // Support batch update (e.g. for reordering products or saving stock)
+    if (Array.isArray(body)) {
+      const supabase = createAdminClient()
+      for (const item of body) {
+        if (item.id) {
+          const updateData: Record<string, unknown> = {}
+          if (item.sort_order !== undefined) updateData.sort_order = Number(item.sort_order)
+          if (item.stock !== undefined) updateData.stock = item.stock
+          if (Object.keys(updateData).length > 0) {
+            await supabase
+              .from('shop_products')
+              .update(updateData)
+              .eq('id', item.id)
+          }
+        }
+      }
+      revalidateTag('shop-products', 'max')
+      return NextResponse.json({ success: true, count: body.length })
+    }
+
+    const { id, name, price, description, image, category, sizes, active, sort_order, stock } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Product ID is verplicht' }, { status: 400 })
@@ -93,13 +114,29 @@ export async function PATCH(req: NextRequest) {
     if (category !== undefined) updateData.category = category
     if (sizes !== undefined) updateData.sizes = Array.isArray(sizes) ? sizes : [sizes]
     if (active !== undefined) updateData.active = Boolean(active)
+    if (sort_order !== undefined) updateData.sort_order = Number(sort_order)
+    if (stock !== undefined) updateData.stock = stock
 
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('shop_products')
       .update(updateData)
       .eq('id', id)
       .select()
       .single()
+
+    // Fallback if stock column doesn't exist yet in Supabase
+    if (error && error.message?.includes('stock') && updateData.stock !== undefined) {
+      const fallbackData = { ...updateData }
+      delete fallbackData.stock
+      const retry = await supabase
+        .from('shop_products')
+        .update(fallbackData)
+        .eq('id', id)
+        .select()
+        .single()
+      data = retry.data
+      error = retry.error
+    }
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })

@@ -22,6 +22,7 @@ interface OrderConfirmationParams {
   to: string
   orderRef: string
   customerName: string
+  phone?: string
   items: OrderItem[]
   total: number
   communication: string
@@ -31,7 +32,7 @@ interface OrderConfirmationParams {
 }
 
 export function createOrderPdfBuffer(params: OrderConfirmationParams): Buffer {
-  const { orderRef, items, total, communication, bankIban, bankHolder, paymentMethod = 'overschrijving' } = params
+  const { orderRef, customerName, phone, items, total, communication, bankIban, bankHolder, paymentMethod = 'overschrijving' } = params
   const isCash = paymentMethod === 'cash'
 
   const doc = new jsPDF({ unit: 'pt', format: 'a4' })
@@ -39,16 +40,17 @@ export function createOrderPdfBuffer(params: OrderConfirmationParams): Buffer {
 
   // Header bar
   doc.setFillColor(22, 37, 68) // #162544
-  doc.rect(0, 0, pageWidth, 80, 'F')
+  doc.rect(0, 0, pageWidth, 85, 'F')
 
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(18)
-  doc.text('Scouts Kriko-M — Besteloverzicht', 40, 42)
+  doc.text('Scouts Kriko-M — Besteloverzicht', 40, 36)
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(11)
-  doc.text(`Bestelnummer: ${orderRef}`, 40, 62)
+  doc.text(`Bestelnummer: ${orderRef}`, 40, 54)
+  doc.text(`Klant: ${customerName}${phone ? `  |  Tel: ${phone}` : ''}`, 40, 70)
 
   let y = 110
 
@@ -66,8 +68,8 @@ export function createOrderPdfBuffer(params: OrderConfirmationParams): Buffer {
   doc.setTextColor(50, 50, 50)
 
   if (isCash) {
-    doc.text('Betaalmethode: Contant / Cash bij afhaling', 56, y + 44)
-    doc.text(`Te betalen bedrag bij afhaling: ${euro(total)}`, 56, y + 62)
+    doc.text('Betaalmethode: Betaling bij afhaling (Cash / Payconiq)', 56, y + 44)
+    doc.text(`Te betalen bedrag bij afhaling: ${euro(total)} (gepaste hoeveelheid cash vereist)`, 56, y + 62)
     y += 105
   } else {
     doc.text('Betaalmethode: Handmatige bankoverschrijving', 56, y + 44)
@@ -128,7 +130,7 @@ export function createOrderPdfBuffer(params: OrderConfirmationParams): Buffer {
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
   doc.setTextColor(100, 100, 100)
-  doc.text('De webshopverantwoordelijke neemt per e-mail contact op voor een afhaalmoment.', 40, y)
+  doc.text('Afhaling wordt rechtstreeks besproken met de uniformverantwoordelijke.', 40, y)
   doc.text('Scouts Kriko-M vzw | Industriepark-Noord 33, 9100 Sint-Niklaas | groepsleiding@kriko-m.be', 40, y + 16)
 
   const arrayBuffer = doc.output('arraybuffer')
@@ -157,9 +159,9 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
 
   const paymentBlockHtml = isCash
     ? `<div style="background:#EEF5F1;border:1.5px solid #C2D9C9;border-radius:10px;padding:16px 20px;margin-top:18px;">
-        <h3 style="margin:0 0 6px;font-size:15px;color:#1A3D2A;font-weight:bold;">Betaling: Contant / Cash bij Afhaling</h3>
+        <h3 style="margin:0 0 6px;font-size:15px;color:#1A3D2A;font-weight:bold;">Betaling bij afhaling (Cash / Payconiq)</h3>
         <p style="margin:0 0 10px;font-size:13px;color:#1A3D2A;line-height:1.5;">
-          Je hebt gekozen om contant te betalen bij het ophalen van je bestelling bij de leiding.
+          Je hebt gekozen om te betalen bij afhaling via Payconiq of cash. <strong>Let op:</strong> bij een contante betaling vragen we vriendelijk doch uitdrukkelijk om steeds een <strong>gepaste hoeveelheid cash</strong> mee te brengen.
         </p>
         <div style="background:#FFFFFF;border:1px solid #C2D9C9;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:13px;color:#1A3D2A;font-weight:600;">Te betalen bedrag bij afhaling:</span>
@@ -185,7 +187,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
         <p style="margin:0 0 14px;font-size:15px;">Beste ${esc(customerName)},</p>
         <p style="margin:0 0 18px;line-height:1.5;font-size:14px;color:#444;">
-          We hebben je bestelling goed ontvangen. ${isCash ? 'Je betaalt contant bij het ophalen van je bestelling.' : 'Gelieve het totaalbedrag over te schrijven met onderstaande gegevens.'}
+          We hebben je bestelling goed ontvangen. ${isCash ? 'Je betaalt bij afhaling via Payconiq of cash (steeds een gepaste hoeveelheid cash voorzien).' : 'Gelieve het totaalbedrag over te schrijven met onderstaande gegevens.'}
         </p>
 
         <h3 style="margin:0 0 8px;font-size:14px;color:#162544;text-transform:uppercase;letter-spacing:0.04em;">Bestelde Artikelen</h3>
@@ -200,7 +202,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
         ${paymentBlockHtml}
 
         <p style="margin:22px 0 0;font-size:13px;color:#666;line-height:1.5;">
-          De webshopverantwoordelijke neemt per e-mail contact met je op om een geschikt afhaalmoment af te spreken.
+          De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen binnenkort contact met je op.
         </p>
         
         <div style="margin:20px 0 0;padding-top:16px;border-top:1px solid #eee;font-size:13px;color:#888;line-height:1.4;">
@@ -214,8 +216,8 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
 
   const paymentTextLines = isCash
     ? [
-        `Betalingsmethode: Contant / Cash bij afhaling`,
-        `Gelieve het gepaste bedrag (${euro(total)}) mee te brengen bij het afhalen.`,
+        `Betalingsmethode: Betaling bij afhaling (Cash / Payconiq)`,
+        `Gelieve bij cash betaling steeds de gepaste hoeveelheid cash (${euro(total)}) mee te brengen.`,
       ]
     : [
         `Betalingsmethode: Handmatige bankoverschrijving`,
@@ -238,7 +240,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     ``,
     ...paymentTextLines,
     ``,
-    `De webshopverantwoordelijke neemt per e-mail contact met je op om een geschikt afhaalmoment af te spreken.`,
+    `De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke.`,
     ``,
     `Stevige linkerhand,`,
     `Scouts Kriko-M vzw`,
@@ -276,7 +278,8 @@ interface WebshopOrderNotificationParams {
   to: string
   orderRef: string
   customerName: string
-  email: string
+  phone?: string
+  email?: string
   items: OrderItem[]
   total: number
   communication: string
@@ -292,8 +295,10 @@ export async function sendWebshopOrderNotification(params: WebshopOrderNotificat
     return
   }
 
-  const { to, orderRef, customerName, email, items, total, paymentMethod = 'overschrijving' } = params
+  const { to, orderRef, customerName, phone, email, items, total, paymentMethod = 'overschrijving' } = params
   const isCash = paymentMethod === 'cash'
+  const cleanPhone = phone ? phone.trim() : ''
+  const waPhone = cleanPhone.replace(/[^0-9]/g, '')
 
   const itemRows = items
     .map(
@@ -309,21 +314,30 @@ export async function sendWebshopOrderNotification(params: WebshopOrderNotificat
   const html = `<!doctype html><html><body style="margin:0;background:#F0ECE4;font-family:Arial,Helvetica,sans-serif;color:#2b2b2b;">
     <div style="max-width:600px;margin:0 auto;padding:24px;">
       <div style="background:#162544;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;">
-        <h1 style="margin:0;font-size:20px;">Nieuwe Webshop Bestelling</h1>
+        <h1 style="margin:0;font-size:20px;">Nieuwe Bestelling Webwinkel</h1>
         <p style="margin:6px 0 0;opacity:.9;font-size:14px;">Bestelnummer: <strong>${esc(orderRef)}</strong></p>
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
         <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
-          Beste webshopverantwoordelijke,<br/><br/>
-          Er is een nieuwe bestelling geplaatst via de webshop van Scouts Kriko-M.
+          Beste uniform- en webwinkelverantwoordelijke,<br/><br/>
+          Er is een nieuwe bestelling geplaatst via de webwinkel van Scouts Kriko-M.
         </p>
 
         <div style="background:#F0ECE4;border-radius:10px;padding:16px 18px;margin-bottom:20px;">
-          <h3 style="margin:0 0 10px;font-size:15px;color:#162544;">Gegevens Koper</h3>
+          <h3 style="margin:0 0 10px;font-size:15px;color:#162544;">Gegevens Koper &amp; Contact</h3>
           <table style="width:100%;border-collapse:collapse;font-size:14px;">
             <tr><td style="padding:4px 0;color:#666;width:140px;">Naam koper:</td><td style="padding:4px 0;font-weight:bold;color:#162544;">${esc(customerName)}</td></tr>
-            <tr><td style="padding:4px 0;color:#666;">E-mailadres:</td><td style="padding:4px 0;"><a href="mailto:${esc(email)}" style="color:#162544;font-weight:bold;">${esc(email)}</a></td></tr>
-            <tr><td style="padding:4px 0;color:#666;">Betaalmethode:</td><td style="padding:4px 0;font-weight:bold;color:${isCash ? '#166534' : '#1E3A8A'};">${isCash ? 'Contant / Cash bij afhaling' : 'Overschrijving'}</td></tr>
+            <tr>
+              <td style="padding:4px 0;color:#666;">Telefoonnummer:</td>
+              <td style="padding:4px 0;font-weight:bold;">
+                ${cleanPhone ? `<a href="tel:${esc(cleanPhone)}" style="color:#162544;text-decoration:underline;">${esc(cleanPhone)}</a> &nbsp;&bull;&nbsp; <a href="https://wa.me/${waPhone}" target="_blank" style="color:#25D366;font-weight:bold;text-decoration:none;">WhatsApp</a>` : '<span style="color:#888;">(Niet ingevuld)</span>'}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:4px 0;color:#666;">E-mailadres:</td>
+              <td style="padding:4px 0;">${email ? `<a href="mailto:${esc(email)}" style="color:#162544;">${esc(email)}</a>` : '<span style="color:#888;">(Geen e-mailadres opgegeven &mdash; koper downloadt PDF)</span>'}</td>
+            </tr>
+            <tr><td style="padding:4px 0;color:#666;">Betaalmethode:</td><td style="padding:4px 0;font-weight:bold;color:${isCash ? '#166534' : '#1E3A8A'};">${isCash ? 'Betaling bij afhaling (Cash / Payconiq)' : 'Overschrijving'}</td></tr>
             <tr><td style="padding:4px 0;color:#666;">Totaalbedrag:</td><td style="padding:4px 0;font-weight:bold;font-size:16px;color:#650B19;">${euro(total)}</td></tr>
           </table>
         </div>
@@ -347,31 +361,32 @@ export async function sendWebshopOrderNotification(params: WebshopOrderNotificat
           </tbody>
         </table>
 
-        <p style="margin:20px 0 0;font-size:13px;color:#666;line-height:1.5;">
-          Je kan rechtstreeks met de koper communiceren via <a href="mailto:${esc(email)}" style="color:#162544;font-weight:bold;">${esc(email)}</a> om een afhaalmoment af te spreken.
-        </p>
+        <div style="background:#EBF0F9;border:1px solid #CBD5E1;border-radius:8px;padding:12px 16px;font-size:13px;color:#162544;line-height:1.5;">
+          <strong>Actie vereist:</strong> Neem contact op met de koper via bericht (SMS of WhatsApp: <strong>${esc(cleanPhone)}</strong>) om de afhaling af te spreken.
+        </div>
       </div>
     </div>
   </body></html>`
 
   const text = [
-    `Nieuwe Webshop Bestelling (${orderRef})`,
+    `Nieuwe Webwinkel Bestelling (${orderRef})`,
     ``,
     `Naam koper: ${customerName}`,
-    `E-mailadres: ${email}`,
-    `Betaalmethode: ${isCash ? 'Cash bij afhaling' : 'Overschrijving'}`,
+    `Telefoonnummer: ${cleanPhone}`,
+    `E-mailadres: ${email || '(Geen)'}`,
+    `Betaalmethode: ${isCash ? 'Betaling bij afhaling (Cash / Payconiq)' : 'Overschrijving'}`,
     `Totaalbedrag: ${euro(total)}`,
     ``,
     `Bestelde artikelen:`,
     ...items.map((i) => `- ${i.quantity}x ${i.name} (${i.size}): ${euro(i.price * i.quantity)}`),
     ``,
-    `Communiceer met de koper via ${email} om af te spreken voor de afhaling.`,
+    `Neem contact op via bericht (SMS/WhatsApp op ${cleanPhone}) om de afhaling af te spreken.`,
   ].join('\n')
 
   const res = await resend.emails.send({
     from: FROM_WEBSHOP,
     to,
-    subject: `Nieuwe Webshop Bestelling ${orderRef} — ${customerName} (${isCash ? 'Cash' : 'Overschrijving'})`,
+    subject: `Nieuwe Webwinkel Bestelling ${orderRef} — ${customerName} (${cleanPhone})`,
     html,
     text,
   })
@@ -385,7 +400,8 @@ interface FinancialOrderNotificationParams {
   to: string
   orderRef: string
   customerName: string
-  email: string
+  phone?: string
+  email?: string
   items: OrderItem[]
   total: number
   communication: string
@@ -400,7 +416,8 @@ export async function sendFinancialOrderNotification(params: FinancialOrderNotif
     return
   }
 
-  const { to, orderRef, customerName, email, items, total, communication } = params
+  const { to, orderRef, customerName, phone, email, items, total, communication } = params
+  const cleanPhone = phone ? phone.trim() : ''
 
   const itemRows = items
     .map(
@@ -414,19 +431,20 @@ export async function sendFinancialOrderNotification(params: FinancialOrderNotif
   const html = `<!doctype html><html><body style="margin:0;background:#F0ECE4;font-family:Arial,Helvetica,sans-serif;color:#2b2b2b;">
     <div style="max-width:580px;margin:0 auto;padding:24px;">
       <div style="background:#162544;color:#fff;padding:20px 24px;border-radius:12px 12px 0 0;">
-        <h1 style="margin:0;font-size:20px;">Webshop Bestelling via Overschrijving</h1>
+        <h1 style="margin:0;font-size:20px;">Webwinkel Bestelling via Overschrijving</h1>
         <p style="margin:6px 0 0;opacity:.9;font-size:14px;">Bestelnummer: <strong>${esc(orderRef)}</strong></p>
       </div>
       <div style="background:#fff;padding:24px;border-radius:0 0 12px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
         <p style="margin:0 0 16px;font-size:15px;line-height:1.5;">
           Beste financieel verantwoordelijke,<br/><br/>
-          Er is een nieuwe bestelling geplaatst via overschrijving in de webshop van Scouts Kriko-M.
+          Er is een nieuwe bestelling geplaatst via overschrijving in de webwinkel van Scouts Kriko-M.
         </p>
 
         <div style="background:#F0ECE4;border-radius:10px;padding:16px 18px;margin-bottom:20px;">
           <h3 style="margin:0 0 10px;font-size:15px;color:#162544;">Overschrijvingsgegevens</h3>
           <table style="width:100%;border-collapse:collapse;font-size:14px;">
-            <tr><td style="padding:4px 0;color:#666;width:140px;">Koper:</td><td style="padding:4px 0;font-weight:bold;color:#162544;">${esc(customerName)} (${esc(email)})</td></tr>
+            <tr><td style="padding:4px 0;color:#666;width:140px;">Koper:</td><td style="padding:4px 0;font-weight:bold;color:#162544;">${esc(customerName)} ${cleanPhone ? `(${esc(cleanPhone)})` : ''}</td></tr>
+            ${email ? `<tr><td style="padding:4px 0;color:#666;">E-mailadres:</td><td style="padding:4px 0;">${esc(email)}</td></tr>` : ''}
             <tr><td style="padding:4px 0;color:#666;">Te ontvangen bedrag:</td><td style="padding:4px 0;font-weight:bold;font-size:16px;color:#650B19;">${euro(total)}</td></tr>
             <tr><td style="padding:4px 0;color:#666;">Mededeling:</td><td style="padding:4px 0;font-weight:bold;font-family:monospace;font-size:15px;color:#162544;letter-spacing:0.05em;">${esc(communication)}</td></tr>
           </table>
@@ -436,19 +454,20 @@ export async function sendFinancialOrderNotification(params: FinancialOrderNotif
         <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:14px;">${itemRows}</table>
 
         <div style="background:#EBF0F9;border:1px solid #CBD5E1;border-radius:8px;padding:12px 16px;font-size:13px;color:#162544;line-height:1.4;">
-          Controleer de bankrekening op ontvangst van de betaling. Zodra het bedrag ontvangen is, kan de status in het leidingsportaal worden aangepast naar <strong>Betaald</strong>.
+          Controleer de bankrekening op ontvangst van de overschrijving. Zodra het bedrag ontvangen is, kan de status in het leidingsportaal worden aangepast naar <strong>Betaald</strong>.
         </div>
       </div>
     </div>
   </body></html>`
 
   const text = [
-    `Webshop Bestelling via Overschrijving (${orderRef})`,
+    `Webwinkel Bestelling via Overschrijving (${orderRef})`,
     ``,
     `Beste financieel verantwoordelijke,`,
     `Er is een nieuwe bestelling geplaatst via overschrijving:`,
     ``,
-    `Koper: ${customerName} (${email})`,
+    `Koper: ${customerName} ${cleanPhone ? `(${cleanPhone})` : ''}`,
+    email ? `E-mail: ${email}` : '',
     `Te ontvangen bedrag: ${euro(total)}`,
     `Mededeling: ${communication}`,
     ``,
@@ -456,7 +475,7 @@ export async function sendFinancialOrderNotification(params: FinancialOrderNotif
     ...items.map((i) => `- ${i.quantity}x ${i.name} (${i.size}): ${euro(i.price * i.quantity)}`),
     ``,
     `Gelieve de bankrekening te controleren en de status in het portaal aan te passen naar Betaald zodra ontvangen.`,
-  ].join('\n')
+  ].filter(Boolean).join('\n')
 
   const res = await resend.emails.send({
     from: FROM_WEBSHOP,

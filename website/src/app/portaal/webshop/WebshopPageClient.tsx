@@ -21,7 +21,8 @@ interface AdminOrder {
   customer_name: string
   child_name?: string
   child_tak?: string
-  email: string
+  phone?: string
+  email?: string
   items: OrderItem[]
   total: number
   status?: string
@@ -37,14 +38,34 @@ interface ShopProduct {
   sizes?: string[] | string
   description?: string
   image?: string
+  sort_order?: number
+  stock?: Record<string, number>
 }
 
 interface Props {
   initialSettings: Settings
   role?: string
-  activeTab: 'bestellingen' | 'artikelen' | 'instellingen'
+  activeTab: 'bestellingen' | 'artikelen' | 'stock' | 'instellingen'
   initialOrders?: AdminOrder[]
   initialShopProducts?: ShopProduct[]
+}
+
+function getWhatsAppUrl(phone: string, orderRef?: string): string {
+  let clean = phone.replace(/[^0-9+]/g, '')
+  if (clean.startsWith('+')) clean = clean.slice(1)
+  if (clean.startsWith('0032')) clean = '32' + clean.slice(4)
+  else if (clean.startsWith('0')) clean = '32' + clean.slice(1)
+  else if (!clean.startsWith('32') && clean.length <= 10) clean = '32' + clean
+
+  const msg = orderRef
+    ? `Hallo! Ik contacteer je namens Scouts Kriko-M i.v.m. je bestelling (${orderRef}).`
+    : `Hallo! Ik contacteer je namens Scouts Kriko-M.`
+  const encoded = encodeURIComponent(msg)
+
+  const isMobile = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  return isMobile
+    ? `https://wa.me/${clean}?text=${encoded}`
+    : `https://web.whatsapp.com/send?phone=${clean}&text=${encoded}`
 }
 
 function normalizeStatus(status?: string): 'niet_betaald' | 'betaald' | 'afgehaald' {
@@ -138,9 +159,17 @@ export default function WebshopPageClient({
       clearTimeout(timeoutId)
       if (res.ok) {
         const data = await res.json()
-        setShopProducts(data)
-        if (data.length > 0) {
-          setSelectedProductId(prev => prev ?? data[0].id)
+        const sortedData = [...data].sort((a: ShopProduct, b: ShopProduct) => {
+          const aIsBadge = a.category === 'kentekens'
+          const bIsBadge = b.category === 'kentekens'
+          if (aIsBadge !== bIsBadge) return aIsBadge ? 1 : -1
+          const diff = (a.sort_order ?? 0) - (b.sort_order ?? 0)
+          if (diff !== 0) return diff
+          return a.id.localeCompare(b.id)
+        })
+        setShopProducts(sortedData)
+        if (sortedData.length > 0) {
+          setSelectedProductId(prev => prev ?? sortedData[0].id)
         }
       }
     } catch (err) {
@@ -158,7 +187,7 @@ export default function WebshopPageClient({
   // Sync / refresh bij tabwissel
   useEffect(() => {
     if (activeTab === 'bestellingen' && orders.length === 0) fetchOrders()
-    if (activeTab === 'artikelen' && shopProducts.length === 0) fetchShopProducts()
+    if ((activeTab === 'artikelen' || activeTab === 'stock') && shopProducts.length === 0) fetchShopProducts()
   }, [activeTab, orders.length, shopProducts.length, fetchOrders, fetchShopProducts])
 
   // Optimistic status update: UI verandert onmiddellijk (0ms), server update in de achtergrond
@@ -240,9 +269,12 @@ export default function WebshopPageClient({
   async function handleProductSave(productToSave: ShopProduct) {
     setSavingProduct(true)
     try {
-      const parsedSizes = typeof productToSave.sizes === 'string'
-        ? productToSave.sizes.split(',').map(s => s.trim()).filter(Boolean)
-        : productToSave.sizes
+      const isBadge = productToSave.category === 'kentekens'
+      const parsedSizes = isBadge
+        ? ['Standaard']
+        : typeof productToSave.sizes === 'string'
+          ? productToSave.sizes.split(',').map(s => s.trim()).filter(Boolean)
+          : productToSave.sizes
 
       const res = await fetch('/api/admin/shop-products', {
         method: 'PATCH',
@@ -255,6 +287,8 @@ export default function WebshopPageClient({
           sizes: parsedSizes,
           description: productToSave.description,
           image: productToSave.image,
+          sort_order: productToSave.sort_order,
+          stock: productToSave.stock,
         }),
       })
       if (!res.ok) {
@@ -360,6 +394,138 @@ export default function WebshopPageClient({
         await handleProductSave({ ...product, image: '' })
       },
     })
+  }
+
+  // Stock & Sortering State & Handlers
+  const [savingStockId, setSavingStockId] = useState<string | null>(null)
+  const [stockFilter, setStockFilter] = useState<'all' | 'kledij' | 'kentekens'>('all')
+  const [stockSearchQuery, setStockSearchQuery] = useState('')
+  const [movingProductId, setMovingProductId] = useState<string | null>(null)
+  const [savingAllStock, setSavingAllStock] = useState(false)
+
+  async function handleMoveProduct(productId: string, direction: 'up' | 'down', category: 'kledij' | 'kentekens') {
+    const isBadgeCategory = category === 'kentekens'
+    const categoryList = shopProducts
+      .filter(p => isBadgeCategory ? p.category === 'kentekens' : p.category !== 'kentekens')
+      .sort((a, b) => {
+        const diff = (a.sort_order ?? 0) - (b.sort_order ?? 0)
+        if (diff !== 0) return diff
+        return a.id.localeCompare(b.id)
+      })
+
+    const currentIndex = categoryList.findIndex(p => p.id === productId)
+    if (currentIndex === -1) return
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+    if (targetIndex < 0 || targetIndex >= categoryList.length) return
+
+    setMovingProductId(productId)
+
+    // Reorder array deterministically
+    const reordered = [...categoryList]
+    const [movedItem] = reordered.splice(currentIndex, 1)
+    reordered.splice(targetIndex, 0, movedItem)
+
+    // Assign sequential non-colliding order numbers (1..N for kledij, 100..M for kentekens)
+    const baseOffset = isBadgeCategory ? 100 : 1
+    const updates: { id: string; sort_order: number }[] = []
+    const updatedOrderMap = new Map<string, number>()
+
+    reordered.forEach((p, idx) => {
+      const newOrder = baseOffset + idx
+      updatedOrderMap.set(p.id, newOrder)
+      if (p.sort_order !== newOrder) {
+        updates.push({ id: p.id, sort_order: newOrder })
+      }
+    })
+
+    // Instant optimistic update in local state
+    setShopProducts(prev => {
+      const updated = prev.map(p => {
+        if (updatedOrderMap.has(p.id)) {
+          return { ...p, sort_order: updatedOrderMap.get(p.id)! }
+        }
+        return p
+      })
+      return updated.sort((a, b) => {
+        const aIsBadge = a.category === 'kentekens'
+        const bIsBadge = b.category === 'kentekens'
+        if (aIsBadge !== bIsBadge) return aIsBadge ? 1 : -1
+        const diff = (a.sort_order ?? 0) - (b.sort_order ?? 0)
+        if (diff !== 0) return diff
+        return a.id.localeCompare(b.id)
+      })
+    })
+
+    try {
+      if (updates.length > 0) {
+        await fetch('/api/admin/shop-products', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates),
+        })
+      }
+    } catch (err) {
+      console.error('Fout bij ordenen:', err)
+      fetchShopProducts()
+    } finally {
+      setMovingProductId(null)
+    }
+  }
+
+  function handleStockValueChange(productId: string, sizeKey: string, val: number | 'inc' | 'dec') {
+    setShopProducts(prev => prev.map(p => {
+      if (p.id !== productId) return p
+      const stockObj = { ...(p.stock || {}) }
+      const current = typeof stockObj[sizeKey] === 'number' ? stockObj[sizeKey] : (Number(stockObj[sizeKey]) || 0)
+      let next = current
+      if (val === 'inc') next = current + 1
+      else if (val === 'dec') next = Math.max(0, current - 1)
+      else next = Math.max(0, Math.floor(val))
+
+      stockObj[sizeKey] = next
+      return { ...p, stock: stockObj }
+    }))
+  }
+
+  async function handleSaveStock(product: ShopProduct) {
+    setSavingStockId(product.id)
+    try {
+      const res = await fetch('/api/admin/shop-products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: product.id,
+          stock: product.stock || {},
+        }),
+      })
+      if (!res.ok) throw new Error('Opslaan mislukt')
+      showNotification('success', `Voorraad voor "${product.name}" opgeslagen!`)
+    } catch (err: unknown) {
+      showNotification('error', err instanceof Error ? err.message : 'Fout bij opslaan voorraad')
+    } finally {
+      setSavingStockId(null)
+    }
+  }
+
+  async function handleSaveAllStock() {
+    setSavingAllStock(true)
+    try {
+      const payload = shopProducts.map(p => ({
+        id: p.id,
+        stock: p.stock || {},
+      }))
+      const res = await fetch('/api/admin/shop-products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) throw new Error('Opslaan mislukt')
+      showNotification('success', 'Alle voorraadwijzigingen zijn opgeslagen!')
+    } catch (err: unknown) {
+      showNotification('error', err instanceof Error ? err.message : 'Fout bij opslaan voorraad')
+    } finally {
+      setSavingAllStock(false)
+    }
   }
 
   // State for expanded completed orders
@@ -601,12 +767,53 @@ export default function WebshopPageClient({
 
         {/* 2. CONTACTGEGEVENS (Direct onder de titel) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', fontSize: '0.88rem', color: '#475569' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <i className="fa-solid fa-envelope" style={{ color: '#64748B', fontSize: '0.85rem' }}></i>
-            <CopyButton text={ord.email} variant="inline">
-              {ord.email}
-            </CopyButton>
-          </div>
+          {ord.phone && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <i className="fa-solid fa-phone" style={{ color: '#166534', fontSize: '0.85rem' }}></i>
+              <a
+                href={`tel:${ord.phone.replace(/\s+/g, '')}`}
+                style={{ color: '#162544', fontWeight: 700, textDecoration: 'none' }}
+              >
+                {ord.phone}
+              </a>
+              <a
+                href={getWhatsAppUrl(ord.phone, orderRef)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Stuur WhatsApp bericht"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: '0.78rem',
+                  padding: '2px 7px',
+                  borderRadius: 6,
+                  backgroundColor: '#25D366',
+                  color: '#FFFFFF',
+                  textDecoration: 'none',
+                  fontWeight: 700,
+                  marginLeft: 4,
+                }}
+              >
+                <i className="fa-brands fa-whatsapp"></i>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          )}
+
+          {ord.email ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <i className="fa-solid fa-envelope" style={{ color: '#64748B', fontSize: '0.85rem' }}></i>
+              <CopyButton text={ord.email} variant="inline">
+                {ord.email}
+              </CopyButton>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#94A3B8', fontSize: '0.82rem', fontStyle: 'italic' }}>
+              <i className="fa-solid fa-envelope-open" style={{ fontSize: '0.85rem' }}></i>
+              <span>Geen e-mailadres opgegeven</span>
+            </div>
+          )}
 
           {ord.child_name && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#475569' }}>
@@ -879,20 +1086,22 @@ export default function WebshopPageClient({
       {activeTab !== 'bestellingen' && (
         <div style={{ backgroundColor: '#ffffff', borderRadius: 24, border: '1px solid #CBD5E1', padding: '28px 32px', color: '#162544', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.05)', width: '100%' }}>
           
-          {/* Header Title Bar */}
-          <div style={{ borderBottom: '2px solid #E2E8F0', paddingBottom: 16, marginBottom: 24 }}>
-            <h1 style={{ margin: '0 0 4px', fontSize: '1.65rem', fontWeight: 900, color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <i className={`fa-solid ${activeTab === 'artikelen' ? 'fa-shirt' : 'fa-gear'}`} style={{ color: '#243B6B' }}></i>
-              <span>
-                {activeTab === 'artikelen' ? 'Artikelen & Assortiment' : 'Webshop Instellingen'}
-              </span>
-            </h1>
-            <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748B' }}>
-              {activeTab === 'artikelen'
-                ? 'Beheer artikelen, prijzen, maten en foto\'s van de webshop en uniformen.'
-                : 'Beheer de e-mailadressen voor bestellingsmeldingen en financiële opvolging.'}
-            </p>
-          </div>
+          {/* Header Title Bar (niet tonen op voorraad pagina) */}
+          {activeTab !== 'stock' && (
+            <div style={{ borderBottom: '2px solid #E2E8F0', paddingBottom: 16, marginBottom: 24 }}>
+              <h1 style={{ margin: '0 0 4px', fontSize: '1.65rem', fontWeight: 900, color: '#162544', fontFamily: 'var(--font-heading, Nunito, sans-serif)', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <i className={`fa-solid ${activeTab === 'artikelen' ? 'fa-shirt' : 'fa-gear'}`} style={{ color: '#243B6B' }}></i>
+                <span>
+                  {activeTab === 'artikelen' ? 'Artikelen & Assortiment' : 'Webshop Instellingen'}
+                </span>
+              </h1>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748B' }}>
+                {activeTab === 'artikelen'
+                  ? 'Beheer artikelen, prijzen, foto\'s en volgorde van de webshop en uniformen.'
+                  : 'Beheer de e-mailadressen voor bestellingsmeldingen en financiële opvolging.'}
+              </p>
+            </div>
+          )}
         {/* TAB 2: ARTIKELEN & ASSORTIMENT                           */}
         {/* ======================================================== */}
         {activeTab === 'artikelen' && (
@@ -934,50 +1143,154 @@ export default function WebshopPageClient({
                   <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', padding: '4px 8px' }}>
                     Kledij
                   </span>
-                  {shopProducts.filter(p => p.category !== 'kentekens').map(p => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setSelectedProductId(p.id)}
-                      style={{
-                        textAlign: 'left',
-                        padding: '9px 12px',
-                        borderRadius: 8,
-                        fontSize: '0.86rem',
-                        fontWeight: selectedProductId === p.id ? 800 : 600,
-                        backgroundColor: selectedProductId === p.id ? '#243B6B' : '#fff',
-                        color: selectedProductId === p.id ? '#fff' : '#162544',
-                        border: '1px solid #CBD5E1',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {p.name}
-                    </button>
-                  ))}
+                  {(() => {
+                    const kledijList = shopProducts
+                      .filter(p => p.category !== 'kentekens')
+                      .sort((a, b) => {
+                        const diff = (a.sort_order ?? 0) - (b.sort_order ?? 0)
+                        if (diff !== 0) return diff
+                        return a.id.localeCompare(b.id)
+                      })
+                    return kledijList.map((p, idx) => (
+                      <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 4, width: '100%' }}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProductId(p.id)}
+                          style={{
+                            flex: 1,
+                            textAlign: 'left',
+                            padding: '8px 10px',
+                            borderRadius: 8,
+                            fontSize: '0.84rem',
+                            fontWeight: selectedProductId === p.id ? 800 : 600,
+                            backgroundColor: selectedProductId === p.id ? '#243B6B' : '#fff',
+                            color: selectedProductId === p.id ? '#fff' : '#162544',
+                            border: '1px solid #CBD5E1',
+                            cursor: 'pointer',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {p.name}
+                        </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }}>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleMoveProduct(p.id, 'up', 'kledij') }}
+                            disabled={idx === 0 || movingProductId === p.id}
+                            title="Omhoog verplaatsen"
+                            style={{
+                              padding: '2px 5px',
+                              fontSize: '0.6rem',
+                              borderRadius: 4,
+                              border: '1px solid #CBD5E1',
+                              backgroundColor: '#fff',
+                              color: idx === 0 ? '#CBD5E1' : '#162544',
+                              cursor: idx === 0 ? 'default' : 'pointer',
+                              lineHeight: 1,
+                            }}
+                          >
+                            ▲
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleMoveProduct(p.id, 'down', 'kledij') }}
+                            disabled={idx === kledijList.length - 1 || movingProductId === p.id}
+                            title="Omlaag verplaatsen"
+                            style={{
+                              padding: '2px 5px',
+                              fontSize: '0.6rem',
+                              borderRadius: 4,
+                              border: '1px solid #CBD5E1',
+                              backgroundColor: '#fff',
+                              color: idx === kledijList.length - 1 ? '#CBD5E1' : '#162544',
+                              cursor: idx === kledijList.length - 1 ? 'default' : 'pointer',
+                              lineHeight: 1,
+                            }}
+                          >
+                            ▼
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  })()}
 
                   <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', padding: '12px 8px 4px' }}>
                     Kentekens
                   </span>
-                  {shopProducts.filter(p => p.category === 'kentekens').map(p => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => setSelectedProductId(p.id)}
-                      style={{
-                        textAlign: 'left',
-                        padding: '8px 10px',
-                        borderRadius: 8,
-                        fontSize: '0.82rem',
-                        fontWeight: selectedProductId === p.id ? 800 : 600,
-                        backgroundColor: selectedProductId === p.id ? '#243B6B' : '#fff',
-                        color: selectedProductId === p.id ? '#fff' : '#162544',
-                        border: '1px solid #CBD5E1',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      {p.name}
-                    </button>
-                  ))}
+                  {(() => {
+                    const kentekensList = shopProducts
+                      .filter(p => p.category === 'kentekens')
+                      .sort((a, b) => {
+                        const diff = (a.sort_order ?? 0) - (b.sort_order ?? 0)
+                        if (diff !== 0) return diff
+                        return a.id.localeCompare(b.id)
+                      })
+                    return kentekensList.map((p, idx) => (
+                      <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 4, width: '100%' }}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProductId(p.id)}
+                          style={{
+                            flex: 1,
+                            textAlign: 'left',
+                            padding: '8px 10px',
+                            borderRadius: 8,
+                            fontSize: '0.82rem',
+                            fontWeight: selectedProductId === p.id ? 800 : 600,
+                            backgroundColor: selectedProductId === p.id ? '#243B6B' : '#fff',
+                            color: selectedProductId === p.id ? '#fff' : '#162544',
+                            border: '1px solid #CBD5E1',
+                            cursor: 'pointer',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {p.name}
+                        </button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }}>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleMoveProduct(p.id, 'up', 'kentekens') }}
+                            disabled={idx === 0 || movingProductId === p.id}
+                            title="Omhoog verplaatsen"
+                            style={{
+                              padding: '2px 5px',
+                              fontSize: '0.6rem',
+                              borderRadius: 4,
+                              border: '1px solid #CBD5E1',
+                              backgroundColor: '#fff',
+                              color: idx === 0 ? '#CBD5E1' : '#162544',
+                              cursor: idx === 0 ? 'default' : 'pointer',
+                              lineHeight: 1,
+                            }}
+                          >
+                            ▲
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleMoveProduct(p.id, 'down', 'kentekens') }}
+                            disabled={idx === kentekensList.length - 1 || movingProductId === p.id}
+                            title="Omlaag verplaatsen"
+                            style={{
+                              padding: '2px 5px',
+                              fontSize: '0.6rem',
+                              borderRadius: 4,
+                              border: '1px solid #CBD5E1',
+                              backgroundColor: '#fff',
+                              color: idx === kentekensList.length - 1 ? '#CBD5E1' : '#162544',
+                              cursor: idx === kentekensList.length - 1 ? 'default' : 'pointer',
+                              lineHeight: 1,
+                            }}
+                          >
+                            ▼
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  })()}
                 </div>
 
                 {/* Right side product editor */}
@@ -1137,22 +1450,24 @@ export default function WebshopPageClient({
                         />
                       </div>
 
-                      {/* Sizes */}
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
-                          Beschikbare Maten (Gescheiden door komma)
-                        </label>
-                        <input
-                          type="text"
-                          value={typeof product.sizes === 'string' ? product.sizes : (Array.isArray(product.sizes) ? product.sizes.join(', ') : '')}
-                          onChange={e => {
-                            const val = e.target.value
-                            setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, sizes: val } : p))
-                          }}
-                          placeholder="Bijv. S, M, L, XL of 6j, 8j, 10j"
-                          style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
-                        />
-                      </div>
+                      {/* Sizes (niet nodig bij kentekens) */}
+                      {!isKenteken && (
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 4 }}>
+                            Beschikbare Maten (Gescheiden door komma)
+                          </label>
+                          <input
+                            type="text"
+                            value={typeof product.sizes === 'string' ? product.sizes : (Array.isArray(product.sizes) ? product.sizes.join(', ') : '')}
+                            onChange={e => {
+                              const val = e.target.value
+                              setShopProducts(prev => prev.map(p => p.id === product.id ? { ...p, sizes: val } : p))
+                            }}
+                            placeholder="Bijv. S, M, L, XL of 6j, 8j, 10j"
+                            style={{ width: '100%', padding: '9px 12px', border: '1px solid #CBD5E1', borderRadius: 8, fontSize: '0.88rem', fontWeight: 700, color: '#162544' }}
+                          />
+                        </div>
+                      )}
 
                       {/* Save Button */}
                       <button
@@ -1169,6 +1484,376 @@ export default function WebshopPageClient({
                 })()}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* TAB: VOORRAAD & STOCKBEHEER                              */}
+        {/* ======================================================== */}
+        {activeTab === 'stock' && (
+          <div>
+            {loadingShopProducts ? (
+              <div style={{ padding: 40, textAlign: 'center', color: '#64748B', fontWeight: 600 }}>
+                <i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }}></i> Voorraad laden…
+              </div>
+            ) : (() => {
+              const filteredStockProducts = shopProducts.filter(p => {
+                if (stockFilter === 'kledij' && p.category === 'kentekens') return false
+                if (stockFilter === 'kentekens' && p.category !== 'kentekens') return false
+                if (stockSearchQuery) {
+                  return p.name.toLowerCase().includes(stockSearchQuery.toLowerCase())
+                }
+                return true
+              })
+
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  {/* Filter balk */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, backgroundColor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 14, padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginRight: 4 }}>Filter:</span>
+                      <button
+                        type="button"
+                        onClick={() => setStockFilter('all')}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: 8,
+                          fontSize: '0.82rem',
+                          fontWeight: stockFilter === 'all' ? 800 : 600,
+                          backgroundColor: stockFilter === 'all' ? '#243B6B' : '#FFFFFF',
+                          color: stockFilter === 'all' ? '#FFFFFF' : '#334155',
+                          border: '1px solid #CBD5E1',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Alles ({shopProducts.length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStockFilter('kledij')}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: 8,
+                          fontSize: '0.82rem',
+                          fontWeight: stockFilter === 'kledij' ? 800 : 600,
+                          backgroundColor: stockFilter === 'kledij' ? '#243B6B' : '#FFFFFF',
+                          color: stockFilter === 'kledij' ? '#FFFFFF' : '#334155',
+                          border: '1px solid #CBD5E1',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Kledij ({shopProducts.filter(p => p.category !== 'kentekens').length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStockFilter('kentekens')}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: 8,
+                          fontSize: '0.82rem',
+                          fontWeight: stockFilter === 'kentekens' ? 800 : 600,
+                          backgroundColor: stockFilter === 'kentekens' ? '#243B6B' : '#FFFFFF',
+                          color: stockFilter === 'kentekens' ? '#FFFFFF' : '#334155',
+                          border: '1px solid #CBD5E1',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Kentekens ({shopProducts.filter(p => p.category === 'kentekens').length})
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                      <div style={{ position: 'relative', width: 220 }}>
+                        <input
+                          type="text"
+                          placeholder="Zoek artikel…"
+                          value={stockSearchQuery}
+                          onChange={e => setStockSearchQuery(e.target.value)}
+                          style={{
+                            width: '100%',
+                            padding: '7px 12px 7px 32px',
+                            borderRadius: 8,
+                            border: '1px solid #CBD5E1',
+                            fontSize: '0.84rem',
+                            backgroundColor: '#FFFFFF',
+                          }}
+                        />
+                        <i className="fa-solid fa-magnifying-glass" style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', fontSize: '0.78rem' }}></i>
+                        {stockSearchQuery && (
+                          <button
+                            type="button"
+                            onClick={() => setStockSearchQuery('')}
+                            style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', border: 'none', background: 'transparent', color: '#94A3B8', cursor: 'pointer', fontSize: '0.8rem' }}
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleSaveAllStock}
+                        disabled={savingAllStock}
+                        title="Sla alle voorraden in 1 keer op"
+                        style={{
+                          padding: '7px 14px',
+                          borderRadius: 8,
+                          backgroundColor: '#166534',
+                          color: '#FFFFFF',
+                          fontSize: '0.82rem',
+                          fontWeight: 800,
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          boxShadow: '0 2px 4px rgba(22,101,52,0.18)',
+                        }}
+                      >
+                        <i className={`fa-solid ${savingAllStock ? 'fa-spinner fa-spin' : 'fa-check-double'}`}></i>
+                        <span>{savingAllStock ? 'Opslaan…' : 'Alles Opslaan'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 3 Kolommen Grid gelijk de webshop */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                      gap: 20,
+                      width: '100%',
+                      alignItems: 'start',
+                    }}
+                  >
+                    {filteredStockProducts.length === 0 ? (
+                      <div style={{ gridColumn: '1 / -1', padding: 40, textAlign: 'center', color: '#64748B', backgroundColor: '#F8FAFC', borderRadius: 14, border: '1px dashed #CBD5E1', fontWeight: 600 }}>
+                        Geen artikelen gevonden voor de geselecteerde filter.
+                      </div>
+                    ) : (
+                      filteredStockProducts.map(product => {
+                        const isBadge = product.category === 'kentekens'
+                        const sizesList = isBadge
+                          ? ['default']
+                          : (Array.isArray(product.sizes) && product.sizes.length > 0)
+                          ? product.sizes
+                          : (typeof product.sizes === 'string' && product.sizes.trim())
+                          ? product.sizes.split(',').map(s => s.trim()).filter(Boolean)
+                          : ['Standaard']
+
+                        return (
+                          <div
+                            key={product.id}
+                            style={{
+                              backgroundColor: '#FFFFFF',
+                              borderRadius: 16,
+                              border: '1.5px solid #CBD5E1',
+                              overflow: 'hidden',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                            }}
+                          >
+                            {/* Header: compacte thumbnail links, titel en prijs (zoals kentekens op de webshop) */}
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 12,
+                                padding: '12px 14px',
+                                borderBottom: '1.5px solid #F1F5F9',
+                                backgroundColor: '#FFFFFF',
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: 54,
+                                  height: 54,
+                                  borderRadius: 10,
+                                  backgroundColor: '#F8FAFC',
+                                  border: '1px solid #CBD5E1',
+                                  position: 'relative',
+                                  flexShrink: 0,
+                                  overflow: 'hidden',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                {product.image ? (
+                                  /* eslint-disable-next-line @next/next/no-img-element */
+                                  <img
+                                    src={product.image}
+                                    alt={product.name}
+                                    style={{
+                                      width: '100%',
+                                      height: '100%',
+                                      objectFit: isBadge ? 'contain' : 'cover',
+                                    }}
+                                  />
+                                ) : (
+                                  <i className={`fa-solid ${isBadge ? 'fa-certificate' : 'fa-shirt'}`} style={{ color: '#94A3B8', fontSize: '1.4rem' }}></i>
+                                )}
+                              </div>
+
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <h3
+                                  style={{
+                                    margin: '0 0 2px',
+                                    fontSize: '0.96rem',
+                                    fontWeight: 900,
+                                    color: '#162544',
+                                    fontFamily: 'var(--font-heading, Nunito, sans-serif)',
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    lineHeight: 1.25,
+                                  }}
+                                  title={product.name}
+                                >
+                                  {product.name}
+                                </h3>
+                                <div style={{ fontSize: '0.82rem', color: '#64748B', fontWeight: 600 }}>
+                                  {formatPrice(product.price)}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Maten & Aantallen: regeltje per regel */}
+                            <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+                              {sizesList.map(sz => {
+                                const qty = typeof product.stock?.[sz] === 'number' ? product.stock[sz] : (Number(product.stock?.[sz]) || 0)
+                                const label = sz === 'default' ? 'Voorraad' : `Maat ${sz}`
+                                const isOutOfStock = qty === 0
+                                const isLowStock = qty > 0 && qty < 6
+
+                                // Enkel het stock cijfer en de omkadering krijgt kleur!
+                                const stockColor = isOutOfStock ? '#DC2626' : isLowStock ? '#D97706' : '#16A34A'
+                                const stockBorder = isOutOfStock ? '#F87171' : isLowStock ? '#FBBF24' : '#86EFAC'
+                                const stockBg = isOutOfStock ? '#FEF2F2' : isLowStock ? '#FFFBEB' : '#F0FDF4'
+
+                                return (
+                                  <div
+                                    key={sz}
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      padding: '4px 6px',
+                                      borderRadius: 8,
+                                      backgroundColor: '#FFFFFF',
+                                      border: '1px solid #F1F5F9',
+                                    }}
+                                  >
+                                    <span style={{ fontSize: '0.86rem', fontWeight: 700, color: '#162544' }}>
+                                      {label}
+                                    </span>
+
+                                    {/* Stepper + Cijfer */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleStockValueChange(product.id, sz, 'dec')}
+                                        disabled={qty <= 0}
+                                        title="Verminder met 1"
+                                        style={{
+                                          width: 26,
+                                          height: 26,
+                                          borderRadius: 6,
+                                          border: '1px solid #CBD5E1',
+                                          backgroundColor: '#FFFFFF',
+                                          color: qty <= 0 ? '#CBD5E1' : '#162544',
+                                          fontWeight: 900,
+                                          fontSize: '0.9rem',
+                                          cursor: qty <= 0 ? 'default' : 'pointer',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          lineHeight: 1,
+                                        }}
+                                      >
+                                        −
+                                      </button>
+                                      <input
+                                        type="number"
+                                        min={0}
+                                        value={qty}
+                                        onChange={e => handleStockValueChange(product.id, sz, parseInt(e.target.value) || 0)}
+                                        style={{
+                                          width: 48,
+                                          textAlign: 'center',
+                                          padding: '3px 2px',
+                                          borderRadius: 6,
+                                          border: `1.5px solid ${stockBorder}`,
+                                          fontSize: '0.92rem',
+                                          fontWeight: 900,
+                                          color: stockColor,
+                                          backgroundColor: stockBg,
+                                        }}
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => handleStockValueChange(product.id, sz, 'inc')}
+                                        title="Vermeerder met 1"
+                                        style={{
+                                          width: 26,
+                                          height: 26,
+                                          borderRadius: 6,
+                                          border: '1px solid #CBD5E1',
+                                          backgroundColor: '#FFFFFF',
+                                          color: '#162544',
+                                          fontWeight: 900,
+                                          fontSize: '0.9rem',
+                                          cursor: 'pointer',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          lineHeight: 1,
+                                        }}
+                                      >
+                                        +
+                                      </button>
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+
+                            {/* Opslaan per artikel knop */}
+                            <div style={{ padding: '8px 14px 12px', borderTop: '1px solid #F1F5F9', backgroundColor: '#FAFAFA' }}>
+                              <button
+                                type="button"
+                                onClick={() => handleSaveStock(product)}
+                                disabled={savingStockId === product.id}
+                                style={{
+                                  width: '100%',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: 6,
+                                  padding: '7px 12px',
+                                  borderRadius: 8,
+                                  backgroundColor: '#243B6B',
+                                  color: '#FFFFFF',
+                                  fontWeight: 800,
+                                  fontSize: '0.82rem',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  boxShadow: '0 2px 5px rgba(36,59,107,0.15)',
+                                }}
+                              >
+                                <i className={`fa-solid ${savingStockId === product.id ? 'fa-spinner fa-spin' : 'fa-floppy-disk'}`}></i>
+                                <span>{savingStockId === product.id ? 'Opslaan…' : 'Voorraad Opslaan'}</span>
+                              </button>
+                            </div>
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+                </div>
+              )
+            })()}
           </div>
         )}
 

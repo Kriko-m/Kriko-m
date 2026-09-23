@@ -96,6 +96,7 @@ export default function PortaalLayoutClient({ children, naam, role, settings }: 
     if (path.startsWith('/portaal/leidingbeheer')) return 'Leidingsbeheer'
     if (path.startsWith('/portaal/instellingen')) return 'Portaalinstellingen'
     if (path === '/portaal/webshop/artikelen') return 'Webshop Artikelen'
+    if (path === '/portaal/webshop/stock') return 'Webshop Voorraad'
     if (path === '/portaal/webshop/instellingen') return 'Webshop Instellingen'
     if (path.startsWith('/portaal/webshop')) return 'Webshop Bestellingen'
     return 'Leidingsportaal'

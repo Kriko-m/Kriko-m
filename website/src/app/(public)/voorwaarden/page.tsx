@@ -19,12 +19,12 @@ export default function VoorwaardenPage() {
     {
       id: 'prijzen',
       title: '3. Prijzen en Betalingswijze',
-      text: 'Alle vermelde prijzen zijn in Euro (€) en vrijgesteld van btw conform het stelsel voor kleine ondernemingen/vzw. Betaling geschiedt via Belgische gestructureerde overschrijving. Na het plaatsen van je bestelling ontvang je een bevestigingsmail met het exacte te betalen bedrag, het rekeningnummer van de vzw en de unieke gestructureerde mededeling. Betalingen dienen binnen 14 kalenderdagen te worden overgemaakt.'
+      text: 'Alle vermelde prijzen zijn in Euro (€) en vrijgesteld van btw conform het stelsel voor kleine ondernemingen/vzw. Bij het afrekenen kan gekozen worden tussen betaling via overschrijving of betaling bij afhaling (via Payconiq of cash, waarbij contante betaling steeds met een gepaste hoeveelheid cash dient te gebeuren). Bij overschrijving ontvang je een bevestigingsmail met het over te schrijven bedrag, het rekeningnummer van de vzw en de unieke mededeling (KM-XXXX). Overschrijvingen dienen binnen 14 kalenderdagen te worden voldaan.'
     },
     {
       id: 'levering',
       title: '4. Levering & Afhaling',
-      text: 'Bestelde artikelen worden niet per post verzonden. Het afhalen van bestellingen wordt rechtstreeks afgesproken met onze uniformverantwoordelijke (tijdens de wekelijkse scoutsvergaderingen of na afspraak aan de scoutslokalen). Zodra je betaling is ontvangen en verwerkt, ontvang je hierover verdere berichtgeving.'
+      text: 'Bestelde artikelen worden niet per post verzonden. Het afhalen van bestellingen wordt steeds rechtstreeks besproken en afgesproken met onze uniformverantwoordelijke. Na het plaatsen van je bestelling nemen zij contact met je op voor een geschikt overhandigingsmoment.'
     },
     {
       id: 'herroeping',

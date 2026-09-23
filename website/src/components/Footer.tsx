@@ -40,7 +40,7 @@ export default function Footer({
             <li><Link href="/kalender">Kalender</Link></li>
             <li><Link href="/echos">Kriko Echo</Link></li>
             <li><Link href="/verhuur">Verhuur lokaal</Link></li>
-            <li><Link href="/shop">Webshop</Link></li>
+            <li><Link href="/webwinkel">Webwinkel</Link></li>
             <li><Link href="/inschrijven">Inschrijven</Link></li>
           </ul>
         </div>

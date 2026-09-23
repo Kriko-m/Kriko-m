@@ -10,14 +10,14 @@ export default function KentekenCard({ product }: { product: Product }) {
   const { addItem } = useCart()
   const [added, setAdded] = useState(false)
 
-  function handleAdd() {
+  function handleAdd(e: React.MouseEvent<HTMLButtonElement>) {
     addItem({
       id: product.id,
       name: product.name,
       price: product.price,
       size: 'Standaard',
       image: product.image,
-    })
+    }, e)
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
   }

@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import ProtectedEmail from '@/components/anti-scraping/ProtectedEmail'
 
 interface OrderData {
   order_ref: string
@@ -12,6 +11,9 @@ interface OrderData {
   bank_holder: string
   webshop_email?: string
   payment_method?: 'overschrijving' | 'cash'
+  customer_name?: string
+  phone?: string
+  email?: string
 }
 
 import { formatPrice } from '@/lib/utils'
@@ -42,14 +44,13 @@ export default function BevestigingPage() {
     return (
       <section className="section container" style={{ textAlign: 'center', padding: '80px 0' }}>
         <p style={{ color: 'var(--color-text-muted)' }}>Geen bestellingsgegevens gevonden.</p>
-        <Link href="/shop" className="btn btn-secondary" style={{ marginTop: 24, display: 'inline-block' }}>
-          Naar de webshop
+        <Link href="/webwinkel" className="btn btn-secondary" style={{ marginTop: 24, display: 'inline-block' }}>
+          Naar de webwinkel
         </Link>
       </section>
     )
   }
 
-  const notificationEmail = order.webshop_email || 'bestellingen@kriko-m.be'
   const isCash = order.payment_method === 'cash'
   const safeTotal = typeof order.total === 'number' && !isNaN(order.total) ? order.total : (Number(order.total) || 0)
   const items = Array.isArray(order.items) ? order.items : []
@@ -65,16 +66,17 @@ export default function BevestigingPage() {
 
       // Header bar
       doc.setFillColor(22, 37, 68) // #162544
-      doc.rect(0, 0, pageWidth, 80, 'F')
+      doc.rect(0, 0, pageWidth, 85, 'F')
 
       doc.setTextColor(255, 255, 255)
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(18)
-      doc.text('Scouts Kriko-M — Besteloverzicht', 40, 42)
+      doc.text('Scouts Kriko-M — Besteloverzicht', 40, 36)
 
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(11)
-      doc.text(`Bestelnummer: ${orderRef}`, 40, 62)
+      doc.text(`Bestelnummer: ${orderRef}`, 40, 54)
+      doc.text(`Klant: ${order.customer_name || 'Koper'}${order.phone ? `  |  Tel: ${order.phone}` : ''}`, 40, 70)
 
       let y = 110
 
@@ -92,8 +94,8 @@ export default function BevestigingPage() {
       doc.setTextColor(50, 50, 50)
 
       if (isCash) {
-        doc.text('Betaalmethode: Contant / Cash bij afhaling', 56, y + 44)
-        doc.text(`Te betalen bedrag bij afhaling: ${formatEuro(safeTotal)}`, 56, y + 62)
+        doc.text('Betaalmethode: Betaling bij afhaling (Cash / Payconiq)', 56, y + 44)
+        doc.text(`Te betalen bedrag bij afhaling: ${formatEuro(safeTotal)} (gepaste hoeveelheid cash vereist)`, 56, y + 62)
         y += 105
       } else {
         doc.text('Betaalmethode: Handmatige bankoverschrijving', 56, y + 44)
@@ -154,7 +156,7 @@ export default function BevestigingPage() {
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(9)
       doc.setTextColor(100, 100, 100)
-      doc.text('De webshopverantwoordelijke neemt per e-mail contact op voor een afhaalmoment.', 40, y)
+      doc.text('Afhaling wordt rechtstreeks via bericht besproken met de uniformverantwoordelijke.', 40, y)
       doc.text('Scouts Kriko-M vzw | Industriepark-Noord 33, 9100 Sint-Niklaas | groepsleiding@kriko-m.be', 40, y + 16)
 
       // Save PDF file to trigger download
@@ -179,12 +181,22 @@ export default function BevestigingPage() {
 
           {/* Bevestigingsbadge */}
           <div style={{ background: 'hsl(145,63%,95%)', border: '2px solid hsl(145,63%,70%)', borderRadius: 'var(--border-radius-lg)', padding: '24px 28px' }}>
-            <strong style={{ display: 'block', color: 'hsl(145,63%,25%)', fontSize: '1.15rem', marginBottom: 6 }}>
-              Bestelling ontvangen — {orderRef}
+            <strong style={{ display: 'block', color: 'hsl(145,63%,25%)', fontSize: '1.2rem', marginBottom: 8 }}>
+              ✓ Bestelling ontvangen — {orderRef}
             </strong>
-            <span style={{ color: 'hsl(145,63%,30%)', fontSize: '0.95rem', lineHeight: 1.5, display: 'block' }}>
-              Je bestelling is succesvol geregistreerd. De webshopverantwoordelijke ontvangt hiervan direct bericht.
-            </span>
+            <p style={{ color: 'hsl(145,63%,25%)', fontSize: '0.95rem', lineHeight: 1.55, margin: '0 0 10px' }}>
+              {order.email ? (
+                <>Je bestelling is geregistreerd. Een bevestigingsmail met alle details is verzonden naar <strong>{order.email}</strong>.</>
+              ) : (
+                <>Je bestelling is succesvol geregistreerd. Je kan hieronder direct je bestelbevestiging downloaden voor je eigen administratie.</>
+              )}
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.92rem', color: 'hsl(145,63%,20%)', fontWeight: 600 }}>
+              <i className="fa-solid fa-comments" />
+              <span>
+                Onze uniformverantwoordelijke neemt via bericht (SMS of WhatsApp) of telefonisch contact met je op{order.phone ? ` via ${order.phone}` : ''} om de afhaling af te spreken.
+              </span>
+            </div>
           </div>
 
           {/* Betalingsinformatie */}
@@ -194,14 +206,14 @@ export default function BevestigingPage() {
             </h3>
 
             {isCash ? (
-              /* Cash bij afhaling */
+              /* Cash / Payconiq bij afhaling */
               <div style={{ background: '#EEF5F1', padding: '18px 22px', borderRadius: 'var(--border-radius-md)', border: '1.5px solid #C2D9C9' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#1A3D2A', fontWeight: 800, fontSize: '1.05rem', marginBottom: 6 }}>
                   <i className="fa-solid fa-money-bill-wave"></i>
-                  <span>Contant / Cash bij afhaling</span>
+                  <span>Betaling bij afhaling (Cash / Payconiq)</span>
                 </div>
                 <p style={{ margin: '0 0 10px', fontSize: '0.92rem', color: '#1A3D2A', lineHeight: 1.5 }}>
-                  Je hebt gekozen om contant te betalen wanneer je je bestelling ophaalt bij de leiding.
+                  Je hebt gekozen om te betalen bij afhaling via Payconiq of contant. <strong>Let op:</strong> bij een contante betaling vragen we vriendelijk doch uitdrukkelijk om steeds een <strong>gepaste hoeveelheid cash</strong> mee te brengen.
                 </p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', padding: '10px 14px', borderRadius: 8, border: '1px solid #C2D9C9' }}>
                   <span style={{ fontWeight: 700, color: '#1A3D2A', fontSize: '0.9rem' }}>Te betalen bedrag bij afhaling:</span>
@@ -244,10 +256,10 @@ export default function BevestigingPage() {
           {/* Ophalen */}
           <div className="checkout-card" style={{ background: 'var(--color-bg-white)' }}>
             <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid var(--color-bg-linen)' }}>
-              Ophalen van je bestelling
+              Afhaling van je bestelling
             </h3>
             <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
-              De webshopverantwoordelijke communiceert zelf per e-mail (via <ProtectedEmail email={notificationEmail} />) wanneer en waar je je bestelling kan komen ophalen.
+              De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op via <strong>{order.phone || 'je telefoonnummer'}</strong>.
             </p>
           </div>
 
@@ -277,7 +289,7 @@ export default function BevestigingPage() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }} className="no-print">
+          <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }} className="no-print">
             <button
               onClick={handleDownloadPdf}
               disabled={downloadingPdf}
@@ -285,10 +297,14 @@ export default function BevestigingPage() {
               style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
             >
               <i className="fa-solid fa-file-arrow-down"></i>
-              <span>{downloadingPdf ? 'PDF genereren…' : 'Bestelling als PDF downloaden'}</span>
+              <span>{downloadingPdf ? 'Bestelbevestiging genereren…' : 'Bestelling als PDF downloaden'}</span>
             </button>
-            <Link href="/" className="btn btn-outline" style={{ textAlign: 'center' }}>
-              ← Terug naar de website
+            <Link
+              href="/webwinkel"
+              className="btn btn-outline"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textAlign: 'center' }}
+            >
+              ← Naar de webwinkel
             </Link>
           </div>
         </div>

@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import CheckoutForm from './CheckoutForm'
+import CheckoutForm from '@/components/shop/CheckoutForm'
 
-export const metadata: Metadata = { title: 'Afrekenen' }
+export const metadata: Metadata = { title: 'Afrekenen — Webwinkel' }
 
-export default function CheckoutPage() {
+export default function AfrekenenPage() {
   return (
     <>
       <section className="tak-hero primair hero-checkout">

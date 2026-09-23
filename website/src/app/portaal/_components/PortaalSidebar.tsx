@@ -284,6 +284,34 @@ export default function PortaalSidebar({ naam, role, mobileOpen = false, onClose
                   }}></i>
                   <span>Artikelen</span>
                 </Link>
+
+                <Link
+                  href="/portaal/webshop/stock"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '11px 14px',
+                    borderRadius: 10,
+                    textDecoration: 'none',
+                    fontSize: '0.92rem',
+                    fontWeight: pathname === '/portaal/webshop/stock' ? 800 : 600,
+                    color: '#FFFFFF',
+                    background: pathname === '/portaal/webshop/stock' ? '#243B6B' : 'transparent',
+                    boxShadow: pathname === '/portaal/webshop/stock' ? '0 2px 8px rgba(0, 0, 0, 0.25)' : 'none',
+                    transition: 'all 0.15s ease',
+                    flexShrink: 0,
+                  }}
+                  className={`portaal-sidebar-item ${pathname === '/portaal/webshop/stock' ? 'active' : ''}`}
+                >
+                  <i className="fa-solid fa-boxes-stacked" style={{
+                    fontSize: '1rem',
+                    width: 20,
+                    textAlign: 'center',
+                    color: pathname === '/portaal/webshop/stock' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                  }}></i>
+                  <span>Voorraad</span>
+                </Link>
               </>
             )}
 
@@ -528,6 +556,29 @@ export default function PortaalSidebar({ naam, role, mobileOpen = false, onClose
                     >
                       <i className="fa-solid fa-shirt" style={{ fontSize: '0.82rem', width: 18, textAlign: 'center', color: pathname === '/portaal/webshop/artikelen' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)' }}></i>
                       <span>Artikelen</span>
+                    </Link>
+
+                    {/* 3. Voorraad (Stock) */}
+                    <Link
+                      href="/portaal/webshop/stock"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        padding: '9px 12px',
+                        borderRadius: 8,
+                        textDecoration: 'none',
+                        fontSize: '0.86rem',
+                        fontWeight: pathname === '/portaal/webshop/stock' ? 800 : 600,
+                        color: '#FFFFFF',
+                        background: pathname === '/portaal/webshop/stock' ? '#243B6B' : 'transparent',
+                        boxShadow: pathname === '/portaal/webshop/stock' ? '0 2px 8px rgba(0, 0, 0, 0.25)' : 'none',
+                        transition: 'all 0.15s ease',
+                      }}
+                      className={`portaal-sidebar-item ${pathname === '/portaal/webshop/stock' ? 'active' : ''}`}
+                    >
+                      <i className="fa-solid fa-boxes-stacked" style={{ fontSize: '0.82rem', width: 18, textAlign: 'center', color: pathname === '/portaal/webshop/stock' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.7)' }}></i>
+                      <span>Voorraad</span>
                     </Link>
 
                     {/* 3. Instellingen (Enkel zichtbaar voor Groepsleiding) */}

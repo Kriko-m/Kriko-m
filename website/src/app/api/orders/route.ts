@@ -12,7 +12,7 @@ function generateCommunication(orderNumber: number): string {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { customer_name, child_name, child_tak, email, cart, kriko_hp_verify, _sec_token, payment_method } = body
+    const { customer_name, child_name, child_tak, phone, email, cart, kriko_hp_verify, _sec_token, payment_method } = body
 
     // 1. Slimme honeypot check tegen geautomatiseerde web-crawlers
     if (typeof kriko_hp_verify === 'string' && kriko_hp_verify.trim() !== '') {
@@ -25,15 +25,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Verzoek te snel verwerkt. Probeer het opnieuw.' }, { status: 400 })
     }
 
-    // Basis-validatie (enkel Naam + E-mailadres verplicht)
-    if (!customer_name?.trim() || !email?.trim()) {
-      return NextResponse.json({ error: 'Vul je naam en e-mailadres in.' }, { status: 400 })
+    // Basis-validatie: Naam + Telefoonnummer verplicht, E-mailadres optioneel
+    const trimmedName = typeof customer_name === 'string' ? customer_name.trim() : ''
+    const trimmedPhone = typeof phone === 'string' ? phone.trim() : ''
+    const trimmedEmail = typeof email === 'string' ? email.trim() : ''
+
+    if (!trimmedName) {
+      return NextResponse.json({ error: 'Vul je naam in.' }, { status: 400 })
     }
-    if (customer_name.length > 120 || email.length > 160) {
+    if (!trimmedPhone) {
+      return NextResponse.json({ error: 'Vul een telefoonnummer in zodat de uniformverantwoordelijke contact kan opnemen.' }, { status: 400 })
+    }
+    if (trimmedName.length > 120 || trimmedPhone.length > 50 || trimmedEmail.length > 160) {
       return NextResponse.json({ error: 'Een van de velden is te lang.' }, { status: 400 })
     }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
-      return NextResponse.json({ error: 'Vul een geldig e-mailadres in.' }, { status: 400 })
+    if (trimmedEmail && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmedEmail)) {
+      return NextResponse.json({ error: 'Vul een geldig e-mailadres in of laat het veld leeg.' }, { status: 400 })
     }
     if (!Array.isArray(cart) || cart.length === 0) {
       return NextResponse.json({ error: 'Je winkelmandje is leeg.' }, { status: 400 })
@@ -88,22 +95,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Je winkelmandje bevat geen geldige artikelen.' }, { status: 400 })
     }
 
-    // Bestelling aanmaken - probeer met 'niet_betaald', val terug op 'pending' indien schema constraint nog niet gemigreerd is
+    // Bestelling aanmaken
     let inserted: { id: string; order_number?: number; order_ref?: string } | null = null
     let insertError: Error | { message?: string } | null = null
 
-    const orderPayload = {
+    const orderPayload: Record<string, unknown> = {
       status: 'niet_betaald',
       payment_method: paymentMethod,
-      customer_name: customer_name.trim(),
+      customer_name: trimmedName,
       child_name: child_name?.trim() || '',
       child_tak: child_tak || '',
-      email: email.trim(),
+      phone: trimmedPhone,
+      email: trimmedEmail,
       items: validatedCart,
       total,
       communication: '',
     }
 
+    // Poging 1: Standaard insert met phone en status niet_betaald
     const firstAttempt = await supabase
       .from('orders')
       .insert(orderPayload)
@@ -111,12 +120,19 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (firstAttempt.error) {
-      // Als de constraint of kolom faalt vóór de SQL migratie, probeer fallback
+      const errMsg = firstAttempt.error.message || ''
+      // Indien kolom 'phone' nog niet bestaat vóór de SQL-migratie:
+      const withoutPhone = { ...orderPayload }
+      delete withoutPhone.phone
+
+      // Indien status 'niet_betaald' constraint nog niet gemigreerd is:
+      const fallbackStatus = errMsg.includes('orders_status_check') ? 'pending' : 'niet_betaald'
+
       const fallbackAttempt = await supabase
         .from('orders')
         .insert({
-          ...orderPayload,
-          status: 'pending',
+          ...withoutPhone,
+          status: fallbackStatus,
         })
         .select('id, order_number, order_ref')
         .single()
@@ -147,13 +163,14 @@ export async function POST(req: NextRequest) {
     // E-mails parallel verzenden via Promise.allSettled om server-reactietijd bij traag internet te minimaliseren
     const emailPromises: Promise<unknown>[] = []
 
-    // 1. E-mail naar koper
-    if (enableCustomerEmail) {
+    // 1. E-mail naar koper (ENKEL indien e-mailadres is ingevuld)
+    if (enableCustomerEmail && trimmedEmail) {
       emailPromises.push(
         sendOrderConfirmation({
-          to: email.trim(),
+          to: trimmedEmail,
           orderRef,
-          customerName: customer_name.trim(),
+          customerName: trimmedName,
+          phone: trimmedPhone,
           items: validatedCart,
           total,
           communication,
@@ -166,14 +183,15 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 2. Notificatiemail naar webshopverantwoordelijke
+    // 2. Notificatiemail naar uniform- en webwinkelverantwoordelijke
     if (enableTeamEmail && webshopEmail) {
       emailPromises.push(
         sendWebshopOrderNotification({
           to: webshopEmail,
           orderRef,
-          customerName: customer_name.trim(),
-          email: email.trim(),
+          customerName: trimmedName,
+          phone: trimmedPhone,
+          email: trimmedEmail,
           items: validatedCart,
           total,
           communication,
@@ -192,8 +210,9 @@ export async function POST(req: NextRequest) {
         sendFinancialOrderNotification({
           to: webshopFinancialEmail,
           orderRef,
-          customerName: customer_name.trim(),
-          email: email.trim(),
+          customerName: trimmedName,
+          phone: trimmedPhone,
+          email: trimmedEmail,
           items: validatedCart,
           total,
           communication,
@@ -218,6 +237,9 @@ export async function POST(req: NextRequest) {
       bank_holder: bankHolder,
       webshop_email: webshopEmail,
       payment_method: paymentMethod,
+      customer_name: trimmedName,
+      phone: trimmedPhone,
+      email: trimmedEmail,
     })
   } catch (err) {
     console.error('Orders API error:', err)

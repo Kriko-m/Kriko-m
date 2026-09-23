@@ -517,12 +517,12 @@ export default function InfoTabbedContent({ email, address: _address }: InfoTabb
                   style={{ fontSize: '0.85rem', color: 'var(--color-text-dark)', marginBottom: 16 }}
                 />
                 <div style={{ marginTop: 'auto' }}>
-                  <Link href="/shop" className="btn btn-secondary" style={{ fontSize: '0.9rem', width: '100%', justifyContent: 'center' }}>
+                  <Link href="/webwinkel" className="btn btn-secondary" style={{ fontSize: '0.9rem', width: '100%', justifyContent: 'center' }}>
                     <EditableText
                       blockKey="info.uniform.webshop.btn_text"
                       page="info"
                       section="uniform"
-                      defaultValue="Naar onze Webshop »"
+                      defaultValue="Naar onze Webwinkel »"
                     />
                   </Link>
                 </div>

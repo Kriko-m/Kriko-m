@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
       // Privélinks, portaal en checkout horen niet in de index.
-      disallow: ['/portaal', '/kamp/', '/api/', '/shop/checkout', '/shop/bevestiging'],
+      disallow: ['/portaal', '/kamp/', '/api/', '/webwinkel/afrekenen', '/webwinkel/bevestiging', '/shop/checkout', '/shop/bevestiging'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   }

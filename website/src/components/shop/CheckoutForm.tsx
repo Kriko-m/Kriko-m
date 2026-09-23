@@ -16,7 +16,7 @@ export default function CheckoutForm() {
   useEffect(() => { setHydrated(true) }, [])
 
   useEffect(() => {
-    if (hydrated && items.length === 0 && status === 'idle') router.push('/shop')
+    if (hydrated && items.length === 0 && status === 'idle') router.push('/webwinkel')
   }, [hydrated, items.length, status, router])
 
   const [paymentMethod, setPaymentMethod] = useState<'overschrijving' | 'cash'>('overschrijving')
@@ -36,6 +36,7 @@ export default function CheckoutForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customer_name: fd.get('customer_name'),
+          phone: fd.get('phone'),
           email: fd.get('email'),
           kriko_hp_verify: fd.get('kriko_hp_verify'),
           _sec_token: loadedAt,
@@ -57,10 +58,13 @@ export default function CheckoutForm() {
           bank_holder: data.bank_holder || 'Scouts Kriko-M vzw',
           webshop_email: data.webshop_email || 'bestellingen@kriko-m.be',
           payment_method: data.payment_method || paymentMethod,
+          customer_name: data.customer_name || fd.get('customer_name') || '',
+          phone: data.phone || fd.get('phone') || '',
+          email: data.email || fd.get('email') || '',
         }
         clearCart()
         sessionStorage.setItem('kriko_last_order', JSON.stringify(orderToStore))
-        router.push('/shop/bevestiging')
+        router.push('/webwinkel/bevestiging')
       } else {
         const data = await res.json().catch(() => ({}))
         setError(data.error ?? 'Er ging iets mis. Probeer het opnieuw.')
@@ -89,7 +93,7 @@ export default function CheckoutForm() {
             Jouw Gegevens
           </h3>
           <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: 24 }}>
-            Vul simpelweg je naam en e-mailadres in om je bestelling door te sturen.
+            Vul je naam en telefoonnummer in zodat onze uniformverantwoordelijke je kan contacteren voor de afhaling.
           </p>
 
           {error && (
@@ -99,7 +103,7 @@ export default function CheckoutForm() {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Slimme honeypot tegen crawlers — onzichtbaar voor mensen en genegeerd door autofill */}
+            {/* Slimme honeypot tegen crawlers */}
             <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden', opacity: 0, pointerEvents: 'none' }}>
               <label htmlFor="kriko_hp_verify">Niet invullen</label>
               <input
@@ -114,7 +118,9 @@ export default function CheckoutForm() {
             </div>
 
             <div className="form-group" style={{ marginBottom: 20 }}>
-              <label className="form-label" htmlFor="customer_name">Naam (Ouder / Koper):</label>
+              <label className="form-label" htmlFor="customer_name">
+                Naam (Ouder / Koper) <span style={{ color: 'var(--color-primary, #650B19)', fontWeight: 800 }}>*</span>:
+              </label>
               <input
                 type="text"
                 id="customer_name"
@@ -126,8 +132,28 @@ export default function CheckoutForm() {
               />
             </div>
 
+            <div className="form-group" style={{ marginBottom: 20 }}>
+              <label className="form-label" htmlFor="phone">
+                Telefoonnummer <span style={{ color: 'var(--color-primary, #650B19)', fontWeight: 800 }}>*</span>:
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                className="form-control"
+                placeholder="bv. 0470 12 34 56"
+                maxLength={40}
+                required
+              />
+              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted, #64748B)', marginTop: 4, display: 'block' }}>
+                Onze uniformverantwoordelijke neemt via bericht (SMS / WhatsApp) of telefonisch contact met je op om de afhaling af te spreken.
+              </span>
+            </div>
+
             <div className="form-group" style={{ marginBottom: 24 }}>
-              <label className="form-label" htmlFor="email">E-mailadres:</label>
+              <label className="form-label" htmlFor="email">
+                E-mailadres <span style={{ color: 'var(--color-text-muted, #64748B)', fontWeight: 400 }}>(optioneel voor bevestigingsmail)</span>:
+              </label>
               <input
                 type="email"
                 id="email"
@@ -135,8 +161,10 @@ export default function CheckoutForm() {
                 className="form-control"
                 placeholder="jouw.naam@domein.be"
                 maxLength={160}
-                required
               />
+              <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted, #64748B)', marginTop: 4, display: 'block' }}>
+                Enkel invullen indien u een bevestigingsmail wenst. U kan uw bestelbevestiging ook downloaden op de volgende pagina.
+              </span>
             </div>
 
             {/* Betalingskeuze */}
@@ -165,7 +193,7 @@ export default function CheckoutForm() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 800, color: 'var(--color-primary-dark, #162544)', fontSize: '0.96rem' }}>
                       <i className="fa-solid fa-building-columns" style={{ color: 'var(--color-primary, #650B19)' }}></i>
-                      <span>Overschrijving</span>
+                      <span>Betaling via overschrijving</span>
                     </div>
                     <input
                       type="radio"
@@ -176,11 +204,11 @@ export default function CheckoutForm() {
                     />
                   </div>
                   <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted, #64748B)', lineHeight: 1.4 }}>
-                    Je ontvangt een overschrijvingsmededeling en ons IBAN-rekeningnummer.
+                    Onze IBAN en unieke gestructureerde mededeling verschijnen op het volgende scherm (en per mail indien ingevuld).
                   </span>
                 </div>
 
-                {/* Optie 2: Cash */}
+                {/* Optie 2: Cash / Payconiq */}
                 <div
                   onClick={() => setPaymentMethod('cash')}
                   style={{
@@ -199,7 +227,7 @@ export default function CheckoutForm() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 800, color: 'var(--color-primary-dark, #162544)', fontSize: '0.96rem' }}>
                       <i className="fa-solid fa-money-bill-wave" style={{ color: '#166534' }}></i>
-                      <span>Cash bij afhaling</span>
+                      <span>Betaling bij afhaling (Cash / Payconiq)</span>
                     </div>
                     <input
                       type="radio"
@@ -210,7 +238,7 @@ export default function CheckoutForm() {
                     />
                   </div>
                   <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted, #64748B)', lineHeight: 1.4 }}>
-                    Je betaalt het gepaste bedrag contant wanneer je je bestelling afhaalt.
+                    Betaal bij afhaling met Payconiq of cash. <strong>Let op:</strong> cash betaling vereist een <strong>gepaste hoeveelheid cash</strong>.
                   </span>
                 </div>
 
@@ -220,11 +248,11 @@ export default function CheckoutForm() {
             {/* Afhaalinfo */}
             <div style={{ background: 'var(--color-bg-linen)', borderRadius: 'var(--border-radius-md)', padding: '16px 20px', border: '1px solid var(--color-border)', marginBottom: 24 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--color-primary-dark)', fontWeight: 800, fontSize: '0.92rem', marginBottom: 6 }}>
-                <i className="fa-solid fa-circle-info"></i>
-                <span>Afhaling van je bestelling</span>
+                <i className="fa-solid fa-comments"></i>
+                <span>Afspraak afhaling via bericht</span>
               </div>
               <p style={{ margin: 0, fontSize: '0.86rem', color: 'var(--color-text-dark)', lineHeight: 1.5 }}>
-                De webshopverantwoordelijke ontvangt jouw bestelling en neemt per e-mail contact op om een afhaalmoment af te spreken.
+                De afhaling van je bestelling wordt rechtstreeks besproken met onze uniformverantwoordelijke. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op!
               </p>
             </div>
 
@@ -262,7 +290,7 @@ export default function CheckoutForm() {
             </div>
           </div>
 
-          <a href="/shop" className="btn btn-outline" style={{ width: '100%', textAlign: 'center' }}>
+          <a href="/webwinkel" className="btn btn-outline" style={{ width: '100%', textAlign: 'center' }}>
             ← Verder winkelen
           </a>
         </div>

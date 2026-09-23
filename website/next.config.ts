@@ -25,6 +25,35 @@ const nextConfig: NextConfig = {
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
         ],
       },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: '/shop',
+        destination: '/webwinkel',
+        permanent: true,
+      },
+      {
+        source: '/shop/checkout',
+        destination: '/webwinkel/afrekenen',
+        permanent: true,
+      },
+      {
+        source: '/shop/bevestiging',
+        destination: '/webwinkel/bevestiging',
+        permanent: true,
+      },
+      {
+        source: '/portaal/webshop/stocks',
+        destination: '/portaal/webshop/stock',
+        permanent: false,
+      },
+      {
+        source: '/portaal/webshop/voorraad',
+        destination: '/portaal/webshop/stock',
+        permanent: false,
+      },
     ]
   },
 };

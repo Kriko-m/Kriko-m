@@ -19,14 +19,14 @@ export default function ShopProductCard({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] ?? 'Standaard')
   const [added, setAdded] = useState(false)
 
-  function handleAdd() {
+  function handleAdd(e: React.MouseEvent<HTMLButtonElement>) {
     addItem({
       id: product.id,
       name: product.name,
       price: product.price,
       size: selectedSize,
       image: product.image,
-    })
+    }, e)
     setAdded(true)
     setTimeout(() => setAdded(false), 1500)
   }
