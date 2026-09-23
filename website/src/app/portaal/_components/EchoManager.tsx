@@ -523,24 +523,6 @@ export default function EchoManager({ initialEchos, isGroepsleiding = false }: P
                         ✕
                       </button>
                     </div>
-
-                    {echoDroppedFile.size > 3.5 * 1024 * 1024 && (
-                      <div style={{
-                        marginTop: 4,
-                        padding: '10px 14px',
-                        borderRadius: 10,
-                        background: '#FEF3C7',
-                        border: '1px solid #FDE68A',
-                        color: '#92400E',
-                        fontSize: '0.84rem',
-                        fontWeight: 600,
-                        maxWidth: 420,
-                        textAlign: 'left',
-                        lineHeight: 1.45,
-                      }}>
-                        💡 <strong>Tip voor leiding:</strong> Dit bestand is {(echoDroppedFile.size / (1024 * 1024)).toFixed(1)} MB. Uploaden werkt gewoon, maar kies in Canva bij voorkeur voor &quot;PDF - Standaard&quot; i.p.v. Afdrukkwaliteit. Dan opent hij nóg sneller op de smartphone van ouders!
-                      </div>
-                    )}
                   </div>
                 ) : (
                   <>
