@@ -8,7 +8,11 @@ import EditableText from '@/components/editing/EditableText'
 
 type ModalType = 'bestellen' | 'afhaling' | 'uniform' | null
 
-export default function ShopInfoModals() {
+interface ShopInfoModalsProps {
+  bankIban?: string
+}
+
+export default function ShopInfoModals({ bankIban = 'BE59 7360 6413 2626' }: ShopInfoModalsProps) {
   const [activeModal, setActiveModal] = useState<ModalType>(null)
   const [mounted, setMounted] = useState(false)
 
@@ -142,7 +146,7 @@ export default function ShopInfoModals() {
                         </p>
                         <ul style={{ margin: 0, paddingLeft: 18, fontSize: '0.88rem', color: '#4A5568', lineHeight: 1.6 }}>
                           <li style={{ marginBottom: 6 }}>
-                            <strong>Betaling via overschrijving:</strong> Schrijf het bedrag over naar onze rekening (<code style={{ background: '#F0ECE4', padding: '2px 6px', borderRadius: 4, fontWeight: 700, color: 'var(--color-primary-dark)' }}>BE59 7360 6413 2626</code>) met vermelding van je unieke mededeling (bv. <code style={{ background: '#F0ECE4', padding: '2px 6px', borderRadius: 4, fontWeight: 700, color: 'var(--color-primary-dark)' }}>KM-0042</code>).
+                            <strong>Betaling via overschrijving:</strong> Schrijf het bedrag over naar onze rekening (<code style={{ background: '#F0ECE4', padding: '2px 6px', borderRadius: 4, fontWeight: 700, color: 'var(--color-primary-dark)' }}>{bankIban}</code>) met vermelding van je unieke mededeling (bv. <code style={{ background: '#F0ECE4', padding: '2px 6px', borderRadius: 4, fontWeight: 700, color: 'var(--color-primary-dark)' }}>KM-0042</code>).
                           </li>
                           <li>
                             <strong>Betaling bij afhaling (Cash / Payconiq):</strong> Betaal ter plaatse cash of via Payconiq. <em>Belangrijk:</em> bij contante betaling vragen we <strong>steeds een gepaste hoeveelheid cash</strong> mee te brengen.

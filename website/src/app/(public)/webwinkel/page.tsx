@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getShopProducts } from '@/lib/db'
+import { getShopProducts, getSettings } from '@/lib/db'
 import ShopProductCard from '@/components/shop/ShopProductCard'
 import KentekenCard from '@/components/shop/KentekenCard'
 import CartDrawer from '@/components/shop/CartDrawer'
@@ -10,13 +10,16 @@ import { Product } from '@/lib/types'
 export const metadata: Metadata = { title: 'Webwinkel — Uniformen' }
 
 export default async function WebwinkelPage() {
-  const products = (await getShopProducts()) as Product[]
+  const [products, settings] = await Promise.all([
+    getShopProducts() as Promise<Product[]>,
+    getSettings(),
+  ])
 
   // Main 3 items: T-shirt, Trui, Groepsdas
-  const mainProducts = products.filter(p => p.category !== 'kentekens')
+  const mainProducts = (products ?? []).filter(p => p.category !== 'kentekens')
   
   // Kentekens collection (~12 badges)
-  const kentekens = products.filter(p => p.category === 'kentekens')
+  const kentekens = (products ?? []).filter(p => p.category === 'kentekens')
 
   return (
     <>
@@ -36,7 +39,7 @@ export default async function WebwinkelPage() {
 
       <section className="section container section--no-top">
         {/* 3 Info Knoppen met Pop-out Modals (Bestellen, Afhaling, Hopper) */}
-        <ShopInfoModals />
+        <ShopInfoModals bankIban={settings?.bank_iban} />
 
         {/* 1. HOOFDARTIKELEN (T-Shirt, Trui, Groepsdas) */}
         <div style={{ marginBottom: 50 }}>

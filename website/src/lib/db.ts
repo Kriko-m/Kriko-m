@@ -7,6 +7,8 @@ export function normalizeSettings(data: any): any {
   const pb = data.portal_backgrounds ?? {}
   return {
     ...data,
+    bank_iban: data.bank_iban || pb.bank_iban || 'BE59 7360 6413 2626',
+    bank_holder: data.bank_holder || pb.bank_holder || 'Scouts Kriko-M vzw',
     webshop_phone: data.webshop_phone ?? pb.webshop_phone ?? '',
     home_title_leiding: data.home_title_leiding ?? null,
     home_subtitle_leiding: data.home_subtitle_leiding ?? null,

@@ -77,11 +77,13 @@ function normalizeStatus(status?: string): 'niet_betaald' | 'betaald' | 'afgehaa
 
 export default function WebshopPageClient({
   initialSettings,
-  role: _role,
+  role = '',
   activeTab,
   initialOrders = [],
   initialShopProducts = [],
 }: Props) {
+  const isGroepsleiding = role === 'admin' || role === 'groepsleiding'
+
   // Settings State
   const [webshopEmail, setWebshopEmail] = useState(initialSettings?.webshop_email || '')
   const [webshopPhone, setWebshopPhone] = useState(initialSettings?.webshop_phone || '')
@@ -89,6 +91,8 @@ export default function WebshopPageClient({
   const [enableCustomerEmail, setEnableCustomerEmail] = useState(initialSettings?.webshop_enable_customer_email !== false)
   const [enableFinancialEmail, setEnableFinancialEmail] = useState(initialSettings?.webshop_enable_financial_email !== false)
   const [enableTeamEmail, setEnableTeamEmail] = useState(initialSettings?.webshop_enable_team_email !== false)
+  const [bankIban, setBankIban] = useState(initialSettings?.bank_iban || 'BE59 7360 6413 2626')
+  const [bankHolder, setBankHolder] = useState(initialSettings?.bank_holder || 'Scouts Kriko-M vzw')
   const [savingSettings, setSavingSettings] = useState(false)
   const [flashMessage, setFlashMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
@@ -247,17 +251,23 @@ export default function WebshopPageClient({
   async function handleSaveSettings() {
     setSavingSettings(true)
     try {
+      const payload: Record<string, unknown> = {
+        webshop_email: webshopEmail.trim(),
+        webshop_phone: webshopPhone.trim(),
+        webshop_financial_email: webshopFinancialEmail.trim(),
+        webshop_enable_customer_email: enableCustomerEmail,
+        webshop_enable_financial_email: enableFinancialEmail,
+        webshop_enable_team_email: enableTeamEmail,
+      }
+      if (isGroepsleiding) {
+        payload.bank_iban = bankIban.trim()
+        payload.bank_holder = bankHolder.trim()
+      }
+
       const res = await fetch('/api/admin/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          webshop_email: webshopEmail.trim(),
-          webshop_phone: webshopPhone.trim(),
-          webshop_financial_email: webshopFinancialEmail.trim(),
-          webshop_enable_customer_email: enableCustomerEmail,
-          webshop_enable_financial_email: enableFinancialEmail,
-          webshop_enable_team_email: enableTeamEmail,
-        }),
+        body: JSON.stringify(payload),
       })
       if (!res.ok) throw new Error('Opslaan van instellingen mislukt')
       showNotification('success', 'Webshop instellingen succesvol opgeslagen!')
@@ -2259,6 +2269,134 @@ export default function WebshopPageClient({
                 }}>
                   <i className="fa-solid fa-triangle-exclamation"></i>
                   <span>Het webshopteam ontvangt geen automatische notificatiemail bij nieuwe bestellingen.</span>
+                </div>
+              )}
+            </div>
+
+            {/* 4. Rekeningnummer & Betaalgegevens (Overschrijvingen) */}
+            <div style={{
+              backgroundColor: '#F8FAFC',
+              borderRadius: 16,
+              border: '1.5px solid #CBD5E1',
+              padding: '22px 26px',
+              transition: 'all 0.2s ease',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 10,
+                    backgroundColor: '#EBF0F9',
+                    color: '#243B6B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1rem',
+                  }}>
+                    <i className="fa-solid fa-building-columns"></i>
+                  </div>
+                  <div>
+                    <strong style={{ fontSize: '1.08rem', color: '#162544', display: 'block', lineHeight: 1.2 }}>
+                      Rekeningnummer Overschrijvingen (IBAN)
+                    </strong>
+                    <span style={{
+                      fontSize: '0.72rem',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                      color: isGroepsleiding ? '#15803D' : '#64748B',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      marginTop: 2,
+                    }}>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: isGroepsleiding ? '#16A34A' : '#94A3B8' }}></span>
+                      {isGroepsleiding ? 'Beheer door Groepsleiding' : 'Alleen-lezen (Groepsleiding)'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <p style={{ margin: '0 0 16px', fontSize: '0.86rem', color: '#64748B', lineHeight: 1.5 }}>
+                Naar dit bankrekeningnummer schrijven kopers het bedrag over bij een webshopbestelling. Dit nummer wordt automatisch vermeld in de bevestigingsmail, de bestel-PDF en op de website.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 6 }}>
+                    Rekeningnummer (IBAN)
+                  </label>
+                  <input
+                    type="text"
+                    value={bankIban}
+                    onChange={e => setBankIban(e.target.value)}
+                    placeholder="BE59 7360 6413 2626"
+                    disabled={!isGroepsleiding}
+                    style={{
+                      width: '100%',
+                      maxWidth: 500,
+                      padding: '10px 14px',
+                      border: '1.5px solid #CBD5E1',
+                      borderRadius: 8,
+                      fontSize: '0.95rem',
+                      fontFamily: 'monospace',
+                      fontWeight: 700,
+                      letterSpacing: '0.05em',
+                      color: '#162544',
+                      backgroundColor: isGroepsleiding ? '#FFFFFF' : '#F1F5F9',
+                      cursor: isGroepsleiding ? 'text' : 'not-allowed',
+                      opacity: isGroepsleiding ? 1 : 0.7,
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 6 }}>
+                    Naam Rekeninghouder / Begunstigde
+                  </label>
+                  <input
+                    type="text"
+                    value={bankHolder}
+                    onChange={e => setBankHolder(e.target.value)}
+                    placeholder="Scouts Kriko-M vzw"
+                    disabled={!isGroepsleiding}
+                    style={{
+                      width: '100%',
+                      maxWidth: 500,
+                      padding: '10px 14px',
+                      border: '1.5px solid #CBD5E1',
+                      borderRadius: 8,
+                      fontSize: '0.92rem',
+                      fontWeight: 700,
+                      color: '#162544',
+                      backgroundColor: isGroepsleiding ? '#FFFFFF' : '#F1F5F9',
+                      cursor: isGroepsleiding ? 'text' : 'not-allowed',
+                      opacity: isGroepsleiding ? 1 : 0.7,
+                    }}
+                  />
+                  <span style={{ fontSize: '0.8rem', color: '#64748B', marginTop: 4, display: 'block' }}>
+                    De officiële benaming van de rekening (bv. &ldquo;Scouts Kriko-M vzw&rdquo;).
+                  </span>
+                </div>
+              </div>
+
+              {!isGroepsleiding && (
+                <div style={{
+                  marginTop: 14,
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #CBD5E1',
+                  color: '#475569',
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}>
+                  <i className="fa-solid fa-lock" style={{ color: '#64748B' }}></i>
+                  <span>Het bankrekeningnummer kan enkel gewijzigd worden door accounts met de rol Groepsleiding.</span>
                 </div>
               )}
             </div>

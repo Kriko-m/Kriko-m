@@ -53,6 +53,14 @@ export async function PATCH(req: NextRequest) {
         pbChanged = true
       }
     }
+    if ('bank_iban' in body) {
+      pb.bank_iban = String(body.bank_iban).slice(0, 50)
+      pbChanged = true
+    }
+    if ('bank_holder' in body) {
+      pb.bank_holder = String(body.bank_holder).slice(0, 150)
+      pbChanged = true
+    }
   }
 
   for (const field of WEBSHOP_BOOLEAN_FIELDS) {
