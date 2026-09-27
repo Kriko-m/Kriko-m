@@ -312,6 +312,34 @@ export default function PortaalSidebar({ naam, role, mobileOpen = false, onClose
                   }}></i>
                   <span>Voorraad</span>
                 </Link>
+
+                <Link
+                  href="/portaal/webshop/instellingen"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '11px 14px',
+                    borderRadius: 10,
+                    textDecoration: 'none',
+                    fontSize: '0.92rem',
+                    fontWeight: pathname === '/portaal/webshop/instellingen' ? 800 : 600,
+                    color: '#FFFFFF',
+                    background: pathname === '/portaal/webshop/instellingen' ? '#243B6B' : 'transparent',
+                    boxShadow: pathname === '/portaal/webshop/instellingen' ? '0 2px 8px rgba(0, 0, 0, 0.25)' : 'none',
+                    transition: 'all 0.15s ease',
+                    flexShrink: 0,
+                  }}
+                  className={`portaal-sidebar-item ${pathname === '/portaal/webshop/instellingen' ? 'active' : ''}`}
+                >
+                  <i className="fa-solid fa-gear" style={{
+                    fontSize: '1rem',
+                    width: 20,
+                    textAlign: 'center',
+                    color: pathname === '/portaal/webshop/instellingen' ? '#FFFFFF' : 'rgba(255, 255, 255, 0.75)',
+                  }}></i>
+                  <span>Instellingen</span>
+                </Link>
               </>
             )}
 

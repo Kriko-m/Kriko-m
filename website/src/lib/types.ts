@@ -14,6 +14,7 @@ export interface Settings {
   bank_holder: string
   contact_email: string
   webshop_email?: string
+  webshop_phone?: string
   webshop_financial_email?: string
   webshop_enable_customer_email?: boolean
   webshop_enable_financial_email?: boolean

@@ -15,9 +15,7 @@ export default async function WebshopInstellingenPage() {
   if (error || !verified) redirect('/portaal')
 
   const role = verified.app_metadata?.role || ''
-  if (role === 'webshop') redirect('/portaal/webshop/bestellingen')
-
-  const isAuthorized = role === 'admin' || role === 'groepsleiding'
+  const isAuthorized = role === 'admin' || role === 'groepsleiding' || role === 'webshop'
   if (!isAuthorized) redirect('/portaal/home')
 
   const admin = createAdminClient()

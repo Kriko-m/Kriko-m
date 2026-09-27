@@ -10,6 +10,7 @@ interface OrderData {
   bank_iban: string
   bank_holder: string
   webshop_email?: string
+  webshop_phone?: string
   payment_method?: 'overschrijving' | 'cash'
   customer_name?: string
   phone?: string
@@ -156,7 +157,11 @@ export default function BevestigingPage() {
       doc.setFont('helvetica', 'normal')
       doc.setFontSize(9)
       doc.setTextColor(100, 100, 100)
-      doc.text('Afhaling wordt rechtstreeks via bericht besproken met de uniformverantwoordelijke.', 40, y)
+      if (order.webshop_phone) {
+        doc.text(`Afhaling wordt rechtstreeks besproken met de uniformverantwoordelijke (tel: ${order.webshop_phone}).`, 40, y)
+      } else {
+        doc.text('Afhaling wordt rechtstreeks via bericht besproken met de uniformverantwoordelijke.', 40, y)
+      }
       doc.text('Scouts Kriko-M vzw | Industriepark-Noord 33, 9100 Sint-Niklaas | groepsleiding@kriko-m.be', 40, y + 16)
 
       // Save PDF file to trigger download
@@ -261,6 +266,17 @@ export default function BevestigingPage() {
             <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
               De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op via <strong>{order.phone || 'je telefoonnummer'}</strong>.
             </p>
+            {order.webshop_phone && (
+              <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem', color: '#1A3D2A', backgroundColor: '#EEF5F1', padding: '12px 16px', borderRadius: 8, border: '1px solid #C2D9C9' }}>
+                <i className="fa-solid fa-phone" style={{ color: '#166534' }}></i>
+                <span>
+                  Vragen over de afhaling? Contacteer onze uniformverantwoordelijke op{' '}
+                  <a href={`tel:${order.webshop_phone.replace(/\s+/g, '')}`} style={{ fontWeight: 800, color: '#1A3D2A', textDecoration: 'underline' }}>
+                    {order.webshop_phone}
+                  </a>.
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Bestelde artikelen */}

@@ -84,6 +84,7 @@ export default function WebshopPageClient({
 }: Props) {
   // Settings State
   const [webshopEmail, setWebshopEmail] = useState(initialSettings?.webshop_email || '')
+  const [webshopPhone, setWebshopPhone] = useState(initialSettings?.webshop_phone || '')
   const [webshopFinancialEmail, setWebshopFinancialEmail] = useState(initialSettings?.webshop_financial_email || '')
   const [enableCustomerEmail, setEnableCustomerEmail] = useState(initialSettings?.webshop_enable_customer_email !== false)
   const [enableFinancialEmail, setEnableFinancialEmail] = useState(initialSettings?.webshop_enable_financial_email !== false)
@@ -251,6 +252,7 @@ export default function WebshopPageClient({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           webshop_email: webshopEmail.trim(),
+          webshop_phone: webshopPhone.trim(),
           webshop_financial_email: webshopFinancialEmail.trim(),
           webshop_enable_customer_email: enableCustomerEmail,
           webshop_enable_financial_email: enableFinancialEmail,
@@ -2213,6 +2215,32 @@ export default function WebshopPageClient({
                     opacity: enableTeamEmail ? 1 : 0.65,
                   }}
                 />
+              </div>
+
+              <div style={{ marginTop: 16 }}>
+                <label style={{ display: 'block', fontSize: '0.76rem', fontWeight: 800, color: '#162544', textTransform: 'uppercase', marginBottom: 6 }}>
+                  Telefoonnummer / GSM Uniformverantwoordelijke
+                </label>
+                <input
+                  type="tel"
+                  value={webshopPhone}
+                  onChange={e => setWebshopPhone(e.target.value)}
+                  placeholder="bv. 0470 12 34 56"
+                  style={{
+                    width: '100%',
+                    maxWidth: 500,
+                    padding: '10px 14px',
+                    border: '1.5px solid #CBD5E1',
+                    borderRadius: 8,
+                    fontSize: '0.92rem',
+                    fontWeight: 700,
+                    color: '#162544',
+                    backgroundColor: '#FFFFFF',
+                  }}
+                />
+                <span style={{ fontSize: '0.8rem', color: '#64748B', marginTop: 4, display: 'block' }}>
+                  Dit nummer wordt getoond op de bestelbevestiging, de PDF en in de e-mail naar de koper voor vragen rond de afhaling van uniformen.
+                </span>
               </div>
 
               {!enableTeamEmail && (

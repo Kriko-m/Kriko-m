@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
     const bankIban = settings?.bank_iban || 'BE59 7360 6413 2626'
     const bankHolder = settings?.bank_holder || 'Scouts Kriko-M vzw'
     const webshopEmail = settings?.webshop_email || 'groepsleiding@kriko-m.be'
+    const webshopPhone = settings?.webshop_phone || ''
     const webshopFinancialEmail = settings?.webshop_financial_email || ''
     const enableCustomerEmail = settings?.webshop_enable_customer_email !== false
     const enableTeamEmail = settings?.webshop_enable_team_email !== false
@@ -177,6 +178,8 @@ export async function POST(req: NextRequest) {
           bankIban,
           bankHolder,
           paymentMethod,
+          webshopEmail,
+          webshopPhone,
         }).catch((mailErr) => {
           console.error('Koper bevestigingsmail mislukt:', mailErr)
         })
@@ -236,6 +239,7 @@ export async function POST(req: NextRequest) {
       bank_iban: bankIban,
       bank_holder: bankHolder,
       webshop_email: webshopEmail,
+      webshop_phone: webshopPhone,
       payment_method: paymentMethod,
       customer_name: trimmedName,
       phone: trimmedPhone,

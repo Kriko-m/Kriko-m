@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS settings (
   bank_holder               TEXT    NOT NULL DEFAULT '',
   contact_email             TEXT    NOT NULL DEFAULT 'groepsleiding@kriko-m.be',
   webshop_email             TEXT    NOT NULL DEFAULT 'groepsleiding@kriko-m.be',
+  webshop_phone             TEXT    NOT NULL DEFAULT '',
   contact_phone             TEXT    NOT NULL DEFAULT '',
   contact_address           TEXT    NOT NULL DEFAULT '',
   reg_fee_first             NUMERIC(8,2) NOT NULL DEFAULT 50.00,

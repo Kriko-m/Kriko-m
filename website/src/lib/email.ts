@@ -29,10 +29,12 @@ interface OrderConfirmationParams {
   bankIban: string
   bankHolder: string
   paymentMethod?: 'overschrijving' | 'cash'
+  webshopEmail?: string
+  webshopPhone?: string
 }
 
 export function createOrderPdfBuffer(params: OrderConfirmationParams): Buffer {
-  const { orderRef, customerName, phone, items, total, communication, bankIban, bankHolder, paymentMethod = 'overschrijving' } = params
+  const { orderRef, customerName, phone, items, total, communication, bankIban, bankHolder, paymentMethod = 'overschrijving', webshopPhone } = params
   const isCash = paymentMethod === 'cash'
 
   const doc = new jsPDF({ unit: 'pt', format: 'a4' })
@@ -130,7 +132,11 @@ export function createOrderPdfBuffer(params: OrderConfirmationParams): Buffer {
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
   doc.setTextColor(100, 100, 100)
-  doc.text('Afhaling wordt rechtstreeks besproken met de uniformverantwoordelijke.', 40, y)
+  if (webshopPhone) {
+    doc.text(`Afhaling wordt rechtstreeks besproken met de uniformverantwoordelijke (tel: ${webshopPhone}).`, 40, y)
+  } else {
+    doc.text('Afhaling wordt rechtstreeks besproken met de uniformverantwoordelijke.', 40, y)
+  }
   doc.text('Scouts Kriko-M vzw | Industriepark-Noord 33, 9100 Sint-Niklaas | groepsleiding@kriko-m.be', 40, y + 16)
 
   const arrayBuffer = doc.output('arraybuffer')
@@ -144,7 +150,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     return
   }
 
-  const { to, orderRef, customerName, items, total, communication, bankIban, bankHolder, paymentMethod = 'overschrijving' } = params
+  const { to, orderRef, customerName, items, total, communication, bankIban, bankHolder, paymentMethod = 'overschrijving', webshopPhone } = params
 
   const isCash = paymentMethod === 'cash'
 
@@ -202,7 +208,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
         ${paymentBlockHtml}
 
         <p style="margin:22px 0 0;font-size:13px;color:#666;line-height:1.5;">
-          De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen binnenkort contact met je op.
+          De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen binnenkort contact met je op.${webshopPhone ? `<br/>Vragen over de afhaling? Je kan onze uniformverantwoordelijke ook bereiken via <strong>${esc(webshopPhone)}</strong>.` : ''}
         </p>
         
         <div style="margin:20px 0 0;padding-top:16px;border-top:1px solid #eee;font-size:13px;color:#888;line-height:1.4;">
@@ -240,7 +246,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     ``,
     ...paymentTextLines,
     ``,
-    `De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke.`,
+    `De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke.${webshopPhone ? ` (Vragen rond afhaling? Tel: ${webshopPhone})` : ''}`,
     ``,
     `Stevige linkerhand,`,
     `Scouts Kriko-M vzw`,

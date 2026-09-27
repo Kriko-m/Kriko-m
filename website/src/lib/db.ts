@@ -4,8 +4,10 @@ import { createAdminClient } from './supabase'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function normalizeSettings(data: any): any {
   if (!data) return data
+  const pb = data.portal_backgrounds ?? {}
   return {
     ...data,
+    webshop_phone: data.webshop_phone ?? pb.webshop_phone ?? '',
     home_title_leiding: data.home_title_leiding ?? null,
     home_subtitle_leiding: data.home_subtitle_leiding ?? null,
     home_title_groepsleiding: data.home_title_groepsleiding ?? null,

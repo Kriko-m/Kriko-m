@@ -62,6 +62,11 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
+  if ('webshop_phone' in body) {
+    pb.webshop_phone = String(body.webshop_phone).slice(0, 100)
+    pbChanged = true
+  }
+
   const update: Record<string, unknown> = {}
   if (pbChanged) {
     update.portal_backgrounds = pb
@@ -74,6 +79,7 @@ export async function PATCH(req: NextRequest) {
     'bank_holder',
     'contact_email',
     'webshop_email',
+    'webshop_phone',
     'webshop_financial_email',
     'reg_fee_first',
     'reg_fee_extra',
@@ -84,8 +90,8 @@ export async function PATCH(req: NextRequest) {
 
   for (const key of STANDARD_SQL_FIELDS) {
     if (key in body) {
-      // If not groepsleiding, only allow webshop email fields
-      if (!isGroepsleiding && key !== 'webshop_email' && key !== 'webshop_financial_email') {
+      // If not groepsleiding, only allow webshop email and phone fields
+      if (!isGroepsleiding && key !== 'webshop_email' && key !== 'webshop_phone' && key !== 'webshop_financial_email') {
         continue
       }
       if (key === 'reg_fee_first' || key === 'reg_fee_extra') {
