@@ -207,9 +207,15 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
 
         ${paymentBlockHtml}
 
-        <p style="margin:22px 0 0;font-size:13px;color:#666;line-height:1.5;">
-          De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen binnenkort contact met je op.${webshopPhone ? `<br/>Vragen over de afhaling? Je kan onze uniformverantwoordelijke ook bereiken via <strong>${esc(webshopPhone)}</strong>.` : ''}
-        </p>
+        <div style="background:#FAF6EE;border:1px solid #EADECC;border-radius:8px;padding:14px 18px;margin-top:20px;">
+          <strong style="color:#162544;font-size:14px;display:block;margin-bottom:4px;">Afhaling van je bestelling</strong>
+          <p style="margin:0;font-size:13px;color:#444;line-height:1.5;">
+            ${webshopPhone 
+              ? `Onze uniformverantwoordelijke neemt via WhatsApp, SMS of telefonisch contact met je op via <strong>${esc(webshopPhone)}</strong> om de afhaling af te spreken.` 
+              : `De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen binnenkort contact met je op.`}
+          </p>
+          ${webshopPhone ? `<p style="margin:8px 0 0;font-size:12px;color:#666;">Vragen over de afhaling? Je kan onze uniformverantwoordelijke ook bereiken op <a href="tel:${esc(webshopPhone.replace(/\s+/g, ''))}" style="color:#650B19;font-weight:bold;text-decoration:underline;">${esc(webshopPhone)}</a>.</p>` : ''}
+        </div>
         
         <div style="margin:20px 0 0;padding-top:16px;border-top:1px solid #eee;font-size:13px;color:#888;line-height:1.4;">
           Stevige linkerhand,<br/>
@@ -246,7 +252,7 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
     ``,
     ...paymentTextLines,
     ``,
-    `De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke.${webshopPhone ? ` (Vragen rond afhaling? Tel: ${webshopPhone})` : ''}`,
+    `Afhaling: De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke.${webshopPhone ? ` Zij nemen contact met je op via ${webshopPhone} (ook bereikbaar voor vragen).` : ''}`,
     ``,
     `Stevige linkerhand,`,
     `Scouts Kriko-M vzw`,

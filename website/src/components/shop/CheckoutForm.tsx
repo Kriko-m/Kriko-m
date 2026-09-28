@@ -4,11 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useCart } from '@/components/shop/CartProvider'
 import { formatPrice } from '@/lib/utils'
 
-interface CheckoutFormProps {
-  webshopPhone?: string
-}
-
-export default function CheckoutForm({ webshopPhone }: CheckoutFormProps = {}) {
+export default function CheckoutForm() {
   const { items, totalPrice, clearCart } = useCart()
   const router = useRouter()
   const [status, setStatus] = useState<'idle' | 'sending'>('idle')
@@ -61,7 +57,7 @@ export default function CheckoutForm({ webshopPhone }: CheckoutFormProps = {}) {
           bank_iban: data.bank_iban || 'BE59 7360 6413 2626',
           bank_holder: data.bank_holder || 'Scouts Kriko-M vzw',
           webshop_email: data.webshop_email || 'bestellingen@kriko-m.be',
-          webshop_phone: data.webshop_phone || webshopPhone || '',
+          webshop_phone: data.webshop_phone || '',
           payment_method: data.payment_method || paymentMethod,
           customer_name: data.customer_name || fd.get('customer_name') || '',
           phone: data.phone || fd.get('phone') || '',
@@ -151,7 +147,7 @@ export default function CheckoutForm({ webshopPhone }: CheckoutFormProps = {}) {
                 required
               />
               <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted, #64748B)', marginTop: 4, display: 'block' }}>
-                Onze uniformverantwoordelijke{webshopPhone ? ` (${webshopPhone})` : ''} neemt via bericht (SMS / WhatsApp) of telefonisch contact met je op om de afhaling af te spreken.
+                Onze uniformverantwoordelijke neemt via bericht (SMS / WhatsApp) of telefonisch contact met je op om de afhaling af te spreken.
               </span>
             </div>
 
@@ -257,7 +253,7 @@ export default function CheckoutForm({ webshopPhone }: CheckoutFormProps = {}) {
                 <span>Afspraak afhaling via bericht</span>
               </div>
               <p style={{ margin: 0, fontSize: '0.86rem', color: 'var(--color-text-dark)', lineHeight: 1.5 }}>
-                De afhaling van je bestelling wordt rechtstreeks besproken met onze uniformverantwoordelijke{webshopPhone ? ` (${webshopPhone})` : ''}. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op!
+                De afhaling van je bestelling wordt rechtstreeks besproken met onze uniformverantwoordelijke. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op!
               </p>
             </div>
 

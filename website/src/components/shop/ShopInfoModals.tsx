@@ -10,12 +10,10 @@ type ModalType = 'bestellen' | 'afhaling' | 'uniform' | null
 
 interface ShopInfoModalsProps {
   bankIban?: string
-  webshopPhone?: string
 }
 
 export default function ShopInfoModals({
   bankIban = 'BE59 7360 6413 2626',
-  webshopPhone = '',
 }: ShopInfoModalsProps) {
   const [activeModal, setActiveModal] = useState<ModalType>(null)
   const [mounted, setMounted] = useState(false)
@@ -165,7 +163,7 @@ export default function ShopInfoModals({
                       <div className="shop-modal-step-text">
                         <h4>Afhaling wordt besproken via bericht</h4>
                         <p>
-                          Onze uniformverantwoordelijke{webshopPhone ? ` (${webshopPhone})` : ''} neemt rechtstreeks via bericht (SMS of WhatsApp) of telefonisch contact met je op om de afhaling af te spreken.
+                          Onze uniformverantwoordelijke neemt rechtstreeks via bericht (SMS of WhatsApp) of telefonisch contact met je op om de afhaling af te spreken.
                         </p>
                       </div>
                     </div>
@@ -223,7 +221,7 @@ export default function ShopInfoModals({
                       <div>
                         <h4>Afhaling via rechtstreeks bericht</h4>
                         <p>
-                          Het afhalen van bestellingen gebeurt niet zomaar aan de lokalen, maar wordt steeds <strong>rechtstreeks via bericht (SMS / WhatsApp) of telefonisch besproken met onze uniformverantwoordelijke{webshopPhone ? ` (${webshopPhone})` : ''}</strong>.
+                          Het afhalen van bestellingen gebeurt niet zomaar aan de lokalen, maar wordt steeds <strong>rechtstreeks via bericht (SMS / WhatsApp) of telefonisch besproken met onze uniformverantwoordelijke</strong>.
                         </p>
                       </div>
                     </div>
@@ -268,22 +266,7 @@ export default function ShopInfoModals({
                   <div className="shop-modal-callout" style={{ background: '#FAF6EE', borderColor: '#EADECC' }}>
                     <i className="fa-solid fa-circle-question" style={{ color: 'var(--color-primary)' }} aria-hidden="true" />
                     <div>
-                      <strong>Vragen over een bestelling of afhaling?</strong>{' '}
-                      {webshopPhone ? (
-                        <>
-                          Contacteer onze uniformverantwoordelijke op{' '}
-                          <a
-                            href={`tel:${webshopPhone.replace(/\s+/g, '')}`}
-                            style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'underline' }}
-                          >
-                            {webshopPhone}
-                          </a>{' '}
-                          of neem contact op via het{' '}
-                        </>
-                      ) : (
-                        'Neem gerust contact op via het '
-                      )}
-                      <Link href="/contact" onClick={closeModal} style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'underline' }}>contactformulier</Link>.
+                      <strong>Vragen over een bestelling of artikel?</strong> Neem gerust contact op via het <Link href="/contact" onClick={closeModal} style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'underline' }}>contactformulier</Link>.
                     </div>
                   </div>
                 </div>

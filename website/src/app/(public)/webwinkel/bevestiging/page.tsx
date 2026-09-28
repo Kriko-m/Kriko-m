@@ -199,7 +199,11 @@ export default function BevestigingPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.92rem', color: 'hsl(145,63%,20%)', fontWeight: 600 }}>
               <i className="fa-solid fa-comments" />
               <span>
-                Onze uniformverantwoordelijke neemt via bericht (SMS of WhatsApp) of telefonisch contact met je op{order.phone ? ` via ${order.phone}` : ''} om de afhaling af te spreken.
+                {order.webshop_phone ? (
+                  <>Onze uniformverantwoordelijke neemt contact met je op via <strong>{order.webshop_phone}</strong> (via WhatsApp, SMS of telefonisch) om de afhaling af te spreken.</>
+                ) : (
+                  <>Onze uniformverantwoordelijke neemt via bericht (SMS of WhatsApp) of telefonisch contact met je op om de afhaling af te spreken.</>
+                )}
               </span>
             </div>
           </div>
@@ -264,13 +268,21 @@ export default function BevestigingPage() {
               Afhaling van je bestelling
             </h3>
             <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
-              De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke{order.webshop_phone ? ` (${order.webshop_phone})` : ''}. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op via jouw nummer <strong>{order.phone || 'je telefoonnummer'}</strong>.
+              {order.webshop_phone ? (
+                <>
+                  De afhaling van je bestelling wordt rechtstreeks besproken met onze uniformverantwoordelijke. Zij nemen via WhatsApp, SMS of telefonisch contact met je op via <strong>{order.webshop_phone}</strong> om een afhaalmoment af te spreken.
+                </>
+              ) : (
+                <>
+                  De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op om de afhaling af te spreken.
+                </>
+              )}
             </p>
             {order.webshop_phone && (
               <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem', color: '#1A3D2A', backgroundColor: '#EEF5F1', padding: '12px 16px', borderRadius: 8, border: '1px solid #C2D9C9' }}>
                 <i className="fa-solid fa-phone" style={{ color: '#166534' }}></i>
                 <span>
-                  Vragen over de afhaling? Contacteer onze uniformverantwoordelijke op{' '}
+                  Vragen over de afhaling? Contacteer onze uniformverantwoordelijke rechtstreeks op{' '}
                   <a href={`tel:${order.webshop_phone.replace(/\s+/g, '')}`} style={{ fontWeight: 800, color: '#1A3D2A', textDecoration: 'underline' }}>
                     {order.webshop_phone}
                   </a>.

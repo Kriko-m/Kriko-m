@@ -39,7 +39,7 @@ export default async function WebwinkelPage() {
 
       <section className="section container section--no-top">
         {/* 3 Info Knoppen met Pop-out Modals (Bestellen, Afhaling, Hopper) */}
-        <ShopInfoModals bankIban={settings?.bank_iban} webshopPhone={settings?.webshop_phone} />
+        <ShopInfoModals bankIban={settings?.bank_iban} />
 
         {/* 1. HOOFDARTIKELEN (T-Shirt, Trui, Groepsdas) */}
         <div style={{ marginBottom: 50 }}>
