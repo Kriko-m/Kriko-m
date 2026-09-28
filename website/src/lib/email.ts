@@ -210,11 +210,9 @@ export async function sendOrderConfirmation(params: OrderConfirmationParams) {
         <div style="background:#FAF6EE;border:1px solid #EADECC;border-radius:8px;padding:14px 18px;margin-top:20px;">
           <strong style="color:#162544;font-size:14px;display:block;margin-bottom:4px;">Afhaling van je bestelling</strong>
           <p style="margin:0;font-size:13px;color:#444;line-height:1.5;">
-            ${webshopPhone 
-              ? `Onze uniformverantwoordelijke neemt via WhatsApp, SMS of telefonisch contact met je op via <strong>${esc(webshopPhone)}</strong> om de afhaling af te spreken.` 
-              : `De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen binnenkort contact met je op.`}
+            Bestelde artikelen worden niet per post verzonden, maar persoonlijk overhandigd aan onze lokalen. Onze uniformverantwoordelijke neemt binnenkort via bericht (WhatsApp / SMS) of telefonisch contact met je op om een geschikt afhaalmoment af te spreken.
           </p>
-          ${webshopPhone ? `<p style="margin:8px 0 0;font-size:12px;color:#666;">Vragen over de afhaling? Je kan onze uniformverantwoordelijke ook bereiken op <a href="tel:${esc(webshopPhone.replace(/\s+/g, ''))}" style="color:#650B19;font-weight:bold;text-decoration:underline;">${esc(webshopPhone)}</a>.</p>` : ''}
+          ${webshopPhone ? `<p style="margin:10px 0 0;font-size:13px;color:#1A3D2A;"><strong>Vragen over de afhaling?</strong> Contacteer onze uniformverantwoordelijke op <a href="tel:${esc(webshopPhone.replace(/\\s+/g, ''))}" style="color:#650B19;font-weight:bold;text-decoration:underline;">${esc(webshopPhone)}</a>.</p>` : ''}
         </div>
         
         <div style="margin:20px 0 0;padding-top:16px;border-top:1px solid #eee;font-size:13px;color:#888;line-height:1.4;">

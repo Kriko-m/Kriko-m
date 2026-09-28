@@ -189,23 +189,13 @@ export default function BevestigingPage() {
             <strong style={{ display: 'block', color: 'hsl(145,63%,25%)', fontSize: '1.2rem', marginBottom: 8 }}>
               ✓ Bestelling ontvangen — {orderRef}
             </strong>
-            <p style={{ color: 'hsl(145,63%,25%)', fontSize: '0.95rem', lineHeight: 1.55, margin: '0 0 10px' }}>
+            <p style={{ color: 'hsl(145,63%,25%)', fontSize: '0.95rem', lineHeight: 1.55, margin: 0 }}>
               {order.email ? (
-                <>Je bestelling is geregistreerd. Een bevestigingsmail met alle details is verzonden naar <strong>{order.email}</strong>.</>
+                <>Je bestelling is goed ontvangen. We hebben een bevestigingsmail met alle details verzonden naar <strong>{order.email}</strong>.</>
               ) : (
-                <>Je bestelling is succesvol geregistreerd. Je kan hieronder direct je bestelbevestiging downloaden voor je eigen administratie.</>
+                <>Je bestelling is goed ontvangen. Je kan hieronder direct je bestelbevestiging downloaden als PDF.</>
               )}
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: '0.92rem', color: 'hsl(145,63%,20%)', fontWeight: 600 }}>
-              <i className="fa-solid fa-comments" />
-              <span>
-                {order.webshop_phone ? (
-                  <>Onze uniformverantwoordelijke neemt contact met je op via <strong>{order.webshop_phone}</strong> (via WhatsApp, SMS of telefonisch) om de afhaling af te spreken.</>
-                ) : (
-                  <>Onze uniformverantwoordelijke neemt via bericht (SMS of WhatsApp) of telefonisch contact met je op om de afhaling af te spreken.</>
-                )}
-              </span>
-            </div>
           </div>
 
           {/* Betalingsinformatie */}
@@ -267,26 +257,18 @@ export default function BevestigingPage() {
             <h3 style={{ fontSize: '1.2rem', color: 'var(--color-primary-dark)', marginBottom: 12, paddingBottom: 8, borderBottom: '1px solid var(--color-bg-linen)' }}>
               Afhaling van je bestelling
             </h3>
-            <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
-              {order.webshop_phone ? (
-                <>
-                  De afhaling van je bestelling wordt rechtstreeks besproken met onze uniformverantwoordelijke. Zij nemen via WhatsApp, SMS of telefonisch contact met je op via <strong>{order.webshop_phone}</strong> om een afhaalmoment af te spreken.
-                </>
-              ) : (
-                <>
-                  De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op om de afhaling af te spreken.
-                </>
-              )}
+            <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: '0 0 12px' }}>
+              Bestelde artikelen worden niet verzonden, maar persoonlijk overhandigd aan onze lokalen. Onze uniformverantwoordelijke neemt binnenkort via bericht (WhatsApp / SMS) of telefonisch contact met je op om een geschikt afhaalmoment af te spreken.
             </p>
             {order.webshop_phone && (
-              <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem', color: '#1A3D2A', backgroundColor: '#EEF5F1', padding: '12px 16px', borderRadius: 8, border: '1px solid #C2D9C9' }}>
-                <i className="fa-solid fa-phone" style={{ color: '#166534' }}></i>
-                <span>
-                  Vragen over de afhaling? Contacteer onze uniformverantwoordelijke rechtstreeks op{' '}
-                  <a href={`tel:${order.webshop_phone.replace(/\s+/g, '')}`} style={{ fontWeight: 800, color: '#1A3D2A', textDecoration: 'underline' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: '0.92rem', color: '#1A3D2A', backgroundColor: '#EEF5F1', padding: '12px 18px', borderRadius: 8, border: '1px solid #C2D9C9' }}>
+                <i className="fa-solid fa-phone" style={{ color: '#166534', fontSize: '1.05rem' }}></i>
+                <div>
+                  <span style={{ display: 'block', fontSize: '0.8rem', color: '#4A6B56', fontWeight: 600 }}>Vragen over de afhaling? Contacteer onze uniformverantwoordelijke:</span>
+                  <a href={`tel:${order.webshop_phone.replace(/\s+/g, '')}`} style={{ fontWeight: 800, color: '#1A3D2A', textDecoration: 'underline', fontSize: '1.05rem' }}>
                     {order.webshop_phone}
-                  </a>.
-                </span>
+                  </a>
+                </div>
               </div>
             )}
           </div>
