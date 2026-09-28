@@ -3,6 +3,7 @@ import { getSettings, getSiteContent } from '@/lib/db'
 import PhotoGallery from '@/components/PhotoGallery'
 import EditableText from '@/components/editing/EditableText'
 import EditableImage from '@/components/editing/EditableImage'
+import ProtectedEmail from '@/components/anti-scraping/ProtectedEmail'
 
 export const metadata: Metadata = { title: 'Verhuur lokaal' }
 
@@ -112,6 +113,40 @@ export default async function VerhuurPage() {
             </a>
             .
           </p>
+
+          <div className="vh-contact-notice">
+            <div className="vh-contact-notice-icon">
+              <i className="fas fa-envelope-open-text" aria-hidden="true"></i>
+            </div>
+            <div className="vh-contact-notice-body">
+              <div className="vh-contact-notice-title">
+                <EditableText
+                  blockKey="verhuur.contact.title"
+                  page="verhuur"
+                  section="contact"
+                  field="title"
+                  defaultValue="Heb je vragen over de verhuur?"
+                  as="strong"
+                />
+              </div>
+              <p className="vh-contact-notice-text">
+                <EditableText
+                  blockKey="verhuur.contact.text"
+                  page="verhuur"
+                  section="contact"
+                  field="content"
+                  defaultValue="Aarzel niet om contact met ons op te nemen. Stuur gerust een mailtje naar "
+                  as="span"
+                />
+                <ProtectedEmail
+                  email="verhuur@kriko-m.be"
+                  showMailto
+                  className="vh-contact-email-link"
+                />
+                .
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="vh-block">
