@@ -264,7 +264,7 @@ export default function BevestigingPage() {
               Afhaling van je bestelling
             </h3>
             <p style={{ fontSize: '0.92rem', color: 'var(--color-text-dark)', lineHeight: 1.55, margin: 0 }}>
-              De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op via <strong>{order.phone || 'je telefoonnummer'}</strong>.
+              De afhaling van je bestelling wordt rechtstreeks besproken met de uniformverantwoordelijke{order.webshop_phone ? ` (${order.webshop_phone})` : ''}. Zij nemen via bericht (SMS of WhatsApp) of telefonisch contact met je op via jouw nummer <strong>{order.phone || 'je telefoonnummer'}</strong>.
             </p>
             {order.webshop_phone && (
               <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 10, fontSize: '0.9rem', color: '#1A3D2A', backgroundColor: '#EEF5F1', padding: '12px 16px', borderRadius: 8, border: '1px solid #C2D9C9' }}>
